@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analytics & BI | Category 03 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 03 - ANALYTICS VIOLET */
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* ANALYTICS MATURITY */
+        .maturity-spectrum { display: flex; gap: 12px; margin-bottom: 20px; }
+        .maturity-stage { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
+        .maturity-stage::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .maturity-stage.descriptive::before { background: var(--blue); }
+        .maturity-stage.diagnostic::before { background: var(--cyan); }
+        .maturity-stage.predictive::before { background: var(--violet); }
+        .maturity-stage.prescriptive::before { background: var(--green); }
+        .maturity-level { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .maturity-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .maturity-question { font-size: 11px; color: var(--cat-light); font-style: italic; margin-bottom: 10px; }
+        .maturity-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .maturity-examples { list-style: none; }
+        .maturity-examples li { font-size: 9px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .maturity-examples li::before { content: '→'; color: var(--cat-light); }
+        .maturity-arrow { display: flex; align-items: center; justify-content: center; color: var(--cat-primary); font-size: 18px; padding: 0 4px; }
+        
+        /* KPI FRAMEWORK */
+        .kpi-framework { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .kpi-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .kpi-title { font-size: 13px; font-weight: 600; }
+        .kpi-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        /* DASHBOARD PATTERNS */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .dashboard-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .dashboard-preview { height: 120px; background: var(--bg-card-alt); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .dashboard-preview-row { display: flex; gap: 8px; flex: 1; }
+        .dashboard-preview-box { background: var(--bg-dark); border-radius: 4px; flex: 1; }
+        .dashboard-preview-box.highlight { background: var(--cat-glow); border: 1px solid var(--cat-primary); }
+        .dashboard-info { padding: 14px; }
+        .dashboard-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .dashboard-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+        
+        /* VIZ BEST PRACTICES */
+        .viz-practices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .viz-practice { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; }
+        .viz-practice-icon { font-size: 24px; margin-bottom: 8px; }
+        .viz-practice-name { font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+        .viz-practice-desc { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+        
+        /* CHART TYPES */
+        .chart-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; transition: all 0.2s; }
+        .chart-card:hover { border-color: var(--cat-primary); }
+        .chart-icon { font-size: 28px; margin-bottom: 6px; }
+        .chart-name { font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+        .chart-use { font-size: 8px; color: var(--text-muted); }
+        
+        /* SELF-SERVICE MODEL */
+        .selfserve-flow { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow-x: auto; }
+        .selfserve-stage { min-width: 160px; padding: 14px; background: var(--bg-card-alt); border-radius: 10px; text-align: center; }
+        .selfserve-icon { font-size: 24px; margin-bottom: 8px; }
+        .selfserve-title { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .selfserve-desc { font-size: 9px; color: var(--text-muted); }
+        .selfserve-arrow { color: var(--cat-primary); font-size: 18px; }
+        
+        /* BI TOOLS COMPARISON */
+        .bi-compare { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .bi-table { width: 100%; border-collapse: collapse; }
+        .bi-table th { background: var(--bg-card-alt); padding: 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .bi-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); }
+        .bi-table tr:last-child td { border-bottom: none; }
+        .bi-table tr:hover td { background: var(--bg-hover); }
+        .bi-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .bi-icon { font-size: 18px; }
+        .bi-rating { color: var(--yellow); font-size: 10px; }
+        .bi-tag { font-size: 8px; padding: 2px 6px; border-radius: 4px; background: var(--cat-glow); color: var(--cat-light); }
+        
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-tag { font-size: 8px; padding: 2px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        /* CODE PANEL */
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: 14px; font-weight: 600; }
+        .footer-brand span { color: var(--brand-orange); }
+        .footer-meta { font-size: 12px; color: var(--text-muted); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .dashboard-grid { grid-template-columns: 1fr; }
+            .maturity-spectrum { flex-direction: column; }
+            .maturity-arrow { transform: rotate(90deg); }
+            .tools-grid, .viz-practices { grid-template-columns: repeat(2, 1fr); }
+            .chart-grid { grid-template-columns: repeat(3, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 03</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="#maturity"><span class="nav-icon">📈</span> Analytics Maturity</a></li>
+            <li><a href="#kpi"><span class="nav-icon">🎯</span> KPI Framework</a></li>
+            <li><a href="#dashboards"><span class="nav-icon">📋</span> Dashboard Patterns</a></li>
+            <li><a href="#visualization"><span class="nav-icon">📊</span> Visualization Guide</a></li>
+            <li><a href="#selfservice"><span class="nav-icon">🔓</span> Self-Service Analytics</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> BI Tools</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">📊 Category 03</span>
+                <h1>Data Analytics & BI</h1>
+                <p>Transform raw data into actionable insights. From descriptive reports to predictive models, master the tools and techniques that drive data-informed decision making.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">$30B</div><div class="hero-metric-label">BI Market Size 2025</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5x</div><div class="hero-metric-label">Faster Decisions</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">127%</div><div class="hero-metric-label">ROI on Analytics</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">73%</div><div class="hero-metric-label">Orgs Investing in BI</div></div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS MATURITY -->
+        <section class="module" id="maturity">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Analytics Maturity Spectrum</h2>
+                    <p>Progress from reactive reporting to proactive optimization</p>
+                </div>
+            </div>
+            
+            <!-- Maturity Visual - Clean 4-Column with Rising Bar -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;">
+                <!-- Level 1: Descriptive -->
+                <div style="background: linear-gradient(135deg, #06B6D415 0%, #06B6D408 100%); border: 2px solid #06B6D4; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #0a0a14; border: 3px solid #06B6D4; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">📊</div>
+                    <div style="margin-top: 20px; font-size: 9px; color: #6a6a7a; text-transform: uppercase; letter-spacing: 1px;">Level 1</div>
+                    <div style="font-size: 15px; font-weight: 700; color: #22D3EE; margin: 4px 0;">Descriptive</div>
+                    <div style="font-size: 10px; color: #22D3EE; font-style: italic; margin-bottom: 8px;">"What happened?"</div>
+                    <div style="height: 1px; background: #06B6D440; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0;">Reports · Summaries · KPIs</div>
+                    <div style="font-size: 7px; color: #6a6a7a; margin-top: 4px;">Static dashboards</div>
+                    <div style="margin-top: 10px; background: #06B6D4; height: 6px; border-radius: 3px; width: 25%;"></div>
+                    <div style="font-size: 8px; color: #06B6D4; font-weight: 600; margin-top: 6px;">HINDSIGHT</div>
+                </div>
+                
+                <!-- Level 2: Diagnostic -->
+                <div style="background: linear-gradient(135deg, #3B82F615 0%, #3B82F608 100%); border: 2px solid #3B82F6; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #0a0a14; border: 3px solid #3B82F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">🔍</div>
+                    <div style="margin-top: 20px; font-size: 9px; color: #6a6a7a; text-transform: uppercase; letter-spacing: 1px;">Level 2</div>
+                    <div style="font-size: 15px; font-weight: 700; color: #60A5FA; margin: 4px 0;">Diagnostic</div>
+                    <div style="font-size: 10px; color: #60A5FA; font-style: italic; margin-bottom: 8px;">"Why did it happen?"</div>
+                    <div style="height: 1px; background: #3B82F640; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0;">Drill-down · Root Cause</div>
+                    <div style="font-size: 7px; color: #6a6a7a; margin-top: 4px;">Interactive BI tools</div>
+                    <div style="margin-top: 10px; background: #3B82F6; height: 6px; border-radius: 3px; width: 50%;"></div>
+                    <div style="font-size: 8px; color: #3B82F6; font-weight: 600; margin-top: 6px;">INSIGHT</div>
+                </div>
+                
+                <!-- Level 3: Predictive -->
+                <div style="background: linear-gradient(135deg, #8B5CF615 0%, #8B5CF608 100%); border: 2px solid #8B5CF6; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #0a0a14; border: 3px solid #8B5CF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">🔮</div>
+                    <div style="margin-top: 20px; font-size: 9px; color: #6a6a7a; text-transform: uppercase; letter-spacing: 1px;">Level 3</div>
+                    <div style="font-size: 15px; font-weight: 700; color: #A78BFA; margin: 4px 0;">Predictive</div>
+                    <div style="font-size: 10px; color: #A78BFA; font-style: italic; margin-bottom: 8px;">"What will happen?"</div>
+                    <div style="height: 1px; background: #8B5CF640; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0;">ML Models · Forecasting</div>
+                    <div style="font-size: 7px; color: #6a6a7a; margin-top: 4px;">Statistical modeling</div>
+                    <div style="margin-top: 10px; background: #8B5CF6; height: 6px; border-radius: 3px; width: 75%;"></div>
+                    <div style="font-size: 8px; color: #8B5CF6; font-weight: 600; margin-top: 6px;">FORESIGHT</div>
+                </div>
+                
+                <!-- Level 4: Prescriptive -->
+                <div style="background: linear-gradient(135deg, #EC489920 0%, #EC489910 100%); border: 3px solid #EC4899; border-radius: 12px; padding: 16px; text-align: center; position: relative; box-shadow: 0 0 20px #EC489930;">
+                    <div style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; background: #0a0a14; border: 3px solid #EC4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 15px #EC489950;">🚀</div>
+                    <div style="margin-top: 22px; font-size: 9px; color: #6a6a7a; text-transform: uppercase; letter-spacing: 1px;">Level 4</div>
+                    <div style="font-size: 15px; font-weight: 700; color: #F472B6; margin: 4px 0;">Prescriptive</div>
+                    <div style="font-size: 10px; color: #F472B6; font-style: italic; margin-bottom: 8px;">"What should we do?"</div>
+                    <div style="height: 1px; background: #EC489940; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0;">Optimization · AI</div>
+                    <div style="font-size: 7px; color: #6a6a7a; margin-top: 4px;">Decision engines</div>
+                    <div style="margin-top: 10px; background: linear-gradient(90deg, #EC4899, #F472B6); height: 6px; border-radius: 3px; width: 100%;"></div>
+                    <div style="font-size: 8px; color: #EC4899; font-weight: 600; margin-top: 6px;">OPTIMIZATION</div>
+                </div>
+            </div>
+            
+            <!-- How to Progress Section -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 20px;">
+                <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px;">🚀 How to Progress Between Levels</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                    <div style="background: var(--bg-card-alt); border-radius: 10px; padding: 16px; border-left: 4px solid #06B6D4;">
+                        <div style="font-size: 11px; font-weight: 600; color: #22D3EE; margin-bottom: 10px;">Level 1 → Level 2</div>
+                        <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                            ✓ Add dimensional models (star schema)<br>
+                            ✓ Enable drill-down & filtering<br>
+                            ✓ Train users on root cause analysis<br>
+                            ✓ Implement cohort views
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-card-alt); border-radius: 10px; padding: 16px; border-left: 4px solid #3B82F6;">
+                        <div style="font-size: 11px; font-weight: 600; color: #60A5FA; margin-bottom: 10px;">Level 2 → Level 3</div>
+                        <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                            ✓ Build ML/statistical models<br>
+                            ✓ Create feature stores & pipelines<br>
+                            ✓ Deploy models to production<br>
+                            ✓ Add confidence intervals
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-card-alt); border-radius: 10px; padding: 16px; border-left: 4px solid #8B5CF6;">
+                        <div style="font-size: 11px; font-weight: 600; color: #A78BFA; margin-bottom: 10px;">Level 3 → Level 4</div>
+                        <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                            ✓ Add optimization algorithms<br>
+                            ✓ Build recommendation engines<br>
+                            ✓ Automate decision execution<br>
+                            ✓ Implement feedback loops
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Assessment -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;">
+                <div style="background: #EF444415; border: 1px solid #EF4444; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #F87171; margin-bottom: 8px;">🔴 Signs You're at Level 1</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.7;">
+                        • Reports are static PDFs/Excel<br>
+                        • "Can you pull data for...?"<br>
+                        • No self-service capabilities
+                    </div>
+                </div>
+                <div style="background: #F59E0B15; border: 1px solid #F59E0B; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #FBBF24; margin-bottom: 8px;">🟡 Signs You're at Level 2</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.7;">
+                        • Interactive dashboards exist<br>
+                        • Users can drill down<br>
+                        • No forecasting capabilities
+                    </div>
+                </div>
+                <div style="background: #3B82F615; border: 1px solid #3B82F6; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #60A5FA; margin-bottom: 8px;">🔵 Signs You're at Level 3</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.7;">
+                        • ML models in production<br>
+                        • Forecasts in dashboards<br>
+                        • Still manual decisions
+                    </div>
+                </div>
+                <div style="background: #10B98115; border: 1px solid #10B981; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #34D399; margin-bottom: 8px;">🟢 Signs You're at Level 4</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.7;">
+                        • Automated recommendations<br>
+                        • System optimizes decisions<br>
+                        • Continuous learning loops
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI FRAMEWORK -->
+        <section class="module" id="kpi">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>KPI vs OKR Framework</h2>
+                    <p>Understand the difference and learn to write effective metrics</p>
+                </div>
+            </div>
+            
+            <!-- KPI vs OKR Comparison -->
+            <div class="pipeline-viz">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">🎯 KPI vs OKR — When to Use Each</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 280" style="width: 100%; height: auto;">
+                        <!-- KPI Side -->
+                        <g transform="translate(20, 15)">
+                            <rect width="380" height="250" rx="12" fill="#3B82F610" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="190" y="28" text-anchor="middle" fill="#60A5FA" font-size="16" font-weight="700">📊 KPIs</text>
+                            <text x="190" y="44" text-anchor="middle" fill="#60A5FA" font-size="9">Key Performance Indicators</text>
+                            
+                            <line x1="20" y1="56" x2="360" y2="56" stroke="#3B82F640"/>
+                            
+                            <text x="20" y="76" fill="#fff" font-size="10" font-weight="600">Purpose:</text>
+                            <text x="20" y="91" fill="#a0a0b0" font-size="9">Measure ongoing health of business operations</text>
+                            
+                            <text x="20" y="112" fill="#fff" font-size="10" font-weight="600">Characteristics:</text>
+                            <text x="20" y="127" fill="#a0a0b0" font-size="8">• Continuous / always-on monitoring</text>
+                            <text x="20" y="140" fill="#a0a0b0" font-size="8">• Stable targets (e.g., "keep churn &lt;5%")</text>
+                            <text x="20" y="153" fill="#a0a0b0" font-size="8">• Often tied to operational dashboards</text>
+                            <text x="20" y="166" fill="#a0a0b0" font-size="8">• Tracks BAU (business as usual)</text>
+                            
+                            <text x="20" y="190" fill="#fff" font-size="10" font-weight="600">Best For:</text>
+                            <text x="20" y="205" fill="#a0a0b0" font-size="8">• Finance: Revenue, margins, cash flow</text>
+                            <text x="20" y="218" fill="#a0a0b0" font-size="8">• Sales: Pipeline, conversion, quota</text>
+                            <text x="20" y="231" fill="#a0a0b0" font-size="8">• Operations: SLAs, uptime, efficiency</text>
+                        </g>
+                        
+                        <!-- VS Circle - properly centered -->
+                        <g transform="translate(420, 115)">
+                            <circle cx="30" cy="30" r="28" fill="#1a1a2e" stroke="#6a6a7a" stroke-width="2"/>
+                            <text x="30" y="36" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">VS</text>
+                        </g>
+                        
+                        <!-- OKR Side -->
+                        <g transform="translate(500, 15)">
+                            <rect width="380" height="250" rx="12" fill="#10B98110" stroke="#10B981" stroke-width="2"/>
+                            <text x="190" y="28" text-anchor="middle" fill="#34D399" font-size="16" font-weight="700">🎯 OKRs</text>
+                            <text x="190" y="44" text-anchor="middle" fill="#34D399" font-size="9">Objectives & Key Results</text>
+                            
+                            <line x1="20" y1="56" x2="360" y2="56" stroke="#10B98140"/>
+                            
+                            <text x="20" y="76" fill="#fff" font-size="10" font-weight="600">Purpose:</text>
+                            <text x="20" y="91" fill="#a0a0b0" font-size="9">Drive change, achieve ambitious goals</text>
+                            
+                            <text x="20" y="112" fill="#fff" font-size="10" font-weight="600">Characteristics:</text>
+                            <text x="20" y="127" fill="#a0a0b0" font-size="8">• Time-bound (quarterly / annual cycles)</text>
+                            <text x="20" y="140" fill="#a0a0b0" font-size="8">• Stretch goals (70% achievement = success)</text>
+                            <text x="20" y="153" fill="#a0a0b0" font-size="8">• Objective is qualitative, KRs are quantitative</text>
+                            <text x="20" y="166" fill="#a0a0b0" font-size="8">• Drives strategic initiatives & transformation</text>
+                            
+                            <text x="20" y="190" fill="#fff" font-size="10" font-weight="600">Best For:</text>
+                            <text x="20" y="205" fill="#a0a0b0" font-size="8">• Product: Launch new features, improve UX</text>
+                            <text x="20" y="218" fill="#a0a0b0" font-size="8">• Engineering: Reduce tech debt, scale infra</text>
+                            <text x="20" y="231" fill="#a0a0b0" font-size="8">• Company: Enter new markets, culture change</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Good vs Bad Examples -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <!-- Good Examples -->
+                <div style="background: var(--bg-card); border: 1px solid #10B981; border-radius: 12px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #34D399; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">✅ Good KPIs & OKRs</div>
+                    
+                    <div style="background: var(--bg-card-alt); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 10px; color: #60A5FA; font-weight: 600; margin-bottom: 4px;">GOOD KPI</div>
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">"Monthly Active Users (MAU)"</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✓ Specific metric with clear definition</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✓ Measurable from product analytics</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✓ Target: 500K MAU, currently 420K</div>
+                    </div>
+                    
+                    <div style="background: var(--bg-card-alt); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 10px; color: #34D399; font-weight: 600; margin-bottom: 4px;">GOOD OKR</div>
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">O: "Become the #1 choice for enterprise customers"</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">KR1: Close 10 Fortune 500 deals (currently 3)</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">KR2: Achieve SOC2 Type II certification</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">KR3: Reduce enterprise onboarding time to &lt;2 weeks</div>
+                    </div>
+                    
+                    <div style="background: var(--bg-card-alt); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 10px; color: #60A5FA; font-weight: 600; margin-bottom: 4px;">GOOD KPI</div>
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">"Net Revenue Retention (NRR)"</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✓ Formula: (Revenue from existing - churn + expansion) / Starting revenue</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✓ Target: NRR ≥ 110%</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✓ Shows growth from existing customers</div>
+                    </div>
+                </div>
+                
+                <!-- Bad Examples -->
+                <div style="background: var(--bg-card); border: 1px solid #EF4444; border-radius: 12px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #F87171; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">❌ Bad KPIs & OKRs</div>
+                    
+                    <div style="background: #EF444415; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 10px; color: #EF4444; font-weight: 600; margin-bottom: 4px;">BAD KPI</div>
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">"Increase customer satisfaction"</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✗ Not measurable — what's "satisfaction"?</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✗ No target number</div>
+                        <div style="font-size: 9px; color: #F87171;">FIX → "Increase NPS from 45 to 60"</div>
+                    </div>
+                    
+                    <div style="background: #EF444415; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 10px; color: #EF4444; font-weight: 600; margin-bottom: 4px;">BAD OKR</div>
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">O: "Ship the new dashboard"</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✗ Objective is a task, not an outcome</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✗ No key results measuring impact</div>
+                        <div style="font-size: 9px; color: #F87171;">FIX → O: "Empower users to find insights faster" KR: "Reduce time-to-insight by 50%"</div>
+                    </div>
+                    
+                    <div style="background: #EF444415; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 10px; color: #EF4444; font-weight: 600; margin-bottom: 4px;">BAD KPI</div>
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">"Lines of code written"</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✗ Vanity metric — doesn't measure value</div>
+                        <div style="font-size: 9px; color: var(--text-secondary);">✗ Incentivizes wrong behavior</div>
+                        <div style="font-size: 9px; color: #F87171;">FIX → "Cycle time" or "Deployment frequency"</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SMART Framework -->
+            <div class="pipeline-viz" style="margin-top: 20px;">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">📝 SMART Framework for Writing Effective KPIs</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 200" style="width: 100%; height: auto;">
+                        <!-- S -->
+                        <g transform="translate(15, 15)">
+                            <rect width="165" height="170" rx="12" fill="#3B82F615" stroke="#3B82F6" stroke-width="2"/>
+                            <circle cx="82" cy="45" r="30" fill="#3B82F630"/>
+                            <text x="82" y="55" text-anchor="middle" fill="#60A5FA" font-size="28" font-weight="700">S</text>
+                            <text x="82" y="95" text-anchor="middle" fill="#60A5FA" font-size="15" font-weight="700">Specific</text>
+                            <line x1="20" y1="108" x2="145" y2="108" stroke="#3B82F640"/>
+                            <text x="82" y="128" text-anchor="middle" fill="#a0a0b0" font-size="9">Clearly defined metric</text>
+                            <text x="82" y="143" text-anchor="middle" fill="#a0a0b0" font-size="9">No ambiguity in what</text>
+                            <text x="82" y="158" text-anchor="middle" fill="#a0a0b0" font-size="9">you're measuring</text>
+                        </g>
+                        
+                        <!-- M -->
+                        <g transform="translate(190, 15)">
+                            <rect width="165" height="170" rx="12" fill="#10B98115" stroke="#10B981" stroke-width="2"/>
+                            <circle cx="82" cy="45" r="30" fill="#10B98130"/>
+                            <text x="82" y="55" text-anchor="middle" fill="#34D399" font-size="28" font-weight="700">M</text>
+                            <text x="82" y="95" text-anchor="middle" fill="#34D399" font-size="15" font-weight="700">Measurable</text>
+                            <line x1="20" y1="108" x2="145" y2="108" stroke="#10B98140"/>
+                            <text x="82" y="128" text-anchor="middle" fill="#a0a0b0" font-size="9">Quantifiable number</text>
+                            <text x="82" y="143" text-anchor="middle" fill="#a0a0b0" font-size="9">you can track and</text>
+                            <text x="82" y="158" text-anchor="middle" fill="#a0a0b0" font-size="9">report on reliably</text>
+                        </g>
+                        
+                        <!-- A -->
+                        <g transform="translate(365, 15)">
+                            <rect width="165" height="170" rx="12" fill="#F59E0B15" stroke="#F59E0B" stroke-width="2"/>
+                            <circle cx="82" cy="45" r="30" fill="#F59E0B30"/>
+                            <text x="82" y="55" text-anchor="middle" fill="#FBBF24" font-size="28" font-weight="700">A</text>
+                            <text x="82" y="95" text-anchor="middle" fill="#FBBF24" font-size="15" font-weight="700">Achievable</text>
+                            <line x1="20" y1="108" x2="145" y2="108" stroke="#F59E0B40"/>
+                            <text x="82" y="128" text-anchor="middle" fill="#a0a0b0" font-size="9">Realistic target given</text>
+                            <text x="82" y="143" text-anchor="middle" fill="#a0a0b0" font-size="9">available resources,</text>
+                            <text x="82" y="158" text-anchor="middle" fill="#a0a0b0" font-size="9">budget, and time</text>
+                        </g>
+                        
+                        <!-- R -->
+                        <g transform="translate(540, 15)">
+                            <rect width="165" height="170" rx="12" fill="#8B5CF615" stroke="#8B5CF6" stroke-width="2"/>
+                            <circle cx="82" cy="45" r="30" fill="#8B5CF630"/>
+                            <text x="82" y="55" text-anchor="middle" fill="#A78BFA" font-size="28" font-weight="700">R</text>
+                            <text x="82" y="95" text-anchor="middle" fill="#A78BFA" font-size="15" font-weight="700">Relevant</text>
+                            <line x1="20" y1="108" x2="145" y2="108" stroke="#8B5CF640"/>
+                            <text x="82" y="128" text-anchor="middle" fill="#a0a0b0" font-size="9">Aligned to business</text>
+                            <text x="82" y="143" text-anchor="middle" fill="#a0a0b0" font-size="9">objectives and team</text>
+                            <text x="82" y="158" text-anchor="middle" fill="#a0a0b0" font-size="9">priorities</text>
+                        </g>
+                        
+                        <!-- T -->
+                        <g transform="translate(715, 15)">
+                            <rect width="165" height="170" rx="12" fill="#EC489915" stroke="#EC4899" stroke-width="2"/>
+                            <circle cx="82" cy="45" r="30" fill="#EC489930"/>
+                            <text x="82" y="55" text-anchor="middle" fill="#F472B6" font-size="28" font-weight="700">T</text>
+                            <text x="82" y="95" text-anchor="middle" fill="#F472B6" font-size="15" font-weight="700">Time-bound</text>
+                            <line x1="20" y1="108" x2="145" y2="108" stroke="#EC489940"/>
+                            <text x="82" y="128" text-anchor="middle" fill="#a0a0b0" font-size="9">Has a deadline or</text>
+                            <text x="82" y="143" text-anchor="middle" fill="#a0a0b0" font-size="9">regular review</text>
+                            <text x="82" y="158" text-anchor="middle" fill="#a0a0b0" font-size="9">cadence defined</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD PATTERNS -->
+        <section class="module" id="dashboards">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Dashboard Design Patterns</h2>
+                    <p>Real layout templates with actual visualizations for different use cases</p>
+                </div>
+            </div>
+            
+            <!-- Executive Dashboard Example -->
+            <div class="pipeline-viz" style="margin-bottom: 20px;">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">📊 Executive Summary Dashboard</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 340" style="width: 100%; height: auto;">
+                        <!-- KPI Cards Row -->
+                        <g transform="translate(20, 20)">
+                            <!-- Revenue Card -->
+                            <rect width="200" height="70" rx="8" fill="#1a1a2e" stroke="#3B82F6"/>
+                            <text x="15" y="25" fill="#6a6a7a" font-size="10">Total Revenue</text>
+                            <text x="15" y="50" fill="#fff" font-size="20" font-weight="700">$2.4M</text>
+                            <text x="140" y="50" fill="#34D399" font-size="11">▲ 12%</text>
+                            
+                            <!-- Users Card -->
+                            <g transform="translate(220, 0)">
+                                <rect width="200" height="70" rx="8" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="15" y="25" fill="#6a6a7a" font-size="10">Active Users</text>
+                                <text x="15" y="50" fill="#fff" font-size="20" font-weight="700">142K</text>
+                                <text x="100" y="50" fill="#34D399" font-size="11">▲ 8%</text>
+                            </g>
+                            
+                            <!-- Conversion Card -->
+                            <g transform="translate(440, 0)">
+                                <rect width="200" height="70" rx="8" fill="#1a1a2e" stroke="#F59E0B"/>
+                                <text x="15" y="25" fill="#6a6a7a" font-size="10">Conversion Rate</text>
+                                <text x="15" y="50" fill="#fff" font-size="20" font-weight="700">3.2%</text>
+                                <text x="85" y="50" fill="#EF4444" font-size="11">▼ 0.3%</text>
+                            </g>
+                            
+                            <!-- NPS Card -->
+                            <g transform="translate(660, 0)">
+                                <rect width="200" height="70" rx="8" fill="#1a1a2e" stroke="#8B5CF6"/>
+                                <text x="15" y="25" fill="#6a6a7a" font-size="10">NPS Score</text>
+                                <text x="15" y="50" fill="#fff" font-size="20" font-weight="700">72</text>
+                                <text x="60" y="50" fill="#34D399" font-size="11">▲ 5 pts</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Main Chart Area -->
+                        <g transform="translate(20, 110)">
+                            <rect width="560" height="210" rx="8" fill="#1a1a2e" stroke="#3a3a4e"/>
+                            <text x="20" y="25" fill="#fff" font-size="12" font-weight="600">Revenue Trend (Last 12 Months)</text>
+                            
+                            <!-- Fake line chart -->
+                            <polyline points="40,160 80,150 120,140 160,155 200,130 240,120 280,125 320,100 360,90 400,85 440,70 480,60" 
+                                      stroke="#3B82F6" stroke-width="2" fill="none"/>
+                            <polyline points="40,170 80,165 120,160 160,165 200,155 240,150 280,155 320,140 360,135 400,130 440,125 480,120" 
+                                      stroke="#10B981" stroke-width="2" fill="none" stroke-dasharray="4,2"/>
+                            
+                            <!-- Legend -->
+                            <g transform="translate(360, 20)">
+                                <line x1="0" y1="0" x2="20" y2="0" stroke="#3B82F6" stroke-width="2"/>
+                                <text x="25" y="4" fill="#a0a0b0" font-size="9">This Year</text>
+                                <line x1="80" y1="0" x2="100" y2="0" stroke="#10B981" stroke-width="2" stroke-dasharray="4,2"/>
+                                <text x="105" y="4" fill="#a0a0b0" font-size="9">Last Year</text>
+                            </g>
+                            
+                            <!-- X-axis labels -->
+                            <text x="40" y="190" fill="#6a6a7a" font-size="8">Jan</text>
+                            <text x="120" y="190" fill="#6a6a7a" font-size="8">Mar</text>
+                            <text x="200" y="190" fill="#6a6a7a" font-size="8">May</text>
+                            <text x="280" y="190" fill="#6a6a7a" font-size="8">Jul</text>
+                            <text x="360" y="190" fill="#6a6a7a" font-size="8">Sep</text>
+                            <text x="440" y="190" fill="#6a6a7a" font-size="8">Nov</text>
+                        </g>
+                        
+                        <!-- Side Panel -->
+                        <g transform="translate(600, 110)">
+                            <rect width="260" height="210" rx="8" fill="#1a1a2e" stroke="#3a3a4e"/>
+                            <text x="15" y="25" fill="#fff" font-size="12" font-weight="600">Top Products</text>
+                            
+                            <!-- Bar items -->
+                            <g transform="translate(15, 45)">
+                                <text x="0" y="10" fill="#a0a0b0" font-size="9">Enterprise Plan</text>
+                                <rect x="0" y="15" width="180" height="12" rx="3" fill="#3B82F640"/>
+                                <rect x="0" y="15" width="180" height="12" rx="3" fill="#3B82F6"/>
+                                <text x="190" y="24" fill="#60A5FA" font-size="9">$890K</text>
+                            </g>
+                            <g transform="translate(15, 85)">
+                                <text x="0" y="10" fill="#a0a0b0" font-size="9">Pro Plan</text>
+                                <rect x="0" y="15" width="230" height="12" rx="3" fill="#10B98140"/>
+                                <rect x="0" y="15" width="140" height="12" rx="3" fill="#10B981"/>
+                                <text x="190" y="24" fill="#34D399" font-size="9">$650K</text>
+                            </g>
+                            <g transform="translate(15, 125)">
+                                <text x="0" y="10" fill="#a0a0b0" font-size="9">Starter Plan</text>
+                                <rect x="0" y="15" width="230" height="12" rx="3" fill="#F59E0B40"/>
+                                <rect x="0" y="15" width="100" height="12" rx="3" fill="#F59E0B"/>
+                                <text x="190" y="24" fill="#FBBF24" font-size="9">$420K</text>
+                            </g>
+                            <g transform="translate(15, 165)">
+                                <text x="0" y="10" fill="#a0a0b0" font-size="9">Add-ons</text>
+                                <rect x="0" y="15" width="230" height="12" rx="3" fill="#8B5CF640"/>
+                                <rect x="0" y="15" width="60" height="12" rx="3" fill="#8B5CF6"/>
+                                <text x="190" y="24" fill="#A78BFA" font-size="9">$240K</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Dashboard Type Cards -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #3B82F6;">
+                    <div style="font-size: 14px; font-weight: 700; color: #60A5FA; margin-bottom: 8px;">📊 Executive Summary</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 12px;">High-level KPIs with trend context for leadership decision-making</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">
+                        <div style="margin-bottom: 4px;">✓ 4-6 KPI cards at top</div>
+                        <div style="margin-bottom: 4px;">✓ Hero trend chart (60% width)</div>
+                        <div style="margin-bottom: 4px;">✓ Supporting breakdown (40%)</div>
+                        <div>✓ Refresh: Daily or Weekly</div>
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #10B981;">
+                    <div style="font-size: 14px; font-weight: 700; color: #34D399; margin-bottom: 8px;">⚡ Operational Monitor</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 12px;">Real-time metrics for daily operations and quick action</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">
+                        <div style="margin-bottom: 4px;">✓ Filters panel on left (20%)</div>
+                        <div style="margin-bottom: 4px;">✓ Live metrics + alerts center</div>
+                        <div style="margin-bottom: 4px;">✓ Data table at bottom</div>
+                        <div>✓ Refresh: Real-time / Hourly</div>
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #8B5CF6;">
+                    <div style="font-size: 14px; font-weight: 700; color: #A78BFA; margin-bottom: 8px;">🔍 Analytical Deep-Dive</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 12px;">Exploration and root cause analysis with drill-down capability</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">
+                        <div style="margin-bottom: 4px;">✓ Hero viz at top (full width)</div>
+                        <div style="margin-bottom: 4px;">✓ 3 supporting charts below</div>
+                        <div style="margin-bottom: 4px;">✓ Dimension filters visible</div>
+                        <div>✓ Refresh: On-demand</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISUALIZATION GUIDE -->
+        <section class="module" id="visualization">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Chart Selection Guide</h2>
+                    <p>Choose the right visualization for your data story — click to see examples</p>
+                </div>
+            </div>
+            
+            <!-- Interactive Chart Cards -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                <!-- Bar Chart -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#3B82F6'" onmouseout="this.style.borderColor='var(--border-color)'">
+                    <div style="font-size: 13px; font-weight: 700; color: #60A5FA; margin-bottom: 8px;">📊 Bar Chart</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Compare categories</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <rect x="10" y="35" width="20" height="20" fill="#3B82F6"/>
+                        <rect x="35" y="20" width="20" height="35" fill="#3B82F6"/>
+                        <rect x="60" y="10" width="20" height="45" fill="#3B82F6"/>
+                        <rect x="85" y="25" width="20" height="30" fill="#3B82F6"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Sales by region, survey results, category comparison</div>
+                </div>
+                
+                <!-- Line Chart -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #10B981; margin-bottom: 8px;">📈 Line Chart</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Trends over time</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <polyline points="10,45 30,40 50,25 70,30 90,15 110,10" stroke="#10B981" stroke-width="2" fill="none"/>
+                        <circle cx="10" cy="45" r="3" fill="#10B981"/>
+                        <circle cx="50" cy="25" r="3" fill="#10B981"/>
+                        <circle cx="110" cy="10" r="3" fill="#10B981"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Revenue over time, stock prices, temperature trends</div>
+                </div>
+                
+                <!-- Pie/Donut -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #F59E0B; margin-bottom: 8px;">🥧 Pie / Donut</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Part of whole</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <circle cx="60" cy="30" r="25" fill="none" stroke="#F59E0B" stroke-width="8" stroke-dasharray="78.5 78.5" stroke-dashoffset="0"/>
+                        <circle cx="60" cy="30" r="25" fill="none" stroke="#3B82F6" stroke-width="8" stroke-dasharray="39 118" stroke-dashoffset="-78.5"/>
+                        <circle cx="60" cy="30" r="25" fill="none" stroke="#8B5CF6" stroke-width="8" stroke-dasharray="25 132" stroke-dashoffset="-117.5"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Market share, budget allocation (use &lt;6 slices)</div>
+                </div>
+                
+                <!-- Scatter Plot -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #8B5CF6; margin-bottom: 8px;">🔵 Scatter Plot</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Correlation</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <circle cx="15" cy="45" r="4" fill="#8B5CF6"/>
+                        <circle cx="25" cy="40" r="4" fill="#8B5CF6"/>
+                        <circle cx="40" cy="35" r="4" fill="#8B5CF6"/>
+                        <circle cx="55" cy="28" r="4" fill="#8B5CF6"/>
+                        <circle cx="70" cy="22" r="4" fill="#8B5CF6"/>
+                        <circle cx="85" cy="18" r="4" fill="#8B5CF6"/>
+                        <circle cx="100" cy="12" r="4" fill="#8B5CF6"/>
+                        <line x1="10" y1="50" x2="110" y2="8" stroke="#8B5CF640" stroke-width="1" stroke-dasharray="4,2"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Price vs demand, ad spend vs conversions</div>
+                </div>
+                
+                <!-- Area Chart -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #06B6D4; margin-bottom: 8px;">📐 Area Chart</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Volume over time</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <polygon points="10,55 10,40 30,35 50,25 70,30 90,20 110,15 110,55" fill="#06B6D440"/>
+                        <polyline points="10,40 30,35 50,25 70,30 90,20 110,15" stroke="#06B6D4" stroke-width="2" fill="none"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Cumulative totals, stacked comparisons</div>
+                </div>
+                
+                <!-- Heat Map -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #EF4444; margin-bottom: 8px;">🗺️ Heat Map</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Density / intensity</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <rect x="10" y="5" width="18" height="16" fill="#EF444420"/>
+                        <rect x="30" y="5" width="18" height="16" fill="#EF444460"/>
+                        <rect x="50" y="5" width="18" height="16" fill="#EF4444"/>
+                        <rect x="70" y="5" width="18" height="16" fill="#EF444480"/>
+                        <rect x="90" y="5" width="18" height="16" fill="#EF444440"/>
+                        <rect x="10" y="23" width="18" height="16" fill="#EF444480"/>
+                        <rect x="30" y="23" width="18" height="16" fill="#EF4444"/>
+                        <rect x="50" y="23" width="18" height="16" fill="#EF444460"/>
+                        <rect x="70" y="23" width="18" height="16" fill="#EF444440"/>
+                        <rect x="90" y="23" width="18" height="16" fill="#EF444420"/>
+                        <rect x="10" y="41" width="18" height="16" fill="#EF444440"/>
+                        <rect x="30" y="41" width="18" height="16" fill="#EF444460"/>
+                        <rect x="50" y="41" width="18" height="16" fill="#EF444440"/>
+                        <rect x="70" y="41" width="18" height="16" fill="#EF4444"/>
+                        <rect x="90" y="41" width="18" height="16" fill="#EF444480"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Cohort analysis, correlation matrix, activity by hour</div>
+                </div>
+                
+                <!-- Funnel -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #EC4899; margin-bottom: 8px;">🔻 Funnel</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Conversion stages</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <polygon points="10,5 110,5 100,20 20,20" fill="#EC489940"/>
+                        <polygon points="20,22 100,22 90,37 30,37" fill="#EC489970"/>
+                        <polygon points="30,39 90,39 80,54 40,54" fill="#EC4899"/>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Sales pipeline, signup flow, checkout steps</div>
+                </div>
+                
+                <!-- Gauge -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #14B8A6; margin-bottom: 8px;">🎯 Gauge</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">KPI vs target</div>
+                    <svg viewBox="0 0 120 60" style="width: 100%; height: 50px;">
+                        <path d="M 20 50 A 40 40 0 0 1 100 50" stroke="#2a2a3e" stroke-width="8" fill="none"/>
+                        <path d="M 20 50 A 40 40 0 0 1 85 25" stroke="#14B8A6" stroke-width="8" fill="none"/>
+                        <text x="60" y="50" text-anchor="middle" fill="#14B8A6" font-size="14" font-weight="700">78%</text>
+                    </svg>
+                    <div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px;">Best for: Goal progress, quota attainment, health scores</div>
+                </div>
+            </div>
+            
+            <!-- Best Practices -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 16px; margin-bottom: 6px;">🎯</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Start Y-Axis at Zero</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">For bar charts, avoid truncating to prevent misleading comparisons</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 16px; margin-bottom: 6px;">🎨</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Limit to 5-7 Colors</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Reserve bright colors for emphasis; use muted palette for most data</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 16px; margin-bottom: 6px;">📝</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Label Everything</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Include units, time periods, and data sources for clarity</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 16px; margin-bottom: 6px;">📱</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Design Mobile-First</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Start with smallest screen, then scale up responsively</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SELF-SERVICE ANALYTICS -->
+        <section class="module" id="selfservice">
+            <div class="module-header">
+                <div class="module-icon">🔓</div>
+                <div class="module-info">
+                    <h2>Self-Service Analytics Model</h2>
+                    <p>Democratize data access while maintaining governance — with clear progression steps</p>
+                </div>
+            </div>
+            
+            <!-- Self-Service Journey -->
+            <div class="pipeline-viz">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">🔓 Self-Service Analytics Journey — Building Data Democracy</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 380" style="width: 100%; height: auto;">
+                        <!-- Stage 1: Foundation -->
+                        <g transform="translate(20, 30)">
+                            <rect width="155" height="140" rx="10" fill="#3B82F615" stroke="#3B82F6" stroke-width="2"/>
+                            <rect x="0" y="0" width="155" height="6" rx="3" fill="#3B82F6"/>
+                            <text x="77" y="26" text-anchor="middle" fill="#6a6a7a" font-size="9">STAGE 1</text>
+                            <text x="20" y="45" fill="#60A5FA" font-size="18">🏗️</text>
+                            <text x="45" y="48" fill="#60A5FA" font-size="11" font-weight="700">Data Foundation</text>
+                            <line x1="12" y1="58" x2="143" y2="58" stroke="#2a2a3e"/>
+                            <text x="12" y="74" fill="#a0a0b0" font-size="8">• Governed data models</text>
+                            <text x="12" y="87" fill="#a0a0b0" font-size="8">• Star schema / dimensional</text>
+                            <text x="12" y="100" fill="#a0a0b0" font-size="8">• dbt / data marts</text>
+                            <text x="12" y="113" fill="#a0a0b0" font-size="8">• Row-level security</text>
+                            <text x="77" y="134" text-anchor="middle" fill="#3B82F6" font-size="7" font-weight="600">Owner: Data Engineering</text>
+                        </g>
+                        
+                        <!-- Arrow 1→2 -->
+                        <text x="180" y="100" fill="#6a6a7a" font-size="16">→</text>
+                        
+                        <!-- Stage 2: Semantic Layer -->
+                        <g transform="translate(195, 30)">
+                            <rect width="155" height="140" rx="10" fill="#10B98115" stroke="#10B981" stroke-width="2"/>
+                            <rect x="0" y="0" width="155" height="6" rx="3" fill="#10B981"/>
+                            <text x="77" y="26" text-anchor="middle" fill="#6a6a7a" font-size="9">STAGE 2</text>
+                            <text x="20" y="45" fill="#34D399" font-size="18">📚</text>
+                            <text x="45" y="48" fill="#34D399" font-size="11" font-weight="700">Semantic Layer</text>
+                            <line x1="12" y1="58" x2="143" y2="58" stroke="#2a2a3e"/>
+                            <text x="12" y="74" fill="#a0a0b0" font-size="8">• Business-friendly names</text>
+                            <text x="12" y="87" fill="#a0a0b0" font-size="8">• Metric definitions</text>
+                            <text x="12" y="100" fill="#a0a0b0" font-size="8">• Joins pre-defined</text>
+                            <text x="12" y="113" fill="#a0a0b0" font-size="8">• LookML / Cube / dbt</text>
+                            <text x="77" y="134" text-anchor="middle" fill="#10B981" font-size="7" font-weight="600">Owner: Analytics Eng</text>
+                        </g>
+                        
+                        <!-- Arrow 2→3 -->
+                        <text x="355" y="100" fill="#6a6a7a" font-size="16">→</text>
+                        
+                        <!-- Stage 3: Discovery -->
+                        <g transform="translate(370, 30)">
+                            <rect width="155" height="140" rx="10" fill="#F59E0B15" stroke="#F59E0B" stroke-width="2"/>
+                            <rect x="0" y="0" width="155" height="6" rx="3" fill="#F59E0B"/>
+                            <text x="77" y="26" text-anchor="middle" fill="#6a6a7a" font-size="9">STAGE 3</text>
+                            <text x="20" y="45" fill="#FBBF24" font-size="18">🔍</text>
+                            <text x="45" y="48" fill="#FBBF24" font-size="11" font-weight="700">Discovery</text>
+                            <line x1="12" y1="58" x2="143" y2="58" stroke="#2a2a3e"/>
+                            <text x="12" y="74" fill="#a0a0b0" font-size="8">• Data catalog</text>
+                            <text x="12" y="87" fill="#a0a0b0" font-size="8">• Search & browse</text>
+                            <text x="12" y="100" fill="#a0a0b0" font-size="8">• Documentation & lineage</text>
+                            <text x="12" y="113" fill="#a0a0b0" font-size="8">• Data quality scores</text>
+                            <text x="77" y="134" text-anchor="middle" fill="#F59E0B" font-size="7" font-weight="600">Owner: Data Governance</text>
+                        </g>
+                        
+                        <!-- Arrow 3→4 -->
+                        <text x="530" y="100" fill="#6a6a7a" font-size="16">→</text>
+                        
+                        <!-- Stage 4: Exploration -->
+                        <g transform="translate(545, 30)">
+                            <rect width="155" height="140" rx="10" fill="#8B5CF615" stroke="#8B5CF6" stroke-width="2"/>
+                            <rect x="0" y="0" width="155" height="6" rx="3" fill="#8B5CF6"/>
+                            <text x="77" y="26" text-anchor="middle" fill="#6a6a7a" font-size="9">STAGE 4</text>
+                            <text x="20" y="45" fill="#A78BFA" font-size="18">👤</text>
+                            <text x="45" y="48" fill="#A78BFA" font-size="11" font-weight="700">Exploration</text>
+                            <line x1="12" y1="58" x2="143" y2="58" stroke="#2a2a3e"/>
+                            <text x="12" y="74" fill="#a0a0b0" font-size="8">• Drag-drop BI tools</text>
+                            <text x="12" y="87" fill="#a0a0b0" font-size="8">• Ad-hoc queries</text>
+                            <text x="12" y="100" fill="#a0a0b0" font-size="8">• Natural language (AI)</text>
+                            <text x="12" y="113" fill="#a0a0b0" font-size="8">• No SQL required</text>
+                            <text x="77" y="134" text-anchor="middle" fill="#8B5CF6" font-size="7" font-weight="600">Owner: Business Users</text>
+                        </g>
+                        
+                        <!-- Arrow 4→5 -->
+                        <text x="705" y="100" fill="#6a6a7a" font-size="16">→</text>
+                        
+                        <!-- Stage 5: Insights -->
+                        <g transform="translate(720, 30)">
+                            <rect width="155" height="140" rx="10" fill="#EC489915" stroke="#EC4899" stroke-width="2"/>
+                            <rect x="0" y="0" width="155" height="6" rx="3" fill="#EC4899"/>
+                            <text x="77" y="26" text-anchor="middle" fill="#6a6a7a" font-size="9">STAGE 5</text>
+                            <text x="20" y="45" fill="#F472B6" font-size="18">📊</text>
+                            <text x="45" y="48" fill="#F472B6" font-size="11" font-weight="700">Insights</text>
+                            <line x1="12" y1="58" x2="143" y2="58" stroke="#2a2a3e"/>
+                            <text x="12" y="74" fill="#a0a0b0" font-size="8">• Dashboards</text>
+                            <text x="12" y="87" fill="#a0a0b0" font-size="8">• Reports & exports</text>
+                            <text x="12" y="100" fill="#a0a0b0" font-size="8">• Alerts & subscriptions</text>
+                            <text x="12" y="113" fill="#a0a0b0" font-size="8">• Embedded analytics</text>
+                            <text x="77" y="134" text-anchor="middle" fill="#EC4899" font-size="7" font-weight="600">Owner: All Users</text>
+                        </g>
+                        
+                        <!-- Prerequisites Section -->
+                        <g transform="translate(20, 190)">
+                            <text x="0" y="0" fill="#fff" font-size="12" font-weight="700">📋 Prerequisites to Progress</text>
+                            
+                            <!-- Stage 1→2 -->
+                            <g transform="translate(0, 20)">
+                                <rect width="205" height="80" rx="8" fill="#1a1a2e" stroke="#3B82F6"/>
+                                <text x="102" y="18" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">Stage 1 → Stage 2</text>
+                                <text x="15" y="38" fill="#a0a0b0" font-size="8">✓ Stable, tested data models</text>
+                                <text x="15" y="52" fill="#a0a0b0" font-size="8">✓ Documentation complete</text>
+                                <text x="15" y="66" fill="#a0a0b0" font-size="8">✓ Security policies defined</text>
+                            </g>
+                            
+                            <!-- Stage 2→3 -->
+                            <g transform="translate(220, 20)">
+                                <rect width="205" height="80" rx="8" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="102" y="18" text-anchor="middle" fill="#34D399" font-size="9" font-weight="600">Stage 2 → Stage 3</text>
+                                <text x="15" y="38" fill="#a0a0b0" font-size="8">✓ Semantic layer implemented</text>
+                                <text x="15" y="52" fill="#a0a0b0" font-size="8">✓ Metric definitions agreed</text>
+                                <text x="15" y="66" fill="#a0a0b0" font-size="8">✓ Business glossary created</text>
+                            </g>
+                            
+                            <!-- Stage 3→4 -->
+                            <g transform="translate(440, 20)">
+                                <rect width="205" height="80" rx="8" fill="#1a1a2e" stroke="#F59E0B"/>
+                                <text x="102" y="18" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">Stage 3 → Stage 4</text>
+                                <text x="15" y="38" fill="#a0a0b0" font-size="8">✓ Data catalog deployed</text>
+                                <text x="15" y="52" fill="#a0a0b0" font-size="8">✓ Users can find datasets</text>
+                                <text x="15" y="66" fill="#a0a0b0" font-size="8">✓ Training program ready</text>
+                            </g>
+                            
+                            <!-- Success Metrics -->
+                            <g transform="translate(660, 20)">
+                                <rect width="205" height="80" rx="8" fill="#1a1a2e" stroke="#EC4899"/>
+                                <text x="102" y="18" text-anchor="middle" fill="#F472B6" font-size="9" font-weight="600">Success Metrics</text>
+                                <text x="15" y="38" fill="#a0a0b0" font-size="8">📊 % users creating own reports</text>
+                                <text x="15" y="52" fill="#a0a0b0" font-size="8">⏱️ Time to first insight</text>
+                                <text x="15" y="66" fill="#a0a0b0" font-size="8">📉 Data team ticket volume</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Common Pitfalls -->
+                        <g transform="translate(20, 310)">
+                            <text x="0" y="0" fill="#fff" font-size="12" font-weight="700">⚠️ Common Pitfalls</text>
+                            
+                            <g transform="translate(0, 15)">
+                                <rect width="280" height="45" rx="6" fill="#EF444420" stroke="#EF4444"/>
+                                <text x="15" y="18" fill="#F87171" font-size="9" font-weight="600">❌ Skipping the Semantic Layer</text>
+                                <text x="15" y="35" fill="#a0a0b0" font-size="8">Users get confused, metrics don't match</text>
+                            </g>
+                            
+                            <g transform="translate(295, 15)">
+                                <rect width="280" height="45" rx="6" fill="#EF444420" stroke="#EF4444"/>
+                                <text x="15" y="18" fill="#F87171" font-size="9" font-weight="600">❌ No Training or Change Management</text>
+                                <text x="15" y="35" fill="#a0a0b0" font-size="8">Tools deployed but nobody uses them</text>
+                            </g>
+                            
+                            <g transform="translate(590, 15)">
+                                <rect width="280" height="45" rx="6" fill="#EF444420" stroke="#EF4444"/>
+                                <text x="15" y="18" fill="#F87171" font-size="9" font-weight="600">❌ Poor Data Quality</text>
+                                <text x="15" y="35" fill="#a0a0b0" font-size="8">Users lose trust, revert to spreadsheets</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- BI TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>BI Tools Comparison Scorecard</h2>
+                    <p>Top 10 platforms compared across key dimensions (scored 1-5)</p>
+                </div>
+            </div>
+            
+            <!-- Scorecard Table -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background: #1a1a2e;">
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Tool</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Viz</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Ease</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Model</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Gov</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Embed</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">AI</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Scale</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Cost</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Best For</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Key Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #60A5FA;">Tableau</span><div style="font-size: 9px; color: #6a6a7a;">Salesforce</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Enterprise visualization</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Industry-leading visuals, huge community</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #F59E0B;">Power BI</span><div style="font-size: 9px; color: #6a6a7a;">Microsoft</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Microsoft shops, budget</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Best value, Office 365 integration</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #10B981;">Looker</span><div style="font-size: 9px; color: #6a6a7a;">Google</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Governed self-service</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">LookML semantic layer, GCP native</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #EC4899;">ThoughtSpot</span><div style="font-size: 9px; color: #6a6a7a;">ThoughtSpot</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">AI-first analytics</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Natural language search, SpotIQ AI</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #8B5CF6;">Sigma</span><div style="font-size: 9px; color: #6a6a7a;">Sigma Computing</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #FBBF24; font-weight: 700;">$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Spreadsheet users</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Excel-like UX on cloud warehouse</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #EF4444;">Qlik Sense</span><div style="font-size: 9px; color: #6a6a7a;">Qlik</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Data exploration</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Associative engine, in-memory</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #06B6D4;">Metabase</span><div style="font-size: 9px; color: #6a6a7a;">Open Source</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">1</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Startups, embedded</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Quick setup, great embedded option</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #14B8A6;">Superset</span><div style="font-size: 9px; color: #6a6a7a;">Apache</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">1</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">SQL-savvy teams</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Fully open source, SQL Lab</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #F472B6;">Domo</span><div style="font-size: 9px; color: #6a6a7a;">Domo Inc</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">All-in-one cloud BI</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">1000+ connectors, mobile-first</td>
+                        </tr>
+                        <tr style="background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #A78BFA;">Mode</span><div style="font-size: 9px; color: #6a6a7a;">ThoughtSpot</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center; color: #FBBF24; font-weight: 700;">$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Data science teams</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">SQL + Python/R notebooks</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Legend Row -->
+            <div style="display: flex; gap: 24px; margin-top: 12px; font-size: 10px; color: var(--text-muted); align-items: center;">
+                <div><span style="background: #34D399; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 700;">4-5</span> Excellent</div>
+                <div><span style="background: #FBBF24; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 700;">3</span> Good</div>
+                <div><span style="background: #EF4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 700;">1-2</span> Limited</div>
+                <div style="height: 16px; width: 1px; background: var(--border-color);"></div>
+                <div><b>Viz</b>=Visualization</div>
+                <div><b>Model</b>=Data Modeling</div>
+                <div><b>Gov</b>=Governance</div>
+                <div><b>Embed</b>=Embedded</div>
+                <div><b>Scale</b>=Enterprise Scale</div>
+            </div>
+        </section>
+
+        <!-- AGENT SECTION -->
+        <section class="module" id="agents">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Analytics Agent</h2>
+                    <p>AI-powered assistant for data analysis and insight generation</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📊</div>
+                    <div class="agent-name">AnalyticsAgent</div>
+                    <div class="agent-role">Insight Generator</div>
+                    <div class="agent-desc">Automates data exploration, identifies trends and anomalies, generates natural language insights, and creates visualizations tailored to your questions.</div>
+                    <ul class="agent-capabilities">
+                        <li>Natural language to SQL</li>
+                        <li>Automated anomaly detection</li>
+                        <li>Trend analysis and forecasting</li>
+                        <li>Dashboard generation</li>
+                        <li>Insight narration</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Analysis Task</div>
+                        <div class="code-tab">Visualization</div>
+                        <div class="code-filename">analytics_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># analytics_agent.py - BI Analytics Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">analytics_agent</span> = Agent(
+    role=<span class="code-string">"Analytics Specialist"</span>,
+    goal=<span class="code-string">"Transform data into actionable insights"</span>,
+    backstory=<span class="code-string">"Expert in statistical analysis and visualization"</span>,
+    tools=[
+        SQLQueryBuilder(),
+        AnomalyDetector(),
+        TrendAnalyzer(),
+        ChartGenerator(),
+        InsightNarrator(),
+    ]
+)
+
+<span class="code-function">analysis_task</span> = Task(
+    description=<span class="code-string">"""
+    User Question: "Why did revenue drop last month?"
+    
+    1. Query revenue data for past 6 months
+    2. Segment by product, region, customer type
+    3. Identify anomalies and contributing factors
+    4. Generate visualizations showing breakdown
+    5. Write executive summary with recommendations
+    """</span>,
+    agent=analytics_agent,
+    expected_output=<span class="code-string">"Root cause analysis with visualizations"</span>
+)
+
+<span class="code-comment"># Execute analysis</span>
+crew = Crew(agents=[analytics_agent], tasks=[analysis_task])
+result = crew.kickoff()
+
+<span class="code-comment"># Output: "Revenue declined 12% primarily due to..."</span></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
+        <div class="footer-meta">Category 3 of 29 • Data Analytics & BI</div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palantir Platform | Data Engineering | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            --page-primary: #1C1C1C;
+            --page-accent: #FFFFFF;
+            --page-light: #A78BFA;
+            --page-glow: rgba(167, 139, 250, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--violet), var(--page-light), var(--indigo)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--violet); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--violet); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--violet); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .pillar-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .pillar-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .pillar-card.gotham::before { background: var(--red); }
+        .pillar-card.foundry::before { background: var(--blue); }
+        .pillar-card.apollo::before { background: var(--yellow); }
+        .pillar-card.aip::before { background: var(--violet); }
+        .pillar-icon { font-size: 32px; margin-bottom: 12px; }
+        .pillar-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .pillar-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .feature-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .feature-icon { width: 44px; height: 44px; background: var(--page-glow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .feature-title { font-size: 15px; font-weight: 600; }
+        .feature-subtitle { font-size: 10px; color: var(--text-muted); }
+        .feature-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .feature-list { list-style: none; }
+        .feature-list li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .feature-list li::before { content: '✓'; color: var(--green); }
+        
+        .ontology-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .ontology-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .ontology-header { padding: 16px; background: linear-gradient(135deg, rgba(139,92,246,0.2), transparent); border-bottom: 1px solid var(--border-color); }
+        .ontology-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .ontology-subtitle { font-size: 10px; color: var(--text-muted); }
+        .ontology-body { padding: 16px; }
+        .ontology-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .ontology-features { list-style: none; }
+        .ontology-features li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .ontology-features li::before { content: '→'; color: var(--violet); }
+        
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .tag.pro { background: rgba(16,185,129,0.2); color: var(--green); }
+        .tag.con { background: rgba(239,68,68,0.2); color: var(--red); }
+        .tag.neutral { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        
+        .code-example { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .code-example-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-example-title { font-size: 12px; font-weight: 600; }
+        .code-example-file { font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-example-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.7; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--violet), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--violet); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .pricing-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .pricing-icon { font-size: 32px; margin-bottom: 12px; }
+        .pricing-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .pricing-unit { font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .pricing-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--violet); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .feature-grid { grid-template-columns: 1fr; }
+            .pillar-grid { grid-template-columns: repeat(2, 1fr); }
+            .ontology-grid, .related-pages, .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔧 Category 02</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-data-engineering-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🏗️</span> Four Platforms</a></li>
+            <li><a href="#ontology"><span class="nav-icon">🧬</span> Ontology</a></li>
+            <li><a href="#aip"><span class="nav-icon">🤖</span> AIP</a></li>
+            <li><a href="#compute"><span class="nav-icon">⚡</span> Compute & Pricing</a></li>
+            <li><a href="#vs-databricks"><span class="nav-icon">⚔️</span> vs Databricks</a></li>
+            <li><a href="#component-comparison"><span class="nav-icon">🔄</span> Component Map</a></li>
+            <li><a href="#migration"><span class="nav-icon">🚀</span> Migration Guide</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-p1-data-ingestion.html"><span class="nav-icon">📥</span> Data Ingestion</a></li>
+            <li><a href="cat02-p2-data-transformation.html"><span class="nav-icon">🔄</span> Data Transformation</a></li>
+            <li><a href="cat02-p3-databricks.html"><span class="nav-icon">🧱</span> Databricks</a></li>
+            <li><a href="cat02-p4-snowflake.html"><span class="nav-icon">❄️</span> Snowflake</a></li>
+            <li><a href="cat02-p5-bigquery.html"><span class="nav-icon">🔍</span> BigQuery</a></li>
+            <li><a href="cat02-p6-apache-spark.html"><span class="nav-icon">⚡</span> Apache Spark</a></li>
+            <li><a href="cat02-p7-palantir.html" class="active"><span class="nav-icon">🔮</span> Palantir</a></li>
+            <li><a href="cat02-p8-data-quality.html"><span class="nav-icon">✅</span> Data Quality</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🔮 Page 2.7</span>
+                <h1>Palantir Platform</h1>
+                <p>Master the operational data platform powering government defense and enterprise operations. Learn the Ontology—Palantir's semantic layer for digital twins, the four platforms (Gotham, Foundry, Apollo, AIP), and how to build AI-powered operational workflows.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">$400B+</div><div class="hero-metric-label">Market Cap (2025)</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">$2.9B</div><div class="hero-metric-label">Revenue (2024)</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Ontology</div><div class="hero-metric-label">Digital Twin Layer</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">4</div><div class="hero-metric-label">Core Platforms</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Palantir?</h2>
+                    <p>The operational data company</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>The Enterprise Operating System</h3>
+                <p>Palantir builds software platforms that serve as central operating systems for organizations. Unlike traditional data platforms that focus on storage and analytics, Palantir's platforms are designed to integrate data, decisions, and operations at scale. The key differentiator is the Ontology—a semantic layer that creates a "digital twin" of your organization, connecting raw data to real-world entities like customers, products, facilities, and processes.</p>
+                
+                <h3>Founded for Defense, Expanded to Enterprise</h3>
+                <p>Founded in 2003 by Peter Thiel, Alex Karp, and others with seed funding from In-Q-Tel (the CIA's venture arm), Palantir originally built intelligence software for defense and counterterrorism. The name comes from the "seeing-stones" in Tolkien's Lord of the Rings. Today, Palantir serves both government (55% of revenue) and commercial customers (45%) across healthcare, manufacturing, financial services, and more. Notable customers include Airbus, Ferrari, Merck, the U.S. Department of Defense, and the NHS.</p>
+                
+                <h3>Four Principal Platforms</h3>
+                <p>Palantir has built four interconnected platforms: Gotham (defense/intelligence), Foundry (commercial operations), Apollo (software deployment), and AIP (AI Platform). These platforms share the same Ontology foundation and are backed by Apollo's continuous deployment capabilities, enabling zero-downtime updates across any environment—from public cloud to air-gapped classified networks.</p>
+            </div>
+        </section>
+
+        <!-- FOUR PLATFORMS -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Four Platforms</h2>
+                    <p>The Palantir operating system stack</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Palantir Platform Architecture</div>
+                    <div class="viz-badge">Unified Stack</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 420" style="width: 100%; height: auto;">
+                        <!-- AIP Layer -->
+                        <g transform="translate(50, 30)">
+                            <rect x="0" y="0" width="800" height="70" rx="10" fill="#8B5CF615" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#A78BFA" font-size="12" font-weight="600">🤖 PALANTIR AIP (Artificial Intelligence Platform)</text>
+                            <text x="120" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">LLM Integration</text>
+                            <text x="300" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">AIP Logic</text>
+                            <text x="480" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Agent Studio</text>
+                            <text x="660" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Model Catalog</text>
+                        </g>
+                        
+                        <!-- User-Facing Platforms -->
+                        <g transform="translate(50, 120)">
+                            <!-- Gotham -->
+                            <rect x="0" y="0" width="390" height="80" rx="10" fill="#EF444415" stroke="#EF4444" stroke-width="2"/>
+                            <text x="195" y="25" text-anchor="middle" fill="#F87171" font-size="12" font-weight="600">🎯 GOTHAM</text>
+                            <text x="195" y="45" text-anchor="middle" fill="#6a6a7a" font-size="9">Defense & Intelligence</text>
+                            <text x="195" y="65" text-anchor="middle" fill="#6a6a7a" font-size="9">Threat detection • Geospatial • Operations</text>
+                            
+                            <!-- Foundry -->
+                            <rect x="410" y="0" width="390" height="80" rx="10" fill="#3B82F615" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="605" y="25" text-anchor="middle" fill="#60A5FA" font-size="12" font-weight="600">🏭 FOUNDRY</text>
+                            <text x="605" y="45" text-anchor="middle" fill="#6a6a7a" font-size="9">Commercial & Enterprise</text>
+                            <text x="605" y="65" text-anchor="middle" fill="#6a6a7a" font-size="9">Data ops • Analytics • Applications</text>
+                        </g>
+                        
+                        <!-- Ontology Layer -->
+                        <g transform="translate(50, 220)">
+                            <rect x="0" y="0" width="800" height="70" rx="10" fill="#10B98115" stroke="#10B981" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#34D399" font-size="12" font-weight="600">🧬 ONTOLOGY — Digital Twin Layer</text>
+                            <text x="120" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Objects</text>
+                            <text x="260" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Properties</text>
+                            <text x="400" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Links</text>
+                            <text x="540" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Actions</text>
+                            <text x="680" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Functions</text>
+                        </g>
+                        
+                        <!-- Apollo Layer -->
+                        <g transform="translate(50, 310)">
+                            <rect x="0" y="0" width="800" height="70" rx="10" fill="#F59E0B15" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#FBBF24" font-size="12" font-weight="600">🚀 APOLLO — Continuous Deployment</text>
+                            <text x="120" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Zero-Downtime Updates</text>
+                            <text x="320" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Multi-Environment</text>
+                            <text x="520" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Dependency Resolution</text>
+                            <text x="720" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Health Monitoring</text>
+                        </g>
+                        
+                        <!-- Infrastructure Icons -->
+                        <g transform="translate(100, 395)">
+                            <text x="0" y="15" fill="#6a6a7a" font-size="9">☁️ AWS/Azure/GCP</text>
+                            <text x="150" y="15" fill="#6a6a7a" font-size="9">🏢 On-Premises</text>
+                            <text x="290" y="15" fill="#6a6a7a" font-size="9">🔒 Air-Gapped</text>
+                            <text x="420" y="15" fill="#6a6a7a" font-size="9">🛰️ Edge/IoT</text>
+                            <text x="540" y="15" fill="#6a6a7a" font-size="9">🚢 Naval/Mobile</text>
+                            <text x="670" y="15" fill="#6a6a7a" font-size="9">🏛️ GovCloud</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Four Platform Cards -->
+            <div class="pillar-grid">
+                <div class="pillar-card gotham">
+                    <div class="pillar-icon">🎯</div>
+                    <div class="pillar-title">Gotham</div>
+                    <div class="pillar-desc">Defense and intelligence platform for threat detection, mission planning, and operational response. Used by IC and DoD.</div>
+                </div>
+                <div class="pillar-card foundry">
+                    <div class="pillar-icon">🏭</div>
+                    <div class="pillar-title">Foundry</div>
+                    <div class="pillar-desc">Commercial operating system for data integration, analytics, and operational applications across enterprise.</div>
+                </div>
+                <div class="pillar-card apollo">
+                    <div class="pillar-icon">🚀</div>
+                    <div class="pillar-title">Apollo</div>
+                    <div class="pillar-desc">Continuous deployment layer that manages software updates across any environment with zero downtime.</div>
+                </div>
+                <div class="pillar-card aip">
+                    <div class="pillar-icon">🤖</div>
+                    <div class="pillar-title">AIP</div>
+                    <div class="pillar-desc">Artificial Intelligence Platform integrating LLMs into Ontology for AI-powered workflows and agents.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONTOLOGY -->
+        <section class="module" id="ontology">
+            <div class="module-header">
+                <div class="module-icon">🧬</div>
+                <div class="module-info">
+                    <h2>The Ontology</h2>
+                    <p>Palantir's core competitive advantage</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Digital Twin of Your Organization</h3>
+                <p>The Ontology is Palantir's most important differentiator. Instead of tables and columns, you work with real-world entities like "Employee," "Aircraft," "Purchase Order," or "Field Service Ticket"—along with the relationships and business logic that govern them. As CTO Shyam Sankar stated: "Our advantage comes down to Ontology. It's really an advantage on the AI demand side."</p>
+                
+                <h3>Semantic + Kinetic Elements</h3>
+                <p>The Ontology contains both semantic elements (objects, properties, links) that define what things are, and kinetic elements (actions, functions, dynamic security) that define what you can do with them. This allows the Ontology to not just describe your business—but to actually operate it, with built-in governance and audit trails.</p>
+            </div>
+            
+            <div class="ontology-grid">
+                <div class="ontology-card">
+                    <div class="ontology-header">
+                        <div class="ontology-title">Object Types</div>
+                        <div class="ontology-subtitle">Real-world entities</div>
+                    </div>
+                    <div class="ontology-body">
+                        <div class="ontology-desc">Define entities like Customer, Equipment, Transaction, or Threat Actor. Each object type maps to backing datasets but abstracts away the technical details.</div>
+                        <ul class="ontology-features">
+                            <li>Map datasets to business concepts</li>
+                            <li>Rich metadata and descriptions</li>
+                            <li>Primary keys and indexing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ontology-card">
+                    <div class="ontology-header">
+                        <div class="ontology-title">Properties</div>
+                        <div class="ontology-subtitle">Attributes and characteristics</div>
+                    </div>
+                    <div class="ontology-body">
+                        <div class="ontology-desc">Properties define the characteristics of objects—like a Customer's name, email, or lifetime value. Properties can be shared across multiple object types.</div>
+                        <ul class="ontology-features">
+                            <li>Shared properties across types</li>
+                            <li>Derived/computed properties</li>
+                            <li>Time series and versioning</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ontology-card">
+                    <div class="ontology-header">
+                        <div class="ontology-title">Link Types</div>
+                        <div class="ontology-subtitle">Relationships between entities</div>
+                    </div>
+                    <div class="ontology-body">
+                        <div class="ontology-desc">Links define relationships: Customer → Order, Supplier → Shipment → Warehouse. Unlike foreign keys, links are first-class citizens with their own properties.</div>
+                        <ul class="ontology-features">
+                            <li>One-to-many, many-to-many</li>
+                            <li>Bidirectional navigation</li>
+                            <li>Link properties (strength, date)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ontology-card">
+                    <div class="ontology-header">
+                        <div class="ontology-title">Action Types</div>
+                        <div class="ontology-subtitle">Controlled modifications</div>
+                    </div>
+                    <div class="ontology-body">
+                        <div class="ontology-desc">Actions define how objects can be modified—with validation rules, approval workflows, and audit trails. All writes must go through Actions, preventing uncontrolled changes.</div>
+                        <ul class="ontology-features">
+                            <li>Validation rules and constraints</li>
+                            <li>Multi-step approval workflows</li>
+                            <li>Complete audit history</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ontology-card">
+                    <div class="ontology-header">
+                        <div class="ontology-title">Functions</div>
+                        <div class="ontology-subtitle">Executable business logic</div>
+                    </div>
+                    <div class="ontology-body">
+                        <div class="ontology-desc">Functions are code-based logic that operates on the Ontology. They can take objects as input, compute derived values, and power real-time operational applications.</div>
+                        <ul class="ontology-features">
+                            <li>TypeScript/Python authoring</li>
+                            <li>Ontology-native inputs/outputs</li>
+                            <li>Used across apps and actions</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ontology-card">
+                    <div class="ontology-header">
+                        <div class="ontology-title">Interfaces</div>
+                        <div class="ontology-subtitle">Object type polymorphism</div>
+                    </div>
+                    <div class="ontology-body">
+                        <div class="ontology-desc">Interfaces describe the shape of object types, enabling polymorphism. Multiple object types can implement the same interface for consistent modeling and interaction.</div>
+                        <ul class="ontology-features">
+                            <li>Shared shape definitions</li>
+                            <li>Cross-type operations</li>
+                            <li>Consistent API patterns</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-example">
+                <div class="code-example-header">
+                    <div class="code-example-title">Ontology SDK Example</div>
+                    <div class="code-example-file">TypeScript</div>
+                </div>
+                <div class="code-example-content">
+                    <pre><span class="code-comment">// Query objects using the Ontology SDK</span>
+<span class="code-keyword">import</span> { Ontology } <span class="code-keyword">from</span> <span class="code-string">"@palantir/ontology-sdk"</span>;
+
+<span class="code-comment">// Get all customers in a region</span>
+<span class="code-keyword">const</span> <span class="code-function">customers</span> = <span class="code-keyword">await</span> Ontology.Customer
+    .where(c => c.region.eq(<span class="code-string">"EMEA"</span>))
+    .where(c => c.status.eq(<span class="code-string">"Active"</span>))
+    .fetchPage();
+
+<span class="code-comment">// Navigate links to related orders</span>
+<span class="code-keyword">for</span> (<span class="code-keyword">const</span> customer <span class="code-keyword">of</span> customers.data) {
+    <span class="code-keyword">const</span> orders = <span class="code-keyword">await</span> customer.orders.fetchPage();
+    console.log(<span class="code-string">`${customer.name}: ${orders.data.length} orders`</span>);
+}
+
+<span class="code-comment">// Execute an action with validation</span>
+<span class="code-keyword">await</span> Ontology.Actions.createOrder({
+    customerId: customer.id,
+    products: [<span class="code-string">"SKU-001"</span>, <span class="code-string">"SKU-002"</span>],
+    priority: <span class="code-string">"HIGH"</span>
+}); <span class="code-comment">// Automatically validated and audited</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- AIP -->
+        <section class="module" id="aip">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>AIP - Artificial Intelligence Platform</h2>
+                    <p>LLMs integrated with the Ontology</p>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🧠</div>
+                        <div>
+                            <div class="feature-title">AIP Logic</div>
+                            <div class="feature-subtitle">No-code LLM functions</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Build LLM-powered functions without writing code. Define prompts that can read from and write to the Ontology, with full audit trails and security enforcement.</div>
+                    <ul class="feature-list">
+                        <li>Natural language to Ontology actions</li>
+                        <li>Automated at scale (up to 100k objects)</li>
+                        <li>Integrated debugging and monitoring</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🤝</div>
+                        <div>
+                            <div class="feature-title">Agent Studio</div>
+                            <div class="feature-subtitle">Build AI agents</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Create production-ready AI agents that can reason over your Ontology, execute multi-step workflows, and integrate with existing applications and systems.</div>
+                    <ul class="feature-list">
+                        <li>Ontology-aware reasoning</li>
+                        <li>Tool integration and function calling</li>
+                        <li>Enterprise security and governance</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">📚</div>
+                        <div>
+                            <div class="feature-title">Model Catalog</div>
+                            <div class="feature-subtitle">Discover and deploy models</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Browse and deploy from a catalog of Palantir-provided LLMs including completion models, embedding models, and vision models. Compare models and test in sandboxes.</div>
+                    <ul class="feature-list">
+                        <li>Palantir-hosted and self-hosted options</li>
+                        <li>Multiple model providers supported</li>
+                        <li>Sandbox/playground testing</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">💬</div>
+                        <div>
+                            <div class="feature-title">AIP Assist</div>
+                            <div class="feature-subtitle">Platform-wide AI assistant</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">AI assistant available across the entire platform. Query documentation, get coding help, explore the Ontology with natural language, and add custom documentation sources.</div>
+                    <ul class="feature-list">
+                        <li>Code generation with TypeScript compiler</li>
+                        <li>Custom documentation integration (RAG)</li>
+                        <li>Ontology exploration in natural language</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">AIP Applications & Tools</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Description</th>
+                            <th>Key Capability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Workshop</strong></td>
+                            <td>Low-code application builder with AIP Interactive widget</td>
+                            <td>LLM-powered operational apps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pipeline Builder</strong></td>
+                            <td>Visual data transformation with "Use LLM" node</td>
+                            <td>AI-enhanced data pipelines</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Workspaces</strong></td>
+                            <td>JupyterLab/RStudio environments with AIP integration</td>
+                            <td>Model development and testing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AIP Accelerate</strong></td>
+                            <td>Rapid workflow building with AI assistance</td>
+                            <td>Quick prototyping</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Build with AIP</strong></td>
+                            <td>Pre-built products and templates from Marketplace</td>
+                            <td>Starter packs for common use cases</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sensitive Data Scanner</strong></td>
+                            <td>AI-powered detection of PII and sensitive data</td>
+                            <td>Automated compliance and security</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- COMPUTE & PRICING -->
+        <section class="module" id="compute">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Compute & Pricing</h2>
+                    <p>Usage-based consumption model</p>
+                </div>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-icon">🖥️</div>
+                    <div class="pricing-title">Compute</div>
+                    <div class="pricing-unit">compute-seconds</div>
+                    <div class="pricing-desc">Measured as Foundry compute-seconds. Formula: max(vCPUs, GiB_RAM/7.5) × replicas × time. Supports batch and interactive workloads on Spark, Flink, and custom engines.</div>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-icon">💾</div>
+                    <div class="pricing-title">Storage</div>
+                    <div class="pricing-unit">gigabyte-months</div>
+                    <div class="pricing-desc">General purpose data stored in non-Ontology transformation layers. Disk usage measured in GB-months. Includes datasets, raw files, and intermediate outputs.</div>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-icon">🧬</div>
+                    <div class="pricing-title">Ontology</div>
+                    <div class="pricing-unit">indexed data units</div>
+                    <div class="pricing-desc">Foundry's Ontology and indexed data formats for fast, organization-centric queries and actions. Separate metering for real-time object storage.</div>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Compute Architecture</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Runtime</th>
+                            <th>Use Case</th>
+                            <th>Languages</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Apache Spark</strong></td>
+                            <td>Large-scale data transformation and batch processing</td>
+                            <td>Python, SQL, Java</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Apache Flink</strong></td>
+                            <td>Streaming and real-time data integration</td>
+                            <td>Python, SQL, Java</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Polars</strong></td>
+                            <td>Fast DataFrame operations for smaller datasets</td>
+                            <td>Python</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ontology Engine</strong></td>
+                            <td>Palantir-authored engine for Ontology operations</td>
+                            <td>TypeScript, Python</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ML Runtime</strong></td>
+                            <td>Machine learning model training and inference</td>
+                            <td>Python, R</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Custom Containers</strong></td>
+                            <td>Bring your own container for specialized workloads</td>
+                            <td>Any</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-example">
+                <div class="code-example-header">
+                    <div class="code-example-title">Compute Usage Formula</div>
+                    <div class="code-example-file">Documentation</div>
+                </div>
+                <div class="code-example-content">
+                    <pre><span class="code-comment"># CPU Compute Seconds Calculation</span>
+vcpu_compute_seconds = max(vCPUs_per_replica, GiB_RAM_per_replica / <span class="code-string">7.5</span>) 
+                     × num_replicas 
+                     × vcpu_usage_rate 
+                     × time_active_in_seconds
+
+<span class="code-comment"># GPU Compute Seconds Calculation</span>
+gpu_compute_seconds = GPUs_per_replica 
+                    × num_replicas 
+                    × gpu_usage_rate 
+                    × time_active_in_seconds
+
+<span class="code-comment"># Key factors:</span>
+<span class="code-comment"># - Compute seconds measured while replica is starting or active</span>
+<span class="code-comment"># - Number of replicas is dynamic (auto-scaling)</span>
+<span class="code-comment"># - Configure min/max replicas in compute module settings</span>
+<span class="code-comment"># - Enterprise contracts may have different usage rates</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- PALANTIR VS DATABRICKS -->
+        <section class="module" id="vs-databricks">
+            <div class="module-header">
+                <div class="module-icon">⚔️</div>
+                <div class="module-info">
+                    <h2>Palantir vs Databricks</h2>
+                    <p>Two different philosophies for data platforms</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Fundamentally Different Approaches</h3>
+                <p>While both Palantir and Databricks are leading data platforms, they represent fundamentally different philosophies. Databricks is a <strong>lakehouse platform</strong>—focused on unifying data lakes and warehouses with best-in-class compute (Spark) and storage (Delta Lake). Palantir is an <strong>operational platform</strong>—focused on creating a semantic layer (Ontology) that turns data into actionable business objects that power real-world decisions and workflows.</p>
+                
+                <h3>Data-Centric vs. Operations-Centric</h3>
+                <p>Databricks excels at data engineering, analytics, and ML/AI workloads where the goal is transforming and analyzing data at scale. Palantir excels at operational use cases where the goal is empowering decision-makers (often non-technical) to take actions based on data. Databricks users typically write code; Palantir users often work through low-code applications built on the Ontology.</p>
+                
+                <h3>When to Choose Each</h3>
+                <p><strong>Choose Databricks</strong> when you need: massive-scale data processing, a unified lakehouse for analytics and ML, strong SQL/BI capabilities, or deep Spark expertise. <strong>Choose Palantir</strong> when you need: operational decision-making applications, a semantic layer (digital twin) of your business, tight integration between data and real-world actions, or deployment to air-gapped/classified environments.</p>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Platform Philosophy Comparison</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Palantir Foundry</th>
+                            <th>Databricks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Core Philosophy</strong></td>
+                            <td>Operational data platform—turn data into decisions</td>
+                            <td>Lakehouse platform—unify analytics and AI</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Primary Users</strong></td>
+                            <td>Business operators, analysts, decision-makers</td>
+                            <td>Data engineers, data scientists, analysts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Model</strong></td>
+                            <td>Ontology (objects, links, actions)—semantic layer</td>
+                            <td>Delta Lake (tables, schemas)—lakehouse layer</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Key Differentiator</strong></td>
+                            <td>Digital twin + operational applications</td>
+                            <td>Unified compute + open formats</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Application Building</strong></td>
+                            <td>Workshop (low-code), Slate, custom apps</td>
+                            <td>Partner tools (Tableau, Power BI), custom</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI/ML Approach</strong></td>
+                            <td>AIP—LLMs integrated with Ontology actions</td>
+                            <td>MLflow, Model Serving, Mosaic AI</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deployment</strong></td>
+                            <td>Any environment via Apollo (air-gapped, edge, etc.)</td>
+                            <td>Cloud-native (AWS, Azure, GCP)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Governance Model</strong></td>
+                            <td>Actions enforce all writes with audit trails</td>
+                            <td>Unity Catalog for access control and lineage</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pricing Model</strong></td>
+                            <td>Compute-seconds + Storage + Ontology units</td>
+                            <td>DBUs (Databricks Units) by SKU</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Market Focus</strong></td>
+                            <td>Government (55%) + Commercial (45%)</td>
+                            <td>Commercial-first, growing government</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2024 Revenue</strong></td>
+                            <td>$2.9B</td>
+                            <td>$2.4B+ (estimated)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- COMPONENT COMPARISON -->
+        <section class="module" id="component-comparison">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Component-by-Component Comparison</h2>
+                    <p>Mapping Databricks capabilities to Palantir equivalents</p>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Storage & Data Layer</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Databricks Component</th>
+                            <th>Palantir Equivalent</th>
+                            <th>Key Differences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Delta Lake</strong></td>
+                            <td><strong>Datasets + Ontology</strong></td>
+                            <td>Delta = ACID tables on object storage. Palantir = Datasets (raw) + Ontology (semantic objects). Ontology adds business meaning, not just schema.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Delta Tables</strong></td>
+                            <td><strong>Object Types</strong></td>
+                            <td>Delta tables are versioned Parquet. Object types are business entities (Customer, Order) backed by datasets with properties, links, and actions.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Foreign Keys / Joins</strong></td>
+                            <td><strong>Link Types</strong></td>
+                            <td>SQL joins require knowing schemas. Links are first-class relationships with bidirectional navigation and their own properties.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Time Travel</strong></td>
+                            <td><strong>Dataset Transactions + Object Versioning</strong></td>
+                            <td>Both support historical queries. Palantir Actions provide full audit trails of who changed what and why.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Schema Evolution</strong></td>
+                            <td><strong>Ontology Evolution</strong></td>
+                            <td>Delta auto-merges compatible schemas. Ontology changes propagate to all dependent applications automatically.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Governance & Security</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Databricks Component</th>
+                            <th>Palantir Equivalent</th>
+                            <th>Key Differences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Unity Catalog</strong></td>
+                            <td><strong>Ontology + Markings + CBAC</strong></td>
+                            <td>Unity = 3-level namespace + RBAC. Palantir = Object-level security with Classification-Based Access Controls (CBAC) for sensitive environments.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Row-Level Security</strong></td>
+                            <td><strong>Dynamic Object Filtering</strong></td>
+                            <td>Both support row/object-level filtering. Palantir security follows objects across all applications automatically.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Column Masking</strong></td>
+                            <td><strong>Property-Level Security</strong></td>
+                            <td>Similar capabilities. Palantir can mask properties based on user clearance levels in classified environments.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Lineage</strong></td>
+                            <td><strong>Automatic Lineage + Audit Logs</strong></td>
+                            <td>Both auto-track lineage. Palantir adds Action-level audit trails showing business decisions, not just data changes.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Metastore</strong></td>
+                            <td><strong>Ontology Metadata Service (OMS)</strong></td>
+                            <td>Unity metastore = technical metadata. OMS = business metadata including object types, link types, action types, and more.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Data Processing & Pipelines</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Databricks Component</th>
+                            <th>Palantir Equivalent</th>
+                            <th>Key Differences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Databricks Workflows</strong></td>
+                            <td><strong>Data Connection + Pipeline Builder + Code Repositories</strong></td>
+                            <td>Workflows = job orchestration. Palantir separates ingestion (Data Connection), transformation (Pipeline Builder/Code Repos), and Ontology sync.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Delta Live Tables (DLT)</strong></td>
+                            <td><strong>Pipeline Builder</strong></td>
+                            <td>DLT = declarative ETL with expectations. Pipeline Builder = visual ETL with LLM integration and automatic Ontology sync.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DLT Expectations</strong></td>
+                            <td><strong>Data Health Checks + Ontology Constraints</strong></td>
+                            <td>Both enforce data quality. Palantir adds Action validation rules that enforce business logic on writes.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Auto Loader</strong></td>
+                            <td><strong>Data Connection (Magritte)</strong></td>
+                            <td>Auto Loader = incremental file ingestion. Data Connection = 400+ connectors for databases, APIs, files, streaming, and SAP/ERP systems.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Structured Streaming</strong></td>
+                            <td><strong>Streaming Sync + Flink</strong></td>
+                            <td>Both support streaming. Palantir can index streaming data into Ontology objects in seconds for real-time operational workflows.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Medallion Architecture</strong></td>
+                            <td><strong>Raw → Clean → Ontology</strong></td>
+                            <td>Similar pattern. Bronze/Silver/Gold maps to Raw datasets → Cleaned datasets → Ontology objects ready for applications.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">AI/ML & Analytics</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Databricks Component</th>
+                            <th>Palantir Equivalent</th>
+                            <th>Key Differences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>MLflow</strong></td>
+                            <td><strong>Modeling Objectives + palantir_models</strong></td>
+                            <td>MLflow = open-source ML lifecycle. Palantir = proprietary framework with tight Ontology integration for feature stores and deployment.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Model Serving</strong></td>
+                            <td><strong>Model Deployment + Functions</strong></td>
+                            <td>Both serve models via REST APIs. Palantir models can be called directly from Actions and Functions in operational workflows.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature Store</strong></td>
+                            <td><strong>Ontology Objects as Features</strong></td>
+                            <td>Databricks has dedicated Feature Store. Palantir uses Ontology objects directly—properties become features with automatic lineage.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mosaic AI / DBRX</strong></td>
+                            <td><strong>AIP + Model Catalog</strong></td>
+                            <td>Databricks trains/hosts LLMs. Palantir integrates multiple LLM providers with Ontology for grounded, auditable AI workflows.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI Functions</strong></td>
+                            <td><strong>AIP Logic</strong></td>
+                            <td>Both enable LLM calls in pipelines. AIP Logic can read/write Ontology objects and trigger Actions with full governance.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SQL Warehouses</strong></td>
+                            <td><strong>Contour + Quiver</strong></td>
+                            <td>SQL Warehouses = serverless SQL analytics. Contour/Quiver = visual analytics on Ontology objects with drill-down to linked entities.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Notebooks</strong></td>
+                            <td><strong>Code Workspaces</strong></td>
+                            <td>Both offer Jupyter-style notebooks. Palantir Code Workspaces include JupyterLab, RStudio, and Streamlit with Ontology SDK access.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Applications & Operations</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Databricks Component</th>
+                            <th>Palantir Equivalent</th>
+                            <th>Key Differences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Dashboards / Lakeview</strong></td>
+                            <td><strong>Workshop + Slate + Reports</strong></td>
+                            <td>Databricks = BI dashboards. Workshop = full operational applications with forms, actions, and workflow logic—not just visualizations.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Partner Connect (Tableau, etc.)</strong></td>
+                            <td><strong>Native Applications</strong></td>
+                            <td>Databricks integrates with BI tools. Palantir builds applications natively on the Ontology—no external tools needed.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>REST APIs</strong></td>
+                            <td><strong>Ontology SDK + OSDK</strong></td>
+                            <td>Both expose APIs. Palantir OSDK generates type-safe clients in TypeScript/Python that understand your specific Ontology.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>—</strong></td>
+                            <td><strong>Actions</strong></td>
+                            <td>No direct equivalent. Actions are Palantir's controlled write mechanism with validation, approvals, side effects, and full audit trails.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>—</strong></td>
+                            <td><strong>Object Views</strong></td>
+                            <td>No direct equivalent. Object Views are auto-generated 360° views of any Ontology object with all linked entities and available actions.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cluster Policies</strong></td>
+                            <td><strong>Compute Modules + Resource Management</strong></td>
+                            <td>Both control compute resources. Palantir tracks compute-seconds with granular monitoring and cost attribution.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Deployment & Operations</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Databricks Component</th>
+                            <th>Palantir Equivalent</th>
+                            <th>Key Differences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Workspace Deployment</strong></td>
+                            <td><strong>Apollo</strong></td>
+                            <td>Databricks = cloud-managed workspaces. Apollo = continuous deployment to ANY environment including air-gapped, edge, and classified networks.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multi-Cloud</strong></td>
+                            <td><strong>Multi-Everything</strong></td>
+                            <td>Databricks runs on AWS/Azure/GCP. Palantir runs on cloud + on-prem + government clouds + submarines + aircraft + edge devices.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Terraform Provider</strong></td>
+                            <td><strong>Apollo Configuration</strong></td>
+                            <td>Databricks uses Terraform for IaC. Apollo manages entire platform deployments with automated rollouts and rollbacks.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>System Tables</strong></td>
+                            <td><strong>Resource Management + Metrics</strong></td>
+                            <td>Both provide operational monitoring. Palantir includes platform-wide observability across all services.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>—</strong></td>
+                            <td><strong>Control Panel</strong></td>
+                            <td>Palantir's admin console for organization settings, application access, CORS configuration, and platform-wide controls.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🏆</div>
+                        <div>
+                            <div class="feature-title">Palantir Strengths</div>
+                            <div class="feature-subtitle">Where Palantir wins</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Palantir excels in scenarios requiring operational decision-making, semantic data modeling, and deployment flexibility.</div>
+                    <ul class="feature-list">
+                        <li>Ontology creates business-meaningful digital twin</li>
+                        <li>Actions enforce governance on all data changes</li>
+                        <li>Workshop enables rapid low-code app development</li>
+                        <li>Apollo deploys to any environment (air-gapped, edge)</li>
+                        <li>AIP integrates LLMs with operational workflows</li>
+                        <li>Strong in government/defense with clearances</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🏆</div>
+                        <div>
+                            <div class="feature-title">Databricks Strengths</div>
+                            <div class="feature-subtitle">Where Databricks wins</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Databricks excels in scenarios requiring massive-scale data processing, open formats, and deep analytics/ML capabilities.</div>
+                    <ul class="feature-list">
+                        <li>Best-in-class Spark performance with Photon</li>
+                        <li>Delta Lake is open source and widely adopted</li>
+                        <li>Unity Catalog provides unified governance</li>
+                        <li>Strong SQL analytics and BI integration</li>
+                        <li>MLflow is industry-standard for ML lifecycle</li>
+                        <li>Large ecosystem and community</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MIGRATION STRATEGY -->
+        <section class="module" id="migration">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Migration: Palantir → Databricks</h2>
+                    <p>Strategy for migrating backend ETL and data pipelines</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>What Migrates vs. What Gets Left Behind</h3>
+                <p>When migrating from Palantir Foundry to Databricks, your <strong>data and ETL logic can migrate</strong>—but the <strong>Ontology, Actions, and AIP must be rebuilt or replaced</strong>. Palantir's transforms are often written in PySpark/SQL which ports directly to Databricks. However, the semantic layer (Ontology) and operational applications (Workshop) have no direct equivalent and require architectural redesign. This is the key trade-off: you gain open formats and ecosystem flexibility, but lose the integrated operational layer.</p>
+                
+                <h3>Migration Complexity by Layer</h3>
+                <p><strong>Low complexity:</strong> Raw data extraction, Spark/SQL transforms, basic pipelines. <strong>Medium complexity:</strong> Data Connection connectors, scheduling, lineage recreation. <strong>High complexity:</strong> Ontology object models, Actions/Functions, Workshop applications, AIP workflows. The Ontology is typically the hardest part—it encodes years of business logic and relationships that must be re-implemented in application code or BI tools.</p>
+                
+                <h3>Recommended Approach</h3>
+                <p>Migrate in phases: (1) Extract raw data to cloud storage, (2) Port transform code to Databricks notebooks/jobs, (3) Rebuild data models in Delta Lake + Unity Catalog, (4) Replace Ontology with semantic layer tools or custom APIs, (5) Rebuild operational apps with partner tools or custom development. Prioritize based on business criticality and complexity assessment.</p>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Palantir → Databricks Migration Architecture</div>
+                    <div class="viz-badge">What Migrates vs. Left Behind</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 520" style="width: 100%; height: auto;">
+                        <!-- Title -->
+                        <text x="450" y="25" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Migration Flow: Palantir Foundry → Databricks Lakehouse</text>
+                        
+                        <!-- LEFT SIDE: Palantir (Source) -->
+                        <g transform="translate(30, 50)">
+                            <rect x="0" y="0" width="280" height="440" rx="12" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="140" y="30" text-anchor="middle" fill="#A78BFA" font-size="13" font-weight="600">PALANTIR FOUNDRY</text>
+                            <text x="140" y="48" text-anchor="middle" fill="#6a6a7a" font-size="9">(Source Platform)</text>
+                            
+                            <!-- AIP - Left Behind -->
+                            <g transform="translate(15, 65)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#EF444420" stroke="#EF4444" stroke-width="1" stroke-dasharray="4,2"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#F87171" font-size="11" font-weight="600">🤖 AIP (AI Platform)</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">AIP Logic • Agent Studio • Model Catalog</text>
+                                <text x="240" y="12" fill="#EF4444" font-size="16">✗</text>
+                            </g>
+                            
+                            <!-- Ontology - Left Behind -->
+                            <g transform="translate(15, 125)">
+                                <rect x="0" y="0" width="250" height="70" rx="8" fill="#EF444420" stroke="#EF4444" stroke-width="1" stroke-dasharray="4,2"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#F87171" font-size="11" font-weight="600">🧬 ONTOLOGY</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Object Types • Link Types • Actions</text>
+                                <text x="125" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Functions • Interfaces • Security</text>
+                                <text x="240" y="12" fill="#EF4444" font-size="16">✗</text>
+                            </g>
+                            
+                            <!-- Workshop Apps - Left Behind -->
+                            <g transform="translate(15, 205)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#EF444420" stroke="#EF4444" stroke-width="1" stroke-dasharray="4,2"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#F87171" font-size="11" font-weight="600">📱 Workshop Applications</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Operational Apps • Dashboards • Forms</text>
+                                <text x="240" y="12" fill="#EF4444" font-size="16">✗</text>
+                            </g>
+                            
+                            <!-- Transforms - Migrates -->
+                            <g transform="translate(15, 265)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">🔄 Transforms (PySpark/SQL)</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Code Repositories • Pipeline Builder</text>
+                                <text x="240" y="12" fill="#10B981" font-size="16">✓</text>
+                            </g>
+                            
+                            <!-- Data Connection - Migrates -->
+                            <g transform="translate(15, 325)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">📥 Data Connection</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Connectors • Ingestion Logic</text>
+                                <text x="240" y="12" fill="#10B981" font-size="16">✓</text>
+                            </g>
+                            
+                            <!-- Raw Datasets - Migrates -->
+                            <g transform="translate(15, 385)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">💾 Datasets (Raw Data)</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Parquet • CSV • JSON • Avro</text>
+                                <text x="240" y="12" fill="#10B981" font-size="16">✓</text>
+                            </g>
+                        </g>
+                        
+                        <!-- MIDDLE: Migration Arrows -->
+                        <g transform="translate(320, 50)">
+                            <!-- Left Behind Label -->
+                            <text x="130" y="100" text-anchor="middle" fill="#EF4444" font-size="10" font-weight="600">LEFT BEHIND</text>
+                            <text x="130" y="115" text-anchor="middle" fill="#6a6a7a" font-size="8">No direct equivalent</text>
+                            <text x="130" y="128" text-anchor="middle" fill="#6a6a7a" font-size="8">Requires rebuild</text>
+                            
+                            <!-- Dotted lines for left behind -->
+                            <line x1="0" y1="90" x2="80" y2="90" stroke="#EF4444" stroke-width="1" stroke-dasharray="4,2"/>
+                            <line x1="180" y1="90" x2="260" y2="280" stroke="#EF4444" stroke-width="1" stroke-dasharray="4,2"/>
+                            
+                            <!-- Migrates arrows -->
+                            <g transform="translate(0, 230)">
+                                <text x="130" y="70" text-anchor="middle" fill="#10B981" font-size="10" font-weight="600">MIGRATES</text>
+                                <path d="M 0 100 L 100 100 L 100 80 L 160 110 L 100 140 L 100 120 L 0 120 Z" fill="#10B98130" stroke="#10B981" stroke-width="2"/>
+                                <text x="80" y="113" text-anchor="middle" fill="#34D399" font-size="9">ETL + Data</text>
+                                
+                                <path d="M 0 160 L 100 160 L 100 140 L 160 170 L 100 200 L 100 180 L 0 180 Z" fill="#10B98130" stroke="#10B981" stroke-width="2"/>
+                                <text x="80" y="173" text-anchor="middle" fill="#34D399" font-size="9">Connectors</text>
+                                
+                                <path d="M 0 220 L 100 220 L 100 200 L 160 230 L 100 260 L 100 240 L 0 240 Z" fill="#10B98130" stroke="#10B981" stroke-width="2"/>
+                                <text x="80" y="233" text-anchor="middle" fill="#34D399" font-size="9">Raw Data</text>
+                            </g>
+                        </g>
+                        
+                        <!-- RIGHT SIDE: Databricks (Target) -->
+                        <g transform="translate(590, 50)">
+                            <rect x="0" y="0" width="280" height="440" rx="12" fill="#1a1a2e" stroke="#FF3621" stroke-width="2"/>
+                            <text x="140" y="30" text-anchor="middle" fill="#FF6B5B" font-size="13" font-weight="600">DATABRICKS LAKEHOUSE</text>
+                            <text x="140" y="48" text-anchor="middle" fill="#6a6a7a" font-size="9">(Target Platform)</text>
+                            
+                            <!-- Rebuild Required -->
+                            <g transform="translate(15, 65)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#F59E0B20" stroke="#F59E0B" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">🤖 Mosaic AI / Partner Tools</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">REBUILD: AI workflows with MLflow + APIs</text>
+                            </g>
+                            
+                            <!-- Semantic Layer - Rebuild -->
+                            <g transform="translate(15, 125)">
+                                <rect x="0" y="0" width="250" height="70" rx="8" fill="#F59E0B20" stroke="#F59E0B" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">🏗️ Unity Catalog + Custom Layer</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">REBUILD: Semantic layer via dbt, Atlan,</text>
+                                <text x="125" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">or custom APIs (no Actions equivalent)</text>
+                            </g>
+                            
+                            <!-- Apps - Rebuild -->
+                            <g transform="translate(15, 205)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#F59E0B20" stroke="#F59E0B" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">📱 BI Tools / Custom Apps</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">REBUILD: Tableau, Power BI, or React apps</text>
+                            </g>
+                            
+                            <!-- Workflows - Direct -->
+                            <g transform="translate(15, 265)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">⚙️ Databricks Workflows</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Port PySpark/SQL transforms directly</text>
+                            </g>
+                            
+                            <!-- Auto Loader -->
+                            <g transform="translate(15, 325)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">📥 Auto Loader + Connectors</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Recreate ingestion with native connectors</text>
+                            </g>
+                            
+                            <!-- Delta Lake -->
+                            <g transform="translate(15, 385)">
+                                <rect x="0" y="0" width="250" height="50" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="1"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">🔺 Delta Lake Tables</text>
+                                <text x="125" y="36" text-anchor="middle" fill="#6a6a7a" font-size="9">Load data into Delta format</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Legend -->
+                        <g transform="translate(320, 480)">
+                            <rect x="0" y="0" width="260" height="35" rx="6" fill="#12121a" stroke="#2a2a3e"/>
+                            <circle cx="20" cy="18" r="6" fill="#10B981"/>
+                            <text x="35" y="22" fill="#6a6a7a" font-size="9">Migrates directly</text>
+                            <circle cx="110" cy="18" r="6" fill="#F59E0B"/>
+                            <text x="125" y="22" fill="#6a6a7a" font-size="9">Requires rebuild</text>
+                            <circle cx="200" cy="18" r="6" fill="#EF4444"/>
+                            <text x="215" y="22" fill="#6a6a7a" font-size="9">Left behind</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Migration Phases</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Phase</th>
+                            <th>Activities</th>
+                            <th>Complexity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Phase 1: Assessment</strong></td>
+                            <td>Inventory all datasets, transforms, Ontology objects, and applications. Identify dependencies and business logic embedded in Actions/Functions.</td>
+                            <td><span class="tag neutral">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 2: Data Extraction</strong></td>
+                            <td>Export raw datasets from Foundry to cloud object storage (S3/ADLS/GCS). Palantir datasets are typically Parquet—direct copy possible.</td>
+                            <td><span class="tag pro">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 3: Transform Migration</strong></td>
+                            <td>Port PySpark/SQL transforms to Databricks notebooks. Remove Palantir-specific decorators (@transform). Recreate in DLT or Workflows.</td>
+                            <td><span class="tag pro">Low-Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 4: Connector Recreation</strong></td>
+                            <td>Replace Data Connection sources with Databricks connectors, Auto Loader, or Fivetran/Airbyte. May require API credential migration.</td>
+                            <td><span class="tag neutral">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 5: Governance Setup</strong></td>
+                            <td>Configure Unity Catalog with 3-level namespace. Recreate access controls, row-level security, and column masking. Rebuild lineage.</td>
+                            <td><span class="tag neutral">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 6: Semantic Layer</strong></td>
+                            <td>Rebuild Ontology concepts using dbt semantic layer, Atlan, or custom APIs. This is the hardest part—Actions have no equivalent.</td>
+                            <td><span class="tag con">High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 7: Application Rebuild</strong></td>
+                            <td>Replace Workshop apps with Tableau/Power BI dashboards or custom React/Python apps. Rebuild operational workflows from scratch.</td>
+                            <td><span class="tag con">High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phase 8: AI/ML Migration</strong></td>
+                            <td>Port models to MLflow. Rebuild AIP Logic functions as Databricks AI Functions or custom APIs. Recreate agent workflows.</td>
+                            <td><span class="tag con">High</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Component Migration Guide</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Palantir Component</th>
+                            <th>Migration Strategy</th>
+                            <th>Databricks Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Datasets (Parquet)</strong></td>
+                            <td>Direct export to cloud storage, load into Delta tables</td>
+                            <td>Delta Lake tables in Unity Catalog</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Repositories</strong></td>
+                            <td>Checkout repos, remove @transform decorator, port to notebooks</td>
+                            <td>Databricks Repos + Notebooks</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pipeline Builder</strong></td>
+                            <td>Promote to code, then migrate transforms. Visual logic lost.</td>
+                            <td>Delta Live Tables (DLT)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Connection</strong></td>
+                            <td>Document all sources, recreate with native connectors</td>
+                            <td>Auto Loader + Partner Connect</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scheduling</strong></td>
+                            <td>Export job definitions, recreate schedules and dependencies</td>
+                            <td>Databricks Workflows</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Object Types</strong></td>
+                            <td>Map to Delta tables. Business meaning must be documented externally.</td>
+                            <td>Delta tables + dbt models + data catalog</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Link Types</strong></td>
+                            <td>Convert to foreign key relationships or join tables</td>
+                            <td>FK constraints + join logic in SQL</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actions</strong></td>
+                            <td>⚠️ No equivalent. Rebuild as API endpoints with custom validation.</td>
+                            <td>Custom APIs + application logic</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Functions</strong></td>
+                            <td>Port business logic to Python UDFs or external services</td>
+                            <td>Python UDFs + Databricks Functions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Workshop Apps</strong></td>
+                            <td>⚠️ Full rebuild required. Document all workflows and logic.</td>
+                            <td>Tableau / Power BI / Custom apps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AIP Logic</strong></td>
+                            <td>Recreate prompts as AI Functions or LangChain workflows</td>
+                            <td>Databricks AI Functions + MLflow</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ontology Security</strong></td>
+                            <td>Map object-level permissions to Unity Catalog RBAC</td>
+                            <td>Unity Catalog + Row-Level Security</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-example">
+                <div class="code-example-header">
+                    <div class="code-example-title">Transform Migration Example</div>
+                    <div class="code-example-file">Before & After</div>
+                </div>
+                <div class="code-example-content">
+                    <pre><span class="code-comment"># ═══════════════════════════════════════════════════════════════</span>
+<span class="code-comment"># BEFORE: Palantir Foundry Transform</span>
+<span class="code-comment"># ═══════════════════════════════════════════════════════════════</span>
+<span class="code-keyword">from</span> transforms.api <span class="code-keyword">import</span> transform, Input, Output
+
+<span class="code-keyword">@transform</span>(
+    orders=Input(<span class="code-string">"/datasets/raw/orders"</span>),
+    customers=Input(<span class="code-string">"/datasets/raw/customers"</span>),
+    output=Output(<span class="code-string">"/datasets/clean/order_summary"</span>)
+)
+<span class="code-keyword">def</span> <span class="code-function">compute</span>(orders, customers, output):
+    df = orders.dataframe()
+    cust_df = customers.dataframe()
+    
+    result = df.join(cust_df, <span class="code-string">"customer_id"</span>) \
+        .groupBy(<span class="code-string">"region"</span>) \
+        .agg(sum(<span class="code-string">"amount"</span>).alias(<span class="code-string">"total_revenue"</span>))
+    
+    output.write_dataframe(result)
+
+
+<span class="code-comment"># ═══════════════════════════════════════════════════════════════</span>
+<span class="code-comment"># AFTER: Databricks Delta Live Tables</span>
+<span class="code-comment"># ═══════════════════════════════════════════════════════════════</span>
+<span class="code-keyword">import</span> dlt
+<span class="code-keyword">from</span> pyspark.sql.functions <span class="code-keyword">import</span> sum
+
+<span class="code-keyword">@dlt.table</span>(
+    comment=<span class="code-string">"Order summary by region"</span>,
+    table_properties={<span class="code-string">"quality"</span>: <span class="code-string">"gold"</span>}
+)
+<span class="code-keyword">def</span> <span class="code-function">order_summary</span>():
+    orders = dlt.read(<span class="code-string">"bronze_orders"</span>)
+    customers = dlt.read(<span class="code-string">"bronze_customers"</span>)
+    
+    <span class="code-keyword">return</span> orders.join(customers, <span class="code-string">"customer_id"</span>) \
+        .groupBy(<span class="code-string">"region"</span>) \
+        .agg(sum(<span class="code-string">"amount"</span>).alias(<span class="code-string">"total_revenue"</span>))</pre>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Migration Do's</div>
+                    <ul class="practice-list">
+                        <li>Document ALL Ontology objects, links, and Actions before starting—this is your business logic</li>
+                        <li>Export transform code from Code Repositories—it's mostly standard PySpark</li>
+                        <li>Use Foundry's data export APIs to extract datasets in parallel</li>
+                        <li>Start with data layer migration before attempting app rebuilds</li>
+                        <li>Leverage dbt for semantic layer to partially replace Ontology concepts</li>
+                        <li>Plan for extended timeline—Ontology rebuild is always underestimated</li>
+                        <li>Consider hybrid approach during transition (both platforms running)</li>
+                        <li>Engage business users early—they depend on Workshop apps</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Migration Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't assume 1:1 mapping—Ontology concepts don't directly translate</li>
+                        <li>Don't underestimate Action complexity—validation logic is embedded everywhere</li>
+                        <li>Don't migrate Workshop apps as-is—they must be completely rebuilt</li>
+                        <li>Don't forget about AIP workflows—these need full reconstruction</li>
+                        <li>Don't ignore lineage—Unity Catalog won't automatically inherit Palantir lineage</li>
+                        <li>Don't skip user training—Databricks UX is very different from Workshop</li>
+                        <li>Don't migrate everything at once—phase by domain/use case</li>
+                        <li>Don't lose audit history—export Action logs before decommissioning</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Key Risks & Considerations</h3>
+                <p><strong>Ontology Loss:</strong> The biggest risk is losing the semantic layer. Years of business logic encoded in Object Types, Link Types, and Actions must be re-implemented—often in multiple places (dbt models, application code, API validators). There is no single Databricks equivalent.</p>
+                
+                <p><strong>Operational App Gap:</strong> Workshop applications that business users depend on daily have no direct replacement. Rebuilding in Tableau/Power BI covers dashboards but not operational workflows with forms, actions, and approvals. Custom development is often required.</p>
+                
+                <p><strong>AI Workflow Disruption:</strong> AIP Logic functions that automate Ontology operations must be rebuilt as Databricks AI Functions or external services. The tight integration between LLMs and business objects is lost.</p>
+                
+                <p><strong>Complexity Compounds:</strong> While individual ETL migrations may be straightforward, the cumulative complexity of rebuilding Ontology, Applications, and AI workflows simultaneously creates significant project risk. Plan phased approaches with clear milestones.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for Palantir success</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Build the Ontology first—it's the foundation for everything else</li>
+                        <li>Use Actions for all Ontology writes to maintain audit trails</li>
+                        <li>Leverage AIP Logic for no-code LLM functions before writing custom code</li>
+                        <li>Use Interfaces for object type polymorphism and consistent APIs</li>
+                        <li>Design object types around business concepts, not database tables</li>
+                        <li>Use Workshop for rapid application development with low-code</li>
+                        <li>Enable incremental object indexing for improved performance</li>
+                        <li>Integrate AIP Assist with your custom documentation</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't skip Ontology design—ad-hoc datasets lead to silos</li>
+                        <li>Avoid direct dataset writes—always go through Actions</li>
+                        <li>Don't over-engineer object types—start simple, evolve iteratively</li>
+                        <li>Never expose raw LLM outputs without validation and governance</li>
+                        <li>Avoid tight coupling between applications—use the Ontology as contract</li>
+                        <li>Don't ignore data lineage—it's automatic, use it for impact analysis</li>
+                        <li>Never hardcode credentials—use platform secrets management</li>
+                        <li>Don't deploy without Apollo—it handles zero-downtime updates</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for Palantir</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔮</div>
+                    <div class="agent-name">PalantirAgent</div>
+                    <div class="agent-role">Ontology & AIP Specialist</div>
+                    <div class="agent-desc">Expert in Palantir Foundry, Ontology design, and AIP integration. Specializes in building digital twins, designing object models, configuring actions and functions, and deploying AI-powered operational workflows.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design Ontology object types and links</li>
+                        <li>Configure Actions with validation rules</li>
+                        <li>Build AIP Logic functions</li>
+                        <li>Create Workshop applications</li>
+                        <li>Integrate LLMs with Ontology operations</li>
+                        <li>Optimize compute usage and costs</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Ontology Task</div>
+                        <div class="code-filename">palantir_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># palantir_agent.py - Palantir Platform Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">palantir_agent</span> = Agent(
+    role=<span class="code-string">"Palantir Solutions Architect"</span>,
+    goal=<span class="code-string">"Design optimal Ontology-driven solutions"</span>,
+    backstory=<span class="code-string">"""Expert in Palantir Foundry, Ontology 
+    design, AIP, and operational workflows. Deep 
+    knowledge of object types, links, actions, 
+    functions, and AI-powered applications."""</span>,
+    tools=[
+        OntologyDesigner(),
+        ActionConfigurator(),
+        AIPLogicBuilder(),
+        WorkshopAppCreator(),
+        ComputeOptimizer(),
+    ]
+)
+
+<span class="code-function">ontology_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze business domain and entities
+    2. Design object types and properties
+    3. Define link types and relationships
+    4. Configure Actions with validation rules
+    5. Build Functions for business logic
+    6. Create AIP Logic for LLM integration
+    7. Deploy Workshop operational apps
+    """</span>,
+    agent=palantir_agent,
+    expected_output=<span class="code-string">"Production-ready Ontology with AIP"</span>
+)
+
+<span class="code-comment"># Execute Palantir implementation</span>
+crew = Crew(agents=[palantir_agent], tasks=[ontology_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat02-p3-databricks.html" class="related-card">
+                    <div class="related-num">Page 2.3</div>
+                    <div class="related-title">Databricks Platform</div>
+                    <div class="related-desc">Compare with lakehouse approach</div>
+                </a>
+                <a href="cat02-p4-snowflake.html" class="related-card">
+                    <div class="related-num">Page 2.4</div>
+                    <div class="related-title">Snowflake Platform</div>
+                    <div class="related-desc">Data warehouse comparison</div>
+                </a>
+                <a href="cat02-p8-data-quality.html" class="related-card">
+                    <div class="related-num">Page 2.8</div>
+                    <div class="related-title">Data Quality</div>
+                    <div class="related-desc">Validation and governance patterns</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat02-p6-apache-spark.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">2.6: Apache Spark</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 2.7 of 12</div>
+        <a href="cat02-p8-data-quality.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">2.8: Data Quality</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

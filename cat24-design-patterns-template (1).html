@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Patterns | Category 24 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 24 - DESIGN PATTERNS TEAL */
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        /* PATTERN CATEGORIES VISUAL */
+        .pattern-categories-visual {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .pattern-categories-svg { width: 100%; height: auto; }
+        
+        /* PATTERN CARDS GRID */
+        .patterns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .pattern-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-lg); 
+            padding: var(--space-lg); 
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .pattern-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--pattern-color);
+        }
+        .pattern-card:hover { 
+            border-color: var(--pattern-color); 
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .pattern-icon { font-size: 32px; margin-bottom: var(--space-sm); }
+        .pattern-name { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); }
+        .pattern-type { font-size: var(--font-xs); color: var(--pattern-color); margin-bottom: var(--space-sm); font-weight: 500; }
+        .pattern-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.5; }
+        .pattern-use { font-size: var(--font-xs); color: var(--text-muted); font-style: italic; }
+        
+        /* CAROUSEL */
+        .pattern-carousel { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-xl); 
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+        .carousel-tabs { 
+            display: flex; 
+            gap: 0; 
+            background: var(--bg-card-alt); 
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+        .carousel-tab { 
+            padding: var(--space-md) var(--space-lg); 
+            background: none; 
+            border: none; 
+            color: var(--text-muted); 
+            font-size: var(--font-sm); 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .carousel-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+        .carousel-tab.active { 
+            color: var(--cat-primary); 
+            border-bottom-color: var(--cat-primary);
+            background: var(--bg-card);
+        }
+        .carousel-content { padding: var(--space-xl); }
+        .pattern-slide { display: none; }
+        .pattern-slide.active { display: block; }
+        .slide-header { margin-bottom: var(--space-lg); }
+        .slide-header h3 { font-size: var(--font-lg); margin-bottom: var(--space-xs); }
+        .slide-subtitle { font-size: var(--font-sm); color: var(--cat-light); }
+        .slide-diagram { 
+            background: var(--bg-card-alt); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-lg); 
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        .slide-svg { width: 100%; height: auto; }
+        .slide-details { 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+        .detail-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+        }
+        .detail-label { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-xs); }
+        .detail-value { font-size: var(--font-sm); color: var(--text-secondary); }
+        
+        /* GOF PATTERNS */
+        .gof-section { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-xl); 
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .gof-header { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--space-md); 
+            margin-bottom: var(--space-lg);
+        }
+        .gof-badge {
+            background: linear-gradient(135deg, var(--cat-dark), var(--cat-primary));
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: var(--font-xs);
+            font-weight: 700;
+            color: #000;
+        }
+        .gof-title { font-size: var(--font-lg); font-weight: 600; }
+        .gof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+        .gof-category {
+            background: var(--bg-card-alt);
+            border: 2px solid var(--gof-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .gof-category-header {
+            background: color-mix(in srgb, var(--gof-color) 15%, transparent);
+            padding: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .gof-category-icon { font-size: 24px; }
+        .gof-category-title { font-size: var(--font-base); font-weight: 600; color: var(--gof-color); }
+        .gof-category-count { 
+            margin-left: auto; 
+            background: var(--gof-color); 
+            color: #000; 
+            padding: 2px 8px; 
+            border-radius: var(--radius-full);
+            font-size: var(--font-xs);
+            font-weight: 700;
+        }
+        .gof-patterns { padding: var(--space-md); }
+        .gof-pattern { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--space-sm); 
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .gof-pattern:last-child { border-bottom: none; }
+        .gof-pattern-dot { 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            background: var(--gof-color);
+        }
+        .gof-pattern-name { font-size: var(--font-sm); color: var(--text-primary); }
+        .gof-pattern-desc { font-size: var(--font-xs); color: var(--text-muted); margin-left: auto; }
+        
+        /* CLOUD PATTERNS */
+        .cloud-patterns { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .cloud-pattern-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            display: flex;
+            gap: var(--space-md);
+            transition: all 0.3s;
+        }
+        .cloud-pattern-card:hover {
+            border-color: var(--cat-primary);
+            transform: translateY(-2px);
+        }
+        .cloud-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--cat-glow);
+            border: 2px solid var(--cat-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .cloud-content { flex: 1; }
+        .cloud-name { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); }
+        .cloud-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-sm); line-height: 1.5; }
+        .cloud-tags { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+        .cloud-tag { 
+            padding: 4px 8px; 
+            background: var(--bg-card-alt); 
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); 
+            font-size: 10px; 
+            color: var(--text-muted);
+        }
+        
+        /* ANTI-PATTERNS */
+        .anti-patterns {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--danger-red);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .anti-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        .anti-icon { font-size: 32px; }
+        .anti-title { font-size: var(--font-lg); font-weight: 600; color: var(--danger-red); }
+        .anti-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .anti-card {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .anti-card:hover {
+            background: rgba(239, 68, 68, 0.1);
+            transform: translateY(-2px);
+        }
+        .anti-card-icon { font-size: 28px; margin-bottom: var(--space-sm); }
+        .anti-card-name { font-size: var(--font-sm); font-weight: 600; color: var(--danger-red); margin-bottom: var(--space-xs); }
+        .anti-card-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        
+        /* DECISION TREE */
+        .decision-tree {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .tree-svg { width: 100%; height: auto; }
+        
+        /* COMPARISON TABLE */
+        .comparison-table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+        .comparison-table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { 
+            background: var(--bg-card-alt); 
+            padding: var(--space-md); 
+            text-align: left; 
+            font-size: var(--font-sm); 
+            font-weight: 600; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .comparison-table td { 
+            padding: var(--space-md); 
+            font-size: var(--font-sm); 
+            color: var(--text-secondary); 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .table-pattern { font-weight: 600; color: var(--text-primary); }
+        .table-check { color: var(--success-green); }
+        .table-x { color: var(--danger-red); }
+        
+        /* TOOLS STRIP */
+        .tools-strip { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: var(--space-sm); 
+        }
+        .tool-item { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: var(--space-xs); 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            padding: var(--space-sm) var(--space-md); 
+            border-radius: var(--radius-full); 
+            font-size: var(--font-sm); 
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .tool-item:hover { 
+            border-color: var(--cat-primary); 
+            color: var(--cat-light);
+        }
+        .tool-emoji { font-size: 16px; }
+        
+        /* FOOTER */
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-lg) var(--space-xl);
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-logo {
+            font-size: var(--font-lg);
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .footer-logo span { color: var(--brand-orange); }
+        .footer-meta {
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+    
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">🎨 Category 24</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview" class="active"><span class="nav-icon">📊</span> Overview</a></li>
+                <li><a href="#gof"><span class="nav-icon">📘</span> GoF Patterns</a></li>
+                <li><a href="#creational"><span class="nav-icon">🏗️</span> Creational</a></li>
+                <li><a href="#structural"><span class="nav-icon">🔗</span> Structural</a></li>
+                <li><a href="#behavioral"><span class="nav-icon">🔄</span> Behavioral</a></li>
+                <li><a href="#architectural"><span class="nav-icon">🏛️</span> Architectural</a></li>
+                <li><a href="#cloud"><span class="nav-icon">☁️</span> Cloud Patterns</a></li>
+                <li><a href="#anti"><span class="nav-icon">⚠️</span> Anti-Patterns</a></li>
+                <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">🛠️ Resources</div>
+            <ul class="sidebar-nav">
+                <li><a href="#"><span class="nav-icon">📚</span> Pattern Catalog</a></li>
+                <li><a href="#"><span class="nav-icon">🔧</span> Refactoring Guide</a></li>
+                <li><a href="#"><span class="nav-icon">📖</span> Case Studies</a></li>
+            </ul>
+        </div>
+    </aside>
+    
+    <div class="main-wrapper">
+        <main class="main-content">
+            <!-- HERO -->
+            <section class="hero-compact" id="overview">
+                <div class="hero-left">
+                    <div class="hero-tag">🎨 Category 24</div>
+                    <h1>Design Patterns</h1>
+                    <p>Proven solutions to common software design problems. Master the Gang of Four patterns, architectural patterns, and cloud-native patterns for building scalable, maintainable systems.</p>
+                </div>
+                <div class="hero-metrics">
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">23</div>
+                        <div class="hero-metric-label">GoF Patterns</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">12+</div>
+                        <div class="hero-metric-label">Cloud Patterns</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">1994</div>
+                        <div class="hero-metric-label">GoF Published</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">3</div>
+                        <div class="hero-metric-label">Pattern Types</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PATTERN CATEGORIES OVERVIEW -->
+            <section class="module" id="gof">
+                <div class="module-header">
+                    <div class="module-icon">📘</div>
+                    <div class="module-info">
+                        <h2>Gang of Four Patterns</h2>
+                        <p>The 23 classic patterns from "Design Patterns: Elements of Reusable Object-Oriented Software"</p>
+                    </div>
+                </div>
+                
+                <div class="pattern-categories-visual">
+                    <svg viewBox="0 0 900 380" class="pattern-categories-svg">
+                        <!-- Background -->
+                        <rect x="0" y="0" width="900" height="380" fill="var(--bg-card-alt)" rx="12"/>
+                        
+                        <!-- Center Hub -->
+                        <circle cx="450" cy="190" r="70" fill="var(--bg-card)" stroke="var(--cat-primary)" stroke-width="3"/>
+                        <circle cx="450" cy="190" r="55" fill="var(--cat-glow)"/>
+                        <text x="450" y="180" text-anchor="middle" fill="var(--cat-light)" font-size="14" font-weight="700">Design</text>
+                        <text x="450" y="200" text-anchor="middle" fill="var(--cat-light)" font-size="14" font-weight="700">Patterns</text>
+                        <text x="450" y="220" text-anchor="middle" fill="var(--text-muted)" font-size="10">23 Patterns</text>
+                        
+                        <!-- CREATIONAL Branch - Left -->
+                        <line x1="380" y1="190" x2="220" y2="190" stroke="#10B981" stroke-width="3"/>
+                        <circle cx="160" cy="190" r="60" fill="var(--bg-card)" stroke="#10B981" stroke-width="3"/>
+                        <text x="160" y="175" text-anchor="middle" fill="#10B981" font-size="12" font-weight="700">CREATIONAL</text>
+                        <text x="160" y="195" text-anchor="middle" fill="var(--text-muted)" font-size="10">Object Creation</text>
+                        <text x="160" y="212" text-anchor="middle" fill="var(--text-secondary)" font-size="11">5 patterns</text>
+                        
+                        <!-- Creational pattern nodes - all r=28 -->
+                        <line x1="115" y1="140" x2="75" y2="110" stroke="#10B981" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="55" cy="95" r="28" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                        <text x="55" y="100" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Singleton</text>
+                        
+                        <line x1="100" y1="190" x2="78" y2="190" stroke="#10B981" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="55" cy="190" r="28" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                        <text x="55" y="195" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Factory</text>
+                        
+                        <line x1="115" y1="240" x2="75" y2="270" stroke="#10B981" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="55" cy="285" r="28" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                        <text x="55" y="290" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Builder</text>
+                        
+                        <!-- STRUCTURAL Branch - Top -->
+                        <line x1="450" y1="120" x2="450" y2="75" stroke="#8B5CF6" stroke-width="3"/>
+                        <rect x="350" y="30" width="200" height="55" rx="28" fill="var(--bg-card)" stroke="#8B5CF6" stroke-width="3"/>
+                        <text x="450" y="52" text-anchor="middle" fill="#8B5CF6" font-size="12" font-weight="700">STRUCTURAL</text>
+                        <text x="450" y="72" text-anchor="middle" fill="var(--text-secondary)" font-size="11">7 patterns • Composition</text>
+                        
+                        <!-- Structural pattern nodes - all r=28 -->
+                        <line x1="350" y1="57" x2="318" y2="57" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="290" cy="57" r="28" fill="var(--bg-card)" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="290" y="62" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Adapter</text>
+                        
+                        <line x1="550" y1="57" x2="582" y2="57" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="610" cy="57" r="28" fill="var(--bg-card)" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="610" y="62" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Decorator</text>
+                        
+                        <!-- BEHAVIORAL Branch - Right -->
+                        <line x1="520" y1="190" x2="680" y2="190" stroke="#EC4899" stroke-width="3"/>
+                        <circle cx="740" cy="190" r="60" fill="var(--bg-card)" stroke="#EC4899" stroke-width="3"/>
+                        <text x="740" y="175" text-anchor="middle" fill="#EC4899" font-size="12" font-weight="700">BEHAVIORAL</text>
+                        <text x="740" y="195" text-anchor="middle" fill="var(--text-muted)" font-size="10">Communication</text>
+                        <text x="740" y="212" text-anchor="middle" fill="var(--text-secondary)" font-size="11">11 patterns</text>
+                        
+                        <!-- Behavioral pattern nodes - all r=28 -->
+                        <line x1="785" y1="140" x2="825" y2="110" stroke="#EC4899" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="845" cy="95" r="28" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                        <text x="845" y="100" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Observer</text>
+                        
+                        <line x1="800" y1="190" x2="822" y2="190" stroke="#EC4899" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="845" cy="190" r="28" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                        <text x="845" y="195" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Strategy</text>
+                        
+                        <line x1="785" y1="240" x2="825" y2="270" stroke="#EC4899" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="845" cy="285" r="28" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                        <text x="845" y="290" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Command</text>
+                        
+                        <!-- Bottom Stats -->
+                        <rect x="250" y="320" width="400" height="45" rx="8" fill="var(--bg-card)" stroke="var(--border-color)"/>
+                        <text x="330" y="348" text-anchor="middle" fill="#10B981" font-size="12" font-weight="600">5 Creational</text>
+                        <text x="450" y="348" text-anchor="middle" fill="#8B5CF6" font-size="12" font-weight="600">7 Structural</text>
+                        <text x="570" y="348" text-anchor="middle" fill="#EC4899" font-size="12" font-weight="600">11 Behavioral</text>
+                    </svg>
+                </div>
+                
+                <!-- GoF Categories Grid -->
+                <div class="gof-section">
+                    <div class="gof-header">
+                        <div class="gof-badge">GoF</div>
+                        <div class="gof-title">Pattern Categories</div>
+                    </div>
+                    <div class="gof-grid">
+                        <div class="gof-category" style="--gof-color: #10B981;">
+                            <div class="gof-category-header">
+                                <span class="gof-category-icon">🏗️</span>
+                                <span class="gof-category-title">Creational</span>
+                                <span class="gof-category-count">5</span>
+                            </div>
+                            <div class="gof-patterns">
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Singleton</span>
+                                    <span class="gof-pattern-desc">Single instance</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Factory Method</span>
+                                    <span class="gof-pattern-desc">Create objects</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Abstract Factory</span>
+                                    <span class="gof-pattern-desc">Object families</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Builder</span>
+                                    <span class="gof-pattern-desc">Step-by-step</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Prototype</span>
+                                    <span class="gof-pattern-desc">Clone objects</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gof-category" style="--gof-color: #8B5CF6;">
+                            <div class="gof-category-header">
+                                <span class="gof-category-icon">🔗</span>
+                                <span class="gof-category-title">Structural</span>
+                                <span class="gof-category-count">7</span>
+                            </div>
+                            <div class="gof-patterns">
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Adapter</span>
+                                    <span class="gof-pattern-desc">Interface convert</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Bridge</span>
+                                    <span class="gof-pattern-desc">Decouple abstraction</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Composite</span>
+                                    <span class="gof-pattern-desc">Tree structures</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Decorator</span>
+                                    <span class="gof-pattern-desc">Add behavior</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Facade</span>
+                                    <span class="gof-pattern-desc">Simplified interface</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Flyweight</span>
+                                    <span class="gof-pattern-desc">Share objects</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Proxy</span>
+                                    <span class="gof-pattern-desc">Object placeholder</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gof-category" style="--gof-color: #EC4899;">
+                            <div class="gof-category-header">
+                                <span class="gof-category-icon">🔄</span>
+                                <span class="gof-category-title">Behavioral</span>
+                                <span class="gof-category-count">11</span>
+                            </div>
+                            <div class="gof-patterns">
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Observer</span>
+                                    <span class="gof-pattern-desc">Event subscription</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Strategy</span>
+                                    <span class="gof-pattern-desc">Interchangeable</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Command</span>
+                                    <span class="gof-pattern-desc">Request as object</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">State</span>
+                                    <span class="gof-pattern-desc">State-based behavior</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Template Method</span>
+                                    <span class="gof-pattern-desc">Algorithm skeleton</span>
+                                </div>
+                                <div class="gof-pattern">
+                                    <span class="gof-pattern-dot"></span>
+                                    <span class="gof-pattern-name">Iterator</span>
+                                    <span class="gof-pattern-desc">Sequential access</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ARCHITECTURAL PATTERNS CAROUSEL -->
+            <section class="module" id="architectural">
+                <div class="module-header">
+                    <div class="module-icon">🏛️</div>
+                    <div class="module-info">
+                        <h2>Architectural Patterns</h2>
+                        <p>High-level structures for organizing software systems</p>
+                    </div>
+                </div>
+                
+                <div class="pattern-carousel">
+                    <div class="carousel-tabs">
+                        <button class="carousel-tab active" data-pattern="mvc">MVC</button>
+                        <button class="carousel-tab" data-pattern="mvvm">MVVM</button>
+                        <button class="carousel-tab" data-pattern="microservices">Microservices</button>
+                        <button class="carousel-tab" data-pattern="eventdriven">Event-Driven</button>
+                        <button class="carousel-tab" data-pattern="cqrs">CQRS</button>
+                        <button class="carousel-tab" data-pattern="hexagonal">Hexagonal</button>
+                    </div>
+                    <div class="carousel-content">
+                        <!-- MVC -->
+                        <div class="pattern-slide active" id="pattern-mvc">
+                            <div class="slide-header">
+                                <h3>Model-View-Controller (MVC)</h3>
+                                <div class="slide-subtitle">Separates application into three interconnected components</div>
+                            </div>
+                            <div class="slide-diagram">
+                                <svg viewBox="0 0 800 280" class="slide-svg">
+                                    <!-- Model -->
+                                    <rect x="50" y="100" width="180" height="100" rx="12" fill="var(--bg-card)" stroke="#10B981" stroke-width="3"/>
+                                    <text x="140" y="140" text-anchor="middle" fill="#10B981" font-size="16" font-weight="700">MODEL</text>
+                                    <text x="140" y="165" text-anchor="middle" fill="var(--text-muted)" font-size="11">Data & Business Logic</text>
+                                    <text x="140" y="185" text-anchor="middle" fill="var(--text-secondary)" font-size="10">• State management</text>
+                                    
+                                    <!-- View -->
+                                    <rect x="310" y="20" width="180" height="100" rx="12" fill="var(--bg-card)" stroke="#3B82F6" stroke-width="3"/>
+                                    <text x="400" y="60" text-anchor="middle" fill="#3B82F6" font-size="16" font-weight="700">VIEW</text>
+                                    <text x="400" y="85" text-anchor="middle" fill="var(--text-muted)" font-size="11">User Interface</text>
+                                    <text x="400" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="10">• Display data</text>
+                                    
+                                    <!-- Controller -->
+                                    <rect x="310" y="160" width="180" height="100" rx="12" fill="var(--bg-card)" stroke="#EC4899" stroke-width="3"/>
+                                    <text x="400" y="200" text-anchor="middle" fill="#EC4899" font-size="16" font-weight="700">CONTROLLER</text>
+                                    <text x="400" y="225" text-anchor="middle" fill="var(--text-muted)" font-size="11">Input Handler</text>
+                                    <text x="400" y="245" text-anchor="middle" fill="var(--text-secondary)" font-size="10">• Process requests</text>
+                                    
+                                    <!-- User -->
+                                    <circle cx="700" cy="70" r="40" fill="var(--bg-card)" stroke="var(--cat-primary)" stroke-width="2"/>
+                                    <text x="700" y="65" text-anchor="middle" fill="var(--text-primary)" font-size="20">👤</text>
+                                    <text x="700" y="85" text-anchor="middle" fill="var(--text-muted)" font-size="10">User</text>
+                                    
+                                    <!-- Arrows -->
+                                    <path d="M 230,150 L 310,100" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+                                    <path d="M 310,180 L 230,150" stroke="#EC4899" stroke-width="2" fill="none" marker-end="url(#arrowPink)"/>
+                                    <path d="M 400,120 L 400,160" stroke="#8B5CF6" stroke-width="2" fill="none" marker-end="url(#arrowViolet)"/>
+                                    <path d="M 490,70 L 660,70" stroke="var(--cat-primary)" stroke-width="2" fill="none" marker-end="url(#arrowTeal)"/>
+                                    <path d="M 660,90 L 490,180" stroke="var(--cat-primary)" stroke-width="2" fill="none" marker-end="url(#arrowTeal)"/>
+                                    
+                                    <!-- Arrow Markers -->
+                                    <defs>
+                                        <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#10B981"/></marker>
+                                        <marker id="arrowPink" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#EC4899"/></marker>
+                                        <marker id="arrowViolet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#8B5CF6"/></marker>
+                                        <marker id="arrowTeal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--cat-primary)"/></marker>
+                                    </defs>
+                                    
+                                    <!-- Labels -->
+                                    <text x="260" y="105" fill="var(--text-muted)" font-size="9">Updates</text>
+                                    <text x="260" y="195" fill="var(--text-muted)" font-size="9">Modifies</text>
+                                    <text x="410" y="145" fill="var(--text-muted)" font-size="9">Selects</text>
+                                </svg>
+                            </div>
+                            <div class="slide-details">
+                                <div class="detail-card">
+                                    <div class="detail-label">Best For</div>
+                                    <div class="detail-value">Web applications, desktop apps with complex UIs</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Frameworks</div>
+                                    <div class="detail-value">Ruby on Rails, ASP.NET MVC, Spring MVC, Django</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Trade-offs</div>
+                                    <div class="detail-value">Clear separation but can lead to complex controllers</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MVVM -->
+                        <div class="pattern-slide" id="pattern-mvvm">
+                            <div class="slide-header">
+                                <h3>Model-View-ViewModel (MVVM)</h3>
+                                <div class="slide-subtitle">Two-way data binding between View and ViewModel</div>
+                            </div>
+                            <div class="slide-diagram">
+                                <svg viewBox="0 0 800 250" class="slide-svg">
+                                    <rect x="50" y="75" width="200" height="100" rx="12" fill="var(--bg-card)" stroke="#10B981" stroke-width="3"/>
+                                    <text x="150" y="115" text-anchor="middle" fill="#10B981" font-size="16" font-weight="700">MODEL</text>
+                                    <text x="150" y="140" text-anchor="middle" fill="var(--text-muted)" font-size="11">Data Layer</text>
+                                    
+                                    <rect x="300" y="75" width="200" height="100" rx="12" fill="var(--bg-card)" stroke="#8B5CF6" stroke-width="3"/>
+                                    <text x="400" y="115" text-anchor="middle" fill="#8B5CF6" font-size="16" font-weight="700">VIEWMODEL</text>
+                                    <text x="400" y="140" text-anchor="middle" fill="var(--text-muted)" font-size="11">Presentation Logic</text>
+                                    
+                                    <rect x="550" y="75" width="200" height="100" rx="12" fill="var(--bg-card)" stroke="#3B82F6" stroke-width="3"/>
+                                    <text x="650" y="115" text-anchor="middle" fill="#3B82F6" font-size="16" font-weight="700">VIEW</text>
+                                    <text x="650" y="140" text-anchor="middle" fill="var(--text-muted)" font-size="11">UI Components</text>
+                                    
+                                    <!-- Two-way binding -->
+                                    <path d="M 500,115 L 550,115" stroke="#F59E0B" stroke-width="3" fill="none"/>
+                                    <path d="M 550,135 L 500,135" stroke="#F59E0B" stroke-width="3" fill="none"/>
+                                    <text x="525" y="105" text-anchor="middle" fill="#F59E0B" font-size="10" font-weight="600">DATA BINDING</text>
+                                    
+                                    <path d="M 250,125 L 300,125" stroke="var(--text-muted)" stroke-width="2" fill="none" marker-end="url(#arrowGray)"/>
+                                    <defs><marker id="arrowGray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--text-muted)"/></marker></defs>
+                                </svg>
+                            </div>
+                            <div class="slide-details">
+                                <div class="detail-card">
+                                    <div class="detail-label">Best For</div>
+                                    <div class="detail-value">Rich client applications, mobile apps</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Frameworks</div>
+                                    <div class="detail-value">WPF, Xamarin, Angular, Vue.js, SwiftUI</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Trade-offs</div>
+                                    <div class="detail-value">Great testability but data binding can be complex</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Microservices -->
+                        <div class="pattern-slide" id="pattern-microservices">
+                            <div class="slide-header">
+                                <h3>Microservices Architecture</h3>
+                                <div class="slide-subtitle">Decompose application into loosely coupled services</div>
+                            </div>
+                            <div class="slide-diagram">
+                                <svg viewBox="0 0 800 280" class="slide-svg">
+                                    <!-- API Gateway -->
+                                    <rect x="330" y="20" width="140" height="50" rx="8" fill="var(--bg-card)" stroke="var(--cat-primary)" stroke-width="3"/>
+                                    <text x="400" y="50" text-anchor="middle" fill="var(--cat-primary)" font-size="12" font-weight="700">API GATEWAY</text>
+                                    
+                                    <!-- Services -->
+                                    <rect x="50" y="120" width="130" height="80" rx="8" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                                    <text x="115" y="155" text-anchor="middle" fill="#10B981" font-size="11" font-weight="600">User Service</text>
+                                    <text x="115" y="175" text-anchor="middle" fill="var(--text-muted)" font-size="9">Auth, Profile</text>
+                                    
+                                    <rect x="210" y="120" width="130" height="80" rx="8" fill="var(--bg-card)" stroke="#3B82F6" stroke-width="2"/>
+                                    <text x="275" y="155" text-anchor="middle" fill="#3B82F6" font-size="11" font-weight="600">Order Service</text>
+                                    <text x="275" y="175" text-anchor="middle" fill="var(--text-muted)" font-size="9">Cart, Checkout</text>
+                                    
+                                    <rect x="370" y="120" width="130" height="80" rx="8" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                                    <text x="435" y="155" text-anchor="middle" fill="#EC4899" font-size="11" font-weight="600">Product Service</text>
+                                    <text x="435" y="175" text-anchor="middle" fill="var(--text-muted)" font-size="9">Catalog, Inventory</text>
+                                    
+                                    <rect x="530" y="120" width="130" height="80" rx="8" fill="var(--bg-card)" stroke="#F59E0B" stroke-width="2"/>
+                                    <text x="595" y="155" text-anchor="middle" fill="#F59E0B" font-size="11" font-weight="600">Payment Service</text>
+                                    <text x="595" y="175" text-anchor="middle" fill="var(--text-muted)" font-size="9">Billing, Stripe</text>
+                                    
+                                    <rect x="690" y="120" width="100" height="80" rx="8" fill="var(--bg-card)" stroke="#8B5CF6" stroke-width="2"/>
+                                    <text x="740" y="155" text-anchor="middle" fill="#8B5CF6" font-size="11" font-weight="600">Notification</text>
+                                    <text x="740" y="175" text-anchor="middle" fill="var(--text-muted)" font-size="9">Email, SMS</text>
+                                    
+                                    <!-- Databases -->
+                                    <ellipse cx="115" cy="240" rx="35" ry="20" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                                    <text x="115" y="245" text-anchor="middle" fill="var(--text-muted)" font-size="9">PostgreSQL</text>
+                                    
+                                    <ellipse cx="275" cy="240" rx="35" ry="20" fill="var(--bg-card)" stroke="#3B82F6" stroke-width="2"/>
+                                    <text x="275" y="245" text-anchor="middle" fill="var(--text-muted)" font-size="9">MongoDB</text>
+                                    
+                                    <ellipse cx="435" cy="240" rx="35" ry="20" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                                    <text x="435" y="245" text-anchor="middle" fill="var(--text-muted)" font-size="9">Elastic</text>
+                                    
+                                    <!-- Connections -->
+                                    <line x1="400" y1="70" x2="115" y2="120" stroke="var(--text-muted)" stroke-width="1"/>
+                                    <line x1="400" y1="70" x2="275" y2="120" stroke="var(--text-muted)" stroke-width="1"/>
+                                    <line x1="400" y1="70" x2="435" y2="120" stroke="var(--text-muted)" stroke-width="1"/>
+                                    <line x1="400" y1="70" x2="595" y2="120" stroke="var(--text-muted)" stroke-width="1"/>
+                                    <line x1="400" y1="70" x2="740" y2="120" stroke="var(--text-muted)" stroke-width="1"/>
+                                    
+                                    <line x1="115" y1="200" x2="115" y2="220" stroke="var(--text-muted)" stroke-width="1"/>
+                                    <line x1="275" y1="200" x2="275" y2="220" stroke="var(--text-muted)" stroke-width="1"/>
+                                    <line x1="435" y1="200" x2="435" y2="220" stroke="var(--text-muted)" stroke-width="1"/>
+                                </svg>
+                            </div>
+                            <div class="slide-details">
+                                <div class="detail-card">
+                                    <div class="detail-label">Best For</div>
+                                    <div class="detail-value">Large-scale applications, distributed teams</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Key Tech</div>
+                                    <div class="detail-value">Kubernetes, Docker, Service Mesh, API Gateway</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Trade-offs</div>
+                                    <div class="detail-value">Scalable but complex operations and debugging</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Event-Driven -->
+                        <div class="pattern-slide" id="pattern-eventdriven">
+                            <div class="slide-header">
+                                <h3>Event-Driven Architecture</h3>
+                                <div class="slide-subtitle">Asynchronous communication via events</div>
+                            </div>
+                            <div class="slide-diagram">
+                                <svg viewBox="0 0 800 250" class="slide-svg">
+                                    <!-- Event Bus -->
+                                    <rect x="200" y="100" width="400" height="50" rx="8" fill="var(--cat-glow)" stroke="var(--cat-primary)" stroke-width="3"/>
+                                    <text x="400" y="130" text-anchor="middle" fill="var(--cat-primary)" font-size="14" font-weight="700">EVENT BUS / MESSAGE BROKER</text>
+                                    
+                                    <!-- Producers -->
+                                    <rect x="50" y="30" width="100" height="50" rx="8" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                                    <text x="100" y="60" text-anchor="middle" fill="#10B981" font-size="11" font-weight="600">Producer A</text>
+                                    
+                                    <rect x="170" y="30" width="100" height="50" rx="8" fill="var(--bg-card)" stroke="#3B82F6" stroke-width="2"/>
+                                    <text x="220" y="60" text-anchor="middle" fill="#3B82F6" font-size="11" font-weight="600">Producer B</text>
+                                    
+                                    <!-- Consumers -->
+                                    <rect x="430" y="170" width="100" height="50" rx="8" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                                    <text x="480" y="200" text-anchor="middle" fill="#EC4899" font-size="11" font-weight="600">Consumer 1</text>
+                                    
+                                    <rect x="550" y="170" width="100" height="50" rx="8" fill="var(--bg-card)" stroke="#F59E0B" stroke-width="2"/>
+                                    <text x="600" y="200" text-anchor="middle" fill="#F59E0B" font-size="11" font-weight="600">Consumer 2</text>
+                                    
+                                    <rect x="670" y="170" width="100" height="50" rx="8" fill="var(--bg-card)" stroke="#8B5CF6" stroke-width="2"/>
+                                    <text x="720" y="200" text-anchor="middle" fill="#8B5CF6" font-size="11" font-weight="600">Consumer 3</text>
+                                    
+                                    <!-- Arrows -->
+                                    <path d="M 100,80 L 100,100" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+                                    <path d="M 220,80 L 220,100" stroke="#3B82F6" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+                                    <path d="M 480,150 L 480,170" stroke="#EC4899" stroke-width="2" fill="none" marker-end="url(#arrowPink)"/>
+                                    <path d="M 600,150 L 600,170" stroke="#F59E0B" stroke-width="2" fill="none" marker-end="url(#arrowYellow)"/>
+                                    <path d="M 720,150 L 720,170" stroke="#8B5CF6" stroke-width="2" fill="none" marker-end="url(#arrowViolet)"/>
+                                    
+                                    <defs>
+                                        <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#3B82F6"/></marker>
+                                        <marker id="arrowYellow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#F59E0B"/></marker>
+                                    </defs>
+                                    
+                                    <!-- Labels -->
+                                    <text x="100" y="95" text-anchor="middle" fill="var(--text-muted)" font-size="9">publish</text>
+                                    <text x="600" y="165" text-anchor="middle" fill="var(--text-muted)" font-size="9">subscribe</text>
+                                </svg>
+                            </div>
+                            <div class="slide-details">
+                                <div class="detail-card">
+                                    <div class="detail-label">Best For</div>
+                                    <div class="detail-value">Real-time systems, decoupled services</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Key Tech</div>
+                                    <div class="detail-value">Kafka, RabbitMQ, AWS SNS/SQS, Redis Pub/Sub</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Trade-offs</div>
+                                    <div class="detail-value">Highly decoupled but eventual consistency challenges</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CQRS -->
+                        <div class="pattern-slide" id="pattern-cqrs">
+                            <div class="slide-header">
+                                <h3>Command Query Responsibility Segregation</h3>
+                                <div class="slide-subtitle">Separate read and write operations</div>
+                            </div>
+                            <div class="slide-diagram">
+                                <svg viewBox="0 0 800 250" class="slide-svg">
+                                    <!-- Client -->
+                                    <rect x="350" y="20" width="100" height="40" rx="8" fill="var(--bg-card)" stroke="var(--cat-primary)" stroke-width="2"/>
+                                    <text x="400" y="45" text-anchor="middle" fill="var(--cat-primary)" font-size="12" font-weight="600">Client</text>
+                                    
+                                    <!-- Command Side -->
+                                    <rect x="100" y="100" width="250" height="120" rx="12" fill="var(--bg-card)" stroke="#EC4899" stroke-width="3"/>
+                                    <text x="225" y="125" text-anchor="middle" fill="#EC4899" font-size="14" font-weight="700">COMMAND (Write)</text>
+                                    <rect x="120" y="140" width="90" height="30" rx="4" fill="var(--bg-card-alt)"/>
+                                    <text x="165" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Validate</text>
+                                    <rect x="230" y="140" width="90" height="30" rx="4" fill="var(--bg-card-alt)"/>
+                                    <text x="275" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Execute</text>
+                                    <rect x="170" y="180" width="90" height="30" rx="4" fill="var(--bg-card-alt)"/>
+                                    <text x="215" y="200" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Write DB</text>
+                                    
+                                    <!-- Query Side -->
+                                    <rect x="450" y="100" width="250" height="120" rx="12" fill="var(--bg-card)" stroke="#10B981" stroke-width="3"/>
+                                    <text x="575" y="125" text-anchor="middle" fill="#10B981" font-size="14" font-weight="700">QUERY (Read)</text>
+                                    <rect x="470" y="140" width="90" height="30" rx="4" fill="var(--bg-card-alt)"/>
+                                    <text x="515" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Read Model</text>
+                                    <rect x="580" y="140" width="90" height="30" rx="4" fill="var(--bg-card-alt)"/>
+                                    <text x="625" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Denormalized</text>
+                                    <rect x="520" y="180" width="90" height="30" rx="4" fill="var(--bg-card-alt)"/>
+                                    <text x="565" y="200" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Fast Read</text>
+                                    
+                                    <!-- Arrows -->
+                                    <path d="M 350,40 L 225,100" stroke="#EC4899" stroke-width="2" fill="none"/>
+                                    <path d="M 450,40 L 575,100" stroke="#10B981" stroke-width="2" fill="none"/>
+                                    
+                                    <!-- Sync -->
+                                    <path d="M 350,160 L 450,160" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5,5" fill="none"/>
+                                    <text x="400" y="150" text-anchor="middle" fill="#F59E0B" font-size="10">Sync Events</text>
+                                </svg>
+                            </div>
+                            <div class="slide-details">
+                                <div class="detail-card">
+                                    <div class="detail-label">Best For</div>
+                                    <div class="detail-value">High-read systems, complex domains</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Key Tech</div>
+                                    <div class="detail-value">Event Sourcing, Read Replicas, Redis Cache</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Trade-offs</div>
+                                    <div class="detail-value">Optimized reads/writes but increased complexity</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hexagonal -->
+                        <div class="pattern-slide" id="pattern-hexagonal">
+                            <div class="slide-header">
+                                <h3>Hexagonal Architecture (Ports & Adapters)</h3>
+                                <div class="slide-subtitle">Isolate core logic from external dependencies</div>
+                            </div>
+                            <div class="slide-diagram">
+                                <svg viewBox="0 0 800 300" class="slide-svg">
+                                    <!-- Hexagon -->
+                                    <polygon points="400,50 550,125 550,225 400,300 250,225 250,125" fill="var(--cat-glow)" stroke="var(--cat-primary)" stroke-width="3"/>
+                                    <text x="400" y="165" text-anchor="middle" fill="var(--cat-primary)" font-size="16" font-weight="700">DOMAIN</text>
+                                    <text x="400" y="185" text-anchor="middle" fill="var(--text-muted)" font-size="12">Business Logic</text>
+                                    <text x="400" y="205" text-anchor="middle" fill="var(--text-secondary)" font-size="10">(Pure, No Dependencies)</text>
+                                    
+                                    <!-- Left Ports (Driving) -->
+                                    <rect x="80" y="100" width="100" height="40" rx="6" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                                    <text x="130" y="125" text-anchor="middle" fill="#10B981" font-size="10" font-weight="600">REST API</text>
+                                    
+                                    <rect x="80" y="160" width="100" height="40" rx="6" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                                    <text x="130" y="185" text-anchor="middle" fill="#10B981" font-size="10" font-weight="600">GraphQL</text>
+                                    
+                                    <rect x="80" y="220" width="100" height="40" rx="6" fill="var(--bg-card)" stroke="#10B981" stroke-width="2"/>
+                                    <text x="130" y="245" text-anchor="middle" fill="#10B981" font-size="10" font-weight="600">CLI</text>
+                                    
+                                    <!-- Right Ports (Driven) -->
+                                    <rect x="620" y="100" width="100" height="40" rx="6" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                                    <text x="670" y="125" text-anchor="middle" fill="#EC4899" font-size="10" font-weight="600">Database</text>
+                                    
+                                    <rect x="620" y="160" width="100" height="40" rx="6" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                                    <text x="670" y="185" text-anchor="middle" fill="#EC4899" font-size="10" font-weight="600">Message Queue</text>
+                                    
+                                    <rect x="620" y="220" width="100" height="40" rx="6" fill="var(--bg-card)" stroke="#EC4899" stroke-width="2"/>
+                                    <text x="670" y="245" text-anchor="middle" fill="#EC4899" font-size="10" font-weight="600">External API</text>
+                                    
+                                    <!-- Connections -->
+                                    <line x1="180" y1="120" x2="250" y2="140" stroke="#10B981" stroke-width="2"/>
+                                    <line x1="180" y1="180" x2="250" y2="175" stroke="#10B981" stroke-width="2"/>
+                                    <line x1="180" y1="240" x2="250" y2="210" stroke="#10B981" stroke-width="2"/>
+                                    
+                                    <line x1="550" y1="140" x2="620" y2="120" stroke="#EC4899" stroke-width="2"/>
+                                    <line x1="550" y1="175" x2="620" y2="180" stroke="#EC4899" stroke-width="2"/>
+                                    <line x1="550" y1="210" x2="620" y2="240" stroke="#EC4899" stroke-width="2"/>
+                                    
+                                    <!-- Labels -->
+                                    <text x="60" y="80" fill="#10B981" font-size="11" font-weight="600">DRIVING</text>
+                                    <text x="60" y="95" fill="var(--text-muted)" font-size="9">(Primary)</text>
+                                    <text x="640" y="80" fill="#EC4899" font-size="11" font-weight="600">DRIVEN</text>
+                                    <text x="640" y="95" fill="var(--text-muted)" font-size="9">(Secondary)</text>
+                                </svg>
+                            </div>
+                            <div class="slide-details">
+                                <div class="detail-card">
+                                    <div class="detail-label">Best For</div>
+                                    <div class="detail-value">Testable, maintainable applications</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Key Concept</div>
+                                    <div class="detail-value">Dependency inversion, interface-based design</div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-label">Trade-offs</div>
+                                    <div class="detail-value">Clean architecture but more boilerplate code</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- CLOUD PATTERNS -->
+            <section class="module" id="cloud">
+                <div class="module-header">
+                    <div class="module-icon">☁️</div>
+                    <div class="module-info">
+                        <h2>Cloud-Native Patterns</h2>
+                        <p>Resilience and scalability patterns for distributed systems</p>
+                    </div>
+                </div>
+                
+                <div class="cloud-patterns">
+                    <div class="cloud-pattern-card">
+                        <div class="cloud-icon">🔌</div>
+                        <div class="cloud-content">
+                            <div class="cloud-name">Circuit Breaker</div>
+                            <div class="cloud-desc">Prevent cascading failures by stopping calls to failing services. Returns fallback responses when service is unhealthy.</div>
+                            <div class="cloud-tags">
+                                <span class="cloud-tag">Resilience</span>
+                                <span class="cloud-tag">Hystrix</span>
+                                <span class="cloud-tag">Resilience4j</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cloud-pattern-card">
+                        <div class="cloud-icon">📚</div>
+                        <div class="cloud-content">
+                            <div class="cloud-name">Saga Pattern</div>
+                            <div class="cloud-desc">Manage distributed transactions across services with compensating actions for rollback on failure.</div>
+                            <div class="cloud-tags">
+                                <span class="cloud-tag">Transactions</span>
+                                <span class="cloud-tag">Choreography</span>
+                                <span class="cloud-tag">Orchestration</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cloud-pattern-card">
+                        <div class="cloud-icon">🌿</div>
+                        <div class="cloud-content">
+                            <div class="cloud-name">Strangler Fig</div>
+                            <div class="cloud-desc">Incrementally migrate legacy systems by routing traffic to new services while phasing out old code.</div>
+                            <div class="cloud-tags">
+                                <span class="cloud-tag">Migration</span>
+                                <span class="cloud-tag">Modernization</span>
+                                <span class="cloud-tag">Gradual</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cloud-pattern-card">
+                        <div class="cloud-icon">🚢</div>
+                        <div class="cloud-content">
+                            <div class="cloud-name">Bulkhead</div>
+                            <div class="cloud-desc">Isolate resources to prevent one service failure from exhausting all resources and affecting others.</div>
+                            <div class="cloud-tags">
+                                <span class="cloud-tag">Isolation</span>
+                                <span class="cloud-tag">Thread Pools</span>
+                                <span class="cloud-tag">Semaphores</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cloud-pattern-card">
+                        <div class="cloud-icon">🚪</div>
+                        <div class="cloud-content">
+                            <div class="cloud-name">Sidecar</div>
+                            <div class="cloud-desc">Deploy helper components alongside services for cross-cutting concerns like logging, proxying, and config.</div>
+                            <div class="cloud-tags">
+                                <span class="cloud-tag">Kubernetes</span>
+                                <span class="cloud-tag">Envoy</span>
+                                <span class="cloud-tag">Service Mesh</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cloud-pattern-card">
+                        <div class="cloud-icon">🔄</div>
+                        <div class="cloud-content">
+                            <div class="cloud-name">Retry with Backoff</div>
+                            <div class="cloud-desc">Automatically retry failed operations with exponential backoff to handle transient failures gracefully.</div>
+                            <div class="cloud-tags">
+                                <span class="cloud-tag">Resilience</span>
+                                <span class="cloud-tag">Exponential</span>
+                                <span class="cloud-tag">Jitter</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ANTI-PATTERNS -->
+            <section class="module" id="anti">
+                <div class="module-header">
+                    <div class="module-icon">⚠️</div>
+                    <div class="module-info">
+                        <h2>Anti-Patterns to Avoid</h2>
+                        <p>Common design mistakes that lead to unmaintainable code</p>
+                    </div>
+                </div>
+                
+                <div class="anti-patterns">
+                    <div class="anti-header">
+                        <span class="anti-icon">🚫</span>
+                        <span class="anti-title">Code Smells & Anti-Patterns</span>
+                    </div>
+                    <div class="anti-grid">
+                        <div class="anti-card">
+                            <div class="anti-card-icon">🍝</div>
+                            <div class="anti-card-name">Spaghetti Code</div>
+                            <div class="anti-card-desc">Tangled, unstructured code with no clear flow</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">🔮</div>
+                            <div class="anti-card-name">God Object</div>
+                            <div class="anti-card-desc">One class that knows and does too much</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">📋</div>
+                            <div class="anti-card-name">Copy-Paste</div>
+                            <div class="anti-card-desc">Duplicated code instead of abstraction</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">⚓</div>
+                            <div class="anti-card-name">Boat Anchor</div>
+                            <div class="anti-card-desc">Unused code kept "just in case"</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">🔫</div>
+                            <div class="anti-card-name">Shotgun Surgery</div>
+                            <div class="anti-card-desc">One change requires many file edits</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">🌋</div>
+                            <div class="anti-card-name">Lava Flow</div>
+                            <div class="anti-card-desc">Dead code no one dares to remove</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">🏚️</div>
+                            <div class="anti-card-name">Big Ball of Mud</div>
+                            <div class="anti-card-desc">No discernible architecture at all</div>
+                        </div>
+                        <div class="anti-card">
+                            <div class="anti-card-icon">🎪</div>
+                            <div class="anti-card-name">Cargo Cult</div>
+                            <div class="anti-card-desc">Using patterns without understanding</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PATTERN COMPARISON -->
+            <section class="module">
+                <div class="module-header">
+                    <div class="module-icon">📊</div>
+                    <div class="module-info">
+                        <h2>Pattern Comparison</h2>
+                        <p>When to use which architectural pattern</p>
+                    </div>
+                </div>
+                
+                <div class="comparison-table-container">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Pattern</th>
+                                <th>Best For</th>
+                                <th>Scalability</th>
+                                <th>Complexity</th>
+                                <th>Team Size</th>
+                                <th>Testability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="table-pattern">MVC</td>
+                                <td>Web apps, traditional apps</td>
+                                <td>Medium</td>
+                                <td>Low</td>
+                                <td>Small-Medium</td>
+                                <td>Good</td>
+                            </tr>
+                            <tr>
+                                <td class="table-pattern">MVVM</td>
+                                <td>Rich clients, mobile</td>
+                                <td>Medium</td>
+                                <td>Medium</td>
+                                <td>Small-Medium</td>
+                                <td>Excellent</td>
+                            </tr>
+                            <tr>
+                                <td class="table-pattern">Microservices</td>
+                                <td>Large-scale, distributed</td>
+                                <td>High</td>
+                                <td>High</td>
+                                <td>Large</td>
+                                <td>Variable</td>
+                            </tr>
+                            <tr>
+                                <td class="table-pattern">Event-Driven</td>
+                                <td>Real-time, async workloads</td>
+                                <td>High</td>
+                                <td>High</td>
+                                <td>Medium-Large</td>
+                                <td>Medium</td>
+                            </tr>
+                            <tr>
+                                <td class="table-pattern">CQRS</td>
+                                <td>High-read systems</td>
+                                <td>High</td>
+                                <td>High</td>
+                                <td>Medium</td>
+                                <td>Good</td>
+                            </tr>
+                            <tr>
+                                <td class="table-pattern">Hexagonal</td>
+                                <td>Long-lived, maintainable</td>
+                                <td>Medium</td>
+                                <td>Medium</td>
+                                <td>Any</td>
+                                <td>Excellent</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- TOOLS -->
+            <section class="module" id="tools">
+                <div class="module-header">
+                    <div class="module-icon">🛠️</div>
+                    <div class="module-info">
+                        <h2>Design Tools & Resources</h2>
+                        <p>Tools for designing and documenting patterns</p>
+                    </div>
+                </div>
+                
+                <div class="tools-strip">
+                    <div class="tool-item"><span class="tool-emoji">📐</span> Draw.io</div>
+                    <div class="tool-item"><span class="tool-emoji">🎨</span> Lucidchart</div>
+                    <div class="tool-item"><span class="tool-emoji">📊</span> PlantUML</div>
+                    <div class="tool-item"><span class="tool-emoji">🔲</span> Mermaid</div>
+                    <div class="tool-item"><span class="tool-emoji">📘</span> Structurizr</div>
+                    <div class="tool-item"><span class="tool-emoji">🏗️</span> C4 Model</div>
+                    <div class="tool-item"><span class="tool-emoji">📚</span> Refactoring Guru</div>
+                    <div class="tool-item"><span class="tool-emoji">🎯</span> SourceMaking</div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo"><span>STRATEGY</span>HUB</div>
+            <div class="footer-meta">Category 24: Design Patterns | Blueprint Technologies cOS</div>
+        </div>
+    </footer>
+    
+    <script>
+        // Architectural Pattern Carousel
+        document.querySelectorAll('.carousel-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.carousel-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.pattern-slide').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                const pattern = tab.getAttribute('data-pattern');
+                document.getElementById('pattern-' + pattern).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

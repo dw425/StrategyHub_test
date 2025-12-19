@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dialog Management | Chatbots & Conversational AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: var(--bg-hover); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 32px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--page-primary), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .hero-left h1 { font-size: 32px; margin-bottom: 12px; }
+        .hero-left p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .hero-metric-value { font-size: 26px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        .module { margin-bottom: 32px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 56px; height: 56px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: 22px; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 18px; margin-bottom: 16px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 14px; }
+        .overview-content strong { color: var(--text-primary); }
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; border-left: 4px solid var(--page-primary); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-term { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .concept-def { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .concept-example { font-size: 10px; color: var(--text-muted); background: var(--bg-card-alt); padding: 10px; border-radius: 8px; font-family: monospace; }
+        .how-it-works { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .hiw-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; }
+        .hiw-body { padding: 20px; }
+        .hiw-step { display: flex; gap: 16px; margin-bottom: 16px; }
+        .hiw-step-num { width: 44px; height: 44px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .hiw-step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .hiw-step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hiw-step-detail { font-size: 11px; color: var(--text-muted); margin-top: 8px; padding: 10px; background: var(--bg-card-alt); border-radius: 8px; border-left: 3px solid var(--page-primary); font-family: monospace; }
+        /* CIRCULAR STATE WHEEL - FIXED POSITIONING */
+        .state-wheel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .state-wheel-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .state-wheel-legend { display: flex; gap: 16px; font-size: 11px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-muted); }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .state-wheel-body { padding: 24px; background: linear-gradient(180deg, #151820 0%, #101318 100%); }
+        .wheel-layout { display: grid; grid-template-columns: 380px 220px; gap: 32px; align-items: center; justify-content: center; }
+        .wheel-container { position: relative; width: 340px; height: 340px; }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; background: linear-gradient(135deg, #F59E0B, #FBBF24); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(245, 158, 11, 0.5); z-index: 10; }
+        .wheel-center-icon { font-size: 32px; }
+        .wheel-center-text { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; color: #1a1a1a; }
+        .wheel-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 250px; height: 250px; border: 2px dashed rgba(245, 158, 11, 0.4); border-radius: 50%; }
+        .wheel-node { position: absolute; width: 72px; height: 72px; }
+        .wheel-node-inner { width: 100%; height: 100%; background: linear-gradient(135deg, #2a3040, #232838); border: 3px solid #4a5568; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s; }
+        .wheel-node-inner:hover { transform: scale(1.08); }
+        .wheel-node-inner.start { border-color: #10B981; background: linear-gradient(135deg, #1a3a2f, #162d25); }
+        .wheel-node-inner.active { border-color: #F59E0B; background: linear-gradient(135deg, #3d3520, #2d2818); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
+        .wheel-node-inner.end { border-color: #3B82F6; background: linear-gradient(135deg, #1e2a40, #182235); }
+        .wheel-node-inner.purple { border-color: #8B5CF6; background: linear-gradient(135deg, #2d2540, #231d35); }
+        .wheel-node-inner.pink { border-color: #EC4899; background: linear-gradient(135deg, #3d2035, #2d1828); }
+        .wheel-node-inner.cyan { border-color: #06B6D4; background: linear-gradient(135deg, #1a3038, #15282e); }
+        .wheel-node-icon { font-size: 22px; }
+        .wheel-node-label { font-size: 9px; font-weight: 600; margin-top: 2px; color: #a0a8b8; }
+        /* 6 nodes positioned precisely - 340px container, 72px nodes, 125px radius from center */
+        .wheel-node.n1 { top: 7px; left: 134px; }      /* Top center */
+        .wheel-node.n2 { top: 70px; left: 232px; }     /* Top right */
+        .wheel-node.n3 { top: 195px; left: 232px; }    /* Bottom right */
+        .wheel-node.n4 { top: 261px; left: 134px; }    /* Bottom center */
+        .wheel-node.n5 { top: 195px; left: 36px; }     /* Bottom left */
+        .wheel-node.n6 { top: 70px; left: 36px; }      /* Top left */
+        /* SVG arrows */
+        .wheel-arrows { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        /* Live chat panel */
+        .live-chat-panel { background: linear-gradient(135deg, #1e222a, #181c22); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; }
+        .live-chat-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .chat-bubble { font-size: 12px; padding: 12px 14px; border-radius: 12px; margin-bottom: 10px; line-height: 1.5; }
+        .chat-bubble.bot { background: #252a35; border: 1px solid #3d4451; margin-right: 16px; border-bottom-left-radius: 4px; color: var(--text-secondary); }
+        .chat-bubble.user { background: var(--blue); margin-left: 16px; border-bottom-right-radius: 4px; }
+        .chat-bubble:last-child { margin-bottom: 0; }
+        .slot-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .slot-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+        .slot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+        .slot-item { background: var(--bg-card-alt); border: 2px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; }
+        .slot-item.filled { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+        .slot-item.required { border-color: var(--red); border-style: dashed; }
+        .slot-name { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+        .slot-value { font-size: 11px; color: var(--text-secondary); }
+        .slot-status { font-size: 9px; padding: 3px 8px; border-radius: 9999px; margin-top: 6px; display: inline-block; }
+        .slot-status.filled { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .slot-status.missing { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .conversation { background: var(--bg-dark); border-radius: 12px; padding: 16px; }
+        .conv-turn { display: flex; gap: 12px; margin-bottom: 12px; }
+        .conv-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .conv-avatar.user { background: var(--blue); }
+        .conv-avatar.bot { background: var(--green); }
+        .conv-name { font-size: 10px; font-weight: 600; margin-bottom: 3px; }
+        .conv-name.user { color: var(--blue); }
+        .conv-name.bot { color: var(--green); }
+        .conv-message { font-size: 12px; color: var(--text-secondary); background: var(--bg-card-alt); padding: 10px 14px; border-radius: 10px; }
+        .conv-highlight { background: var(--page-glow); padding: 2px 6px; border-radius: 4px; color: var(--page-light); }
+        .approach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .approach-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
+        .approach-header { padding: 20px; border-bottom: 1px solid var(--border-color); text-align: center; }
+        .approach-icon { font-size: 36px; margin-bottom: 10px; }
+        .approach-name { font-size: 15px; font-weight: 600; }
+        .approach-type { font-size: 11px; color: var(--page-light); }
+        .approach-body { padding: 16px; }
+        .approach-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .approach-list { list-style: none; margin-bottom: 12px; }
+        .approach-list.pros li::before { content: '✓ '; color: var(--green); }
+        .approach-list.cons li::before { content: '✗ '; color: var(--red); }
+        .approach-list li { font-size: 11px; color: var(--text-secondary); padding: 4px 0; }
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+        .table-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; }
+        .comparison-table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 14px 16px; font-size: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .tag { font-size: 9px; padding: 3px 8px; border-radius: 9999px; }
+        .tag.high { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .tag.medium { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; }
+        .practice-card.do { border-left: 4px solid var(--green); }
+        .practice-card.dont { border-left: 4px solid var(--red); }
+        .practice-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 13px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); line-height: 1.6; }
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .tool-card:hover { border-color: var(--page-primary); }
+        .tool-icon { font-size: 32px; margin-bottom: 10px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-type { font-size: 10px; color: var(--page-light); margin-bottom: 8px; }
+        .tool-desc { font-size: 11px; color: var(--text-muted); }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; }
+        .agent-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px; }
+        .agent-name { font-size: 20px; font-weight: 600; }
+        .agent-role { font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .agent-capabilities li::before { content: '✦ '; color: var(--page-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
+        .code-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--page-light); }
+        .code-content { padding: 16px; background: var(--bg-dark); overflow-x: auto; max-height: 400px; }
+        .code-content pre { font-family: monospace; font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-decoration: none; color: inherit; }
+        .related-card:hover { border-color: var(--page-primary); }
+        .related-num { font-size: 11px; color: var(--page-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border-radius: 10px; font-size: 13px; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-title">💬 Category 06</div>
+    <ul class="sidebar-nav">
+        <li><a href="cat06-chatbots-overview.html">🏠 Overview</a></li>
+        <li><a href="cat06-p1-nlu-intent.html">🧠 6.1 NLU & Intent</a></li>
+        <li><a href="cat06-p2-dialog-management.html" class="active">🔀 6.2 Dialog Management</a></li>
+        <li><a href="cat06-p3-response-generation.html">💬 6.3 Response Generation</a></li>
+        <li><a href="cat06-p4-context-memory.html">🧩 6.4 Context & Memory</a></li>
+        <li><a href="cat06-p5-platforms.html">🤖 6.5 Platforms</a></li>
+        <li><a href="cat06-p6-voice-assistants.html">🎙️ 6.6 Voice Assistants</a></li>
+        <li><a href="cat06-p7-multichannel.html">📱 6.7 Multi-Channel</a></li>
+        <li><a href="cat06-p8-analytics.html">📊 6.8 Analytics</a></li>
+        <li><a href="cat06-p9-testing.html">🧪 6.9 Testing & QA</a></li>
+        <li><a href="cat06-p10-enterprise.html">🏢 6.10 Enterprise</a></li>
+    </ul>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🔀 Page 6.2 • Conversation Control</div>
+                <h1>Dialog Management</h1>
+                <p>Control conversation flow with finite state machines, slot filling strategies, and policy-based decision making. Build chatbots that guide users through complex multi-turn interactions while gracefully handling interruptions, corrections, and unexpected inputs.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">FSM</div><div class="hero-metric-label">State Machines</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Slots</div><div class="hero-metric-label">Form Filling</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Policy</div><div class="hero-metric-label">RL Learning</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">LLM</div><div class="hero-metric-label">Hybrid</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info"><h2>Understanding Dialog Management</h2><p>The brain that orchestrates conversation flow</p></div>
+            </div>
+            <div class="overview-content">
+                <h3>What is Dialog Management?</h3>
+                <p>Dialog Management (DM) is the central component that decides what to do next in a conversation. Given the current state—user's intent, extracted entities, conversation history, and application context—the dialog manager selects the next action: ask a follow-up question, call an API, provide information, or hand off to a human agent. It's the "brain" that connects understanding to action, transforming raw NLU output into coherent conversational experiences.</p>
+                <p>Good dialog management creates the illusion of intelligence. When a user says <strong>"Actually, make that two adults and one child,"</strong> a well-designed dialog manager recognizes this as a modification to a previous request, updates the relevant slots, confirms the change, and continues the booking flow seamlessly. Poor dialog management forces users to start over or repeat information constantly, creating frustrating experiences.</p>
+                <p>The evolution of dialog management mirrors the broader AI evolution: from <strong>rigid rule-based systems</strong> with hand-coded decision trees, to <strong>statistical approaches</strong> that learn from data, to <strong>modern hybrid systems</strong> that combine structured flows with LLM flexibility. Each approach offers different trade-offs in terms of control, flexibility, predictability, and development effort.</p>
+                <p>Key challenges include handling <strong>interruptions</strong> (user changes topic), <strong>corrections</strong> (user fixes previous info), <strong>disambiguation</strong> (clarifying ambiguous requests), <strong>context switching</strong> (returning to previous topic), and <strong>graceful degradation</strong> (handling edge cases). The best dialog managers handle these gracefully without exposing complexity to users.</p>
+            </div>
+        </section>
+
+        <!-- KEY CONCEPTS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔑</div>
+                <div class="module-info"><h2>Key Concepts</h2><p>Essential dialog management terminology</p></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card" style="border-left-color: var(--yellow);">
+                    <div class="concept-icon">🔄</div>
+                    <div class="concept-term">Dialog State</div>
+                    <div class="concept-def">Complete snapshot of conversation including collected entities, active intent, stage, and flags. State drives all decision-making.</div>
+                    <div class="concept-example">state: {intent: "book_flight",<br>slots: {dest: "NYC"},<br>stage: "collecting_date"}</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--green);">
+                    <div class="concept-icon">📝</div>
+                    <div class="concept-term">Slot</div>
+                    <div class="concept-def">A parameter to collect for task completion. Slots have types, validation rules, and prompts. Can be required or optional.</div>
+                    <div class="concept-example">slot: departure_date<br>type: date, required: true<br>prompt: "When do you travel?"</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--blue);">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-term">Dialog Policy</div>
+                    <div class="concept-def">Strategy determining next action given current state. Can be rule-based, ML-learned, or hybrid. The core decision engine.</div>
+                    <div class="concept-example">if missing_slots:<br>  ask_for_slot()<br>elif all_filled:<br>  execute_action()</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--purple);">
+                    <div class="concept-icon">🔀</div>
+                    <div class="concept-term">Turn</div>
+                    <div class="concept-def">Single exchange—one user message + one system response. Multi-turn conversations involve multiple back-and-forth exchanges.</div>
+                    <div class="concept-example">Turn 1: User asks<br>Turn 2: Bot clarifies<br>Turn 3: User provides<br>Turn 4: Bot confirms</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--pink);">
+                    <div class="concept-icon">⚡</div>
+                    <div class="concept-term">Transition</div>
+                    <div class="concept-def">Movement from one state to another, triggered by user actions or system events. Defines valid conversation paths.</div>
+                    <div class="concept-example">State: ask_destination<br>→ user_provides_city<br>→ Transition: ask_date</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--cyan);">
+                    <div class="concept-icon">🔙</div>
+                    <div class="concept-term">Fallback</div>
+                    <div class="concept-def">Handler for unexpected inputs or low confidence. Good fallbacks recover through clarification rather than failing.</div>
+                    <div class="concept-example">confidence < 0.6 →<br>"Did you want to:<br>A) Book flight<br>B) Check status?"</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info"><h2>How It Works</h2><p>The dialog management decision cycle</p></div>
+            </div>
+            <div class="how-it-works">
+                <div class="hiw-header">🔄 Dialog Management Cycle</div>
+                <div class="hiw-body">
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">1</div>
+                        <div><div class="hiw-step-title">Receive NLU Output</div><div class="hiw-step-desc">Dialog manager receives structured NLU output: intent classification with confidence scores, extracted entities with types and values, and sentiment analysis.</div><div class="hiw-step-detail">{"intent": "book_flight", "confidence": 0.94, "entities": [{"type": "city", "value": "NYC"}]}</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">2</div>
+                        <div><div class="hiw-step-title">Update Dialog State</div><div class="hiw-step-desc">Merge new information with existing state. Update slots from entities, track filled vs. missing slots, record conversation history for context.</div><div class="hiw-step-detail">slots.destination = "NYC", missing_slots = ["origin", "date"], turn_count++</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">3</div>
+                        <div><div class="hiw-step-title">Evaluate Dialog Policy</div><div class="hiw-step-desc">Policy examines current state and determines next action. Could be rule-based logic, ML model, or LLM reasoning. Considers business rules and user context.</div><div class="hiw-step-detail">Intent confidence 0.94 > 0.7 ✓, Required slot "origin" missing → Action: ask_slot("origin")</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">4</div>
+                        <div><div class="hiw-step-title">Select System Action</div><div class="hiw-step-desc">Convert policy output to concrete action: prompt_for_slot, call_api, confirm_action, provide_info, transfer_agent, or end_conversation.</div><div class="hiw-step-detail">{"action": "prompt_for_slot", "slot": "origin", "template": "ask_departure_city"}</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">5</div>
+                        <div><div class="hiw-step-title">Execute Action</div><div class="hiw-step-desc">Perform selected action. For API calls, invoke services. For prompts, trigger response generation. Log all actions for analytics.</div><div class="hiw-step-detail">ResponseGenerator.generate("ask_departure_city") → "Where will you be flying from?"</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">6</div>
+                        <div><div class="hiw-step-title">Persist State & Await</div><div class="hiw-step-desc">Save updated state to storage, set timeouts, await next user input. Cycle repeats until goal achieved or user exits.</div><div class="hiw-step-detail">stage="awaiting_origin", session_timeout=30min, last_action="prompt_for_slot"</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CIRCULAR STATE WHEEL -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info"><h2>State Machine Visualization</h2><p>Flight booking dialog flow with live conversation</p></div>
+            </div>
+            <div class="state-wheel">
+                <div class="state-wheel-header">
+                    <span>✈️ Flight Booking Conversation Flow</span>
+                    <div class="state-wheel-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--green);"></div>Start</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--page-primary);"></div>Current</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--blue);"></div>End</div>
+                    </div>
+                </div>
+                <div class="state-wheel-body">
+                    <div class="wheel-layout">
+                        <div class="wheel-container">
+                            <!-- Center hub -->
+                            <div class="wheel-center">
+                                <div class="wheel-center-icon">✈️</div>
+                                <div class="wheel-center-text">Dialog</div>
+                            </div>
+                            
+                            <!-- Dashed ring -->
+                            <div class="wheel-ring"></div>
+                            
+                            <!-- SVG for curved arrows -->
+                            <svg class="wheel-arrows" viewBox="0 0 340 340">
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+                                        <polygon points="0 0, 8 3, 0 6" fill="#F59E0B" opacity="0.7"/>
+                                    </marker>
+                                </defs>
+                                <!-- Curved arrows between nodes (clockwise from Greeting) -->
+                                <path d="M 195 55 Q 240 55 258 90" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+                                <path d="M 285 145 Q 295 170 285 200" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+                                <path d="M 258 255 Q 240 285 195 290" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+                                <path d="M 145 290 Q 100 285 82 255" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+                                <path d="M 55 200 Q 45 170 55 145" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+                                <path d="M 82 90 Q 100 55 145 50" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+                            </svg>
+                            
+                            <!-- State nodes positioned around circle -->
+                            <div class="wheel-node n1">
+                                <div class="wheel-node-inner start">
+                                    <div class="wheel-node-icon">👋</div>
+                                    <div class="wheel-node-label">Greeting</div>
+                                </div>
+                            </div>
+                            <div class="wheel-node n2">
+                                <div class="wheel-node-inner purple">
+                                    <div class="wheel-node-icon">📍</div>
+                                    <div class="wheel-node-label">Origin</div>
+                                </div>
+                            </div>
+                            <div class="wheel-node n3">
+                                <div class="wheel-node-inner active">
+                                    <div class="wheel-node-icon">🎯</div>
+                                    <div class="wheel-node-label">Destination</div>
+                                </div>
+                            </div>
+                            <div class="wheel-node n4">
+                                <div class="wheel-node-inner cyan">
+                                    <div class="wheel-node-icon">📅</div>
+                                    <div class="wheel-node-label">Date</div>
+                                </div>
+                            </div>
+                            <div class="wheel-node n5">
+                                <div class="wheel-node-inner pink">
+                                    <div class="wheel-node-icon">✅</div>
+                                    <div class="wheel-node-label">Confirm</div>
+                                </div>
+                            </div>
+                            <div class="wheel-node n6">
+                                <div class="wheel-node-inner end">
+                                    <div class="wheel-node-icon">🎉</div>
+                                    <div class="wheel-node-label">Complete</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Live chat panel -->
+                        <div class="live-chat-panel">
+                            <div class="live-chat-title"><div class="live-dot"></div>Live Conversation</div>
+                            <div class="chat-bubble bot">Hi! Where would you like to fly?</div>
+                            <div class="chat-bubble user">I want to go to NYC</div>
+                            <div class="chat-bubble bot">Great choice! When do you want to travel?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLOT FILLING -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info"><h2>Slot Filling in Action</h2><p>Collecting information through conversation</p></div>
+            </div>
+            <div class="slot-section">
+                <div class="slot-title">📋 Flight Booking Slots</div>
+                <div class="slot-grid">
+                    <div class="slot-item filled"><div class="slot-name">Origin</div><div class="slot-value">San Francisco</div><div class="slot-status filled">✓ Filled</div></div>
+                    <div class="slot-item filled"><div class="slot-name">Destination</div><div class="slot-value">New York</div><div class="slot-status filled">✓ Filled</div></div>
+                    <div class="slot-item required"><div class="slot-name">Departure</div><div class="slot-value">—</div><div class="slot-status missing">Required</div></div>
+                    <div class="slot-item"><div class="slot-name">Return</div><div class="slot-value">—</div><div class="slot-status">Optional</div></div>
+                </div>
+                <div class="conversation">
+                    <div class="conv-turn"><div class="conv-avatar user">👤</div><div class="conv-content"><div class="conv-name user">User</div><div class="conv-message">"I need to fly from <span class="conv-highlight">San Francisco</span> to <span class="conv-highlight">New York</span>"</div></div></div>
+                    <div class="conv-turn"><div class="conv-avatar bot">🤖</div><div class="conv-content"><div class="conv-name bot">Bot</div><div class="conv-message">"Great! When would you like to depart?"</div></div></div>
+                    <div class="conv-turn"><div class="conv-avatar user">👤</div><div class="conv-content"><div class="conv-name user">User</div><div class="conv-message">"<span class="conv-highlight">Next Friday</span>"</div></div></div>
+                    <div class="conv-turn"><div class="conv-avatar bot">🤖</div><div class="conv-content"><div class="conv-name bot">Bot</div><div class="conv-message">"Perfect—December 20th. Round trip or one-way?"</div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- APPROACHES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info"><h2>Dialog Management Approaches</h2><p>Choose the right strategy</p></div>
+            </div>
+            <div class="approach-grid">
+                <div class="approach-card">
+                    <div class="approach-header"><div class="approach-icon">📋</div><div class="approach-name">Rule-Based</div><div class="approach-type">State Machines</div></div>
+                    <div class="approach-body">
+                        <div class="approach-desc">Hand-coded rules and explicit state transitions. Every path defined by developers.</div>
+                        <ul class="approach-list pros"><li>100% predictable</li><li>Easy to debug</li><li>No training data</li><li>Full control</li></ul>
+                        <ul class="approach-list cons"><li>Doesn't scale</li><li>Brittle to edge cases</li><li>High maintenance</li></ul>
+                    </div>
+                </div>
+                <div class="approach-card">
+                    <div class="approach-header"><div class="approach-icon">🧠</div><div class="approach-name">ML-Based</div><div class="approach-type">Policy Learning</div></div>
+                    <div class="approach-body">
+                        <div class="approach-desc">Learned policies from data using supervised or reinforcement learning.</div>
+                        <ul class="approach-list pros"><li>Handles complexity</li><li>Improves with data</li><li>Adapts to patterns</li><li>Optimizes outcomes</li></ul>
+                        <ul class="approach-list cons"><li>Requires data</li><li>Less predictable</li><li>Harder to debug</li></ul>
+                    </div>
+                </div>
+                <div class="approach-card">
+                    <div class="approach-header"><div class="approach-icon">🔮</div><div class="approach-name">LLM-Hybrid</div><div class="approach-type">Structured + AI</div></div>
+                    <div class="approach-body">
+                        <div class="approach-desc">Structured flows for critical paths + LLM flexibility for edge cases.</div>
+                        <ul class="approach-list pros"><li>Best of both</li><li>Natural feel</li><li>Guardrails + flex</li><li>Reduced dev time</li></ul>
+                        <ul class="approach-list cons"><li>Complex architecture</li><li>Higher latency</li><li>LLM costs</li></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON TABLE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info"><h2>Framework Comparison</h2><p>Dialog management across platforms</p></div>
+            </div>
+            <div class="table-container">
+                <div class="table-header">🏆 Dialog Management Frameworks</div>
+                <table class="comparison-table">
+                    <thead><tr><th>Framework</th><th>Approach</th><th>State Mgmt</th><th>Flexibility</th><th>Best For</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Dialogflow CX</strong></td><td>Visual Flows</td><td><span class="tag high">Excellent</span></td><td><span class="tag medium">Medium</span></td><td>Enterprise</td></tr>
+                        <tr><td><strong>Rasa</strong></td><td>ML + Rules</td><td><span class="tag high">Excellent</span></td><td><span class="tag high">High</span></td><td>Custom, self-hosted</td></tr>
+                        <tr><td><strong>Amazon Lex</strong></td><td>Intent-based</td><td><span class="tag medium">Good</span></td><td><span class="tag medium">Medium</span></td><td>AWS ecosystem</td></tr>
+                        <tr><td><strong>LangGraph</strong></td><td>LLM + Graph</td><td><span class="tag high">Excellent</span></td><td><span class="tag high">Very High</span></td><td>LLM-native apps</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info"><h2>Dialog Management Tools</h2><p>Libraries and frameworks</p></div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card"><div class="tool-icon">🟣</div><div class="tool-name">Rasa</div><div class="tool-type">Open Source</div><div class="tool-desc">Full-stack with stories, rules, forms</div></div>
+                <div class="tool-card"><div class="tool-icon">🔷</div><div class="tool-name">LangGraph</div><div class="tool-type">LangChain</div><div class="tool-desc">Stateful multi-actor LLM apps</div></div>
+                <div class="tool-card"><div class="tool-icon">🟠</div><div class="tool-name">Dialogflow CX</div><div class="tool-type">Google Cloud</div><div class="tool-desc">Visual flow builder</div></div>
+                <div class="tool-card"><div class="tool-icon">🔵</div><div class="tool-name">Amazon Lex</div><div class="tool-type">AWS</div><div class="tool-desc">Intent + Lambda fulfillment</div></div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info"><h2>Best Practices</h2><p>Building robust dialog systems</p></div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do This</div>
+                    <ul class="practice-list">
+                        <li>Design happy path first, then add edge case handlers systematically</li>
+                        <li>Allow corrections at any point—"actually, make that Chicago"</li>
+                        <li>Confirm before irreversible actions (payments, bookings)</li>
+                        <li>Provide escape hatches—restart, go back, reach human</li>
+                        <li>Use progressive disclosure—don't overwhelm with options</li>
+                        <li>Log all state transitions for debugging and analytics</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Avoid This</div>
+                    <ul class="practice-list">
+                        <li>Creating dead-end states with no way forward or back</li>
+                        <li>Asking many slots without acknowledging previous answers</li>
+                        <li>Ignoring context—if user said NYC don't ask "which city?"</li>
+                        <li>Over-confirming every detail—breaks conversation flow</li>
+                        <li>Designing only for perfect users following exact script</li>
+                        <li>Failing silently—always provide feedback and recovery</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info"><h2>Agent This</h2><p>AI-powered dialog design assistant</p></div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔀</div>
+                    <div class="agent-name">DialogArchitectAgent</div>
+                    <div class="agent-role">Conversation Flow Designer</div>
+                    <div class="agent-desc">Expert in dialog systems, state machines, slot filling, and flow optimization. Builds chatbots that guide users through complex interactions while handling edge cases.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design conversation flow diagrams</li>
+                        <li>Define slot schemas with validation</li>
+                        <li>Create dialog policy specifications</li>
+                        <li>Handle interruptions and corrections</li>
+                        <li>Implement fallback strategies</li>
+                        <li>Optimize task completion rate</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">dialog_architect_agent.py</div>
+                    <div class="code-content"><pre>from crewai import Agent, Task, Crew
+from enum import Enum
+from dataclasses import dataclass
+
+dialog_agent = Agent(
+    role="Dialog Architect",
+    goal="Design optimal conversation flows",
+    backstory="""Expert in state machines, slot filling,
+    and conversational UX. Built dialog systems for
+    millions of conversations.""",
+    tools=[FlowDesigner(), PolicyOptimizer()]
+)
+
+class DialogState(Enum):
+    GREETING = "greeting"
+    COLLECT_ORIGIN = "collect_origin"
+    COLLECT_DEST = "collect_destination"
+    COLLECT_DATE = "collect_date"
+    CONFIRM = "confirm"
+    COMPLETE = "complete"
+
+@dataclass
+class ConversationContext:
+    state: DialogState = DialogState.GREETING
+    origin: str = None
+    destination: str = None
+    date: str = None
+
+class DialogManager:
+    def __init__(self):
+        self.context = ConversationContext()
+    
+    def process_turn(self, nlu_output):
+        # Update slots from entities
+        for entity in nlu_output.get("entities", []):
+            if entity["type"] == "city":
+                if not self.context.origin:
+                    self.context.origin = entity["value"]
+                else:
+                    self.context.destination = entity["value"]
+        
+        return self._apply_policy()
+    
+    def _apply_policy(self):
+        if not self.context.origin:
+            return {"action": "ask", "slot": "origin"}
+        elif not self.context.destination:
+            return {"action": "ask", "slot": "destination"}
+        elif not self.context.date:
+            return {"action": "ask", "slot": "date"}
+        else:
+            return {"action": "confirm", "data": self.context}</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info"><h2>Related Pages</h2><p>Continue learning</p></div>
+            </div>
+            <div class="related-grid">
+                <a href="cat06-p1-nlu-intent.html" class="related-card"><div class="related-num">Page 6.1</div><div class="related-title">NLU & Intent</div><div class="related-desc">Understanding input that drives dialog</div></a>
+                <a href="cat06-p3-response-generation.html" class="related-card"><div class="related-num">Page 6.3</div><div class="related-title">Response Generation</div><div class="related-desc">Generate responses from actions</div></a>
+                <a href="cat06-p4-context-memory.html" class="related-card"><div class="related-num">Page 6.4</div><div class="related-title">Context & Memory</div><div class="related-desc">Maintain state across turns</div></a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat06-p1-nlu-intent.html" class="footer-link">← 6.1: NLU & Intent</a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 6.2 of 10</div>
+        <a href="cat06-p3-response-generation.html" class="footer-link">6.3: Response Generation →</a>
+    </div>
+</footer>
+
+</body>
+</html>

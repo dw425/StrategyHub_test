@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databricks Platform | Data Engineering | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            --page-primary: #FF3621;
+            --page-light: #FF6B5B;
+            --page-glow: rgba(255, 54, 33, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--yellow)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .pillar-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .pillar-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .pillar-card.delta::before { background: var(--green); }
+        .pillar-card.unity::before { background: var(--blue); }
+        .pillar-card.workflows::before { background: var(--yellow); }
+        .pillar-card.mlflow::before { background: var(--violet); }
+        .pillar-icon { font-size: 32px; margin-bottom: 12px; }
+        .pillar-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .pillar-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .feature-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .feature-icon { width: 44px; height: 44px; background: var(--page-glow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .feature-title { font-size: 15px; font-weight: 600; }
+        .feature-subtitle { font-size: 10px; color: var(--text-muted); }
+        .feature-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .feature-list { list-style: none; }
+        .feature-list li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .feature-list li::before { content: '✓'; color: var(--green); }
+        
+        .unity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .unity-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .unity-header { padding: 16px; background: linear-gradient(135deg, rgba(59,130,246,0.2), transparent); border-bottom: 1px solid var(--border-color); }
+        .unity-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .unity-subtitle { font-size: 10px; color: var(--text-muted); }
+        .unity-body { padding: 16px; }
+        .unity-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .unity-features { list-style: none; }
+        .unity-features li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .unity-features li::before { content: '→'; color: var(--blue); }
+        
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .tag.pro { background: rgba(16,185,129,0.2); color: var(--green); }
+        .tag.con { background: rgba(239,68,68,0.2); color: var(--red); }
+        .tag.neutral { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        
+        .code-example { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .code-example-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-example-title { font-size: 12px; font-weight: 600; }
+        .code-example-file { font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-example-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.7; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(255,54,33,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .feature-grid { grid-template-columns: 1fr; }
+            .pillar-grid { grid-template-columns: repeat(2, 1fr); }
+            .unity-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔧 Category 02</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-data-engineering-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#lakehouse"><span class="nav-icon">🏠</span> Lakehouse</a></li>
+            <li><a href="#delta"><span class="nav-icon">🔺</span> Delta Lake</a></li>
+            <li><a href="#unity"><span class="nav-icon">🔐</span> Unity Catalog</a></li>
+            <li><a href="#workflows"><span class="nav-icon">⚙️</span> Workflows</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-p1-data-ingestion.html"><span class="nav-icon">📥</span> Data Ingestion</a></li>
+            <li><a href="cat02-p2-data-transformation.html"><span class="nav-icon">🔄</span> Data Transformation</a></li>
+            <li><a href="cat02-p3-databricks.html" class="active"><span class="nav-icon">🧱</span> Databricks</a></li>
+            <li><a href="cat02-p4-snowflake.html"><span class="nav-icon">❄️</span> Snowflake</a></li>
+            <li><a href="cat02-p5-bigquery.html"><span class="nav-icon">🔍</span> BigQuery</a></li>
+            <li><a href="cat02-p6-apache-spark.html"><span class="nav-icon">⚡</span> Apache Spark</a></li>
+            <li><a href="cat02-p7-orchestration.html"><span class="nav-icon">🎼</span> Orchestration</a></li>
+            <li><a href="cat02-p8-data-quality.html"><span class="nav-icon">✅</span> Data Quality</a></li>
+            <li><a href="cat02-p9-observability.html"><span class="nav-icon">👁️</span> Observability</a></li>
+            <li><a href="cat02-p10-data-catalogs.html"><span class="nav-icon">📚</span> Data Catalogs</a></li>
+            <li><a href="cat02-p11-streaming.html"><span class="nav-icon">🌊</span> Streaming</a></li>
+            <li><a href="cat02-p12-reverse-etl.html"><span class="nav-icon">↩️</span> Reverse ETL</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🧱 Page 2.3</span>
+                <h1>Databricks Platform</h1>
+                <p>Master the unified data analytics platform. Learn lakehouse architecture, Delta Lake for reliable data lakes, Unity Catalog for governance, and Databricks Workflows for orchestration—all powered by Apache Spark.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">$62B</div><div class="hero-metric-label">Valuation (2023)</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10K+</div><div class="hero-metric-label">Enterprise Customers</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Delta</div><div class="hero-metric-label">Lake Format</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Unity</div><div class="hero-metric-label">Catalog Governance</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Databricks?</h2>
+                    <p>The lakehouse company</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>The Lakehouse Platform</h3>
+                <p>Databricks pioneered the "lakehouse" architecture—combining the best of data lakes (cheap storage, schema flexibility, diverse data types) with the best of data warehouses (ACID transactions, governance, performance). Built on Apache Spark, Databricks provides a unified platform for data engineering, data science, machine learning, and analytics.</p>
+                
+                <h3>Founded by Spark Creators</h3>
+                <p>Databricks was founded in 2013 by the original creators of Apache Spark at UC Berkeley. They went on to create Delta Lake (reliable data lake storage), MLflow (ML lifecycle), and Koalas (pandas on Spark). Today, Databricks is one of the most valuable private companies in tech, serving over 10,000 enterprise customers.</p>
+                
+                <h3>Multi-Cloud Native</h3>
+                <p>Databricks runs on AWS, Azure, and GCP, with deep integrations into each cloud ecosystem. Compute runs in your cloud account, data stays in your storage (S3, ADLS, GCS), and Databricks provides the management plane. This separation enables cost efficiency and data residency compliance.</p>
+            </div>
+        </section>
+
+        <!-- LAKEHOUSE ARCHITECTURE -->
+        <section class="module" id="lakehouse">
+            <div class="module-header">
+                <div class="module-icon">🏠</div>
+                <div class="module-info">
+                    <h2>Lakehouse Architecture</h2>
+                    <p>The best of lakes and warehouses</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Databricks Lakehouse Architecture</div>
+                    <div class="viz-badge">Unified Platform</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 400" style="width: 100%; height: auto;">
+                        <!-- Cloud Storage Layer -->
+                        <g transform="translate(50, 320)">
+                            <rect x="0" y="0" width="800" height="60" rx="10" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#60A5FA" font-size="12" font-weight="600">☁️ CLOUD OBJECT STORAGE</text>
+                            <text x="400" y="45" text-anchor="middle" fill="#6a6a7a" font-size="10">S3 / ADLS / GCS — Your data stays in your account</text>
+                        </g>
+                        
+                        <!-- Delta Lake Layer -->
+                        <g transform="translate(50, 230)">
+                            <rect x="0" y="0" width="800" height="70" rx="10" fill="#10B98115" stroke="#10B981" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#34D399" font-size="12" font-weight="600">🔺 DELTA LAKE</text>
+                            <text x="150" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">ACID Transactions</text>
+                            <text x="325" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Time Travel</text>
+                            <text x="500" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Schema Evolution</text>
+                            <text x="675" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Z-Order Indexing</text>
+                        </g>
+                        
+                        <!-- Unity Catalog -->
+                        <g transform="translate(50, 140)">
+                            <rect x="0" y="0" width="800" height="70" rx="10" fill="#3B82F615" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#60A5FA" font-size="12" font-weight="600">🔐 UNITY CATALOG</text>
+                            <text x="150" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Fine-grained Access</text>
+                            <text x="325" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Data Lineage</text>
+                            <text x="500" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Audit Logs</text>
+                            <text x="675" y="50" text-anchor="middle" fill="#6a6a7a" font-size="9">Cross-workspace Sharing</text>
+                        </g>
+                        
+                        <!-- Compute Layer -->
+                        <g transform="translate(50, 50)">
+                            <rect x="0" y="0" width="800" height="70" rx="10" fill="#F9731615" stroke="#F97316" stroke-width="2"/>
+                            <text x="400" y="25" text-anchor="middle" fill="#FB923C" font-size="12" font-weight="600">⚡ COMPUTE LAYER</text>
+                            
+                            <rect x="30" y="38" width="110" height="24" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="85" y="54" text-anchor="middle" fill="#fff" font-size="9">SQL Warehouses</text>
+                            
+                            <rect x="160" y="38" width="110" height="24" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="215" y="54" text-anchor="middle" fill="#fff" font-size="9">All-Purpose Clusters</text>
+                            
+                            <rect x="290" y="38" width="110" height="24" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="345" y="54" text-anchor="middle" fill="#fff" font-size="9">Job Clusters</text>
+                            
+                            <rect x="420" y="38" width="110" height="24" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="475" y="54" text-anchor="middle" fill="#fff" font-size="9">Serverless</text>
+                            
+                            <rect x="550" y="38" width="110" height="24" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="605" y="54" text-anchor="middle" fill="#fff" font-size="9">ML Runtime</text>
+                            
+                            <rect x="680" y="38" width="100" height="24" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="730" y="54" text-anchor="middle" fill="#fff" font-size="9">Photon Engine</text>
+                        </g>
+                        
+                        <!-- Workload Icons at top -->
+                        <g transform="translate(100, 10)">
+                            <text x="0" y="15" fill="#6a6a7a" font-size="9">📊 BI/SQL</text>
+                            <text x="130" y="15" fill="#6a6a7a" font-size="9">🔄 ETL/ELT</text>
+                            <text x="260" y="15" fill="#6a6a7a" font-size="9">🤖 ML/AI</text>
+                            <text x="390" y="15" fill="#6a6a7a" font-size="9">🌊 Streaming</text>
+                            <text x="520" y="15" fill="#6a6a7a" font-size="9">📈 Analytics</text>
+                            <text x="650" y="15" fill="#6a6a7a" font-size="9">🔬 Data Science</text>
+                        </g>
+                        
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrowDown" markerWidth="10" markerHeight="10" refX="5" refY="10" orient="auto">
+                                <path d="M0,0 L5,10 L10,0" fill="none" stroke="#6a6a7a" stroke-width="1"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Four Pillars -->
+            <div class="pillar-grid">
+                <div class="pillar-card delta">
+                    <div class="pillar-icon">🔺</div>
+                    <div class="pillar-title">Delta Lake</div>
+                    <div class="pillar-desc">Open-source storage layer that brings ACID transactions to data lakes</div>
+                </div>
+                <div class="pillar-card unity">
+                    <div class="pillar-icon">🔐</div>
+                    <div class="pillar-title">Unity Catalog</div>
+                    <div class="pillar-desc">Unified governance for data, ML models, and AI assets</div>
+                </div>
+                <div class="pillar-card workflows">
+                    <div class="pillar-icon">⚙️</div>
+                    <div class="pillar-title">Workflows</div>
+                    <div class="pillar-desc">Orchestrate jobs, notebooks, and pipelines with dependencies</div>
+                </div>
+                <div class="pillar-card mlflow">
+                    <div class="pillar-icon">🧪</div>
+                    <div class="pillar-title">MLflow</div>
+                    <div class="pillar-desc">End-to-end ML lifecycle: tracking, registry, deployment</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DELTA LAKE -->
+        <section class="module" id="delta">
+            <div class="module-header">
+                <div class="module-icon">🔺</div>
+                <div class="module-info">
+                    <h2>Delta Lake</h2>
+                    <p>Reliability and performance for data lakes</p>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔒</div>
+                        <div>
+                            <div class="feature-title">ACID Transactions</div>
+                            <div class="feature-subtitle">Serializable isolation level</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Full ACID compliance on cloud object storage. Concurrent reads and writes without corruption. No more partial failures or inconsistent data.</div>
+                    <ul class="feature-list">
+                        <li>Atomic commits across multiple files</li>
+                        <li>Concurrent write safety with OCC</li>
+                        <li>Consistent reads during writes</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">⏱️</div>
+                        <div>
+                            <div class="feature-title">Time Travel</div>
+                            <div class="feature-subtitle">Query historical data</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Access and restore previous versions of your data. Query data as of any timestamp or version. Audit changes and rollback mistakes.</div>
+                    <ul class="feature-list">
+                        <li>SELECT * FROM table VERSION AS OF 5</li>
+                        <li>SELECT * FROM table TIMESTAMP AS OF '2024-01-01'</li>
+                        <li>RESTORE TABLE table TO VERSION AS OF 3</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">📊</div>
+                        <div>
+                            <div class="feature-title">Schema Evolution</div>
+                            <div class="feature-subtitle">Adapt to changing data</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Add new columns, merge schemas automatically, and handle schema drift without breaking pipelines. No more failed jobs from schema changes.</div>
+                    <ul class="feature-list">
+                        <li>Auto-merge compatible schemas</li>
+                        <li>Add columns without rewriting data</li>
+                        <li>Explicit schema enforcement option</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">⚡</div>
+                        <div>
+                            <div class="feature-title">Performance</div>
+                            <div class="feature-subtitle">Fast queries at scale</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Z-ordering for data skipping, file compaction, caching, and Photon engine for 2-8x faster queries than open-source Spark.</div>
+                    <ul class="feature-list">
+                        <li>Z-ORDER BY for multi-dimensional clustering</li>
+                        <li>OPTIMIZE for file compaction</li>
+                        <li>Photon vectorized execution engine</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="code-example">
+                <div class="code-example-header">
+                    <div class="code-example-title">Delta Lake Operations</div>
+                    <div class="code-example-file">SQL / PySpark</div>
+                </div>
+                <div class="code-example-content">
+                    <pre><span class="code-comment">-- Create a Delta table</span>
+<span class="code-keyword">CREATE TABLE</span> customers (
+    customer_id <span class="code-keyword">BIGINT</span>,
+    name <span class="code-keyword">STRING</span>,
+    email <span class="code-keyword">STRING</span>,
+    created_at <span class="code-keyword">TIMESTAMP</span>
+) <span class="code-keyword">USING</span> DELTA
+<span class="code-keyword">PARTITIONED BY</span> (created_at)
+<span class="code-keyword">LOCATION</span> <span class="code-string">'s3://bucket/customers'</span>;
+
+<span class="code-comment">-- MERGE (upsert) pattern</span>
+<span class="code-keyword">MERGE INTO</span> customers <span class="code-keyword">AS</span> target
+<span class="code-keyword">USING</span> updates <span class="code-keyword">AS</span> source
+<span class="code-keyword">ON</span> target.customer_id = source.customer_id
+<span class="code-keyword">WHEN MATCHED THEN UPDATE SET</span> *
+<span class="code-keyword">WHEN NOT MATCHED THEN INSERT</span> *;
+
+<span class="code-comment">-- Time travel query</span>
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> customers <span class="code-keyword">VERSION AS OF</span> 5;
+
+<span class="code-comment">-- Optimize and Z-order for performance</span>
+<span class="code-keyword">OPTIMIZE</span> customers <span class="code-keyword">ZORDER BY</span> (customer_id);</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- UNITY CATALOG -->
+        <section class="module" id="unity">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Unity Catalog</h2>
+                    <p>Unified governance for the lakehouse</p>
+                </div>
+            </div>
+            
+            <div class="unity-grid">
+                <div class="unity-card">
+                    <div class="unity-header">
+                        <div class="unity-title">3-Level Namespace</div>
+                        <div class="unity-subtitle">Hierarchical organization</div>
+                    </div>
+                    <div class="unity-body">
+                        <div class="unity-desc">Organize data in a clear hierarchy: catalog.schema.table. Share data across workspaces while maintaining governance.</div>
+                        <ul class="unity-features">
+                            <li>Catalog (top level, often per env)</li>
+                            <li>Schema (database equivalent)</li>
+                            <li>Tables, Views, Functions, Models</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="unity-card">
+                    <div class="unity-header">
+                        <div class="unity-title">Fine-Grained Access</div>
+                        <div class="unity-subtitle">Row and column level security</div>
+                    </div>
+                    <div class="unity-body">
+                        <div class="unity-desc">Control who can see what data with row filters and column masks. Apply policies that follow data across queries and workspaces.</div>
+                        <ul class="unity-features">
+                            <li>Row-level security filters</li>
+                            <li>Column masking for PII</li>
+                            <li>Dynamic views for access control</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="unity-card">
+                    <div class="unity-header">
+                        <div class="unity-title">Data Lineage</div>
+                        <div class="unity-subtitle">Track data flow automatically</div>
+                    </div>
+                    <div class="unity-body">
+                        <div class="unity-desc">Automatic lineage tracking at table and column level. See where data comes from and where it goes—no manual documentation needed.</div>
+                        <ul class="unity-features">
+                            <li>Automatic column-level lineage</li>
+                            <li>Cross-workspace tracking</li>
+                            <li>Impact analysis for changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WORKFLOWS -->
+        <section class="module" id="workflows">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Databricks Workflows</h2>
+                    <p>Orchestration for the lakehouse</p>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Workflow Components</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Description</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Jobs</strong></td>
+                            <td>Scheduled or triggered execution of tasks</td>
+                            <td>Production pipelines, scheduled reports</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tasks</strong></td>
+                            <td>Individual units of work (notebook, JAR, SQL, dbt)</td>
+                            <td>ETL steps, model training, data validation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Delta Live Tables</strong></td>
+                            <td>Declarative ETL framework with quality checks</td>
+                            <td>Streaming + batch pipelines, data quality</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Job Clusters</strong></td>
+                            <td>Ephemeral clusters created for job execution</td>
+                            <td>Cost optimization, isolation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Triggers</strong></td>
+                            <td>Scheduled (cron), file arrival, continuous</td>
+                            <td>Event-driven pipelines, SLA compliance</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-example">
+                <div class="code-example-header">
+                    <div class="code-example-title">Delta Live Tables (DLT) Pipeline</div>
+                    <div class="code-example-file">Python / SQL</div>
+                </div>
+                <div class="code-example-content">
+                    <pre><span class="code-keyword">import</span> dlt
+<span class="code-keyword">from</span> pyspark.sql.functions <span class="code-keyword">import</span> *
+
+<span class="code-comment"># Bronze: Raw ingestion</span>
+<span class="code-keyword">@dlt.table</span>(
+    comment=<span class="code-string">"Raw orders from source"</span>
+)
+<span class="code-keyword">def</span> <span class="code-function">bronze_orders</span>():
+    <span class="code-keyword">return</span> spark.readStream.format(<span class="code-string">"cloudFiles"</span>) \
+        .option(<span class="code-string">"cloudFiles.format"</span>, <span class="code-string">"json"</span>) \
+        .load(<span class="code-string">"/mnt/raw/orders"</span>)
+
+<span class="code-comment"># Silver: Cleaned and validated</span>
+<span class="code-keyword">@dlt.table</span>(
+    comment=<span class="code-string">"Cleaned orders"</span>
+)
+<span class="code-keyword">@dlt.expect_or_drop</span>(<span class="code-string">"valid_amount"</span>, <span class="code-string">"amount > 0"</span>)
+<span class="code-keyword">@dlt.expect_or_fail</span>(<span class="code-string">"valid_id"</span>, <span class="code-string">"order_id IS NOT NULL"</span>)
+<span class="code-keyword">def</span> <span class="code-function">silver_orders</span>():
+    <span class="code-keyword">return</span> dlt.read_stream(<span class="code-string">"bronze_orders"</span>) \
+        .select(<span class="code-string">"order_id"</span>, <span class="code-string">"customer_id"</span>, <span class="code-string">"amount"</span>, <span class="code-string">"created_at"</span>)
+
+<span class="code-comment"># Gold: Business aggregates</span>
+<span class="code-keyword">@dlt.table</span>(
+    comment=<span class="code-string">"Daily order metrics"</span>
+)
+<span class="code-keyword">def</span> <span class="code-function">gold_daily_metrics</span>():
+    <span class="code-keyword">return</span> dlt.read(<span class="code-string">"silver_orders"</span>) \
+        .groupBy(to_date(<span class="code-string">"created_at"</span>).alias(<span class="code-string">"date"</span>)) \
+        .agg(count(<span class="code-string">"*"</span>).alias(<span class="code-string">"order_count"</span>), 
+             sum(<span class="code-string">"amount"</span>).alias(<span class="code-string">"total_revenue"</span>))</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for Databricks success</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Use Unity Catalog for all new projects—it's the future of governance</li>
+                        <li>Leverage Delta Lake everywhere—tables, streaming, ML feature stores</li>
+                        <li>Use job clusters for production—ephemeral, isolated, cost-effective</li>
+                        <li>Implement medallion architecture (bronze/silver/gold)</li>
+                        <li>Enable Photon for SQL-heavy workloads (2-8x speedup)</li>
+                        <li>Use OPTIMIZE and Z-ORDER for frequently queried columns</li>
+                        <li>Implement DLT for streaming pipelines with quality expectations</li>
+                        <li>Set up proper cluster policies to control costs</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't use all-purpose clusters for production jobs</li>
+                        <li>Avoid small files—use Auto Loader and OPTIMIZE regularly</li>
+                        <li>Never skip VACUUM—old files accumulate and cost money</li>
+                        <li>Don't over-partition—too many partitions hurt performance</li>
+                        <li>Avoid legacy Hive metastore for new projects</li>
+                        <li>Don't ignore cluster auto-termination settings</li>
+                        <li>Never hardcode secrets—use Databricks secrets or external vaults</li>
+                        <li>Don't skip data quality checks—use DLT expectations or Great Expectations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for Databricks</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🧱</div>
+                    <div class="agent-name">DatabricksAgent</div>
+                    <div class="agent-role">Lakehouse Platform Specialist</div>
+                    <div class="agent-desc">Expert in Databricks platform, Delta Lake, Unity Catalog, and lakehouse architecture. Specializes in pipeline development, performance optimization, governance setup, and migration from legacy systems.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design medallion architecture pipelines</li>
+                        <li>Configure Unity Catalog governance</li>
+                        <li>Optimize Delta Lake performance</li>
+                        <li>Build DLT streaming pipelines</li>
+                        <li>Migrate from Hadoop/legacy platforms</li>
+                        <li>Implement cluster policies and cost controls</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Migration Task</div>
+                        <div class="code-filename">databricks_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># databricks_agent.py - Databricks Platform Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">databricks_agent</span> = Agent(
+    role=<span class="code-string">"Databricks Solutions Architect"</span>,
+    goal=<span class="code-string">"Design optimal lakehouse solutions"</span>,
+    backstory=<span class="code-string">"""Expert in Databricks, Delta Lake, 
+    Unity Catalog, and Apache Spark. Deep knowledge 
+    of medallion architecture, DLT pipelines, 
+    performance tuning, and enterprise governance."""</span>,
+    tools=[
+        DeltaLakeOptimizer(),
+        UnityCatalogConfigurator(),
+        DLTPipelineBuilder(),
+        ClusterPolicyManager(),
+        MigrationPlanner(),
+    ]
+)
+
+<span class="code-function">lakehouse_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Assess current data architecture
+    2. Design medallion layer structure
+    3. Configure Unity Catalog governance
+    4. Build DLT pipelines with quality checks
+    5. Optimize Delta tables (Z-ORDER, OPTIMIZE)
+    6. Set up cluster policies for cost control
+    7. Implement monitoring and alerting
+    """</span>,
+    agent=databricks_agent,
+    expected_output=<span class="code-string">"Production-ready lakehouse architecture"</span>
+)
+
+<span class="code-comment"># Execute Databricks implementation</span>
+crew = Crew(agents=[databricks_agent], tasks=[lakehouse_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat02-p6-apache-spark.html" class="related-card">
+                    <div class="related-num">Page 2.6</div>
+                    <div class="related-title">Apache Spark</div>
+                    <div class="related-desc">The engine powering Databricks</div>
+                </a>
+                <a href="cat02-p4-snowflake.html" class="related-card">
+                    <div class="related-num">Page 2.4</div>
+                    <div class="related-title">Snowflake Platform</div>
+                    <div class="related-desc">Compare with data warehouse approach</div>
+                </a>
+                <a href="cat02-p8-data-quality.html" class="related-card">
+                    <div class="related-num">Page 2.8</div>
+                    <div class="related-title">Data Quality</div>
+                    <div class="related-desc">DLT expectations and quality frameworks</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat02-p2-data-transformation.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">2.2: Data Transformation</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 2.3 of 12</div>
+        <a href="cat02-p4-snowflake.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">2.4: Snowflake Platform</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

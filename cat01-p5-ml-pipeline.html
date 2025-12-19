@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Pipeline & Workflow | AI/ML Foundations | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cyan)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stage-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .stage-num { position: absolute; top: -12px; left: 20px; width: 24px; height: 24px; background: var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .stage-icon { font-size: 28px; margin-bottom: 12px; margin-top: 8px; }
+        .stage-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+        .stage-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .stage-tasks { list-style: none; }
+        .stage-tasks li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .stage-tasks li::before { content: '✓'; color: var(--page-light); font-size: 10px; }
+        
+        .tools-comparison { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .tools-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .tools-header-title { font-size: 13px; font-weight: 600; }
+        .tools-table { width: 100%; border-collapse: collapse; }
+        .tools-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .tools-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .tools-table tr:hover td { background: var(--bg-hover); }
+        .tool-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .tool-icon { font-size: 16px; }
+        .tool-tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--page-glow); color: var(--page-light); }
+        
+        .mlops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .mlops-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .mlops-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .mlops-card-icon { width: 40px; height: 40px; background: var(--page-glow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .mlops-card-title { font-size: 15px; font-weight: 600; }
+        .mlops-card-subtitle { font-size: 10px; color: var(--text-muted); }
+        .mlops-card-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .mlops-features { list-style: none; }
+        .mlops-features li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .mlops-features li::before { content: '→'; color: var(--page-light); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(16,185,129,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .mlops-grid { grid-template-columns: 1fr; }
+            .stage-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🧠 Category 01</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-aiml-foundations-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#pipeline"><span class="nav-icon">🔄</span> Pipeline Stages</a></li>
+            <li><a href="#stages"><span class="nav-icon">📋</span> Detailed Stages</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#mlops"><span class="nav-icon">🚀</span> MLOps</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-p1-supervised-learning.html"><span class="nav-icon">🏷️</span> Supervised Learning</a></li>
+            <li><a href="cat01-p2-unsupervised-learning.html"><span class="nav-icon">🔍</span> Unsupervised Learning</a></li>
+            <li><a href="cat01-p3-reinforcement-learning.html"><span class="nav-icon">🎮</span> Reinforcement Learning</a></li>
+            <li><a href="cat01-p4-neural-networks.html"><span class="nav-icon">🔮</span> Neural Networks</a></li>
+            <li><a href="cat01-p5-ml-pipeline.html" class="active"><span class="nav-icon">⚙️</span> ML Pipeline</a></li>
+            <li><a href="cat01-p6-algorithm-selection.html"><span class="nav-icon">🎯</span> Algorithm Selection</a></li>
+            <li><a href="cat01-p7-ml-frameworks.html"><span class="nav-icon">🛠️</span> ML Frameworks</a></li>
+            <li><a href="cat01-p8-evaluation-metrics.html"><span class="nav-icon">📈</span> Evaluation Metrics</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">⚙️ Page 1.5</span>
+                <h1>ML Pipeline & Workflow</h1>
+                <p>Master the end-to-end machine learning lifecycle from data preparation to production deployment. Learn how to build reproducible, scalable, and maintainable ML systems that deliver value in real-world applications.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">87%</div><div class="hero-metric-label">ML Projects Never Reach Production</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">6</div><div class="hero-metric-label">Core Pipeline Stages</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">70%</div><div class="hero-metric-label">Time Spent on Data Prep</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">∞</div><div class="hero-metric-label">Iterations Required</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is an ML Pipeline?</h2>
+                    <p>Understanding the end-to-end machine learning workflow</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Definition & Purpose</h3>
+                <p>An ML pipeline is a series of automated steps that transform raw data into deployed models and predictions. It encompasses everything from data collection and preprocessing through model training, evaluation, deployment, and monitoring. A well-designed pipeline ensures reproducibility, scalability, and maintainability.</p>
+                
+                <p>Unlike ad-hoc experimentation, production ML requires systematic workflows that can be version-controlled, tested, and automated. Pipelines make it possible to iterate quickly, deploy reliably, and maintain models over time as data and requirements evolve.</p>
+                
+                <h3>Why Pipelines Matter</h3>
+                <p>Most ML projects fail to reach production—not because of algorithmic challenges, but due to engineering problems. Pipelines address common issues: unreproducible experiments, manual deployment processes, data quality degradation, and model performance decay. They bridge the gap between data science notebooks and production systems.</p>
+                
+                <h3>The Reality of ML Work</h3>
+                <p>Data scientists spend roughly 70% of their time on data preparation—not model building. This makes data pipelines and feature engineering crucial. Production systems also require continuous monitoring, retraining, and governance that far exceed initial model development effort.</p>
+            </div>
+        </section>
+
+        <!-- PIPELINE VISUALIZATION -->
+        <section class="module" id="pipeline">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>ML Pipeline Stages</h2>
+                    <p>The complete machine learning workflow</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 End-to-End ML Pipeline</div>
+                    <div class="viz-badge">6 Stages</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 400" style="width: 100%; height: auto;">
+                        <!-- Stage 1: Data Collection -->
+                        <g transform="translate(20, 30)">
+                            <rect x="0" y="0" width="130" height="130" rx="10" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="14" fill="#3B82F6"/>
+                            <text x="20" y="25" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">1</text>
+                            <text x="65" y="55" text-anchor="middle" fill="#60A5FA" font-size="11" font-weight="600">DATA</text>
+                            <text x="65" y="70" text-anchor="middle" fill="#60A5FA" font-size="11" font-weight="600">COLLECTION</text>
+                            <text x="65" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">Sources, APIs</text>
+                            <text x="65" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Databases</text>
+                            <text x="65" y="120" text-anchor="middle" fill="#a0a0b0" font-size="8">Raw data ingestion</text>
+                        </g>
+                        
+                        <!-- Arrow -->
+                        <path d="M 155 95 L 170 95" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow1)"/>
+                        
+                        <!-- Stage 2: Data Prep -->
+                        <g transform="translate(175, 30)">
+                            <rect x="0" y="0" width="130" height="130" rx="10" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="14" fill="#8B5CF6"/>
+                            <text x="20" y="25" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">2</text>
+                            <text x="65" y="55" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="600">DATA</text>
+                            <text x="65" y="70" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="600">PREPARATION</text>
+                            <text x="65" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">Clean, Transform</text>
+                            <text x="65" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Feature Eng.</text>
+                            <text x="65" y="120" text-anchor="middle" fill="#a0a0b0" font-size="8">70% of ML time</text>
+                        </g>
+                        
+                        <!-- Arrow -->
+                        <path d="M 310 95 L 325 95" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrow2)"/>
+                        
+                        <!-- Stage 3: Training -->
+                        <g transform="translate(330, 30)">
+                            <rect x="0" y="0" width="130" height="130" rx="10" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="14" fill="#10B981"/>
+                            <text x="20" y="25" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">3</text>
+                            <text x="65" y="55" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">MODEL</text>
+                            <text x="65" y="70" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">TRAINING</text>
+                            <text x="65" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">Algorithm, Tune</text>
+                            <text x="65" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Cross-validate</text>
+                            <text x="65" y="120" text-anchor="middle" fill="#a0a0b0" font-size="8">Experimentation</text>
+                        </g>
+                        
+                        <!-- Arrow -->
+                        <path d="M 465 95 L 480 95" stroke="#10B981" stroke-width="2" marker-end="url(#arrow3)"/>
+                        
+                        <!-- Stage 4: Evaluation -->
+                        <g transform="translate(485, 30)">
+                            <rect x="0" y="0" width="130" height="130" rx="10" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="14" fill="#F59E0B"/>
+                            <text x="20" y="25" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">4</text>
+                            <text x="65" y="55" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">MODEL</text>
+                            <text x="65" y="70" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">EVALUATION</text>
+                            <text x="65" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">Metrics, Bias</text>
+                            <text x="65" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Error Analysis</text>
+                            <text x="65" y="120" text-anchor="middle" fill="#a0a0b0" font-size="8">Go/No-Go decision</text>
+                        </g>
+                        
+                        <!-- Arrow -->
+                        <path d="M 620 95 L 635 95" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrow4)"/>
+                        
+                        <!-- Stage 5: Deployment -->
+                        <g transform="translate(640, 30)">
+                            <rect x="0" y="0" width="130" height="130" rx="10" fill="#1a1a2e" stroke="#EC4899" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="14" fill="#EC4899"/>
+                            <text x="20" y="25" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">5</text>
+                            <text x="65" y="55" text-anchor="middle" fill="#F472B6" font-size="11" font-weight="600">MODEL</text>
+                            <text x="65" y="70" text-anchor="middle" fill="#F472B6" font-size="11" font-weight="600">DEPLOYMENT</text>
+                            <text x="65" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">API, Container</text>
+                            <text x="65" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">A/B Test</text>
+                            <text x="65" y="120" text-anchor="middle" fill="#a0a0b0" font-size="8">Production release</text>
+                        </g>
+                        
+                        <!-- Arrow -->
+                        <path d="M 775 95 L 790 95" stroke="#EC4899" stroke-width="2" marker-end="url(#arrow5)"/>
+                        
+                        <!-- Stage 6: Monitoring -->
+                        <g transform="translate(640, 180)">
+                            <rect x="0" y="0" width="130" height="130" rx="10" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="14" fill="#06B6D4"/>
+                            <text x="20" y="25" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">6</text>
+                            <text x="65" y="55" text-anchor="middle" fill="#22D3EE" font-size="11" font-weight="600">MODEL</text>
+                            <text x="65" y="70" text-anchor="middle" fill="#22D3EE" font-size="11" font-weight="600">MONITORING</text>
+                            <text x="65" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">Drift detection</text>
+                            <text x="65" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Alerts, Retrain</text>
+                            <text x="65" y="120" text-anchor="middle" fill="#a0a0b0" font-size="8">Continuous ops</text>
+                        </g>
+                        
+                        <!-- Feedback loop arrow -->
+                        <path d="M 640 245 C 400 300, 200 300, 85 165" fill="none" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6" marker-end="url(#arrow6)"/>
+                        <text x="350" y="290" text-anchor="middle" fill="#22D3EE" font-size="10">Feedback Loop → Retrain</text>
+                        
+                        <!-- Connect stage 5 to 6 -->
+                        <path d="M 705 165 L 705 175" stroke="#EC4899" stroke-width="2" marker-end="url(#arrow5)"/>
+                        
+                        <!-- Key Metrics Box -->
+                        <g transform="translate(20, 180)">
+                            <rect x="0" y="0" width="600" height="130" rx="10" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="20" y="25" fill="#10B981" font-size="12" font-weight="600">Key Metrics by Stage</text>
+                            
+                            <g transform="translate(20, 45)">
+                                <circle cx="8" cy="8" r="6" fill="#3B82F6"/>
+                                <text x="20" y="12" fill="#6a6a7a" font-size="9">Data: Volume, completeness, freshness</text>
+                            </g>
+                            <g transform="translate(20, 65)">
+                                <circle cx="8" cy="8" r="6" fill="#8B5CF6"/>
+                                <text x="20" y="12" fill="#6a6a7a" font-size="9">Prep: Missing values, outliers, feature coverage</text>
+                            </g>
+                            <g transform="translate(20, 85)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="20" y="12" fill="#6a6a7a" font-size="9">Training: Loss, learning rate, convergence</text>
+                            </g>
+                            <g transform="translate(300, 45)">
+                                <circle cx="8" cy="8" r="6" fill="#F59E0B"/>
+                                <text x="20" y="12" fill="#6a6a7a" font-size="9">Eval: F1, AUC, RMSE, business metrics</text>
+                            </g>
+                            <g transform="translate(300, 65)">
+                                <circle cx="8" cy="8" r="6" fill="#EC4899"/>
+                                <text x="20" y="12" fill="#6a6a7a" font-size="9">Deploy: Latency, throughput, error rate</text>
+                            </g>
+                            <g transform="translate(300, 85)">
+                                <circle cx="8" cy="8" r="6" fill="#06B6D4"/>
+                                <text x="20" y="12" fill="#6a6a7a" font-size="9">Monitor: Drift score, prediction distribution</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Arrow markers -->
+                        <defs>
+                            <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#3B82F6"/></marker>
+                            <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8B5CF6"/></marker>
+                            <marker id="arrow3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#10B981"/></marker>
+                            <marker id="arrow4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#F59E0B"/></marker>
+                            <marker id="arrow5" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#EC4899"/></marker>
+                            <marker id="arrow6" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#06B6D4"/></marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- DETAILED STAGES -->
+        <section class="module" id="stages">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Pipeline Stages in Detail</h2>
+                    <p>What happens at each stage of the ML workflow</p>
+                </div>
+            </div>
+            
+            <div class="stage-grid">
+                <div class="stage-card">
+                    <div class="stage-num">1</div>
+                    <div class="stage-icon">📥</div>
+                    <div class="stage-title">Data Collection</div>
+                    <div class="stage-desc">Gather raw data from various sources into a centralized location.</div>
+                    <ul class="stage-tasks">
+                        <li>Connect to data sources (DBs, APIs, files)</li>
+                        <li>Set up ingestion pipelines</li>
+                        <li>Handle batch and streaming data</li>
+                        <li>Validate data schemas</li>
+                        <li>Implement data versioning</li>
+                    </ul>
+                </div>
+                <div class="stage-card">
+                    <div class="stage-num">2</div>
+                    <div class="stage-icon">🔧</div>
+                    <div class="stage-title">Data Preparation</div>
+                    <div class="stage-desc">Clean, transform, and engineer features from raw data.</div>
+                    <ul class="stage-tasks">
+                        <li>Handle missing values</li>
+                        <li>Remove duplicates and outliers</li>
+                        <li>Feature engineering</li>
+                        <li>Normalization/scaling</li>
+                        <li>Train/validation/test split</li>
+                    </ul>
+                </div>
+                <div class="stage-card">
+                    <div class="stage-num">3</div>
+                    <div class="stage-icon">🏋️</div>
+                    <div class="stage-title">Model Training</div>
+                    <div class="stage-desc">Select algorithms and train models on prepared data.</div>
+                    <ul class="stage-tasks">
+                        <li>Algorithm selection</li>
+                        <li>Hyperparameter tuning</li>
+                        <li>Cross-validation</li>
+                        <li>Experiment tracking</li>
+                        <li>Model versioning</li>
+                    </ul>
+                </div>
+                <div class="stage-card">
+                    <div class="stage-num">4</div>
+                    <div class="stage-icon">📊</div>
+                    <div class="stage-title">Model Evaluation</div>
+                    <div class="stage-desc">Assess model performance and readiness for production.</div>
+                    <ul class="stage-tasks">
+                        <li>Calculate performance metrics</li>
+                        <li>Error analysis</li>
+                        <li>Bias and fairness checks</li>
+                        <li>Compare to baselines</li>
+                        <li>Business metric alignment</li>
+                    </ul>
+                </div>
+                <div class="stage-card">
+                    <div class="stage-num">5</div>
+                    <div class="stage-icon">🚀</div>
+                    <div class="stage-title">Model Deployment</div>
+                    <div class="stage-desc">Package and serve models in production environments.</div>
+                    <ul class="stage-tasks">
+                        <li>Model serialization</li>
+                        <li>Containerization (Docker)</li>
+                        <li>API endpoint creation</li>
+                        <li>A/B testing setup</li>
+                        <li>Rollback procedures</li>
+                    </ul>
+                </div>
+                <div class="stage-card">
+                    <div class="stage-num">6</div>
+                    <div class="stage-icon">📈</div>
+                    <div class="stage-title">Model Monitoring</div>
+                    <div class="stage-desc">Track performance and detect issues in production.</div>
+                    <ul class="stage-tasks">
+                        <li>Performance monitoring</li>
+                        <li>Data drift detection</li>
+                        <li>Prediction drift alerts</li>
+                        <li>Automated retraining triggers</li>
+                        <li>Incident response</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Pipeline Tools by Stage</h2>
+                    <p>Popular tools for each pipeline stage</p>
+                </div>
+            </div>
+            
+            <div class="tools-comparison">
+                <div class="tools-header">
+                    <div class="tools-header-title">ML Pipeline Tool Landscape</div>
+                </div>
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Tool</th>
+                            <th>Purpose</th>
+                            <th>Key Feature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tool-tag">Data</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🔷</span> Apache Airflow</div></td>
+                            <td>Workflow orchestration</td>
+                            <td>DAG-based scheduling</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Data</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🌊</span> dbt</div></td>
+                            <td>Data transformation</td>
+                            <td>SQL-based ELT</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Features</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🪶</span> Feast</div></td>
+                            <td>Feature store</td>
+                            <td>Feature serving & registry</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Training</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">📊</span> MLflow</div></td>
+                            <td>Experiment tracking</td>
+                            <td>Model versioning & registry</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Training</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">📈</span> Weights & Biases</div></td>
+                            <td>Experiment tracking</td>
+                            <td>Visualization & collaboration</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Training</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🎯</span> Optuna</div></td>
+                            <td>Hyperparameter tuning</td>
+                            <td>Bayesian optimization</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Deploy</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🍱</span> BentoML</div></td>
+                            <td>Model serving</td>
+                            <td>Easy deployment</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Deploy</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🔺</span> Seldon Core</div></td>
+                            <td>Model serving</td>
+                            <td>Kubernetes-native</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">Monitor</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">👁️</span> Evidently AI</div></td>
+                            <td>ML monitoring</td>
+                            <td>Drift detection</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-tag">E2E</span></td>
+                            <td><div class="tool-name"><span class="tool-icon">🔷</span> Kubeflow</div></td>
+                            <td>Full ML platform</td>
+                            <td>Kubernetes ML toolkit</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- MLOPS -->
+        <section class="module" id="mlops">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>MLOps Practices</h2>
+                    <p>Operationalizing machine learning at scale</p>
+                </div>
+            </div>
+            
+            <div class="mlops-grid">
+                <div class="mlops-card">
+                    <div class="mlops-card-header">
+                        <div class="mlops-card-icon">🔄</div>
+                        <div>
+                            <div class="mlops-card-title">CI/CD for ML</div>
+                            <div class="mlops-card-subtitle">Continuous Integration & Deployment</div>
+                        </div>
+                    </div>
+                    <div class="mlops-card-desc">Automate the testing and deployment of ML models just like software. Include data validation, model training, and deployment in your pipelines.</div>
+                    <ul class="mlops-features">
+                        <li>Automated testing of data quality</li>
+                        <li>Model performance regression tests</li>
+                        <li>Automated model deployment</li>
+                        <li>Rollback capabilities</li>
+                    </ul>
+                </div>
+                
+                <div class="mlops-card">
+                    <div class="mlops-card-header">
+                        <div class="mlops-card-icon">📦</div>
+                        <div>
+                            <div class="mlops-card-title">Model Registry</div>
+                            <div class="mlops-card-subtitle">Version Control for Models</div>
+                        </div>
+                    </div>
+                    <div class="mlops-card-desc">Central repository for storing, versioning, and managing ML models. Track lineage from data to deployed model.</div>
+                    <ul class="mlops-features">
+                        <li>Model versioning</li>
+                        <li>Stage transitions (dev→staging→prod)</li>
+                        <li>Metadata and lineage tracking</li>
+                        <li>Model comparison</li>
+                    </ul>
+                </div>
+                
+                <div class="mlops-card">
+                    <div class="mlops-card-header">
+                        <div class="mlops-card-icon">🪶</div>
+                        <div>
+                            <div class="mlops-card-title">Feature Store</div>
+                            <div class="mlops-card-subtitle">Centralized Feature Management</div>
+                        </div>
+                    </div>
+                    <div class="mlops-card-desc">Reusable feature repository ensuring consistency between training and serving. Prevents training-serving skew.</div>
+                    <ul class="mlops-features">
+                        <li>Feature registry and discovery</li>
+                        <li>Online (low-latency) serving</li>
+                        <li>Offline (batch) serving</li>
+                        <li>Point-in-time correctness</li>
+                    </ul>
+                </div>
+                
+                <div class="mlops-card">
+                    <div class="mlops-card-header">
+                        <div class="mlops-card-icon">📊</div>
+                        <div>
+                            <div class="mlops-card-title">Observability</div>
+                            <div class="mlops-card-subtitle">Production ML Monitoring</div>
+                        </div>
+                    </div>
+                    <div class="mlops-card-desc">Monitor model performance, data quality, and system health in production. Detect drift and degradation early.</div>
+                    <ul class="mlops-features">
+                        <li>Prediction monitoring</li>
+                        <li>Data drift detection</li>
+                        <li>Model performance tracking</li>
+                        <li>Automated alerting</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for production ML pipelines</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Version everything: data, code, models, configs</li>
+                        <li>Automate pipelines—manual steps don't scale</li>
+                        <li>Test data quality as rigorously as code</li>
+                        <li>Use feature stores to prevent training-serving skew</li>
+                        <li>Implement comprehensive logging and monitoring</li>
+                        <li>Plan for model retraining from day one</li>
+                        <li>Document data lineage and model decisions</li>
+                        <li>Start simple and iterate—avoid over-engineering</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't skip data validation—bad data in = bad models out</li>
+                        <li>Avoid training-serving skew (different preprocessing)</li>
+                        <li>Never deploy without rollback capability</li>
+                        <li>Don't ignore model decay—performance degrades over time</li>
+                        <li>Avoid "notebook to production" without refactoring</li>
+                        <li>Don't hardcode paths, credentials, or configurations</li>
+                        <li>Never assume data distributions stay constant</li>
+                        <li>Don't neglect documentation and reproducibility</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for ML pipelines</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">⚙️</div>
+                    <div class="agent-name">MLOpsAgent</div>
+                    <div class="agent-role">Pipeline & Operations Specialist</div>
+                    <div class="agent-desc">Expert in building and maintaining production ML systems. Automates pipeline creation, monitoring setup, and troubleshooting. Specializes in MLOps best practices and tool selection.</div>
+                    <ul class="agent-capabilities">
+                        <li>Pipeline architecture design</li>
+                        <li>Tool selection and integration</li>
+                        <li>CI/CD pipeline setup</li>
+                        <li>Monitoring and alerting configuration</li>
+                        <li>Drift detection implementation</li>
+                        <li>Automated retraining workflows</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Pipeline Task</div>
+                        <div class="code-filename">mlops_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># mlops_agent.py - ML Pipeline Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">import</span> mlflow
+<span class="code-keyword">from</span> prefect <span class="code-keyword">import</span> flow, task
+
+<span class="code-function">mlops_agent</span> = Agent(
+    role=<span class="code-string">"MLOps Engineer"</span>,
+    goal=<span class="code-string">"Build production-ready ML pipelines"</span>,
+    backstory=<span class="code-string">"""Expert in ML infrastructure, 
+    pipeline orchestration, and production systems. 
+    Specializes in reproducible, scalable workflows."""</span>,
+    tools=[
+        PipelineBuilder(),
+        DataValidator(),
+        ModelRegistry(),
+        MonitoringSetup(),
+        DriftDetector(),
+    ]
+)
+
+<span class="code-function">pipeline_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze existing workflow and data sources
+    2. Design pipeline architecture (DAG)
+    3. Implement data validation checks
+    4. Set up experiment tracking (MLflow)
+    5. Configure model registry with versioning
+    6. Deploy monitoring and alerting
+    7. Document pipeline and create runbooks
+    """</span>,
+    agent=mlops_agent,
+    expected_output=<span class="code-string">"Production-ready ML pipeline"</span>
+)
+
+<span class="code-comment"># Execute pipeline creation</span>
+crew = Crew(agents=[mlops_agent], tasks=[pipeline_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat01-p7-ml-frameworks.html" class="related-card">
+                    <div class="related-num">Page 1.7</div>
+                    <div class="related-title">ML Frameworks</div>
+                    <div class="related-desc">PyTorch, TensorFlow, and training tools</div>
+                </a>
+                <a href="cat01-p8-evaluation-metrics.html" class="related-card">
+                    <div class="related-num">Page 1.8</div>
+                    <div class="related-title">Evaluation Metrics</div>
+                    <div class="related-desc">Measuring model performance</div>
+                </a>
+                <a href="cat01-p1-supervised-learning.html" class="related-card">
+                    <div class="related-num">Page 1.1</div>
+                    <div class="related-title">Supervised Learning</div>
+                    <div class="related-desc">Core ML training techniques</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat01-p4-neural-networks.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">1.4: Neural Networks</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 1.5 of 8</div>
+        <a href="cat01-p6-algorithm-selection.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">1.6: Algorithm Selection</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Vision | Category 23 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 23 - COMPUTER VISION VIOLET */
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        /* VIZ CONTAINERS */
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .viz-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .viz-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .viz-svg { width: 100%; height: auto; }
+        
+        /* TOOL CARDS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* USE CASE CARDS */
+        .usecase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .usecase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; position: relative; overflow: hidden; }
+        .usecase-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .usecase-card.detection::before { background: var(--cat-primary); }
+        .usecase-card.segmentation::before { background: var(--cyan); }
+        .usecase-card.recognition::before { background: var(--pink); }
+        .usecase-card.ocr::before { background: var(--success-green); }
+        .usecase-card.tracking::before { background: var(--warning-yellow); }
+        .usecase-card.generation::before { background: var(--orange); }
+        .usecase-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .usecase-icon { font-size: 32px; margin-bottom: var(--space-md); }
+        .usecase-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .usecase-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-md); }
+        .usecase-tags { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+        .usecase-tag { font-size: var(--font-xs); padding: 2px 8px; border-radius: var(--radius-sm); background: var(--bg-card-alt); color: var(--text-muted); }
+        
+        /* MODEL COMPARISON */
+        .model-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .model-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .model-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .model-header { padding: var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .model-type { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1px; color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .model-name { font-size: var(--font-lg); font-weight: 600; }
+        .model-body { padding: var(--space-lg); }
+        .model-stat { display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); }
+        .model-stat:last-child { border-bottom: none; }
+        .model-stat-label { font-size: var(--font-sm); color: var(--text-secondary); }
+        .model-stat-value { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); }
+        .model-stat-bar { height: 4px; background: var(--bg-card-alt); border-radius: var(--radius-full); margin-top: var(--space-xs); overflow: hidden; }
+        .model-stat-fill { height: 100%; background: linear-gradient(90deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-full); }
+        
+        /* AGENT + CODE */
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-section-header { margin-bottom: var(--space-lg); }
+        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: var(--bg-card); }
+        .code-body { padding: var(--space-lg); background: #0d0d14; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: var(--font-sm); line-height: 1.7; overflow-x: auto; }
+        .code-body code { color: var(--text-secondary); }
+        .code-comment { color: var(--text-muted); }
+        .code-keyword { color: var(--cat-light); }
+        .code-string { color: var(--success-green); }
+        .code-function { color: var(--cyan); }
+        .code-number { color: var(--warning-yellow); }
+        .code-class { color: var(--pink); }
+        
+        /* METRICS DASHBOARD */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .metric-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; position: relative; overflow: hidden; }
+        .metric-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .metric-icon { font-size: 24px; margin-bottom: var(--space-sm); }
+        .metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .metric-label { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .metric-delta { font-size: var(--font-xs); color: var(--success-green); margin-top: var(--space-xs); }
+        .metric-delta.negative { color: var(--danger-red); }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; }
+        .footer-nav { display: flex; gap: var(--space-xl); }
+        .footer-link { display: flex; flex-direction: column; gap: var(--space-xs); text-decoration: none; padding: var(--space-md); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { background: var(--bg-hover); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .footer-link-title { font-size: var(--font-base); color: var(--text-primary); font-weight: 500; }
+        .footer-link.prev .footer-link-title::before { content: '← '; color: var(--cat-light); }
+        .footer-link.next .footer-link-title::after { content: ' →'; color: var(--cat-light); }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+    
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">👁️ Computer Vision</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview" class="active"><span class="nav-icon">📊</span> Overview</a></li>
+                <li><a href="#pipeline"><span class="nav-icon">🔄</span> CV Pipeline</a></li>
+                <li><a href="#architectures"><span class="nav-icon">🏗️</span> Model Architectures</a></li>
+                <li><a href="#usecases"><span class="nav-icon">🎯</span> Use Cases</a></li>
+                <li><a href="#agent"><span class="nav-icon">🤖</span> Vision Agent</a></li>
+                <li><a href="#metrics"><span class="nav-icon">📈</span> Performance Metrics</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">🛠️ Tools & Frameworks</div>
+            <ul class="sidebar-nav">
+                <li><a href="#"><span class="nav-icon">🔥</span> PyTorch Vision</a></li>
+                <li><a href="#"><span class="nav-icon">📷</span> OpenCV</a></li>
+                <li><a href="#"><span class="nav-icon">🤗</span> Hugging Face</a></li>
+                <li><a href="#"><span class="nav-icon">☁️</span> Cloud Vision APIs</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">📚 Resources</div>
+            <ul class="sidebar-nav">
+                <li><a href="#"><span class="nav-icon">📄</span> Documentation</a></li>
+                <li><a href="#"><span class="nav-icon">🎓</span> Tutorials</a></li>
+                <li><a href="#"><span class="nav-icon">💡</span> Best Practices</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        <main class="main-content">
+            <!-- HERO -->
+            <section class="hero-compact" id="overview">
+                <div class="hero-left">
+                    <div class="hero-tag">👁️ Category 23</div>
+                    <h1>Computer Vision</h1>
+                    <p>Enterprise visual intelligence solutions—from object detection and image segmentation to OCR and real-time video analytics—powering automated inspection, document processing, and intelligent surveillance.</p>
+                </div>
+                <div class="hero-metrics">
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">$45B</div>
+                        <div class="hero-metric-label">Market Size 2025</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">18.4%</div>
+                        <div class="hero-metric-label">CAGR Growth</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">94%</div>
+                        <div class="hero-metric-label">Model Accuracy</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">&lt;50ms</div>
+                        <div class="hero-metric-label">Inference Time</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- MODULE 1: CV PIPELINE -->
+            <section class="module" id="pipeline">
+                <div class="module-header">
+                    <div class="module-icon">🔄</div>
+                    <div class="module-info">
+                        <h2>Computer Vision Pipeline</h2>
+                        <p>End-to-end visual processing workflow</p>
+                    </div>
+                </div>
+                
+                <div class="description-block">
+                    <p>The computer vision pipeline transforms raw visual data into actionable intelligence through a series of processing stages. From image acquisition and preprocessing to feature extraction, model inference, and post-processing—each stage optimizes for accuracy, latency, and scalability in production environments.</p>
+                </div>
+                
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <div class="viz-title">📊 CV Processing Pipeline</div>
+                        <div class="viz-badge">Interactive</div>
+                    </div>
+                    <div class="viz-canvas">
+                        <svg class="viz-svg" viewBox="0 0 800 340">
+                            <defs>
+                                <!-- Pipe gradients -->
+                                <linearGradient id="pipeViolet" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#A78BFA"/>
+                                    <stop offset="50%" style="stop-color:#8B5CF6"/>
+                                    <stop offset="100%" style="stop-color:#6D28D9"/>
+                                </linearGradient>
+                                <linearGradient id="pipeCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#22D3EE"/>
+                                    <stop offset="50%" style="stop-color:#06B6D4"/>
+                                    <stop offset="100%" style="stop-color:#0891B2"/>
+                                </linearGradient>
+                                <linearGradient id="pipePink" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#F472B6"/>
+                                    <stop offset="50%" style="stop-color:#EC4899"/>
+                                    <stop offset="100%" style="stop-color:#DB2777"/>
+                                </linearGradient>
+                                <linearGradient id="pipeGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#34D399"/>
+                                    <stop offset="50%" style="stop-color:#10B981"/>
+                                    <stop offset="100%" style="stop-color:#059669"/>
+                                </linearGradient>
+                                <linearGradient id="pipeAmber" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FBBF24"/>
+                                    <stop offset="50%" style="stop-color:#F59E0B"/>
+                                    <stop offset="100%" style="stop-color:#D97706"/>
+                                </linearGradient>
+                                <!-- Flow animation -->
+                                <pattern id="flowPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <circle cx="3" cy="10" r="2" fill="#fff" opacity="0.6">
+                                        <animate attributeName="cx" from="-3" to="23" dur="1s" repeatCount="indefinite"/>
+                                    </circle>
+                                </pattern>
+                            </defs>
+                            
+                            <!-- Background -->
+                            <rect width="800" height="340" fill="#0a0a0f"/>
+                            
+                            <!-- Main pipeline flow -->
+                            <g transform="translate(0, 20)">
+                                
+                                <!-- STAGE 1: INPUT - Tank/Source -->
+                                <g transform="translate(30, 60)">
+                                    <!-- Tank body -->
+                                    <rect x="0" y="0" width="90" height="100" rx="8" fill="#12121a" stroke="#8B5CF6" stroke-width="3"/>
+                                    <rect x="0" y="0" width="90" height="25" rx="8" fill="#8B5CF6" opacity="0.2"/>
+                                    <!-- Tank details -->
+                                    <text x="45" y="17" text-anchor="middle" fill="#A78BFA" font-size="9" font-weight="700">INPUT</text>
+                                    <text x="45" y="55" text-anchor="middle" fill="#fff" font-size="24">📷</text>
+                                    <text x="45" y="78" text-anchor="middle" fill="#6a6a7a" font-size="9">Image</text>
+                                    <text x="45" y="90" text-anchor="middle" fill="#6a6a7a" font-size="9">Video</text>
+                                    <!-- Valve/connector -->
+                                    <rect x="85" y="40" width="20" height="20" rx="4" fill="#8B5CF6"/>
+                                    <circle cx="95" cy="50" r="5" fill="#12121a"/>
+                                </g>
+                                
+                                <!-- Pipe 1→2 -->
+                                <g transform="translate(125, 100)">
+                                    <rect x="0" y="0" width="60" height="20" rx="3" fill="url(#pipeViolet)"/>
+                                    <rect x="0" y="5" width="60" height="10" fill="url(#flowPattern)" opacity="0.3"/>
+                                    <rect x="55" y="-5" width="15" height="30" rx="3" fill="#4C1D95"/>
+                                </g>
+                                
+                                <!-- STAGE 2: PREPROCESS - Processing Unit -->
+                                <g transform="translate(185, 50)">
+                                    <rect x="0" y="0" width="100" height="120" rx="8" fill="#12121a" stroke="#06B6D4" stroke-width="3"/>
+                                    <rect x="0" y="0" width="100" height="25" rx="8" fill="#06B6D4" opacity="0.2"/>
+                                    <text x="50" y="17" text-anchor="middle" fill="#22D3EE" font-size="9" font-weight="700">PREPROCESS</text>
+                                    <!-- Gauge display -->
+                                    <rect x="15" y="35" width="70" height="40" rx="4" fill="#0a0a0f" stroke="#0891B2"/>
+                                    <text x="50" y="52" text-anchor="middle" fill="#22D3EE" font-size="8">RESIZE</text>
+                                    <text x="50" y="65" text-anchor="middle" fill="#22D3EE" font-size="10" font-weight="600">224×224</text>
+                                    <!-- Controls -->
+                                    <circle cx="25" cy="95" r="8" fill="#06B6D4" opacity="0.3" stroke="#06B6D4"/>
+                                    <circle cx="50" cy="95" r="8" fill="#06B6D4" opacity="0.3" stroke="#06B6D4"/>
+                                    <circle cx="75" cy="95" r="8" fill="#06B6D4" stroke="#06B6D4"/>
+                                    <text x="50" y="112" text-anchor="middle" fill="#6a6a7a" font-size="7">NORM  AUG  CROP</text>
+                                </g>
+                                
+                                <!-- Pipe 2→3 -->
+                                <g transform="translate(285, 100)">
+                                    <rect x="0" y="0" width="50" height="20" rx="3" fill="url(#pipeCyan)"/>
+                                    <rect x="0" y="5" width="50" height="10" fill="url(#flowPattern)" opacity="0.3"/>
+                                    <rect x="45" y="-5" width="15" height="30" rx="3" fill="#164E63"/>
+                                </g>
+                                
+                                <!-- STAGE 3: FEATURES - Neural Network Block -->
+                                <g transform="translate(335, 40)">
+                                    <rect x="0" y="0" width="110" height="140" rx="8" fill="#12121a" stroke="#EC4899" stroke-width="3"/>
+                                    <rect x="0" y="0" width="110" height="25" rx="8" fill="#EC4899" opacity="0.2"/>
+                                    <text x="55" y="17" text-anchor="middle" fill="#F472B6" font-size="9" font-weight="700">FEATURE EXTRACT</text>
+                                    <!-- Neural network visual -->
+                                    <g transform="translate(15, 35)">
+                                        <!-- Layer 1 -->
+                                        <circle cx="10" cy="15" r="6" fill="#EC4899" opacity="0.6"/>
+                                        <circle cx="10" cy="35" r="6" fill="#EC4899" opacity="0.6"/>
+                                        <circle cx="10" cy="55" r="6" fill="#EC4899" opacity="0.6"/>
+                                        <circle cx="10" cy="75" r="6" fill="#EC4899" opacity="0.6"/>
+                                        <!-- Layer 2 -->
+                                        <circle cx="40" cy="25" r="6" fill="#EC4899" opacity="0.8"/>
+                                        <circle cx="40" cy="45" r="6" fill="#EC4899" opacity="0.8"/>
+                                        <circle cx="40" cy="65" r="6" fill="#EC4899" opacity="0.8"/>
+                                        <!-- Layer 3 -->
+                                        <circle cx="70" cy="35" r="6" fill="#EC4899"/>
+                                        <circle cx="70" cy="55" r="6" fill="#EC4899"/>
+                                        <!-- Connections -->
+                                        <line x1="16" y1="15" x2="34" y2="25" stroke="#EC4899" stroke-width="1" opacity="0.3"/>
+                                        <line x1="16" y1="35" x2="34" y2="45" stroke="#EC4899" stroke-width="1" opacity="0.3"/>
+                                        <line x1="16" y1="55" x2="34" y2="65" stroke="#EC4899" stroke-width="1" opacity="0.3"/>
+                                        <line x1="46" y1="25" x2="64" y2="35" stroke="#EC4899" stroke-width="1" opacity="0.3"/>
+                                        <line x1="46" y1="45" x2="64" y2="55" stroke="#EC4899" stroke-width="1" opacity="0.3"/>
+                                    </g>
+                                    <text x="55" y="130" text-anchor="middle" fill="#6a6a7a" font-size="8">CNN / ViT</text>
+                                </g>
+                                
+                                <!-- Pipe 3→4 -->
+                                <g transform="translate(445, 100)">
+                                    <rect x="0" y="0" width="50" height="20" rx="3" fill="url(#pipePink)"/>
+                                    <rect x="0" y="5" width="50" height="10" fill="url(#flowPattern)" opacity="0.3"/>
+                                    <rect x="45" y="-5" width="15" height="30" rx="3" fill="#831843"/>
+                                </g>
+                                
+                                <!-- STAGE 4: INFERENCE - Detection Unit -->
+                                <g transform="translate(495, 50)">
+                                    <rect x="0" y="0" width="100" height="120" rx="8" fill="#12121a" stroke="#10B981" stroke-width="3"/>
+                                    <rect x="0" y="0" width="100" height="25" rx="8" fill="#10B981" opacity="0.2"/>
+                                    <text x="50" y="17" text-anchor="middle" fill="#34D399" font-size="9" font-weight="700">INFERENCE</text>
+                                    <!-- Detection display -->
+                                    <rect x="10" y="32" width="80" height="55" rx="4" fill="#0a0a0f" stroke="#059669"/>
+                                    <!-- Bounding boxes preview -->
+                                    <rect x="18" y="40" width="25" height="20" rx="2" fill="none" stroke="#34D399" stroke-width="1.5"/>
+                                    <rect x="50" y="50" width="30" height="25" rx="2" fill="none" stroke="#34D399" stroke-width="1.5"/>
+                                    <text x="30" y="72" fill="#34D399" font-size="6">0.94</text>
+                                    <text x="65" y="80" fill="#34D399" font-size="6">0.87</text>
+                                    <!-- Status -->
+                                    <circle cx="25" cy="102" r="6" fill="#10B981"/>
+                                    <text x="55" y="105" fill="#34D399" font-size="8">DETECTING</text>
+                                </g>
+                                
+                                <!-- Pipe 4→5 -->
+                                <g transform="translate(595, 100)">
+                                    <rect x="0" y="0" width="50" height="20" rx="3" fill="url(#pipeGreen)"/>
+                                    <rect x="0" y="5" width="50" height="10" fill="url(#flowPattern)" opacity="0.3"/>
+                                    <rect x="45" y="-5" width="15" height="30" rx="3" fill="#064E3B"/>
+                                </g>
+                                
+                                <!-- STAGE 5: POST-PROCESS - Output -->
+                                <g transform="translate(655, 60)">
+                                    <rect x="0" y="0" width="90" height="100" rx="8" fill="#12121a" stroke="#F59E0B" stroke-width="3"/>
+                                    <rect x="0" y="0" width="90" height="25" rx="8" fill="#F59E0B" opacity="0.2"/>
+                                    <text x="45" y="17" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="700">OUTPUT</text>
+                                    <!-- Output format -->
+                                    <rect x="10" y="32" width="70" height="45" rx="4" fill="#0a0a0f" stroke="#D97706"/>
+                                    <text x="45" y="48" text-anchor="middle" fill="#FBBF24" font-size="7" font-family="monospace">{</text>
+                                    <text x="45" y="58" text-anchor="middle" fill="#6a6a7a" font-size="6" font-family="monospace">"class": "car"</text>
+                                    <text x="45" y="68" text-anchor="middle" fill="#6a6a7a" font-size="6" font-family="monospace">"conf": 0.94</text>
+                                    <text x="45" y="78" text-anchor="middle" fill="#FBBF24" font-size="7" font-family="monospace">}</text>
+                                    <text x="45" y="95" text-anchor="middle" fill="#6a6a7a" font-size="8">JSON / API</text>
+                                </g>
+                                
+                            </g>
+                            
+                            <!-- Bottom metrics panel -->
+                            <g transform="translate(30, 250)">
+                                <rect x="0" y="0" width="740" height="70" rx="10" fill="#12121a" stroke="#2a2a3e"/>
+                                
+                                <!-- Metrics -->
+                                <g transform="translate(30, 15)">
+                                    <text x="0" y="10" fill="#6a6a7a" font-size="9">LATENCY</text>
+                                    <text x="0" y="30" fill="#A78BFA" font-size="16" font-weight="700">~5ms</text>
+                                    <text x="0" y="45" fill="#6a6a7a" font-size="8">per frame</text>
+                                </g>
+                                
+                                <line x1="115" y1="10" x2="115" y2="60" stroke="#2a2a3e"/>
+                                
+                                <g transform="translate(135, 15)">
+                                    <text x="0" y="10" fill="#6a6a7a" font-size="9">THROUGHPUT</text>
+                                    <text x="0" y="30" fill="#22D3EE" font-size="16" font-weight="700">200 FPS</text>
+                                    <text x="0" y="45" fill="#6a6a7a" font-size="8">batch mode</text>
+                                </g>
+                                
+                                <line x1="250" y1="10" x2="250" y2="60" stroke="#2a2a3e"/>
+                                
+                                <g transform="translate(270, 15)">
+                                    <text x="0" y="10" fill="#6a6a7a" font-size="9">BATCH</text>
+                                    <text x="0" y="30" fill="#F472B6" font-size="16" font-weight="700">32</text>
+                                    <text x="0" y="45" fill="#6a6a7a" font-size="8">optimal</text>
+                                </g>
+                                
+                                <line x1="350" y1="10" x2="350" y2="60" stroke="#2a2a3e"/>
+                                
+                                <g transform="translate(370, 15)">
+                                    <text x="0" y="10" fill="#6a6a7a" font-size="9">MEMORY</text>
+                                    <text x="0" y="30" fill="#34D399" font-size="16" font-weight="700">4GB</text>
+                                    <text x="0" y="45" fill="#6a6a7a" font-size="8">VRAM</text>
+                                </g>
+                                
+                                <line x1="460" y1="10" x2="460" y2="60" stroke="#2a2a3e"/>
+                                
+                                <g transform="translate(480, 15)">
+                                    <text x="0" y="10" fill="#6a6a7a" font-size="9">MODEL</text>
+                                    <text x="0" y="30" fill="#FBBF24" font-size="16" font-weight="700">YOLOv8-L</text>
+                                    <text x="0" y="45" fill="#6a6a7a" font-size="8">production</text>
+                                </g>
+                                
+                                <line x1="600" y1="10" x2="600" y2="60" stroke="#2a2a3e"/>
+                                
+                                <g transform="translate(620, 15)">
+                                    <text x="0" y="10" fill="#6a6a7a" font-size="9">ACCURACY</text>
+                                    <text x="0" y="30" fill="#A78BFA" font-size="16" font-weight="700">94%</text>
+                                    <text x="0" y="45" fill="#6a6a7a" font-size="8">mAP@50</text>
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- MODULE 2: MODEL ARCHITECTURES -->
+            <section class="module" id="architectures">
+                <div class="module-header">
+                    <div class="module-icon">🏗️</div>
+                    <div class="module-info">
+                        <h2>Model Architectures</h2>
+                        <p>CNN, Transformer, and hybrid vision models</p>
+                    </div>
+                </div>
+                
+                <div class="description-block">
+                    <p>Modern computer vision leverages three architectural paradigms: Convolutional Neural Networks (CNNs) excel at local feature extraction, Vision Transformers (ViTs) capture global context through self-attention, and hybrid models combine both approaches for optimal accuracy and efficiency across diverse visual tasks.</p>
+                </div>
+                
+                <div class="model-grid">
+                    <!-- CNN Models -->
+                    <div class="model-card">
+                        <div class="model-header">
+                            <div class="model-type">Convolutional</div>
+                            <div class="model-name">CNN Architecture</div>
+                        </div>
+                        <div class="model-body">
+                            <div class="model-stat">
+                                <span class="model-stat-label">Accuracy (ImageNet)</span>
+                                <span class="model-stat-value">84.2%</span>
+                            </div>
+                            <div class="model-stat-bar"><div class="model-stat-fill" style="width: 84%"></div></div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Inference Speed</span>
+                                <span class="model-stat-value">Fast</span>
+                            </div>
+                            <div class="model-stat-bar"><div class="model-stat-fill" style="width: 90%"></div></div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Parameters</span>
+                                <span class="model-stat-value">25M-60M</span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Best For</span>
+                                <span class="model-stat-value">Edge/Mobile</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vision Transformer -->
+                    <div class="model-card">
+                        <div class="model-header">
+                            <div class="model-type">Transformer</div>
+                            <div class="model-name">Vision Transformer (ViT)</div>
+                        </div>
+                        <div class="model-body">
+                            <div class="model-stat">
+                                <span class="model-stat-label">Accuracy (ImageNet)</span>
+                                <span class="model-stat-value">90.5%</span>
+                            </div>
+                            <div class="model-stat-bar"><div class="model-stat-fill" style="width: 90%"></div></div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Inference Speed</span>
+                                <span class="model-stat-value">Moderate</span>
+                            </div>
+                            <div class="model-stat-bar"><div class="model-stat-fill" style="width: 65%"></div></div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Parameters</span>
+                                <span class="model-stat-value">86M-632M</span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Best For</span>
+                                <span class="model-stat-value">High Accuracy</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hybrid Model -->
+                    <div class="model-card">
+                        <div class="model-header">
+                            <div class="model-type">Hybrid</div>
+                            <div class="model-name">CNN + Transformer</div>
+                        </div>
+                        <div class="model-body">
+                            <div class="model-stat">
+                                <span class="model-stat-label">Accuracy (ImageNet)</span>
+                                <span class="model-stat-value">91.3%</span>
+                            </div>
+                            <div class="model-stat-bar"><div class="model-stat-fill" style="width: 91%"></div></div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Inference Speed</span>
+                                <span class="model-stat-value">Balanced</span>
+                            </div>
+                            <div class="model-stat-bar"><div class="model-stat-fill" style="width: 75%"></div></div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Parameters</span>
+                                <span class="model-stat-value">50M-300M</span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="model-stat-label">Best For</span>
+                                <span class="model-stat-value">Production</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Architecture Comparison Viz - 3 Separate Radar Charts -->
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <div class="viz-title">📊 Architecture Comparison</div>
+                        <div class="viz-badge">Analysis</div>
+                    </div>
+                    <div class="viz-canvas">
+                        <svg class="viz-svg" viewBox="0 0 800 320">
+                            <defs>
+                                <linearGradient id="cnnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#8B5CF6"/>
+                                    <stop offset="100%" style="stop-color:#7C3AED"/>
+                                </linearGradient>
+                                <linearGradient id="vitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#06B6D4"/>
+                                    <stop offset="100%" style="stop-color:#0891B2"/>
+                                </linearGradient>
+                                <linearGradient id="hybridGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#EC4899"/>
+                                    <stop offset="100%" style="stop-color:#DB2777"/>
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Background -->
+                            <rect width="800" height="320" fill="#0a0a0f"/>
+                            
+                            <!-- ==================== CNN RADAR ==================== -->
+                            <g transform="translate(135, 155)">
+                                <!-- Title -->
+                                <text x="0" y="-115" text-anchor="middle" fill="#A78BFA" font-size="14" font-weight="700">CNN</text>
+                                <text x="0" y="-100" text-anchor="middle" fill="#6a6a7a" font-size="9">ResNet, EfficientNet</text>
+                                
+                                <!-- Pentagon grid -->
+                                <polygon points="0,-75 71.3,-23.2 44.1,60.7 -44.1,60.7 -71.3,-23.2" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                <polygon points="0,-56.25 53.5,-17.4 33.1,45.5 -33.1,45.5 -53.5,-17.4" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                <polygon points="0,-37.5 35.6,-11.6 22.1,30.4 -22.1,30.4 -35.6,-11.6" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                
+                                <!-- Axes -->
+                                <line x1="0" y1="0" x2="0" y2="-75" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="71.3" y2="-23.2" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="44.1" y2="60.7" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="-44.1" y2="60.7" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="-71.3" y2="-23.2" stroke="#3a3a4e" stroke-width="1"/>
+                                
+                                <!-- CNN Data: Accuracy 84%, Speed 92%, Cost 88%, Memory 85%, Ease 78% -->
+                                <polygon points="0,-63 65.6,-21.4 38.8,53.4 -37.5,51.6 -55.6,-18.1" 
+                                         fill="#8B5CF6" fill-opacity="0.3" stroke="#8B5CF6" stroke-width="2.5"/>
+                                
+                                <!-- Data points -->
+                                <circle cx="0" cy="-63" r="4" fill="#8B5CF6"/>
+                                <circle cx="65.6" cy="-21.4" r="4" fill="#8B5CF6"/>
+                                <circle cx="38.8" cy="53.4" r="4" fill="#8B5CF6"/>
+                                <circle cx="-37.5" cy="51.6" r="4" fill="#8B5CF6"/>
+                                <circle cx="-55.6" cy="-18.1" r="4" fill="#8B5CF6"/>
+                                
+                                <!-- Axis labels -->
+                                <text x="0" y="-82" text-anchor="middle" fill="#a0a0b0" font-size="8">Accuracy</text>
+                                <text x="82" y="-20" text-anchor="start" fill="#a0a0b0" font-size="8">Speed</text>
+                                <text x="52" y="75" text-anchor="middle" fill="#a0a0b0" font-size="8">Cost Eff.</text>
+                                <text x="-52" y="75" text-anchor="middle" fill="#a0a0b0" font-size="8">Memory</text>
+                                <text x="-82" y="-20" text-anchor="end" fill="#a0a0b0" font-size="8">Ease</text>
+                                
+                                <!-- Best at badge -->
+                                <rect x="-35" y="90" width="70" height="20" rx="10" fill="#8B5CF6" opacity="0.2" stroke="#8B5CF6"/>
+                                <text x="0" y="103" text-anchor="middle" fill="#A78BFA" font-size="9" font-weight="600">⚡ Fastest</text>
+                            </g>
+                            
+                            <!-- ==================== ViT RADAR ==================== -->
+                            <g transform="translate(400, 155)">
+                                <!-- Title -->
+                                <text x="0" y="-115" text-anchor="middle" fill="#22D3EE" font-size="14" font-weight="700">Vision Transformer</text>
+                                <text x="0" y="-100" text-anchor="middle" fill="#6a6a7a" font-size="9">ViT, DeiT, Swin</text>
+                                
+                                <!-- Pentagon grid -->
+                                <polygon points="0,-75 71.3,-23.2 44.1,60.7 -44.1,60.7 -71.3,-23.2" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                <polygon points="0,-56.25 53.5,-17.4 33.1,45.5 -33.1,45.5 -53.5,-17.4" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                <polygon points="0,-37.5 35.6,-11.6 22.1,30.4 -22.1,30.4 -35.6,-11.6" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                
+                                <!-- Axes -->
+                                <line x1="0" y1="0" x2="0" y2="-75" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="71.3" y2="-23.2" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="44.1" y2="60.7" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="-44.1" y2="60.7" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="-71.3" y2="-23.2" stroke="#3a3a4e" stroke-width="1"/>
+                                
+                                <!-- ViT Data: Accuracy 93%, Speed 65%, Cost 58%, Memory 55%, Ease 62% -->
+                                <polygon points="0,-69.75 46.3,-15.1 25.6,35.2 -24.3,33.4 -44.2,-14.4" 
+                                         fill="#06B6D4" fill-opacity="0.3" stroke="#06B6D4" stroke-width="2.5"/>
+                                
+                                <!-- Data points -->
+                                <circle cx="0" cy="-69.75" r="4" fill="#06B6D4"/>
+                                <circle cx="46.3" cy="-15.1" r="4" fill="#06B6D4"/>
+                                <circle cx="25.6" cy="35.2" r="4" fill="#06B6D4"/>
+                                <circle cx="-24.3" cy="33.4" r="4" fill="#06B6D4"/>
+                                <circle cx="-44.2" cy="-14.4" r="4" fill="#06B6D4"/>
+                                
+                                <!-- Axis labels -->
+                                <text x="0" y="-82" text-anchor="middle" fill="#a0a0b0" font-size="8">Accuracy</text>
+                                <text x="82" y="-20" text-anchor="start" fill="#a0a0b0" font-size="8">Speed</text>
+                                <text x="52" y="75" text-anchor="middle" fill="#a0a0b0" font-size="8">Cost Eff.</text>
+                                <text x="-52" y="75" text-anchor="middle" fill="#a0a0b0" font-size="8">Memory</text>
+                                <text x="-82" y="-20" text-anchor="end" fill="#a0a0b0" font-size="8">Ease</text>
+                                
+                                <!-- Best at badge -->
+                                <rect x="-40" y="90" width="80" height="20" rx="10" fill="#06B6D4" opacity="0.2" stroke="#06B6D4"/>
+                                <text x="0" y="103" text-anchor="middle" fill="#22D3EE" font-size="9" font-weight="600">🎯 Most Accurate</text>
+                            </g>
+                            
+                            <!-- ==================== HYBRID RADAR ==================== -->
+                            <g transform="translate(665, 155)">
+                                <!-- Title -->
+                                <text x="0" y="-115" text-anchor="middle" fill="#F472B6" font-size="14" font-weight="700">Hybrid</text>
+                                <text x="0" y="-100" text-anchor="middle" fill="#6a6a7a" font-size="9">ConvNeXt, CoAtNet</text>
+                                
+                                <!-- Pentagon grid -->
+                                <polygon points="0,-75 71.3,-23.2 44.1,60.7 -44.1,60.7 -71.3,-23.2" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                <polygon points="0,-56.25 53.5,-17.4 33.1,45.5 -33.1,45.5 -53.5,-17.4" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                <polygon points="0,-37.5 35.6,-11.6 22.1,30.4 -22.1,30.4 -35.6,-11.6" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                                
+                                <!-- Axes -->
+                                <line x1="0" y1="0" x2="0" y2="-75" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="71.3" y2="-23.2" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="44.1" y2="60.7" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="-44.1" y2="60.7" stroke="#3a3a4e" stroke-width="1"/>
+                                <line x1="0" y1="0" x2="-71.3" y2="-23.2" stroke="#3a3a4e" stroke-width="1"/>
+                                
+                                <!-- Hybrid Data: Accuracy 91%, Speed 78%, Cost 75%, Memory 72%, Ease 80% -->
+                                <polygon points="0,-68.25 55.6,-18.1 33.1,45.5 -31.8,43.7 -57.1,-18.6" 
+                                         fill="#EC4899" fill-opacity="0.3" stroke="#EC4899" stroke-width="2.5"/>
+                                
+                                <!-- Data points -->
+                                <circle cx="0" cy="-68.25" r="4" fill="#EC4899"/>
+                                <circle cx="55.6" cy="-18.1" r="4" fill="#EC4899"/>
+                                <circle cx="33.1" cy="45.5" r="4" fill="#EC4899"/>
+                                <circle cx="-31.8" cy="43.7" r="4" fill="#EC4899"/>
+                                <circle cx="-57.1" cy="-18.6" r="4" fill="#EC4899"/>
+                                
+                                <!-- Axis labels -->
+                                <text x="0" y="-82" text-anchor="middle" fill="#a0a0b0" font-size="8">Accuracy</text>
+                                <text x="82" y="-20" text-anchor="start" fill="#a0a0b0" font-size="8">Speed</text>
+                                <text x="52" y="75" text-anchor="middle" fill="#a0a0b0" font-size="8">Cost Eff.</text>
+                                <text x="-52" y="75" text-anchor="middle" fill="#a0a0b0" font-size="8">Memory</text>
+                                <text x="-82" y="-20" text-anchor="end" fill="#a0a0b0" font-size="8">Ease</text>
+                                
+                                <!-- Best at badge -->
+                                <rect x="-40" y="90" width="80" height="20" rx="10" fill="#EC4899" opacity="0.2" stroke="#EC4899"/>
+                                <text x="0" y="103" text-anchor="middle" fill="#F472B6" font-size="9" font-weight="600">⚖️ Best Balance</text>
+                            </g>
+                            
+                            <!-- Bottom recommendation -->
+                            <g transform="translate(400, 295)">
+                                <text x="0" y="0" text-anchor="middle" fill="#6a6a7a" font-size="10">
+                                    <tspan fill="#a0a0b0" font-weight="500">Recommendation:</tspan>
+                                    Use <tspan fill="#8B5CF6" font-weight="600">CNN</tspan> for edge/mobile, 
+                                    <tspan fill="#06B6D4" font-weight="600">ViT</tspan> for max accuracy, 
+                                    <tspan fill="#EC4899" font-weight="600">Hybrid</tspan> for production balance
+                                </text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- MODULE 3: USE CASES -->
+            <section class="module" id="usecases">
+                <div class="module-header">
+                    <div class="module-icon">🎯</div>
+                    <div class="module-info">
+                        <h2>Computer Vision Use Cases</h2>
+                        <p>Enterprise applications across industries</p>
+                    </div>
+                </div>
+                
+                <div class="description-block">
+                    <p>Computer vision powers transformative applications across every industry—from manufacturing quality inspection and retail analytics to healthcare diagnostics and autonomous systems. Each use case demands specific model architectures, accuracy requirements, and latency constraints.</p>
+                </div>
+                
+                <div class="usecase-grid">
+                    <div class="usecase-card detection">
+                        <div class="usecase-icon">🔍</div>
+                        <div class="usecase-title">Object Detection</div>
+                        <div class="usecase-desc">Real-time identification and localization of objects within images and video streams.</div>
+                        <div class="usecase-tags">
+                            <span class="usecase-tag">YOLO</span>
+                            <span class="usecase-tag">R-CNN</span>
+                            <span class="usecase-tag">SSD</span>
+                        </div>
+                    </div>
+                    
+                    <div class="usecase-card segmentation">
+                        <div class="usecase-icon">🧩</div>
+                        <div class="usecase-title">Image Segmentation</div>
+                        <div class="usecase-desc">Pixel-level classification for precise boundary detection and scene understanding.</div>
+                        <div class="usecase-tags">
+                            <span class="usecase-tag">U-Net</span>
+                            <span class="usecase-tag">Mask R-CNN</span>
+                            <span class="usecase-tag">SAM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="usecase-card recognition">
+                        <div class="usecase-icon">👤</div>
+                        <div class="usecase-title">Face Recognition</div>
+                        <div class="usecase-desc">Biometric identification and verification for security and access control systems.</div>
+                        <div class="usecase-tags">
+                            <span class="usecase-tag">ArcFace</span>
+                            <span class="usecase-tag">FaceNet</span>
+                            <span class="usecase-tag">RetinaFace</span>
+                        </div>
+                    </div>
+                    
+                    <div class="usecase-card ocr">
+                        <div class="usecase-icon">📄</div>
+                        <div class="usecase-title">OCR & Document AI</div>
+                        <div class="usecase-desc">Text extraction and document understanding for intelligent automation workflows.</div>
+                        <div class="usecase-tags">
+                            <span class="usecase-tag">Tesseract</span>
+                            <span class="usecase-tag">PaddleOCR</span>
+                            <span class="usecase-tag">LayoutLM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="usecase-card tracking">
+                        <div class="usecase-icon">🎬</div>
+                        <div class="usecase-title">Video Analytics</div>
+                        <div class="usecase-desc">Multi-object tracking, action recognition, and anomaly detection in video streams.</div>
+                        <div class="usecase-tags">
+                            <span class="usecase-tag">DeepSORT</span>
+                            <span class="usecase-tag">ByteTrack</span>
+                            <span class="usecase-tag">SlowFast</span>
+                        </div>
+                    </div>
+                    
+                    <div class="usecase-card generation">
+                        <div class="usecase-icon">🎨</div>
+                        <div class="usecase-title">Image Generation</div>
+                        <div class="usecase-desc">Synthetic data creation, style transfer, and generative AI for visual content.</div>
+                        <div class="usecase-tags">
+                            <span class="usecase-tag">Stable Diffusion</span>
+                            <span class="usecase-tag">DALL-E</span>
+                            <span class="usecase-tag">GAN</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Industry Matrix -->
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <div class="viz-title">🏭 Industry Applications Matrix</div>
+                        <div class="viz-badge">Enterprise</div>
+                    </div>
+                    <div class="viz-canvas">
+                        <svg class="viz-svg" viewBox="0 0 800 300">
+                            <!-- Background -->
+                            <rect width="800" height="300" fill="#0a0a0f"/>
+                            
+                            <!-- Headers -->
+                            <g transform="translate(150, 20)">
+                                <text x="50" y="0" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">Detection</text>
+                                <text x="150" y="0" text-anchor="middle" fill="#22D3EE" font-size="10" font-weight="600">Segmentation</text>
+                                <text x="250" y="0" text-anchor="middle" fill="#F472B6" font-size="10" font-weight="600">Recognition</text>
+                                <text x="350" y="0" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">OCR</text>
+                                <text x="450" y="0" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">Video</text>
+                                <text x="550" y="0" text-anchor="middle" fill="#F97316" font-size="10" font-weight="600">Generation</text>
+                            </g>
+                            
+                            <!-- Industry rows -->
+                            <!-- Manufacturing -->
+                            <g transform="translate(20, 50)">
+                                <text x="0" y="15" fill="#fff" font-size="12" font-weight="500">🏭 Manufacturing</text>
+                                <circle cx="200" cy="12" r="12" fill="#8B5CF6" opacity="0.9"/>
+                                <circle cx="300" cy="12" r="12" fill="#06B6D4" opacity="0.9"/>
+                                <circle cx="400" cy="12" r="6" fill="#EC4899" opacity="0.4"/>
+                                <circle cx="500" cy="12" r="8" fill="#10B981" opacity="0.6"/>
+                                <circle cx="600" cy="12" r="12" fill="#F59E0B" opacity="0.9"/>
+                                <circle cx="700" cy="12" r="6" fill="#F97316" opacity="0.4"/>
+                            </g>
+                            
+                            <!-- Retail -->
+                            <g transform="translate(20, 90)">
+                                <text x="0" y="15" fill="#fff" font-size="12" font-weight="500">🛒 Retail</text>
+                                <circle cx="200" cy="12" r="12" fill="#8B5CF6" opacity="0.9"/>
+                                <circle cx="300" cy="12" r="8" fill="#06B6D4" opacity="0.6"/>
+                                <circle cx="400" cy="12" r="12" fill="#EC4899" opacity="0.9"/>
+                                <circle cx="500" cy="12" r="6" fill="#10B981" opacity="0.4"/>
+                                <circle cx="600" cy="12" r="10" fill="#F59E0B" opacity="0.7"/>
+                                <circle cx="700" cy="12" r="8" fill="#F97316" opacity="0.6"/>
+                            </g>
+                            
+                            <!-- Healthcare -->
+                            <g transform="translate(20, 130)">
+                                <text x="0" y="15" fill="#fff" font-size="12" font-weight="500">🏥 Healthcare</text>
+                                <circle cx="200" cy="12" r="10" fill="#8B5CF6" opacity="0.7"/>
+                                <circle cx="300" cy="12" r="12" fill="#06B6D4" opacity="0.9"/>
+                                <circle cx="400" cy="12" r="8" fill="#EC4899" opacity="0.6"/>
+                                <circle cx="500" cy="12" r="12" fill="#10B981" opacity="0.9"/>
+                                <circle cx="600" cy="12" r="6" fill="#F59E0B" opacity="0.4"/>
+                                <circle cx="700" cy="12" r="10" fill="#F97316" opacity="0.7"/>
+                            </g>
+                            
+                            <!-- Automotive -->
+                            <g transform="translate(20, 170)">
+                                <text x="0" y="15" fill="#fff" font-size="12" font-weight="500">🚗 Automotive</text>
+                                <circle cx="200" cy="12" r="12" fill="#8B5CF6" opacity="0.9"/>
+                                <circle cx="300" cy="12" r="12" fill="#06B6D4" opacity="0.9"/>
+                                <circle cx="400" cy="12" r="6" fill="#EC4899" opacity="0.4"/>
+                                <circle cx="500" cy="12" r="6" fill="#10B981" opacity="0.4"/>
+                                <circle cx="600" cy="12" r="12" fill="#F59E0B" opacity="0.9"/>
+                                <circle cx="700" cy="12" r="8" fill="#F97316" opacity="0.6"/>
+                            </g>
+                            
+                            <!-- Security -->
+                            <g transform="translate(20, 210)">
+                                <text x="0" y="15" fill="#fff" font-size="12" font-weight="500">🔒 Security</text>
+                                <circle cx="200" cy="12" r="12" fill="#8B5CF6" opacity="0.9"/>
+                                <circle cx="300" cy="12" r="6" fill="#06B6D4" opacity="0.4"/>
+                                <circle cx="400" cy="12" r="12" fill="#EC4899" opacity="0.9"/>
+                                <circle cx="500" cy="12" r="6" fill="#10B981" opacity="0.4"/>
+                                <circle cx="600" cy="12" r="12" fill="#F59E0B" opacity="0.9"/>
+                                <circle cx="700" cy="12" r="6" fill="#F97316" opacity="0.4"/>
+                            </g>
+                            
+                            <!-- Agriculture -->
+                            <g transform="translate(20, 250)">
+                                <text x="0" y="15" fill="#fff" font-size="12" font-weight="500">🌾 Agriculture</text>
+                                <circle cx="200" cy="12" r="10" fill="#8B5CF6" opacity="0.7"/>
+                                <circle cx="300" cy="12" r="12" fill="#06B6D4" opacity="0.9"/>
+                                <circle cx="400" cy="12" r="6" fill="#EC4899" opacity="0.4"/>
+                                <circle cx="500" cy="12" r="6" fill="#10B981" opacity="0.4"/>
+                                <circle cx="600" cy="12" r="10" fill="#F59E0B" opacity="0.7"/>
+                                <circle cx="700" cy="12" r="10" fill="#F97316" opacity="0.7"/>
+                            </g>
+                            
+                            <!-- Legend -->
+                            <g transform="translate(600, 280)">
+                                <circle cx="10" cy="0" r="5" fill="#fff" opacity="0.4"/>
+                                <text x="25" y="4" fill="#6a6a7a" font-size="9">Low</text>
+                                <circle cx="70" cy="0" r="7" fill="#fff" opacity="0.6"/>
+                                <text x="85" y="4" fill="#6a6a7a" font-size="9">Med</text>
+                                <circle cx="130" cy="0" r="9" fill="#fff" opacity="0.9"/>
+                                <text x="145" y="4" fill="#6a6a7a" font-size="9">High</text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- MODULE 4: VISION AGENT -->
+            <section class="module" id="agent">
+                <div class="module-header">
+                    <div class="module-icon">🤖</div>
+                    <div class="module-info">
+                        <h2>Vision Processing Agent</h2>
+                        <p>AI-powered visual analysis automation</p>
+                    </div>
+                </div>
+                
+                <div class="agent-section">
+                    <div class="agent-section-header">
+                        <div class="agent-section-tag">✦ Blueprint Agent</div>
+                        <div class="agent-section-title">VisionAnalyst Agent</div>
+                    </div>
+                    
+                    <div class="agent-grid">
+                        <div class="agent-info">
+                            <div class="agent-avatar">👁️</div>
+                            <div class="agent-name">VisionAnalyst</div>
+                            <div class="agent-role">Computer Vision Specialist</div>
+                            <div class="agent-desc">Autonomous agent for image analysis, object detection, and visual data processing. Orchestrates multi-model pipelines for complex visual understanding tasks.</div>
+                            <ul class="agent-capabilities">
+                                <li>Multi-model inference orchestration</li>
+                                <li>Automated image preprocessing</li>
+                                <li>Batch processing optimization</li>
+                                <li>Real-time video stream analysis</li>
+                                <li>Custom model fine-tuning workflows</li>
+                                <li>Result aggregation and reporting</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-panel">
+                            <div class="code-header">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">detection.py</div>
+                                    <div class="code-tab">config.yaml</div>
+                                    <div class="code-tab">pipeline.py</div>
+                                </div>
+                            </div>
+                            <div class="code-body">
+<code><span class="code-comment"># VisionAnalyst Agent - Object Detection Pipeline</span>
+<span class="code-keyword">from</span> ultralytics <span class="code-keyword">import</span> YOLO
+<span class="code-keyword">from</span> transformers <span class="code-keyword">import</span> <span class="code-class">AutoProcessor</span>, <span class="code-class">AutoModelForObjectDetection</span>
+<span class="code-keyword">import</span> torch
+
+<span class="code-keyword">class</span> <span class="code-class">VisionAnalystAgent</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-keyword">self</span>, model_type=<span class="code-string">"yolov8"</span>):
+        <span class="code-keyword">self</span>.device = <span class="code-string">"cuda"</span> <span class="code-keyword">if</span> torch.cuda.is_available() <span class="code-keyword">else</span> <span class="code-string">"cpu"</span>
+        <span class="code-keyword">self</span>.model = <span class="code-keyword">self</span>._load_model(model_type)
+        <span class="code-keyword">self</span>.confidence_threshold = <span class="code-number">0.5</span>
+        
+    <span class="code-keyword">def</span> <span class="code-function">detect</span>(<span class="code-keyword">self</span>, image_path, classes=<span class="code-keyword">None</span>):
+        <span class="code-string">"""Run object detection on input image."""</span>
+        results = <span class="code-keyword">self</span>.model(image_path)
+        detections = []
+        
+        <span class="code-keyword">for</span> r <span class="code-keyword">in</span> results:
+            boxes = r.boxes
+            <span class="code-keyword">for</span> box <span class="code-keyword">in</span> boxes:
+                <span class="code-keyword">if</span> box.conf > <span class="code-keyword">self</span>.confidence_threshold:
+                    detections.append({
+                        <span class="code-string">"class"</span>: r.names[<span class="code-function">int</span>(box.cls)],
+                        <span class="code-string">"confidence"</span>: <span class="code-function">float</span>(box.conf),
+                        <span class="code-string">"bbox"</span>: box.xyxy.tolist()
+                    })
+        <span class="code-keyword">return</span> detections
+
+<span class="code-comment"># Initialize and run detection</span>
+agent = <span class="code-class">VisionAnalystAgent</span>(model_type=<span class="code-string">"yolov8x"</span>)
+results = agent.detect(<span class="code-string">"warehouse_image.jpg"</span>)</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- MODULE 5: TOOLS & FRAMEWORKS -->
+            <section class="module" id="tools">
+                <div class="module-header">
+                    <div class="module-icon">🛠️</div>
+                    <div class="module-info">
+                        <h2>Tools & Frameworks</h2>
+                        <p>Production-ready CV technology stack</p>
+                    </div>
+                </div>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🔥</div>
+                            <div class="tool-card-name">PyTorch Vision</div>
+                        </div>
+                        <div class="tool-card-desc">Deep learning framework with torchvision for image classification, detection, and segmentation models.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">📷</div>
+                            <div class="tool-card-name">OpenCV</div>
+                        </div>
+                        <div class="tool-card-desc">Industry-standard library for image processing, video capture, and real-time CV applications.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🤗</div>
+                            <div class="tool-card-name">Hugging Face</div>
+                        </div>
+                        <div class="tool-card-desc">Model hub with pre-trained vision transformers, CLIP, and multimodal models ready for fine-tuning.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">⚡</div>
+                            <div class="tool-card-name">Ultralytics</div>
+                        </div>
+                        <div class="tool-card-desc">YOLOv8 ecosystem for object detection, segmentation, and pose estimation with easy deployment.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🚀</div>
+                            <div class="tool-card-name">TensorRT</div>
+                        </div>
+                        <div class="tool-card-desc">NVIDIA's inference optimizer for deploying high-performance CV models on GPU hardware.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">☁️</div>
+                            <div class="tool-card-name">Cloud Vision APIs</div>
+                        </div>
+                        <div class="tool-card-desc">AWS Rekognition, Google Vision AI, and Azure Computer Vision for managed CV services.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">📊</div>
+                            <div class="tool-card-name">Label Studio</div>
+                        </div>
+                        <div class="tool-card-desc">Open-source data labeling platform for creating training datasets with annotation tools.</div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🔬</div>
+                            <div class="tool-card-name">Roboflow</div>
+                        </div>
+                        <div class="tool-card-desc">End-to-end platform for dataset management, model training, and deployment workflows.</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- MODULE 6: PERFORMANCE METRICS -->
+            <section class="module" id="metrics">
+                <div class="module-header">
+                    <div class="module-icon">📈</div>
+                    <div class="module-info">
+                        <h2>Performance Metrics</h2>
+                        <p>KPIs for model evaluation and optimization</p>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">🎯</div>
+                        <div class="metric-value">94.2%</div>
+                        <div class="metric-label">mAP@50</div>
+                        <div class="metric-delta">↑ 2.1% vs baseline</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-value">42ms</div>
+                        <div class="metric-label">Inference Latency</div>
+                        <div class="metric-delta">↓ 15ms optimized</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-value">89.7%</div>
+                        <div class="metric-label">Precision</div>
+                        <div class="metric-delta">↑ 1.8% vs v1</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">🔄</div>
+                        <div class="metric-value">91.3%</div>
+                        <div class="metric-label">Recall</div>
+                        <div class="metric-delta">↑ 0.9% improved</div>
+                    </div>
+                </div>
+                
+                <!-- Performance Dashboard Viz -->
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <div class="viz-title">📊 Model Performance Dashboard</div>
+                        <div class="viz-badge">Real-time</div>
+                    </div>
+                    <div class="viz-canvas">
+                        <svg class="viz-svg" viewBox="0 0 800 300">
+                            <defs>
+                                <linearGradient id="perfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#7C3AED"/>
+                                    <stop offset="100%" style="stop-color:#A78BFA"/>
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Background -->
+                            <rect width="800" height="300" fill="#0a0a0f"/>
+                            
+                            <!-- Precision-Recall Curve -->
+                            <g transform="translate(50, 30)">
+                                <text x="0" y="0" fill="#A78BFA" font-size="12" font-weight="600">Precision-Recall Curve</text>
+                                
+                                <!-- Axes -->
+                                <line x1="30" y1="30" x2="30" y2="200" stroke="#2a2a3e" stroke-width="2"/>
+                                <line x1="30" y1="200" x2="280" y2="200" stroke="#2a2a3e" stroke-width="2"/>
+                                
+                                <!-- Grid -->
+                                <line x1="30" y1="70" x2="280" y2="70" stroke="#1a1a2e" stroke-dasharray="4,4"/>
+                                <line x1="30" y1="115" x2="280" y2="115" stroke="#1a1a2e" stroke-dasharray="4,4"/>
+                                <line x1="30" y1="160" x2="280" y2="160" stroke="#1a1a2e" stroke-dasharray="4,4"/>
+                                
+                                <!-- Labels -->
+                                <text x="20" y="35" text-anchor="end" fill="#6a6a7a" font-size="9">1.0</text>
+                                <text x="20" y="75" text-anchor="end" fill="#6a6a7a" font-size="9">0.8</text>
+                                <text x="20" y="120" text-anchor="end" fill="#6a6a7a" font-size="9">0.6</text>
+                                <text x="20" y="165" text-anchor="end" fill="#6a6a7a" font-size="9">0.4</text>
+                                <text x="20" y="205" text-anchor="end" fill="#6a6a7a" font-size="9">0.2</text>
+                                
+                                <text x="30" y="220" fill="#6a6a7a" font-size="9">0</text>
+                                <text x="155" y="220" fill="#6a6a7a" font-size="9">0.5</text>
+                                <text x="275" y="220" fill="#6a6a7a" font-size="9">1.0</text>
+                                
+                                <text x="155" y="240" text-anchor="middle" fill="#6a6a7a" font-size="10">Recall</text>
+                                <text x="0" y="115" transform="rotate(-90, 0, 115)" text-anchor="middle" fill="#6a6a7a" font-size="10">Precision</text>
+                                
+                                <!-- PR Curve -->
+                                <path d="M30,35 Q80,38 100,45 T150,70 T200,100 T250,150 T280,200" 
+                                      fill="none" stroke="url(#perfGrad)" stroke-width="3"/>
+                                <path d="M30,35 Q80,38 100,45 T150,70 T200,100 T250,150 T280,200 L280,200 L30,200 Z" 
+                                      fill="url(#perfGrad)" opacity="0.1"/>
+                                
+                                <!-- AUC label -->
+                                <rect x="180" y="80" width="80" height="30" rx="6" fill="#12121a" stroke="#8B5CF6"/>
+                                <text x="220" y="100" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="600">AUC: 0.94</text>
+                            </g>
+                            
+                            <!-- Confusion Matrix Mini -->
+                            <g transform="translate(380, 30)">
+                                <text x="0" y="0" fill="#22D3EE" font-size="12" font-weight="600">Confusion Matrix</text>
+                                
+                                <!-- Matrix cells -->
+                                <rect x="60" y="50" width="70" height="50" fill="#10B981" opacity="0.8"/>
+                                <rect x="130" y="50" width="70" height="50" fill="#EF4444" opacity="0.3"/>
+                                <rect x="60" y="100" width="70" height="50" fill="#EF4444" opacity="0.3"/>
+                                <rect x="130" y="100" width="70" height="50" fill="#10B981" opacity="0.8"/>
+                                
+                                <!-- Labels -->
+                                <text x="95" y="80" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">TP</text>
+                                <text x="95" y="95" text-anchor="middle" fill="#fff" font-size="10">847</text>
+                                <text x="165" y="80" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">FP</text>
+                                <text x="165" y="95" text-anchor="middle" fill="#fff" font-size="10">42</text>
+                                <text x="95" y="130" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">FN</text>
+                                <text x="95" y="145" text-anchor="middle" fill="#fff" font-size="10">78</text>
+                                <text x="165" y="130" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">TN</text>
+                                <text x="165" y="145" text-anchor="middle" fill="#fff" font-size="10">933</text>
+                                
+                                <!-- Axis labels -->
+                                <text x="130" y="40" text-anchor="middle" fill="#6a6a7a" font-size="9">Predicted</text>
+                                <text x="40" y="100" text-anchor="middle" fill="#6a6a7a" font-size="9" transform="rotate(-90, 40, 100)">Actual</text>
+                                
+                                <!-- F1 Score -->
+                                <rect x="60" y="170" width="140" height="35" rx="8" fill="#12121a" stroke="#06B6D4"/>
+                                <text x="130" y="192" text-anchor="middle" fill="#22D3EE" font-size="12" font-weight="600">F1 Score: 0.934</text>
+                            </g>
+                            
+                            <!-- Inference Time Distribution -->
+                            <g transform="translate(580, 30)">
+                                <text x="0" y="0" fill="#F472B6" font-size="12" font-weight="600">Latency Distribution</text>
+                                
+                                <!-- Histogram bars -->
+                                <rect x="20" y="140" width="25" height="60" rx="3" fill="#EC4899" opacity="0.4"/>
+                                <rect x="50" y="80" width="25" height="120" rx="3" fill="#EC4899" opacity="0.6"/>
+                                <rect x="80" y="40" width="25" height="160" rx="3" fill="#EC4899" opacity="0.9"/>
+                                <rect x="110" y="60" width="25" height="140" rx="3" fill="#EC4899" opacity="0.7"/>
+                                <rect x="140" y="120" width="25" height="80" rx="3" fill="#EC4899" opacity="0.5"/>
+                                <rect x="170" y="160" width="25" height="40" rx="3" fill="#EC4899" opacity="0.3"/>
+                                
+                                <!-- X-axis labels -->
+                                <text x="32" y="215" text-anchor="middle" fill="#6a6a7a" font-size="8">20ms</text>
+                                <text x="92" y="215" text-anchor="middle" fill="#6a6a7a" font-size="8">40ms</text>
+                                <text x="152" y="215" text-anchor="middle" fill="#6a6a7a" font-size="8">60ms</text>
+                                
+                                <!-- Stats -->
+                                <rect x="20" y="230" width="175" height="30" rx="6" fill="#12121a" stroke="#EC4899"/>
+                                <text x="107" y="250" text-anchor="middle" fill="#F472B6" font-size="10">P95: 48ms | P99: 62ms</text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-nav">
+                    <a href="#" class="footer-link prev">
+                        <span class="footer-link-label">Previous</span>
+                        <span class="footer-link-title">Competitive Intelligence</span>
+                    </a>
+                    <a href="#" class="footer-link next">
+                        <span class="footer-link-label">Next</span>
+                        <span class="footer-link-title">Design Patterns</span>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

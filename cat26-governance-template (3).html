@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Governance | Category 26 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EF4444;
+            --cat-light: #F87171;
+            --cat-dark: #DC2626;
+            --cat-glow: rgba(239, 68, 68, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 8px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 48px 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 64px; padding: 32px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 4px 16px; border-radius: 9999px; font-size: 11px; color: var(--cat-light); margin-bottom: 16px; width: fit-content; }
+        .hero-left h1 { font-size: 32px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); }
+        
+        .module { margin-bottom: 64px; padding-top: 32px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: 24px; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+        
+        /* SCORECARD STYLES */
+        .scorecard-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .scorecard-header {
+            background: linear-gradient(135deg, var(--cat-primary), var(--cat-dark));
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .scorecard-title { font-size: 15px; font-weight: 700; }
+        .scorecard-subtitle { font-size: 10px; opacity: 0.8; }
+        .overall-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .score-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 3px solid #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-value { font-size: 18px; font-weight: 800; line-height: 1; }
+        .score-max { font-size: 8px; opacity: 0.7; }
+        .score-label { font-size: 10px; text-align: right; }
+        .score-level { font-size: 12px; font-weight: 700; }
+        
+        .scorecard-body { padding: 16px; }
+        
+        .score-category {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .score-category-header {
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .score-category-header:hover { background: var(--bg-hover); }
+        .category-left { display: flex; align-items: center; gap: 10px; }
+        .category-icon { font-size: 20px; }
+        .category-name { font-size: 13px; font-weight: 600; }
+        .category-desc { font-size: 10px; color: var(--text-muted); }
+        .category-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .category-score-value {
+            font-size: 16px;
+            font-weight: 700;
+            min-width: 36px;
+            text-align: right;
+        }
+        .category-score-bar {
+            width: 80px;
+            height: 5px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .category-score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s, background 0.3s;
+        }
+        .expand-icon { font-size: 14px; color: var(--text-muted); transition: transform 0.3s; }
+        .score-category.expanded .expand-icon { transform: rotate(180deg); }
+        
+        .score-criteria {
+            display: none;
+            padding: 0 16px 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .score-category.expanded .score-criteria { display: block; }
+        
+        .criterion-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .criterion-row:last-child { border-bottom: none; }
+        .criterion-info { flex: 1; }
+        .criterion-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+        .criterion-desc { font-size: 10px; color: var(--text-muted); }
+        .criterion-score {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .score-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 5px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-dark);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .score-btn:hover { border-color: var(--text-secondary); }
+        .score-btn.selected { border-color: var(--green); background: rgba(16,185,129,0.2); color: var(--green); }
+        .score-btn.selected-1 { border-color: #EF4444; background: rgba(239,68,68,0.2); color: #EF4444; }
+        .score-btn.selected-2 { border-color: #F59E0B; background: rgba(245,158,11,0.2); color: #F59E0B; }
+        .score-btn.selected-3 { border-color: #3B82F6; background: rgba(59,130,246,0.2); color: #3B82F6; }
+        .score-btn.selected-4 { border-color: #10B981; background: rgba(16,185,129,0.2); color: #10B981; }
+        .score-btn.selected-5 { border-color: #8B5CF6; background: rgba(139,92,246,0.2); color: #8B5CF6; }
+        
+        /* MATURITY LEVELS */
+        .maturity-visual {
+            display: flex;
+            gap: 4px;
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--bg-card-alt);
+            border-radius: 8px;
+        }
+        .maturity-level {
+            flex: 1;
+            padding: 10px 8px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .maturity-level.current {
+            border-color: var(--green);
+            background: rgba(16,185,129,0.1);
+        }
+        .maturity-level.current::before {
+            content: '★ CURRENT';
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--green);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 7px;
+            font-weight: 700;
+        }
+        .maturity-number { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
+        .maturity-name { font-size: 10px; font-weight: 600; margin-bottom: 1px; }
+        .maturity-desc { font-size: 8px; color: var(--text-muted); }
+        .level-1 .maturity-number { color: #EF4444; }
+        .level-2 .maturity-number { color: #F59E0B; }
+        .level-3 .maturity-number { color: #3B82F6; }
+        .level-4 .maturity-number { color: #10B981; }
+        .level-5 .maturity-number { color: #8B5CF6; }
+        
+        /* GOVERNANCE FRAMEWORK SVG */
+        .framework-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .framework-svg { width: 100%; height: auto; max-height: 320px; }
+        
+        /* RACI MATRIX */
+        .raci-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        .raci-header {
+            background: var(--bg-card-alt);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .raci-title { font-size: 16px; font-weight: 700; }
+        .raci-table { width: 100%; border-collapse: collapse; }
+        .raci-table th {
+            background: var(--bg-card-alt);
+            padding: 12px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .raci-table th:first-child { text-align: left; }
+        .raci-table td {
+            padding: 12px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .raci-table td:first-child { text-align: left; font-weight: 500; }
+        .raci-table tr:hover td { background: var(--bg-hover); }
+        .raci-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .raci-r { background: rgba(239,68,68,0.2); color: #EF4444; }
+        .raci-a { background: rgba(245,158,11,0.2); color: #F59E0B; }
+        .raci-c { background: rgba(59,130,246,0.2); color: #3B82F6; }
+        .raci-i { background: rgba(107,114,128,0.2); color: #9CA3AF; }
+        
+        /* POLICY CARDS */
+        .policy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .policy-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .policy-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .policy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .policy-icon { font-size: 24px; }
+        .policy-status {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        .status-active { background: rgba(16,185,129,0.2); color: #10B981; }
+        .status-review { background: rgba(245,158,11,0.2); color: #F59E0B; }
+        .status-draft { background: rgba(59,130,246,0.2); color: #3B82F6; }
+        .policy-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .policy-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+        .policy-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+        
+        /* KPI METRICS */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .kpi-value { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+        .kpi-label { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .trend-positive { background: rgba(16,185,129,0.2); color: #10B981; }
+        .trend-negative { background: rgba(239,68,68,0.2); color: #EF4444; }
+        
+        /* TOOLS */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .tool-card:hover { border-color: var(--cat-primary); }
+        .tool-icon { font-size: 24px; margin-bottom: 6px; }
+        .tool-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+        .tool-category { font-size: 9px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-logo span { color: var(--brand-orange); }
+        .footer-meta { font-size: 13px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+    
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">📋 Category 26</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview" class="active">📊 Overview</a></li>
+                <li><a href="#scorecard">🎯 Maturity Scorecard</a></li>
+                <li><a href="#framework">🏛️ Governance Framework</a></li>
+                <li><a href="#raci">👥 RACI Matrix</a></li>
+                <li><a href="#policies">📜 Policies</a></li>
+                <li><a href="#metrics">📈 KPIs & Metrics</a></li>
+                <li><a href="#tools">🛠️ Tools</a></li>
+            </ul>
+        </div>
+    </aside>
+    
+    <div class="main-wrapper">
+        <main class="main-content">
+            <!-- HERO -->
+            <section class="hero-compact" id="overview">
+                <div class="hero-left">
+                    <div class="hero-tag">📋 Category 26</div>
+                    <h1>Data Governance</h1>
+                    <p>Establish accountability, policies, and processes to ensure data quality, security, and compliance across your organization. Build trust in your data through standardized governance practices.</p>
+                </div>
+                <div class="hero-metrics">
+                    <div class="hero-metric">
+                        <div class="hero-metric-value" id="hero-score">3.2</div>
+                        <div class="hero-metric-label">Maturity Score (of 5)</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">156</div>
+                        <div class="hero-metric-label">Active Policies</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">42</div>
+                        <div class="hero-metric-label">Data Stewards</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">73%</div>
+                        <div class="hero-metric-label">Data Trust Score</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- INTERACTIVE SCORECARD -->
+            <section class="module" id="scorecard">
+                <div class="module-header">
+                    <div class="module-icon">🎯</div>
+                    <div class="module-info">
+                        <h2>Governance Maturity Scorecard</h2>
+                        <p>Assess and track your data governance maturity - click categories to expand and adjust scores</p>
+                    </div>
+                </div>
+                
+                <div class="scorecard-container">
+                    <div class="scorecard-header">
+                        <div>
+                            <div class="scorecard-title">Data Governance Maturity Assessment</div>
+                            <div class="scorecard-subtitle">Click each category to expand and adjust individual scores</div>
+                        </div>
+                        <div class="overall-score">
+                            <div class="score-label">
+                                <div>Overall Maturity</div>
+                                <div class="score-level" id="maturity-level">Defined</div>
+                            </div>
+                            <div class="score-circle">
+                                <div class="score-value" id="overall-score">3.2</div>
+                                <div class="score-max">/ 5.0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scorecard-body">
+                        <!-- Category 1: Data Quality -->
+                        <div class="score-category" data-category="quality">
+                            <div class="score-category-header" onclick="toggleCategory('quality')">
+                                <div class="category-left">
+                                    <span class="category-icon">✨</span>
+                                    <div>
+                                        <div class="category-name">Data Quality Management</div>
+                                        <div class="category-desc">Standards, profiling, cleansing, and monitoring</div>
+                                    </div>
+                                </div>
+                                <div class="category-score">
+                                    <div class="category-score-bar"><div class="category-score-fill" id="quality-bar" style="width: 70%; background: #3B82F6;"></div></div>
+                                    <div class="category-score-value" id="quality-score">3.5</div>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="score-criteria" id="quality-criteria">
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Quality Rules Defined</div>
+                                        <div class="criterion-desc">Documented business rules for data validation and quality checks</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="quality" data-crit="rules" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="rules" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="rules" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="quality" data-crit="rules" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="rules" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Automated Data Profiling</div>
+                                        <div class="criterion-desc">Systematic analysis of data patterns, anomalies, and statistics</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="quality" data-crit="profiling" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="profiling" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="quality" data-crit="profiling" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="profiling" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="profiling" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Cleansing Processes</div>
+                                        <div class="criterion-desc">Established workflows for correcting and standardizing data</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="quality" data-crit="cleansing" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="cleansing" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="cleansing" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="quality" data-crit="cleansing" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="cleansing" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Quality Dashboards & Monitoring</div>
+                                        <div class="criterion-desc">Real-time visibility into data quality metrics and trends</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="quality" data-crit="monitoring" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="monitoring" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="quality" data-crit="monitoring" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="monitoring" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="quality" data-crit="monitoring" data-val="5">5</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 2: Metadata Management -->
+                        <div class="score-category" data-category="metadata">
+                            <div class="score-category-header" onclick="toggleCategory('metadata')">
+                                <div class="category-left">
+                                    <span class="category-icon">🏷️</span>
+                                    <div>
+                                        <div class="category-name">Metadata Management</div>
+                                        <div class="category-desc">Data catalog, lineage, business glossary</div>
+                                    </div>
+                                </div>
+                                <div class="category-score">
+                                    <div class="category-score-bar"><div class="category-score-fill" id="metadata-bar" style="width: 60%; background: #3B82F6;"></div></div>
+                                    <div class="category-score-value" id="metadata-score">3.0</div>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="score-criteria" id="metadata-criteria">
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Enterprise Data Catalog</div>
+                                        <div class="criterion-desc">Centralized inventory of all data assets with searchability</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="metadata" data-crit="catalog" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="catalog" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="metadata" data-crit="catalog" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="catalog" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="catalog" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Lineage Tracking</div>
+                                        <div class="criterion-desc">End-to-end visibility of data flow from source to consumption</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="metadata" data-crit="lineage" data-val="1">1</button>
+                                        <button class="score-btn selected-2" data-cat="metadata" data-crit="lineage" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="lineage" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="lineage" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="lineage" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Business Glossary</div>
+                                        <div class="criterion-desc">Standardized definitions for business terms and metrics</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="metadata" data-crit="glossary" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="glossary" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="glossary" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="metadata" data-crit="glossary" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="glossary" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Automated Metadata Harvesting</div>
+                                        <div class="criterion-desc">Auto-discovery and sync of technical metadata from sources</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="metadata" data-crit="harvesting" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="harvesting" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="metadata" data-crit="harvesting" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="harvesting" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="metadata" data-crit="harvesting" data-val="5">5</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 3: Data Security & Privacy -->
+                        <div class="score-category" data-category="security">
+                            <div class="score-category-header" onclick="toggleCategory('security')">
+                                <div class="category-left">
+                                    <span class="category-icon">🔒</span>
+                                    <div>
+                                        <div class="category-name">Data Security & Privacy</div>
+                                        <div class="category-desc">Access controls, classification, privacy compliance</div>
+                                    </div>
+                                </div>
+                                <div class="category-score">
+                                    <div class="category-score-bar"><div class="category-score-fill" id="security-bar" style="width: 80%; background: #10B981;"></div></div>
+                                    <div class="category-score-value" id="security-score">4.0</div>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="score-criteria" id="security-criteria">
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Classification Framework</div>
+                                        <div class="criterion-desc">Standardized sensitivity levels (Public, Internal, Confidential, Restricted)</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="security" data-crit="classification" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="security" data-crit="classification" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="security" data-crit="classification" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="security" data-crit="classification" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="security" data-crit="classification" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Role-Based Access Control</div>
+                                        <div class="criterion-desc">Fine-grained permissions aligned with job functions</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="security" data-crit="rbac" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="security" data-crit="rbac" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="security" data-crit="rbac" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="security" data-crit="rbac" data-val="4">4</button>
+                                        <button class="score-btn selected-5" data-cat="security" data-crit="rbac" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Privacy Impact Assessments</div>
+                                        <div class="criterion-desc">Systematic evaluation of privacy risks for new initiatives</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="security" data-crit="pia" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="security" data-crit="pia" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="security" data-crit="pia" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="security" data-crit="pia" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="security" data-crit="pia" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Masking & Anonymization</div>
+                                        <div class="criterion-desc">Protection of sensitive data in non-production environments</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="security" data-crit="masking" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="security" data-crit="masking" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="security" data-crit="masking" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="security" data-crit="masking" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="security" data-crit="masking" data-val="5">5</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 4: Data Stewardship -->
+                        <div class="score-category" data-category="stewardship">
+                            <div class="score-category-header" onclick="toggleCategory('stewardship')">
+                                <div class="category-left">
+                                    <span class="category-icon">👥</span>
+                                    <div>
+                                        <div class="category-name">Data Stewardship & Ownership</div>
+                                        <div class="category-desc">Accountability, roles, responsibilities</div>
+                                    </div>
+                                </div>
+                                <div class="category-score">
+                                    <div class="category-score-bar"><div class="category-score-fill" id="stewardship-bar" style="width: 50%; background: #F59E0B;"></div></div>
+                                    <div class="category-score-value" id="stewardship-score">2.5</div>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="score-criteria" id="stewardship-criteria">
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Owner Assignment</div>
+                                        <div class="criterion-desc">Clear business ownership for each data domain</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="stewardship" data-crit="owners" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="owners" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="stewardship" data-crit="owners" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="owners" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="owners" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Stewardship Program</div>
+                                        <div class="criterion-desc">Formal network of data stewards across business units</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="stewardship" data-crit="program" data-val="1">1</button>
+                                        <button class="score-btn selected-2" data-cat="stewardship" data-crit="program" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="program" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="program" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="program" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Training & Enablement</div>
+                                        <div class="criterion-desc">Ongoing education for data governance roles</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="stewardship" data-crit="training" data-val="1">1</button>
+                                        <button class="score-btn selected-2" data-cat="stewardship" data-crit="training" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="training" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="training" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="training" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Issue Resolution Process</div>
+                                        <div class="criterion-desc">Defined escalation paths for data quality issues</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="stewardship" data-crit="issues" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="issues" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="stewardship" data-crit="issues" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="issues" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="stewardship" data-crit="issues" data-val="5">5</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 5: Compliance & Regulatory -->
+                        <div class="score-category" data-category="compliance">
+                            <div class="score-category-header" onclick="toggleCategory('compliance')">
+                                <div class="category-left">
+                                    <span class="category-icon">⚖️</span>
+                                    <div>
+                                        <div class="category-name">Compliance & Regulatory</div>
+                                        <div class="category-desc">GDPR, CCPA, SOX, industry regulations</div>
+                                    </div>
+                                </div>
+                                <div class="category-score">
+                                    <div class="category-score-bar"><div class="category-score-fill" id="compliance-bar" style="width: 70%; background: #3B82F6;"></div></div>
+                                    <div class="category-score-value" id="compliance-score">3.5</div>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="score-criteria" id="compliance-criteria">
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Regulatory Mapping</div>
+                                        <div class="criterion-desc">Documented requirements for applicable regulations</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="compliance" data-crit="mapping" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="mapping" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="mapping" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="compliance" data-crit="mapping" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="mapping" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Audit Trail & Evidence</div>
+                                        <div class="criterion-desc">Complete records for compliance demonstration</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="compliance" data-crit="audit" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="audit" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="compliance" data-crit="audit" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="audit" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="audit" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Data Retention Management</div>
+                                        <div class="criterion-desc">Policies and automation for data lifecycle</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="compliance" data-crit="retention" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="retention" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="retention" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="compliance" data-crit="retention" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="retention" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Consent Management</div>
+                                        <div class="criterion-desc">Tracking and honoring data subject preferences</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="compliance" data-crit="consent" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="consent" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="compliance" data-crit="consent" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="consent" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="compliance" data-crit="consent" data-val="5">5</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 6: Data Architecture -->
+                        <div class="score-category" data-category="architecture">
+                            <div class="score-category-header" onclick="toggleCategory('architecture')">
+                                <div class="category-left">
+                                    <span class="category-icon">🏗️</span>
+                                    <div>
+                                        <div class="category-name">Data Architecture & Integration</div>
+                                        <div class="category-desc">Standards, models, integration patterns</div>
+                                    </div>
+                                </div>
+                                <div class="category-score">
+                                    <div class="category-score-bar"><div class="category-score-fill" id="architecture-bar" style="width: 60%; background: #3B82F6;"></div></div>
+                                    <div class="category-score-value" id="architecture-score">3.0</div>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="score-criteria" id="architecture-criteria">
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Enterprise Data Model</div>
+                                        <div class="criterion-desc">Canonical data models and entity definitions</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="architecture" data-crit="model" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="model" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="architecture" data-crit="model" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="model" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="model" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Integration Standards</div>
+                                        <div class="criterion-desc">Defined patterns for data exchange (APIs, events, batch)</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="architecture" data-crit="integration" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="integration" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="integration" data-val="3">3</button>
+                                        <button class="score-btn selected-4" data-cat="architecture" data-crit="integration" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="integration" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Master Data Management</div>
+                                        <div class="criterion-desc">Golden record strategy for core entities</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="architecture" data-crit="mdm" data-val="1">1</button>
+                                        <button class="score-btn selected-2" data-cat="architecture" data-crit="mdm" data-val="2">2</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="mdm" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="mdm" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="mdm" data-val="5">5</button>
+                                    </div>
+                                </div>
+                                <div class="criterion-row">
+                                    <div class="criterion-info">
+                                        <div class="criterion-name">Reference Data Management</div>
+                                        <div class="criterion-desc">Centralized management of codes and lookups</div>
+                                    </div>
+                                    <div class="criterion-score">
+                                        <button class="score-btn" data-cat="architecture" data-crit="rdm" data-val="1">1</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="rdm" data-val="2">2</button>
+                                        <button class="score-btn selected-3" data-cat="architecture" data-crit="rdm" data-val="3">3</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="rdm" data-val="4">4</button>
+                                        <button class="score-btn" data-cat="architecture" data-crit="rdm" data-val="5">5</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MATURITY VISUAL -->
+                        <div class="maturity-visual">
+                            <div class="maturity-level level-1">
+                                <div class="maturity-number">1</div>
+                                <div class="maturity-name">Initial</div>
+                                <div class="maturity-desc">Ad-hoc, reactive</div>
+                            </div>
+                            <div class="maturity-level level-2">
+                                <div class="maturity-number">2</div>
+                                <div class="maturity-name">Developing</div>
+                                <div class="maturity-desc">Basic processes</div>
+                            </div>
+                            <div class="maturity-level level-3 current" id="maturity-3">
+                                <div class="maturity-number">3</div>
+                                <div class="maturity-name">Defined</div>
+                                <div class="maturity-desc">Standardized</div>
+                            </div>
+                            <div class="maturity-level level-4" id="maturity-4">
+                                <div class="maturity-number">4</div>
+                                <div class="maturity-name">Managed</div>
+                                <div class="maturity-desc">Measured & controlled</div>
+                            </div>
+                            <div class="maturity-level level-5" id="maturity-5">
+                                <div class="maturity-number">5</div>
+                                <div class="maturity-name">Optimized</div>
+                                <div class="maturity-desc">Continuous improvement</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- GOVERNANCE FRAMEWORK -->
+            <section class="module" id="framework">
+                <div class="module-header">
+                    <div class="module-icon">🏛️</div>
+                    <div class="module-info">
+                        <h2>Governance Framework</h2>
+                        <p>Organizational structure and decision-making hierarchy</p>
+                    </div>
+                </div>
+                
+                <div class="framework-container">
+                    <svg viewBox="0 0 1000 350" class="framework-svg">
+                        <defs>
+                            <linearGradient id="execGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.4"/>
+                                <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.1"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <rect x="0" y="0" width="1000" height="350" fill="#1a1a2e" rx="12"/>
+                        
+                        <!-- Executive Level -->
+                        <rect x="350" y="20" width="300" height="70" rx="12" fill="url(#execGrad)" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="500" y="50" text-anchor="middle" fill="#8B5CF6" font-size="14" font-weight="700">Executive Steering Committee</text>
+                        <text x="500" y="70" text-anchor="middle" fill="#a0a0b0" font-size="11">CDO • CIO • CFO • Business Executives</text>
+                        
+                        <!-- Connector -->
+                        <line x1="500" y1="90" x2="500" y2="120" stroke="#6a6a7a" stroke-width="2"/>
+                        
+                        <!-- Governance Council -->
+                        <rect x="300" y="120" width="400" height="70" rx="12" fill="rgba(236,72,153,0.2)" stroke="#EC4899" stroke-width="2"/>
+                        <text x="500" y="150" text-anchor="middle" fill="#EC4899" font-size="14" font-weight="700">Data Governance Council</text>
+                        <text x="500" y="170" text-anchor="middle" fill="#a0a0b0" font-size="11">Policy Decisions • Standards Approval • Conflict Resolution</text>
+                        
+                        <!-- Connectors to Working Groups -->
+                        <line x1="400" y1="190" x2="400" y2="220" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="500" y1="190" x2="500" y2="220" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="600" y1="190" x2="600" y2="220" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="300" y1="190" x2="700" y2="190" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="200" y1="190" x2="200" y2="220" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="200" y1="190" x2="300" y2="190" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="700" y1="190" x2="800" y2="190" stroke="#6a6a7a" stroke-width="2"/>
+                        <line x1="800" y1="190" x2="800" y2="220" stroke="#6a6a7a" stroke-width="2"/>
+                        
+                        <!-- Working Groups -->
+                        <rect x="100" y="220" width="180" height="60" rx="8" fill="rgba(59,130,246,0.2)" stroke="#3B82F6" stroke-width="2"/>
+                        <text x="190" y="248" text-anchor="middle" fill="#3B82F6" font-size="12" font-weight="600">Data Quality WG</text>
+                        <text x="190" y="265" text-anchor="middle" fill="#a0a0b0" font-size="10">Standards & Metrics</text>
+                        
+                        <rect x="310" y="220" width="180" height="60" rx="8" fill="rgba(16,185,129,0.2)" stroke="#10B981" stroke-width="2"/>
+                        <text x="400" y="248" text-anchor="middle" fill="#10B981" font-size="12" font-weight="600">Metadata WG</text>
+                        <text x="400" y="265" text-anchor="middle" fill="#a0a0b0" font-size="10">Catalog & Lineage</text>
+                        
+                        <rect x="520" y="220" width="180" height="60" rx="8" fill="rgba(245,158,11,0.2)" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="610" y="248" text-anchor="middle" fill="#F59E0B" font-size="12" font-weight="600">Security & Privacy WG</text>
+                        <text x="610" y="265" text-anchor="middle" fill="#a0a0b0" font-size="10">Access & Compliance</text>
+                        
+                        <rect x="720" y="220" width="180" height="60" rx="8" fill="rgba(6,182,212,0.2)" stroke="#06B6D4" stroke-width="2"/>
+                        <text x="810" y="248" text-anchor="middle" fill="#06B6D4" font-size="12" font-weight="600">Architecture WG</text>
+                        <text x="810" y="265" text-anchor="middle" fill="#a0a0b0" font-size="10">Models & Integration</text>
+                        
+                        <!-- Connectors to Stewards -->
+                        <line x1="190" y1="280" x2="190" y2="295" stroke="#6a6a7a" stroke-width="1" stroke-dasharray="4,2"/>
+                        <line x1="400" y1="280" x2="400" y2="295" stroke="#6a6a7a" stroke-width="1" stroke-dasharray="4,2"/>
+                        <line x1="610" y1="280" x2="610" y2="295" stroke="#6a6a7a" stroke-width="1" stroke-dasharray="4,2"/>
+                        <line x1="810" y1="280" x2="810" y2="295" stroke="#6a6a7a" stroke-width="1" stroke-dasharray="4,2"/>
+                        
+                        <!-- Data Steward Layer -->
+                        <rect x="50" y="295" width="900" height="45" rx="10" fill="rgba(107,114,128,0.2)" stroke="#6B7280" stroke-width="2" stroke-dasharray="4,2"/>
+                        <text x="500" y="318" text-anchor="middle" fill="#9CA3AF" font-size="12" font-weight="700">Data Stewards Network</text>
+                        <text x="500" y="332" text-anchor="middle" fill="#6a6a7a" font-size="9">Domain Stewards • Technical Stewards • Business Stewards • Data Custodians</text>
+                    </svg>
+                </div>
+            </section>
+            
+            <!-- RACI MATRIX -->
+            <section class="module" id="raci">
+                <div class="module-header">
+                    <div class="module-icon">👥</div>
+                    <div class="module-info">
+                        <h2>RACI Matrix</h2>
+                        <p>Responsibility assignment for governance activities</p>
+                    </div>
+                </div>
+                
+                <div class="raci-container">
+                    <div class="raci-header">
+                        <div class="raci-title">Governance Responsibility Matrix</div>
+                    </div>
+                    <table class="raci-table">
+                        <thead>
+                            <tr>
+                                <th style="width:30%;">Activity</th>
+                                <th>CDO</th>
+                                <th>Data Owner</th>
+                                <th>Data Steward</th>
+                                <th>IT/Engineering</th>
+                                <th>Business User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Define Data Standards</td>
+                                <td><span class="raci-badge raci-a">A</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                                <td><span class="raci-badge raci-i">I</span></td>
+                            </tr>
+                            <tr>
+                                <td>Approve Data Access</td>
+                                <td><span class="raci-badge raci-i">I</span></td>
+                                <td><span class="raci-badge raci-a">A</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                            </tr>
+                            <tr>
+                                <td>Monitor Data Quality</td>
+                                <td><span class="raci-badge raci-a">A</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-i">I</span></td>
+                            </tr>
+                            <tr>
+                                <td>Resolve Data Issues</td>
+                                <td><span class="raci-badge raci-i">I</span></td>
+                                <td><span class="raci-badge raci-a">A</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                            </tr>
+                            <tr>
+                                <td>Maintain Data Catalog</td>
+                                <td><span class="raci-badge raci-a">A</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-i">I</span></td>
+                            </tr>
+                            <tr>
+                                <td>Ensure Compliance</td>
+                                <td><span class="raci-badge raci-a">A</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-r">R</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                                <td><span class="raci-badge raci-c">C</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- POLICIES -->
+            <section class="module" id="policies">
+                <div class="module-header">
+                    <div class="module-icon">📜</div>
+                    <div class="module-info">
+                        <h2>Governance Policies</h2>
+                        <p>Key policies governing data management</p>
+                    </div>
+                </div>
+                
+                <div class="policy-grid">
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-icon">🏷️</span>
+                            <span class="policy-status status-active">Active</span>
+                        </div>
+                        <div class="policy-name">Data Classification Policy</div>
+                        <div class="policy-desc">Standards for categorizing data by sensitivity level and handling requirements</div>
+                        <div class="policy-meta">
+                            <span>v2.1</span>
+                            <span>Updated: Nov 2024</span>
+                        </div>
+                    </div>
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-icon">🗓️</span>
+                            <span class="policy-status status-active">Active</span>
+                        </div>
+                        <div class="policy-name">Data Retention Policy</div>
+                        <div class="policy-desc">Lifecycle management rules for data storage, archival, and destruction</div>
+                        <div class="policy-meta">
+                            <span>v1.8</span>
+                            <span>Updated: Oct 2024</span>
+                        </div>
+                    </div>
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-icon">🔐</span>
+                            <span class="policy-status status-active">Active</span>
+                        </div>
+                        <div class="policy-name">Access Control Policy</div>
+                        <div class="policy-desc">Rules governing who can access what data under which conditions</div>
+                        <div class="policy-meta">
+                            <span>v3.0</span>
+                            <span>Updated: Dec 2024</span>
+                        </div>
+                    </div>
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-icon">✨</span>
+                            <span class="policy-status status-review">Under Review</span>
+                        </div>
+                        <div class="policy-name">Data Quality Policy</div>
+                        <div class="policy-desc">Standards and thresholds for acceptable data quality levels</div>
+                        <div class="policy-meta">
+                            <span>v2.0-draft</span>
+                            <span>Review: Jan 2025</span>
+                        </div>
+                    </div>
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-icon">🤝</span>
+                            <span class="policy-status status-active">Active</span>
+                        </div>
+                        <div class="policy-name">Privacy & Consent Policy</div>
+                        <div class="policy-desc">Guidelines for handling personal data and managing consent preferences</div>
+                        <div class="policy-meta">
+                            <span>v2.5</span>
+                            <span>Updated: Sep 2024</span>
+                        </div>
+                    </div>
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-icon">🔄</span>
+                            <span class="policy-status status-draft">Draft</span>
+                        </div>
+                        <div class="policy-name">Data Sharing Policy</div>
+                        <div class="policy-desc">Rules for sharing data internally and with external partners</div>
+                        <div class="policy-meta">
+                            <span>v1.0-draft</span>
+                            <span>Target: Feb 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- KPIs -->
+            <section class="module" id="metrics">
+                <div class="module-header">
+                    <div class="module-icon">📈</div>
+                    <div class="module-info">
+                        <h2>Governance KPIs</h2>
+                        <p>Key performance indicators tracking governance effectiveness</p>
+                    </div>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: #10B981;">94%</div>
+                        <div class="kpi-label">Policy Compliance Rate</div>
+                        <div class="kpi-trend trend-positive">↑ 3% from last quarter</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: #3B82F6;">87%</div>
+                        <div class="kpi-label">Data Quality Score</div>
+                        <div class="kpi-trend trend-positive">↑ 5% from last quarter</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: #F59E0B;">76%</div>
+                        <div class="kpi-label">Catalog Coverage</div>
+                        <div class="kpi-trend trend-positive">↑ 12% from last quarter</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: #8B5CF6;">2.3d</div>
+                        <div class="kpi-label">Avg Issue Resolution</div>
+                        <div class="kpi-trend trend-positive">↓ 0.5d from last quarter</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- TOOLS -->
+            <section class="module" id="tools">
+                <div class="module-header">
+                    <div class="module-icon">🛠️</div>
+                    <div class="module-info">
+                        <h2>Governance Tools</h2>
+                        <p>Essential platforms for data governance</p>
+                    </div>
+                </div>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">📚</div>
+                        <div class="tool-name">Collibra</div>
+                        <div class="tool-category">Data Catalog & Governance</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🔍</div>
+                        <div class="tool-name">Alation</div>
+                        <div class="tool-category">Data Catalog</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🌊</div>
+                        <div class="tool-name">Atlan</div>
+                        <div class="tool-category">Data Workspace</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🔗</div>
+                        <div class="tool-name">Informatica</div>
+                        <div class="tool-category">Data Quality & MDM</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🦅</div>
+                        <div class="tool-name">Apache Atlas</div>
+                        <div class="tool-category">Metadata & Lineage</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-name">DataHub</div>
+                        <div class="tool-category">Metadata Platform</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">✅</div>
+                        <div class="tool-name">Great Expectations</div>
+                        <div class="tool-category">Data Quality</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🔒</div>
+                        <div class="tool-name">Privacera</div>
+                        <div class="tool-category">Access Governance</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo"><span>STRATEGY</span>HUB</div>
+            <div class="footer-meta">Category 26: Data Governance | Blueprint Technologies cOS</div>
+        </div>
+    </footer>
+    
+    <script>
+        // Scorecard state
+        const scores = {
+            quality: { rules: 4, profiling: 3, cleansing: 4, monitoring: 3 },
+            metadata: { catalog: 3, lineage: 2, glossary: 4, harvesting: 3 },
+            security: { classification: 4, rbac: 5, pia: 3, masking: 4 },
+            stewardship: { owners: 3, program: 2, training: 2, issues: 3 },
+            compliance: { mapping: 4, audit: 3, retention: 4, consent: 3 },
+            architecture: { model: 3, integration: 4, mdm: 2, rdm: 3 }
+        };
+        
+        // Toggle category expansion
+        function toggleCategory(cat) {
+            const categoryEl = document.querySelector(`[data-category="${cat}"]`);
+            categoryEl.classList.toggle('expanded');
+        }
+        
+        // Handle score button clicks
+        document.querySelectorAll('.score-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const cat = this.dataset.cat;
+                const crit = this.dataset.crit;
+                const val = parseInt(this.dataset.val);
+                
+                // Update score state
+                scores[cat][crit] = val;
+                
+                // Update button styles
+                const siblings = this.parentElement.querySelectorAll('.score-btn');
+                siblings.forEach(s => {
+                    s.className = 'score-btn';
+                });
+                this.classList.add(`selected-${val}`);
+                
+                // Recalculate
+                updateScores();
+            });
+        });
+        
+        function updateScores() {
+            // Calculate category scores
+            const categoryScores = {};
+            for (const [cat, criteria] of Object.entries(scores)) {
+                const values = Object.values(criteria);
+                categoryScores[cat] = values.reduce((a, b) => a + b, 0) / values.length;
+            }
+            
+            // Update category displays
+            for (const [cat, score] of Object.entries(categoryScores)) {
+                const scoreEl = document.getElementById(`${cat}-score`);
+                const barEl = document.getElementById(`${cat}-bar`);
+                
+                if (scoreEl) scoreEl.textContent = score.toFixed(1);
+                if (barEl) {
+                    barEl.style.width = `${score * 20}%`;
+                    if (score < 2) barEl.style.background = '#EF4444';
+                    else if (score < 3) barEl.style.background = '#F59E0B';
+                    else if (score < 4) barEl.style.background = '#3B82F6';
+                    else barEl.style.background = '#10B981';
+                }
+            }
+            
+            // Calculate overall
+            const overall = Object.values(categoryScores).reduce((a, b) => a + b, 0) / 6;
+            document.getElementById('overall-score').textContent = overall.toFixed(1);
+            document.getElementById('hero-score').textContent = overall.toFixed(1);
+            
+            // Update maturity level
+            let level, levelName;
+            if (overall < 1.5) { level = 1; levelName = 'Initial'; }
+            else if (overall < 2.5) { level = 2; levelName = 'Developing'; }
+            else if (overall < 3.5) { level = 3; levelName = 'Defined'; }
+            else if (overall < 4.5) { level = 4; levelName = 'Managed'; }
+            else { level = 5; levelName = 'Optimized'; }
+            
+            document.getElementById('maturity-level').textContent = levelName;
+            
+            // Update maturity visual
+            document.querySelectorAll('.maturity-level').forEach(el => el.classList.remove('current'));
+            const currentLevel = document.querySelector(`.level-${level}`);
+            if (currentLevel) currentLevel.classList.add('current');
+        }
+        
+        // Initialize
+        updateScores();
+    </script>
+</body>
+</html>

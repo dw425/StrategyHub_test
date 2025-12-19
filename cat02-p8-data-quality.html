@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Quality | Data Engineering | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            --page-primary: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cyan)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .dimension-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .dimension-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .dimension-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); }
+        .dimension-icon { font-size: 32px; margin-bottom: 12px; }
+        .dimension-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .dimension-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
+        .dimension-example { font-size: 9px; color: var(--text-muted); font-style: italic; }
+        
+        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .tool-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-info h3 { font-size: 14px; margin-bottom: 2px; }
+        .tool-info span { font-size: 10px; color: var(--text-muted); }
+        .tool-body { padding: 16px; }
+        .tool-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .tool-features { list-style: none; }
+        .tool-features li { font-size: 10px; padding: 3px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .tool-features li::before { content: '✓'; color: var(--green); }
+        
+        .code-example { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .code-example-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-example-title { font-size: 12px; font-weight: 600; }
+        .code-example-file { font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-example-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.7; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .test-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .test-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .test-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .test-icon { width: 40px; height: 40px; background: var(--page-glow); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .test-title { font-size: 14px; font-weight: 600; }
+        .test-subtitle { font-size: 10px; color: var(--text-muted); }
+        .test-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .test-examples { list-style: none; }
+        .test-examples li { font-size: 10px; padding: 4px 0; color: var(--text-muted); font-family: monospace; }
+        
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(16,185,129,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .test-grid { grid-template-columns: 1fr; }
+            .dimension-grid, .tool-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔧 Category 02</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-data-engineering-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#dimensions"><span class="nav-icon">📐</span> Quality Dimensions</a></li>
+            <li><a href="#tools"><span class="nav-icon">🔧</span> Quality Tools</a></li>
+            <li><a href="#testing"><span class="nav-icon">🧪</span> Testing Types</a></li>
+            <li><a href="#greatex"><span class="nav-icon">📊</span> Great Expectations</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-p1-data-ingestion.html"><span class="nav-icon">📥</span> Data Ingestion</a></li>
+            <li><a href="cat02-p2-data-transformation.html"><span class="nav-icon">🔄</span> Data Transformation</a></li>
+            <li><a href="cat02-p3-databricks.html"><span class="nav-icon">🧱</span> Databricks</a></li>
+            <li><a href="cat02-p4-snowflake.html"><span class="nav-icon">❄️</span> Snowflake</a></li>
+            <li><a href="cat02-p5-bigquery.html"><span class="nav-icon">🔍</span> BigQuery</a></li>
+            <li><a href="cat02-p6-apache-spark.html"><span class="nav-icon">⚡</span> Apache Spark</a></li>
+            <li><a href="cat02-p7-orchestration.html"><span class="nav-icon">🎼</span> Orchestration</a></li>
+            <li><a href="cat02-p8-data-quality.html" class="active"><span class="nav-icon">✅</span> Data Quality</a></li>
+            <li><a href="cat02-p9-observability.html"><span class="nav-icon">👁️</span> Observability</a></li>
+            <li><a href="cat02-p10-data-catalogs.html"><span class="nav-icon">📚</span> Data Catalogs</a></li>
+            <li><a href="cat02-p11-streaming.html"><span class="nav-icon">🌊</span> Streaming</a></li>
+            <li><a href="cat02-p12-reverse-etl.html"><span class="nav-icon">↩️</span> Reverse ETL</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">✅ Page 2.8</span>
+                <h1>Data Quality</h1>
+                <p>Master data quality testing and validation. Learn Great Expectations, Soda, and dbt tests—the tools and frameworks that ensure your data is accurate, complete, consistent, and trustworthy.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">6</div><div class="hero-metric-label">Quality Dimensions</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">GX</div><div class="hero-metric-label">Great Expectations</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Shift</div><div class="hero-metric-label">Left Testing</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Trust</div><div class="hero-metric-label">Data Contracts</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Data Quality?</h2>
+                    <p>The foundation of data trust</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Beyond "Garbage In, Garbage Out"</h3>
+                <p>Data quality is the degree to which data meets the requirements of its intended use. Poor quality data leads to incorrect insights, flawed ML models, compliance violations, and eroded trust. In a world of AI and analytics, data quality isn't optional—it's the foundation everything else depends on.</p>
+                
+                <h3>Shift Left: Test Early, Test Often</h3>
+                <p>Modern data quality embraces "shift left" testing—catching issues as early as possible in the pipeline rather than discovering them in dashboards or ML predictions. Just as software engineering adopted unit testing, data engineering now embeds quality checks throughout the data lifecycle.</p>
+                
+                <h3>Data Contracts & Trust</h3>
+                <p>Data contracts define expectations between data producers and consumers. They specify what quality guarantees a dataset provides—schema, freshness, completeness, and more. When combined with automated testing, contracts create accountability and trust across the data ecosystem.</p>
+            </div>
+        </section>
+
+        <!-- QUALITY DIMENSIONS -->
+        <section class="module" id="dimensions">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Quality Dimensions</h2>
+                    <p>The six pillars of data quality</p>
+                </div>
+            </div>
+            
+            <div class="dimension-grid">
+                <div class="dimension-card">
+                    <div class="dimension-icon">🎯</div>
+                    <div class="dimension-title">Accuracy</div>
+                    <div class="dimension-desc">Data correctly represents the real-world entity or event it describes</div>
+                    <div class="dimension-example">e.g., Customer age matches their actual age</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">📦</div>
+                    <div class="dimension-title">Completeness</div>
+                    <div class="dimension-desc">All required data is present with no missing values or records</div>
+                    <div class="dimension-example">e.g., No NULL email addresses for active users</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">🔄</div>
+                    <div class="dimension-title">Consistency</div>
+                    <div class="dimension-desc">Data is uniform across systems and doesn't contradict itself</div>
+                    <div class="dimension-example">e.g., Order total = sum of line items</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">⏰</div>
+                    <div class="dimension-title">Timeliness</div>
+                    <div class="dimension-desc">Data is available when needed and reflects current state</div>
+                    <div class="dimension-example">e.g., Dashboard updates within 15 minutes</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">✅</div>
+                    <div class="dimension-title">Validity</div>
+                    <div class="dimension-desc">Data conforms to defined formats, types, and ranges</div>
+                    <div class="dimension-example">e.g., Email addresses match regex pattern</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">🔗</div>
+                    <div class="dimension-title">Uniqueness</div>
+                    <div class="dimension-desc">No duplicate records exist where uniqueness is expected</div>
+                    <div class="dimension-example">e.g., One record per customer_id</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUALITY TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Data Quality Tools</h2>
+                    <p>The leading platforms</p>
+                </div>
+            </div>
+            
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📊</div>
+                        <div class="tool-info">
+                            <h3>Great Expectations</h3>
+                            <span>Open Source</span>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <div class="tool-desc">Python-based data validation framework. Define expectations as code, generate docs, integrate with pipelines.</div>
+                        <ul class="tool-features">
+                            <li>300+ built-in expectations</li>
+                            <li>Auto-generated data docs</li>
+                            <li>Pipeline integration</li>
+                            <li>Custom expectations</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🧪</div>
+                        <div class="tool-info">
+                            <h3>Soda</h3>
+                            <span>SodaCL Language</span>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <div class="tool-desc">YAML-based data quality with SodaCL. Simple syntax, powerful checks, Soda Cloud for visibility.</div>
+                        <ul class="tool-features">
+                            <li>Human-readable YAML checks</li>
+                            <li>Anomaly detection</li>
+                            <li>Schema monitoring</li>
+                            <li>Soda Cloud dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔶</div>
+                        <div class="tool-info">
+                            <h3>dbt Tests</h3>
+                            <span>Built into dbt</span>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <div class="tool-desc">Native testing in dbt. Schema tests, data tests, and custom tests as part of transformation.</div>
+                        <ul class="tool-features">
+                            <li>unique, not_null, relationships</li>
+                            <li>accepted_values checks</li>
+                            <li>Custom SQL tests</li>
+                            <li>dbt packages (dbt_utils, etc.)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TESTING TYPES -->
+        <section class="module" id="testing">
+            <div class="module-header">
+                <div class="module-icon">🧪</div>
+                <div class="module-info">
+                    <h2>Testing Types</h2>
+                    <p>Different tests for different needs</p>
+                </div>
+            </div>
+            
+            <div class="test-grid">
+                <div class="test-card">
+                    <div class="test-header">
+                        <div class="test-icon">📋</div>
+                        <div>
+                            <div class="test-title">Schema Tests</div>
+                            <div class="test-subtitle">Structure validation</div>
+                        </div>
+                    </div>
+                    <div class="test-desc">Validate that data conforms to expected structure—column names, data types, nullable constraints.</div>
+                    <ul class="test-examples">
+                        <li>expect_column_to_exist</li>
+                        <li>expect_column_values_to_be_of_type</li>
+                        <li>expect_table_columns_to_match_set</li>
+                    </ul>
+                </div>
+                
+                <div class="test-card">
+                    <div class="test-header">
+                        <div class="test-icon">📊</div>
+                        <div>
+                            <div class="test-title">Volume Tests</div>
+                            <div class="test-subtitle">Row count validation</div>
+                        </div>
+                    </div>
+                    <div class="test-desc">Check that data volume is within expected ranges—catches missing data or unexpected duplicates.</div>
+                    <ul class="test-examples">
+                        <li>expect_table_row_count_to_be_between</li>
+                        <li>row_count > yesterday * 0.9</li>
+                        <li>freshness_check(hours=2)</li>
+                    </ul>
+                </div>
+                
+                <div class="test-card">
+                    <div class="test-header">
+                        <div class="test-icon">🎯</div>
+                        <div>
+                            <div class="test-title">Value Tests</div>
+                            <div class="test-subtitle">Content validation</div>
+                        </div>
+                    </div>
+                    <div class="test-desc">Validate actual data values—ranges, patterns, allowed values, and business rules.</div>
+                    <ul class="test-examples">
+                        <li>expect_column_values_to_be_in_set</li>
+                        <li>expect_column_values_to_match_regex</li>
+                        <li>expect_column_values_to_be_between</li>
+                    </ul>
+                </div>
+                
+                <div class="test-card">
+                    <div class="test-header">
+                        <div class="test-icon">🔗</div>
+                        <div>
+                            <div class="test-title">Relationship Tests</div>
+                            <div class="test-subtitle">Referential integrity</div>
+                        </div>
+                    </div>
+                    <div class="test-desc">Ensure foreign keys reference valid primary keys—critical for joins and dimensional models.</div>
+                    <ul class="test-examples">
+                        <li>expect_column_values_to_be_in_other_table</li>
+                        <li>relationships (dbt)</li>
+                        <li>referential_integrity_check</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- GREAT EXPECTATIONS -->
+        <section class="module" id="greatex">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Great Expectations</h2>
+                    <p>Python-based data validation</p>
+                </div>
+            </div>
+            
+            <div class="code-example">
+                <div class="code-example-header">
+                    <div class="code-example-title">Great Expectations Suite Example</div>
+                    <div class="code-example-file">Python</div>
+                </div>
+                <div class="code-example-content">
+                    <pre><span class="code-keyword">import</span> great_expectations <span class="code-keyword">as</span> gx
+
+<span class="code-comment"># Create a Data Context</span>
+context = gx.get_context()
+
+<span class="code-comment"># Connect to your data source</span>
+datasource = context.sources.add_pandas(<span class="code-string">"orders_source"</span>)
+data_asset = datasource.add_dataframe_asset(<span class="code-string">"orders"</span>)
+batch_request = data_asset.build_batch_request(dataframe=orders_df)
+
+<span class="code-comment"># Create expectation suite</span>
+suite = context.add_expectation_suite(<span class="code-string">"orders_quality_suite"</span>)
+
+<span class="code-comment"># Add expectations</span>
+validator = context.get_validator(
+    batch_request=batch_request,
+    expectation_suite_name=<span class="code-string">"orders_quality_suite"</span>
+)
+
+<span class="code-comment"># Schema expectations</span>
+validator.expect_column_to_exist(<span class="code-string">"order_id"</span>)
+validator.expect_column_to_exist(<span class="code-string">"customer_id"</span>)
+validator.expect_column_to_exist(<span class="code-string">"order_total"</span>)
+
+<span class="code-comment"># Uniqueness expectations</span>
+validator.expect_column_values_to_be_unique(<span class="code-string">"order_id"</span>)
+
+<span class="code-comment"># Completeness expectations</span>
+validator.expect_column_values_to_not_be_null(<span class="code-string">"customer_id"</span>)
+validator.expect_column_values_to_not_be_null(<span class="code-string">"order_total"</span>)
+
+<span class="code-comment"># Value range expectations</span>
+validator.expect_column_values_to_be_between(
+    <span class="code-string">"order_total"</span>, min_value=0, max_value=100000
+)
+
+<span class="code-comment"># Valid values expectations</span>
+validator.expect_column_values_to_be_in_set(
+    <span class="code-string">"status"</span>, [<span class="code-string">"pending"</span>, <span class="code-string">"shipped"</span>, <span class="code-string">"delivered"</span>, <span class="code-string">"cancelled"</span>]
+)
+
+<span class="code-comment"># Save and run validation</span>
+validator.save_expectation_suite()
+results = validator.validate()
+
+<span class="code-comment"># Check results</span>
+<span class="code-keyword">if</span> results.success:
+    print(<span class="code-string">"✅ All quality checks passed!"</span>)
+<span class="code-keyword">else</span>:
+    print(<span class="code-string">"❌ Quality checks failed"</span>)
+    <span class="code-keyword">for</span> result <span class="code-keyword">in</span> results.results:
+        <span class="code-keyword">if</span> <span class="code-keyword">not</span> result.success:
+            print(f<span class="code-string">"  - {result.expectation_config.expectation_type}"</span>)</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for data quality success</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Test at every stage: ingestion, transformation, serving</li>
+                        <li>Start with critical tables and expand coverage over time</li>
+                        <li>Use data contracts between producers and consumers</li>
+                        <li>Alert on failures but avoid alert fatigue</li>
+                        <li>Document expectations and share quality reports</li>
+                        <li>Version control your test suites alongside code</li>
+                        <li>Monitor quality metrics over time for trends</li>
+                        <li>Automate quality checks in CI/CD pipelines</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't test everything—focus on business-critical data</li>
+                        <li>Avoid hardcoded thresholds without business context</li>
+                        <li>Never ignore failing tests—fix or adjust expectations</li>
+                        <li>Don't skip freshness checks on time-sensitive data</li>
+                        <li>Avoid running quality checks only in production</li>
+                        <li>Don't treat data quality as a one-time project</li>
+                        <li>Never blame data producers—collaborate on solutions</li>
+                        <li>Avoid quality checks that can't be explained to stakeholders</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for data quality</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">✅</div>
+                    <div class="agent-name">DataQualityAgent</div>
+                    <div class="agent-role">Quality Engineering Specialist</div>
+                    <div class="agent-desc">Expert in data quality frameworks, testing strategies, and validation tooling. Specializes in Great Expectations, Soda, dbt tests, and building comprehensive quality programs.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design quality test suites</li>
+                        <li>Implement Great Expectations</li>
+                        <li>Set up quality monitoring</li>
+                        <li>Create data contracts</li>
+                        <li>Debug quality failures</li>
+                        <li>Build quality dashboards</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Quality Task</div>
+                        <div class="code-filename">quality_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># quality_agent.py - Data Quality Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">quality_agent</span> = Agent(
+    role=<span class="code-string">"Data Quality Engineer"</span>,
+    goal=<span class="code-string">"Ensure data is accurate and trustworthy"</span>,
+    backstory=<span class="code-string">"""Expert in data quality frameworks 
+    including Great Expectations, Soda, and dbt 
+    tests. Deep knowledge of quality dimensions, 
+    testing strategies, data contracts, and 
+    building trust in data systems."""</span>,
+    tools=[
+        ExpectationBuilder(),
+        QualityAnalyzer(),
+        ContractGenerator(),
+        AnomalyDetector(),
+        ReportBuilder(),
+    ]
+)
+
+<span class="code-function">quality_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Profile data to understand distributions
+    2. Identify critical quality dimensions
+    3. Design comprehensive test suite
+    4. Implement expectations in GX/Soda
+    5. Set up alerting and monitoring
+    6. Create quality documentation
+    7. Build stakeholder dashboard
+    """</span>,
+    agent=quality_agent,
+    expected_output=<span class="code-string">"Complete data quality program"</span>
+)
+
+<span class="code-comment"># Execute quality implementation</span>
+crew = Crew(agents=[quality_agent], tasks=[quality_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat02-p9-observability.html" class="related-card">
+                    <div class="related-num">Page 2.9</div>
+                    <div class="related-title">Data Observability</div>
+                    <div class="related-desc">Monitor quality continuously</div>
+                </a>
+                <a href="cat02-p2-data-transformation.html" class="related-card">
+                    <div class="related-num">Page 2.2</div>
+                    <div class="related-title">Data Transformation</div>
+                    <div class="related-desc">dbt tests and quality</div>
+                </a>
+                <a href="cat02-p7-orchestration.html" class="related-card">
+                    <div class="related-num">Page 2.7</div>
+                    <div class="related-title">Orchestration</div>
+                    <div class="related-desc">Quality checks in pipelines</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat02-p7-orchestration.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">2.7: Orchestration Tools</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 2.8 of 12</div>
+        <a href="cat02-p9-observability.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">2.9: Data Observability</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

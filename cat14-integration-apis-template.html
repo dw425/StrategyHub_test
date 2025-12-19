@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration & APIs | Category 14 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 14 - INTEGRATION CYAN */
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --violet: #7C3AED;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        /* VIZ CONTAINERS */
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .viz-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .viz-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .viz-svg { width: 100%; height: auto; }
+        
+        /* TOOL CARDS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* SERVICE MESH */
+        .mesh-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .mesh-header { padding: var(--space-lg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-lg); }
+        .mesh-icon { font-size: 32px; }
+        .mesh-title h3 { font-size: var(--font-lg); margin-bottom: 2px; }
+        .mesh-title p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .mesh-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .mesh-svg { width: 100%; height: auto; }
+        .mesh-stats { display: flex; justify-content: center; gap: var(--space-xl); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .mesh-stat { display: flex; align-items: center; gap: var(--space-xs); }
+        .mesh-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .mesh-stat-value { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); }
+        
+        /* AGENT + CODE */
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-section-header { margin-bottom: var(--space-lg); }
+        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(6,182,212,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #7EE787; }
+        .code-function { color: #D2A8FF; }
+        
+        /* DIVIDER */
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: var(--font-base); font-weight: 600; }
+        .footer-brand span { color: var(--brand-orange); }
+        .footer-meta { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔗 Category 14</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">🏠</span> Category Overview</a></li>
+            <li><a href="#gateway"><span class="nav-icon">🚪</span> API Gateway</a></li>
+            <li><a href="#events"><span class="nav-icon">📡</span> Event Architecture</a></li>
+            <li><a href="#connectors"><span class="nav-icon">🔌</span> Connectors</a></li>
+            <li><a href="#lifecycle"><span class="nav-icon">🔄</span> API Lifecycle</a></li>
+            <li><a href="#webhooks"><span class="nav-icon">🪝</span> Webhooks</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔗 Category 14</span>
+                <h1>Integration & APIs</h1>
+                <p>Connect systems, orchestrate data flows, and build event-driven architectures with modern API management and integration patterns.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">83%</div><div class="hero-metric-label">Apps Use APIs</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">$5.1B</div><div class="hero-metric-label">iPaaS Market</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2.5M</div><div class="hero-metric-label">Calls/Day Avg</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">47ms</div><div class="hero-metric-label">P95 Latency</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: API GATEWAY -->
+        <section class="module" id="gateway">
+            <div class="module-header">
+                <div class="module-icon">🚪</div>
+                <div class="module-info">
+                    <h2>API Gateway Architecture</h2>
+                    <p>Centralized request routing, authentication, and traffic management</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The API Gateway serves as the single entry point for all client requests, handling cross-cutting concerns like authentication, rate limiting, and request routing. This pattern decouples clients from backend services and enables consistent policy enforcement across all APIs.</p>
+            </div>
+            
+            <!-- API Gateway Flow -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🌐 Request Flow Through Gateway</div>
+                    <div class="viz-badge">Live Traffic</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 280" class="viz-svg">
+                        <defs>
+                            <pattern id="apiGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                            <marker id="apiArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#06B6D4"/>
+                            </marker>
+                            <marker id="apiArrowGreen" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#10B981"/>
+                            </marker>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#apiGrid)"/>
+                        
+                        <!-- Clients -->
+                        <g transform="translate(30, 60)">
+                            <rect width="70" height="45" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="35" y="22" text-anchor="middle" fill="#60A5FA" font-size="16">📱</text>
+                            <text x="35" y="38" text-anchor="middle" fill="#6a6a7a" font-size="8">Mobile</text>
+                        </g>
+                        <g transform="translate(30, 120)">
+                            <rect width="70" height="45" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="35" y="22" text-anchor="middle" fill="#60A5FA" font-size="16">💻</text>
+                            <text x="35" y="38" text-anchor="middle" fill="#6a6a7a" font-size="8">Web App</text>
+                        </g>
+                        <g transform="translate(30, 180)">
+                            <rect width="70" height="45" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="35" y="22" text-anchor="middle" fill="#60A5FA" font-size="16">🤖</text>
+                            <text x="35" y="38" text-anchor="middle" fill="#6a6a7a" font-size="8">Partner</text>
+                        </g>
+                        
+                        <!-- Request arrows to gateway -->
+                        <path d="M 105 82 L 150 140" stroke="#3B82F6" stroke-width="2" marker-end="url(#apiArrow)" stroke-dasharray="4,2">
+                            <animate attributeName="stroke-dashoffset" from="12" to="0" dur="0.5s" repeatCount="indefinite"/>
+                        </path>
+                        <path d="M 105 142 L 150 140" stroke="#3B82F6" stroke-width="2" marker-end="url(#apiArrow)" stroke-dasharray="4,2">
+                            <animate attributeName="stroke-dashoffset" from="12" to="0" dur="0.5s" repeatCount="indefinite"/>
+                        </path>
+                        <path d="M 105 202 L 150 145" stroke="#3B82F6" stroke-width="2" marker-end="url(#apiArrow)" stroke-dasharray="4,2">
+                            <animate attributeName="stroke-dashoffset" from="12" to="0" dur="0.5s" repeatCount="indefinite"/>
+                        </path>
+                        
+                        <!-- API Gateway Box -->
+                        <g transform="translate(160, 70)" filter="url(#glow)">
+                            <rect width="180" height="140" rx="12" fill="#1a1a2e" stroke="#06B6D4" stroke-width="3"/>
+                            <rect x="0" y="0" width="180" height="32" rx="12" fill="#06B6D4"/>
+                            <text x="90" y="22" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">API GATEWAY</text>
+                            
+                            <!-- Gateway functions -->
+                            <g transform="translate(15, 45)">
+                                <rect width="70" height="24" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="35" y="16" text-anchor="middle" fill="#22D3EE" font-size="8">🔐 Auth</text>
+                            </g>
+                            <g transform="translate(95, 45)">
+                                <rect width="70" height="24" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="35" y="16" text-anchor="middle" fill="#22D3EE" font-size="8">⏱️ Rate Limit</text>
+                            </g>
+                            <g transform="translate(15, 78)">
+                                <rect width="70" height="24" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="35" y="16" text-anchor="middle" fill="#22D3EE" font-size="8">🔀 Routing</text>
+                            </g>
+                            <g transform="translate(95, 78)">
+                                <rect width="70" height="24" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="35" y="16" text-anchor="middle" fill="#22D3EE" font-size="8">📊 Logging</text>
+                            </g>
+                            <g transform="translate(55, 111)">
+                                <rect width="70" height="24" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="35" y="16" text-anchor="middle" fill="#22D3EE" font-size="8">⚖️ Load Bal</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Arrows from gateway to services -->
+                        <path d="M 345 110 L 410 70" stroke="#06B6D4" stroke-width="2" marker-end="url(#apiArrow)"/>
+                        <path d="M 345 140 L 410 140" stroke="#06B6D4" stroke-width="2" marker-end="url(#apiArrow)"/>
+                        <path d="M 345 170 L 410 210" stroke="#06B6D4" stroke-width="2" marker-end="url(#apiArrow)"/>
+                        
+                        <!-- Backend Services -->
+                        <g transform="translate(420, 35)">
+                            <rect width="120" height="60" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="60" y="25" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">User Service</text>
+                            <text x="60" y="45" text-anchor="middle" fill="#6a6a7a" font-size="9">/api/v1/users</text>
+                        </g>
+                        <g transform="translate(420, 110)">
+                            <rect width="120" height="60" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="60" y="25" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">Order Service</text>
+                            <text x="60" y="45" text-anchor="middle" fill="#6a6a7a" font-size="9">/api/v1/orders</text>
+                        </g>
+                        <g transform="translate(420, 185)">
+                            <rect width="120" height="60" rx="8" fill="#1a1a2e" stroke="#7C3AED" stroke-width="2"/>
+                            <text x="60" y="25" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="600">Data Service</text>
+                            <text x="60" y="45" text-anchor="middle" fill="#6a6a7a" font-size="9">/api/v1/data</text>
+                        </g>
+                        
+                        <!-- Arrows to data stores -->
+                        <path d="M 545 65 L 600 65" stroke="#10B981" stroke-width="2" marker-end="url(#apiArrowGreen)"/>
+                        <path d="M 545 140 L 600 140" stroke="#F59E0B" stroke-width="2" marker-end="url(#apiArrow)"/>
+                        <path d="M 545 215 L 600 215" stroke="#7C3AED" stroke-width="2" marker-end="url(#apiArrow)"/>
+                        
+                        <!-- Data Stores -->
+                        <g transform="translate(610, 35)">
+                            <rect width="80" height="60" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="40" y="30" text-anchor="middle" fill="#34D399" font-size="18">🗄️</text>
+                            <text x="40" y="48" text-anchor="middle" fill="#6a6a7a" font-size="8">PostgreSQL</text>
+                        </g>
+                        <g transform="translate(610, 110)">
+                            <rect width="80" height="60" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="40" y="30" text-anchor="middle" fill="#FBBF24" font-size="18">🗄️</text>
+                            <text x="40" y="48" text-anchor="middle" fill="#6a6a7a" font-size="8">MongoDB</text>
+                        </g>
+                        <g transform="translate(610, 185)">
+                            <rect width="80" height="60" rx="8" fill="#1a1a2e" stroke="#7C3AED" stroke-width="2"/>
+                            <text x="40" y="30" text-anchor="middle" fill="#A78BFA" font-size="18">🗄️</text>
+                            <text x="40" y="48" text-anchor="middle" fill="#6a6a7a" font-size="8">Redis Cache</text>
+                        </g>
+                        
+                        <!-- Metrics Panel -->
+                        <g transform="translate(720, 50)">
+                            <rect width="160" height="180" rx="10" fill="#1a1a2e" stroke="#2a2a3e" stroke-width="1"/>
+                            <text x="80" y="25" text-anchor="middle" fill="#6a6a7a" font-size="10" font-weight="600">LIVE METRICS</text>
+                            <line x1="20" y1="35" x2="140" y2="35" stroke="#2a2a3e"/>
+                            
+                            <text x="20" y="55" fill="#6a6a7a" font-size="9">Requests/sec</text>
+                            <text x="140" y="55" text-anchor="end" fill="#22D3EE" font-size="10" font-weight="600">2,847</text>
+                            
+                            <text x="20" y="80" fill="#6a6a7a" font-size="9">Avg Latency</text>
+                            <text x="140" y="80" text-anchor="end" fill="#34D399" font-size="10" font-weight="600">23ms</text>
+                            
+                            <text x="20" y="105" fill="#6a6a7a" font-size="9">Error Rate</text>
+                            <text x="140" y="105" text-anchor="end" fill="#34D399" font-size="10" font-weight="600">0.02%</text>
+                            
+                            <text x="20" y="130" fill="#6a6a7a" font-size="9">Auth Success</text>
+                            <text x="140" y="130" text-anchor="end" fill="#34D399" font-size="10" font-weight="600">99.8%</text>
+                            
+                            <text x="20" y="155" fill="#6a6a7a" font-size="9">Rate Limited</text>
+                            <text x="140" y="155" text-anchor="end" fill="#FBBF24" font-size="10" font-weight="600">147</text>
+                            
+                            <text x="20" y="170" fill="#6a6a7a" font-size="9">Cache Hit</text>
+                            <text x="140" y="170" text-anchor="end" fill="#A78BFA" font-size="10" font-weight="600">89%</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 2: EVENT ARCHITECTURE -->
+        <section class="module" id="events">
+            <div class="module-header">
+                <div class="module-icon">📡</div>
+                <div class="module-info">
+                    <h2>Event-Driven Architecture</h2>
+                    <p>Asynchronous messaging with pub/sub patterns and event streaming</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Event-driven architecture enables loose coupling between services through asynchronous message passing. Producers emit events to topics without knowledge of consumers, allowing independent scaling and evolution of system components.</p>
+            </div>
+            
+            <!-- Event Mesh -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📨 Event Mesh - Pub/Sub Flow</div>
+                    <div class="viz-badge">Streaming</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 300" class="viz-svg">
+                        <defs>
+                            <pattern id="eventGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#eventGrid)"/>
+                        
+                        <!-- Producers -->
+                        <text x="80" y="25" text-anchor="middle" fill="#EF4444" font-size="10" font-weight="600">PRODUCERS</text>
+                        
+                        <g transform="translate(40, 40)">
+                            <rect width="80" height="50" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                            <text x="40" y="25" text-anchor="middle" fill="#F87171" font-size="14">🛒</text>
+                            <text x="40" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Orders</text>
+                        </g>
+                        <g transform="translate(40, 105)">
+                            <rect width="80" height="50" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                            <text x="40" y="25" text-anchor="middle" fill="#F87171" font-size="14">👤</text>
+                            <text x="40" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Users</text>
+                        </g>
+                        <g transform="translate(40, 170)">
+                            <rect width="80" height="50" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                            <text x="40" y="25" text-anchor="middle" fill="#F87171" font-size="14">💳</text>
+                            <text x="40" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Payments</text>
+                        </g>
+                        <g transform="translate(40, 235)">
+                            <rect width="80" height="50" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                            <text x="40" y="25" text-anchor="middle" fill="#F87171" font-size="14">📦</text>
+                            <text x="40" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Inventory</text>
+                        </g>
+                        
+                        <!-- Animated event dots from producers to broker -->
+                        <circle r="4" fill="#EF4444">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 125 65 L 280 150"/>
+                        </circle>
+                        <circle r="4" fill="#EF4444">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 125 130 L 280 150" begin="0.3s"/>
+                        </circle>
+                        <circle r="4" fill="#EF4444">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 125 195 L 280 150" begin="0.6s"/>
+                        </circle>
+                        <circle r="4" fill="#EF4444">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 125 260 L 280 150" begin="0.9s"/>
+                        </circle>
+                        
+                        <!-- Connection lines to broker -->
+                        <path d="M 125 65 L 280 130" stroke="#3a3a4e" stroke-width="1"/>
+                        <path d="M 125 130 L 280 140" stroke="#3a3a4e" stroke-width="1"/>
+                        <path d="M 125 195 L 280 160" stroke="#3a3a4e" stroke-width="1"/>
+                        <path d="M 125 260 L 280 170" stroke="#3a3a4e" stroke-width="1"/>
+                        
+                        <!-- Message Broker -->
+                        <g transform="translate(280, 60)">
+                            <rect width="160" height="180" rx="12" fill="#1a1a2e" stroke="#06B6D4" stroke-width="3"/>
+                            <rect x="0" y="0" width="160" height="32" rx="12" fill="#06B6D4"/>
+                            <text x="80" y="21" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">MESSAGE BROKER</text>
+                            
+                            <!-- Topics -->
+                            <g transform="translate(15, 45)">
+                                <rect width="130" height="28" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="10" y="18" fill="#22D3EE" font-size="9">📌 order.created</text>
+                                <circle cx="115" cy="14" r="6" fill="#10B981"/>
+                                <text cx="115" cy="17" text-anchor="middle" fill="#fff" font-size="6">24</text>
+                            </g>
+                            <g transform="translate(15, 80)">
+                                <rect width="130" height="28" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="10" y="18" fill="#22D3EE" font-size="9">📌 user.registered</text>
+                                <circle cx="115" cy="14" r="6" fill="#10B981"/>
+                            </g>
+                            <g transform="translate(15, 115)">
+                                <rect width="130" height="28" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="10" y="18" fill="#22D3EE" font-size="9">📌 payment.complete</text>
+                                <circle cx="115" cy="14" r="6" fill="#FBBF24"/>
+                            </g>
+                            <g transform="translate(15, 150)">
+                                <rect width="130" height="28" rx="4" fill="#12121a" stroke="#0891B2"/>
+                                <text x="10" y="18" fill="#22D3EE" font-size="9">📌 inventory.updated</text>
+                                <circle cx="115" cy="14" r="6" fill="#10B981"/>
+                            </g>
+                        </g>
+                        
+                        <!-- Connection lines to consumers -->
+                        <path d="M 445 110 L 540 65" stroke="#3a3a4e" stroke-width="1"/>
+                        <path d="M 445 130 L 540 130" stroke="#3a3a4e" stroke-width="1"/>
+                        <path d="M 445 170 L 540 195" stroke="#3a3a4e" stroke-width="1"/>
+                        <path d="M 445 190 L 540 260" stroke="#3a3a4e" stroke-width="1"/>
+                        
+                        <!-- Animated event dots from broker to consumers -->
+                        <circle r="4" fill="#10B981">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 445 110 L 540 65" begin="0.2s"/>
+                        </circle>
+                        <circle r="4" fill="#10B981">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 445 130 L 540 130" begin="0.5s"/>
+                        </circle>
+                        <circle r="4" fill="#10B981">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 445 170 L 540 195" begin="0.8s"/>
+                        </circle>
+                        <circle r="4" fill="#10B981">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 445 190 L 540 260" begin="1.1s"/>
+                        </circle>
+                        
+                        <!-- Consumers -->
+                        <text x="600" y="25" text-anchor="middle" fill="#10B981" font-size="10" font-weight="600">CONSUMERS</text>
+                        
+                        <g transform="translate(540, 40)">
+                            <rect width="100" height="50" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="25" text-anchor="middle" fill="#34D399" font-size="14">📧</text>
+                            <text x="50" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Notifications</text>
+                        </g>
+                        <g transform="translate(540, 105)">
+                            <rect width="100" height="50" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="25" text-anchor="middle" fill="#34D399" font-size="14">📊</text>
+                            <text x="50" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Analytics</text>
+                        </g>
+                        <g transform="translate(540, 170)">
+                            <rect width="100" height="50" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="25" text-anchor="middle" fill="#34D399" font-size="14">🔍</text>
+                            <text x="50" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">Search Index</text>
+                        </g>
+                        <g transform="translate(540, 235)">
+                            <rect width="100" height="50" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="25" text-anchor="middle" fill="#34D399" font-size="14">🤖</text>
+                            <text x="50" y="42" text-anchor="middle" fill="#6a6a7a" font-size="8">ML Pipeline</text>
+                        </g>
+                        
+                        <!-- Stats -->
+                        <g transform="translate(680, 80)">
+                            <rect width="130" height="140" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="65" y="22" text-anchor="middle" fill="#6a6a7a" font-size="9" font-weight="600">STREAM STATS</text>
+                            <line x1="15" y1="32" x2="115" y2="32" stroke="#2a2a3e"/>
+                            
+                            <text x="15" y="52" fill="#6a6a7a" font-size="8">Events/sec</text>
+                            <text x="115" y="52" text-anchor="end" fill="#22D3EE" font-size="9" font-weight="600">12,847</text>
+                            
+                            <text x="15" y="72" fill="#6a6a7a" font-size="8">Avg Lag</text>
+                            <text x="115" y="72" text-anchor="end" fill="#34D399" font-size="9" font-weight="600">45ms</text>
+                            
+                            <text x="15" y="92" fill="#6a6a7a" font-size="8">Partitions</text>
+                            <text x="115" y="92" text-anchor="end" fill="#A78BFA" font-size="9" font-weight="600">24</text>
+                            
+                            <text x="15" y="112" fill="#6a6a7a" font-size="8">Replicas</text>
+                            <text x="115" y="112" text-anchor="end" fill="#FBBF24" font-size="9" font-weight="600">3</text>
+                            
+                            <text x="15" y="132" fill="#6a6a7a" font-size="8">Retention</text>
+                            <text x="115" y="132" text-anchor="end" fill="#6a6a7a" font-size="9" font-weight="600">7 days</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 3: INTEGRATION AGENTS -->
+        <section class="module" id="agents">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Integration Automation Agents</h2>
+                    <p>AI-powered API management, monitoring, and orchestration</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Integration agents automate the complex tasks of API lifecycle management, from documentation generation to anomaly detection. These agents work together as a service mesh, each handling specific integration concerns while communicating through events.</p>
+            </div>
+            
+            <!-- Service Mesh Visualization -->
+            <div class="mesh-container">
+                <div class="mesh-header">
+                    <div class="mesh-icon">🕸️</div>
+                    <div class="mesh-title">
+                        <h3>Integration Agent Mesh</h3>
+                        <p>Interconnected agents processing API requests and events</p>
+                    </div>
+                </div>
+                <div class="mesh-canvas">
+                    <svg viewBox="0 0 800 320" class="mesh-svg">
+                        <defs>
+                            <pattern id="meshGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <circle cx="15" cy="15" r="1" fill="#1a1a2e"/>
+                            </pattern>
+                            <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#meshGrid)"/>
+                        
+                        <!-- Connection lines (behind nodes) -->
+                        <g stroke="#2a2a3e" stroke-width="2" fill="none">
+                            <!-- Central to outer connections -->
+                            <line x1="400" y1="160" x2="180" y2="80">
+                                <animate attributeName="stroke" values="#2a2a3e;#06B6D4;#2a2a3e" dur="2s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="400" y1="160" x2="620" y2="80">
+                                <animate attributeName="stroke" values="#2a2a3e;#06B6D4;#2a2a3e" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+                            </line>
+                            <line x1="400" y1="160" x2="140" y2="200">
+                                <animate attributeName="stroke" values="#2a2a3e;#06B6D4;#2a2a3e" dur="2s" repeatCount="indefinite" begin="0.6s"/>
+                            </line>
+                            <line x1="400" y1="160" x2="660" y2="200">
+                                <animate attributeName="stroke" values="#2a2a3e;#06B6D4;#2a2a3e" dur="2s" repeatCount="indefinite" begin="0.9s"/>
+                            </line>
+                            <line x1="400" y1="160" x2="280" y2="280">
+                                <animate attributeName="stroke" values="#2a2a3e;#06B6D4;#2a2a3e" dur="2s" repeatCount="indefinite" begin="1.2s"/>
+                            </line>
+                            <line x1="400" y1="160" x2="520" y2="280">
+                                <animate attributeName="stroke" values="#2a2a3e;#06B6D4;#2a2a3e" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+                            </line>
+                            
+                            <!-- Outer ring connections -->
+                            <path d="M 180 80 Q 400 30 620 80" stroke="#1a1a2e"/>
+                            <path d="M 140 200 Q 100 140 180 80" stroke="#1a1a2e"/>
+                            <path d="M 620 80 Q 700 140 660 200" stroke="#1a1a2e"/>
+                            <path d="M 140 200 Q 180 250 280 280" stroke="#1a1a2e"/>
+                            <path d="M 660 200 Q 620 250 520 280" stroke="#1a1a2e"/>
+                            <path d="M 280 280 Q 400 310 520 280" stroke="#1a1a2e"/>
+                        </g>
+                        
+                        <!-- Animated request particles -->
+                        <circle r="3" fill="#06B6D4">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M 400 160 L 180 80 L 400 160 L 620 80 L 400 160"/>
+                        </circle>
+                        <circle r="3" fill="#10B981">
+                            <animateMotion dur="2.5s" repeatCount="indefinite" path="M 400 160 L 140 200 L 280 280 L 400 160" begin="0.5s"/>
+                        </circle>
+                        <circle r="3" fill="#F59E0B">
+                            <animateMotion dur="2.2s" repeatCount="indefinite" path="M 400 160 L 660 200 L 520 280 L 400 160" begin="1s"/>
+                        </circle>
+                        
+                        <!-- Central Orchestrator Node -->
+                        <g transform="translate(400, 160)" filter="url(#nodeGlow)">
+                            <circle r="50" fill="#1a1a2e" stroke="#06B6D4" stroke-width="3"/>
+                            <circle r="40" fill="#06B6D4" opacity="0.2"/>
+                            <text y="-8" text-anchor="middle" fill="#22D3EE" font-size="24">🎯</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">Orchestrator</text>
+                            <text y="25" text-anchor="middle" fill="#6a6a7a" font-size="7">Routes & Coordinates</text>
+                        </g>
+                        
+                        <!-- Agent 1: API Monitor -->
+                        <g transform="translate(180, 80)" filter="url(#nodeGlow)">
+                            <circle r="38" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <circle r="30" fill="#3B82F6" opacity="0.2"/>
+                            <text y="-5" text-anchor="middle" fill="#60A5FA" font-size="20">📊</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">Monitor</text>
+                            <text y="23" text-anchor="middle" fill="#6a6a7a" font-size="6">Health & Metrics</text>
+                        </g>
+                        
+                        <!-- Agent 2: Schema Validator -->
+                        <g transform="translate(620, 80)" filter="url(#nodeGlow)">
+                            <circle r="38" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <circle r="30" fill="#10B981" opacity="0.2"/>
+                            <text y="-5" text-anchor="middle" fill="#34D399" font-size="20">✅</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">Validator</text>
+                            <text y="23" text-anchor="middle" fill="#6a6a7a" font-size="6">Schema Check</text>
+                        </g>
+                        
+                        <!-- Agent 3: Doc Generator -->
+                        <g transform="translate(140, 200)" filter="url(#nodeGlow)">
+                            <circle r="38" fill="#1a1a2e" stroke="#7C3AED" stroke-width="2"/>
+                            <circle r="30" fill="#7C3AED" opacity="0.2"/>
+                            <text y="-5" text-anchor="middle" fill="#A78BFA" font-size="20">📝</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">DocGen</text>
+                            <text y="23" text-anchor="middle" fill="#6a6a7a" font-size="6">OpenAPI Spec</text>
+                        </g>
+                        
+                        <!-- Agent 4: Security Scanner -->
+                        <g transform="translate(660, 200)" filter="url(#nodeGlow)">
+                            <circle r="38" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                            <circle r="30" fill="#EF4444" opacity="0.2"/>
+                            <text y="-5" text-anchor="middle" fill="#F87171" font-size="20">🔒</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">Security</text>
+                            <text y="23" text-anchor="middle" fill="#6a6a7a" font-size="6">Vuln Scan</text>
+                        </g>
+                        
+                        <!-- Agent 5: Rate Manager -->
+                        <g transform="translate(280, 280)" filter="url(#nodeGlow)">
+                            <circle r="38" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <circle r="30" fill="#F59E0B" opacity="0.2"/>
+                            <text y="-5" text-anchor="middle" fill="#FBBF24" font-size="20">⚡</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">RateMgr</text>
+                            <text y="23" text-anchor="middle" fill="#6a6a7a" font-size="6">Throttle & Quota</text>
+                        </g>
+                        
+                        <!-- Agent 6: Transform Agent -->
+                        <g transform="translate(520, 280)" filter="url(#nodeGlow)">
+                            <circle r="38" fill="#1a1a2e" stroke="#EC4899" stroke-width="2"/>
+                            <circle r="30" fill="#EC4899" opacity="0.2"/>
+                            <text y="-5" text-anchor="middle" fill="#F472B6" font-size="20">🔄</text>
+                            <text y="12" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">Transform</text>
+                            <text y="23" text-anchor="middle" fill="#6a6a7a" font-size="6">Map & Convert</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="mesh-stats">
+                    <div class="mesh-stat">
+                        <span class="mesh-stat-label">Active Agents:</span>
+                        <span class="mesh-stat-value">7</span>
+                    </div>
+                    <div class="mesh-stat">
+                        <span class="mesh-stat-label">Requests/min:</span>
+                        <span class="mesh-stat-value">4,892</span>
+                    </div>
+                    <div class="mesh-stat">
+                        <span class="mesh-stat-label">Avg Response:</span>
+                        <span class="mesh-stat-value">12ms</span>
+                    </div>
+                    <div class="mesh-stat">
+                        <span class="mesh-stat-label">Mesh Health:</span>
+                        <span class="mesh-stat-value" style="color: #34D399;">Optimal</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent + Code Section -->
+            <div class="agent-section">
+                <div class="agent-section-header">
+                    <div class="agent-section-tag">Agent This</div>
+                    <div class="agent-section-title">Integration Automation System</div>
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-info">
+                        <div class="agent-avatar">🔗</div>
+                        <div class="agent-name">IntegrationCrew</div>
+                        <div class="agent-role">Multi-Agent API Orchestration</div>
+                        <p class="agent-desc">Coordinates specialized agents to manage API lifecycle, monitor health, validate schemas, and enforce security policies across all integration endpoints.</p>
+                        <ul class="agent-capabilities">
+                            <li>Auto-generate OpenAPI documentation</li>
+                            <li>Real-time API health monitoring</li>
+                            <li>Schema validation and versioning</li>
+                            <li>Security vulnerability scanning</li>
+                            <li>Rate limiting and quota management</li>
+                            <li>Request/response transformation</li>
+                            <li>Anomaly detection and alerting</li>
+                        </ul>
+                    </div>
+                    <div class="code-panel">
+                        <div class="code-header">
+                            <div class="code-tabs">
+                                <div class="code-tab active">Python</div>
+                                <div class="code-tab">YAML</div>
+                            </div>
+                            <div class="code-filename">integration_crew.py</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><span class="code-comment"># Integration Automation Crew</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+<span class="code-comment"># Initialize LLM</span>
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Integration Agents</span>
+monitor_agent = Agent(
+    role=<span class="code-string">"API Health Monitor"</span>,
+    goal=<span class="code-string">"Track API performance and detect anomalies"</span>,
+    backstory=<span class="code-string">"""Expert at monitoring API health metrics,
+    latency patterns, and error rates in real-time."""</span>,
+    llm=llm,
+    tools=[prometheus_tool, grafana_tool, alertmanager]
+)
+
+validator_agent = Agent(
+    role=<span class="code-string">"Schema Validation Engineer"</span>,
+    goal=<span class="code-string">"Ensure API contracts are valid and consistent"</span>,
+    backstory=<span class="code-string">"""Specialist in OpenAPI specs, JSON Schema,
+    and API contract testing."""</span>,
+    llm=llm,
+    tools=[openapi_parser, schema_validator, diff_tool]
+)
+
+security_agent = Agent(
+    role=<span class="code-string">"API Security Analyst"</span>,
+    goal=<span class="code-string">"Identify and remediate API vulnerabilities"</span>,
+    backstory=<span class="code-string">"""Security expert focused on OWASP API Top 10,
+    authentication flaws, and injection attacks."""</span>,
+    llm=llm,
+    tools=[owasp_scanner, auth_tester, injection_detector]
+)
+
+docgen_agent = Agent(
+    role=<span class="code-string">"Documentation Generator"</span>,
+    goal=<span class="code-string">"Auto-generate and update API documentation"</span>,
+    backstory=<span class="code-string">"""Technical writer who creates clear, accurate
+    API docs from code and OpenAPI specs."""</span>,
+    llm=llm,
+    tools=[swagger_ui, redoc_tool, markdown_gen]
+)
+
+<span class="code-comment"># Create Integration Crew</span>
+integration_crew = Crew(
+    agents=[monitor_agent, validator_agent, 
+            security_agent, docgen_agent],
+    process=Process.hierarchical,
+    manager_llm=llm,
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">process_api_request</span>(endpoint: str):
+    <span class="code-string">"""Process and validate an API endpoint."""</span>
+    tasks = [
+        Task(
+            description=<span class="code-string">f"Monitor health of {endpoint}"</span>,
+            agent=monitor_agent
+        ),
+        Task(
+            description=<span class="code-string">"Validate schema compliance"</span>,
+            agent=validator_agent
+        ),
+        Task(
+            description=<span class="code-string">"Scan for security issues"</span>,
+            agent=security_agent
+        ),
+        Task(
+            description=<span class="code-string">"Update documentation"</span>,
+            agent=docgen_agent
+        )
+    ]
+    <span class="code-keyword">return await</span> integration_crew.kickoff_async(tasks=tasks)</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS SECTION -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Integration Tools</h2>
+                    <p>API gateways, message brokers, and iPaaS platforms</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟠</div>
+                        <div class="tool-card-name">Kong Gateway</div>
+                    </div>
+                    <div class="tool-card-desc">Cloud-native API gateway with plugins for auth, rate limiting, and observability.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟢</div>
+                        <div class="tool-card-name">Apache Kafka</div>
+                    </div>
+                    <div class="tool-card-desc">Distributed event streaming platform for high-throughput, fault-tolerant messaging.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔵</div>
+                        <div class="tool-card-name">MuleSoft</div>
+                    </div>
+                    <div class="tool-card-desc">Enterprise iPaaS for connecting applications, data, and devices across cloud and on-prem.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟣</div>
+                        <div class="tool-card-name">Postman</div>
+                    </div>
+                    <div class="tool-card-desc">API platform for building, testing, documenting, and monitoring APIs collaboratively.</div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
+        <div class="footer-meta">Category 14: Integration & APIs | Strategy Hub</div>
+    </div>
+</footer>
+
+</body>
+</html>

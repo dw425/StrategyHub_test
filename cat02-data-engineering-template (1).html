@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Engineering | Category 02 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 02 - DATA ENGINEERING TEAL */
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* ARCHITECTURE COMPARISON */
+        .arch-compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .arch-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .arch-header { padding: 16px; border-bottom: 1px solid var(--border-color); }
+        .arch-icon { font-size: 28px; margin-bottom: 8px; }
+        .arch-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .arch-subtitle { font-size: 10px; color: var(--text-muted); }
+        .arch-body { padding: 16px; }
+        .arch-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .arch-traits { list-style: none; }
+        .arch-traits li { font-size: 10px; padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .arch-traits li:last-child { border-bottom: none; }
+        .arch-traits .label { color: var(--text-muted); width: 70px; }
+        .arch-traits .value { color: var(--text-primary); font-weight: 500; }
+        .arch-card.lake .arch-header { background: linear-gradient(135deg, rgba(59,130,246,0.2), transparent); border-bottom-color: var(--blue); }
+        .arch-card.warehouse .arch-header { background: linear-gradient(135deg, rgba(139,92,246,0.2), transparent); border-bottom-color: var(--violet); }
+        .arch-card.lakehouse .arch-header { background: linear-gradient(135deg, rgba(20,184,166,0.2), transparent); border-bottom-color: var(--cat-primary); }
+        
+        /* PIPELINE VISUALIZATION */
+        .pipeline-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .pipeline-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .pipeline-title { font-size: 13px; font-weight: 600; }
+        .pipeline-toggle { display: flex; gap: 4px; }
+        .pipeline-toggle-btn { padding: 4px 12px; font-size: 10px; border: 1px solid var(--border-color); background: var(--bg-card-alt); color: var(--text-muted); border-radius: 6px; cursor: pointer; }
+        .pipeline-toggle-btn.active { background: var(--cat-glow); border-color: var(--cat-primary); color: var(--cat-light); }
+        .pipeline-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        /* DATA QUALITY */
+        .quality-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+        .quality-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .quality-icon { font-size: 24px; margin-bottom: 8px; }
+        .quality-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .quality-desc { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+        
+        /* BATCH VS STREAM */
+        .compare-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .compare-header { display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .compare-header-cell { padding: 12px 16px; font-size: 12px; font-weight: 600; text-align: center; }
+        .compare-header-cell:first-child { text-align: left; }
+        .compare-header-cell.batch { color: var(--blue); }
+        .compare-header-cell.stream { color: var(--green); }
+        .compare-row { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border-color); }
+        .compare-row:last-child { border-bottom: none; }
+        .compare-cell { padding: 12px 16px; font-size: 11px; display: flex; align-items: center; }
+        .compare-cell:first-child { color: var(--text-muted); font-weight: 500; }
+        .compare-cell:not(:first-child) { justify-content: center; }
+        
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-tag { font-size: 8px; padding: 2px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        /* LAYER DIAGRAM */
+        .layer-stack { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .layer-row { display: flex; gap: 8px; }
+        .layer-card { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; }
+        .layer-card.full { flex: none; width: 100%; }
+        .layer-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .layer-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .layer-items { display: flex; flex-wrap: wrap; gap: 6px; }
+        .layer-item { font-size: 9px; padding: 4px 8px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-secondary); }
+        .layer-card.ingestion { border-left: 3px solid var(--blue); }
+        .layer-card.storage { border-left: 3px solid var(--violet); }
+        .layer-card.processing { border-left: 3px solid var(--cat-primary); }
+        .layer-card.serving { border-left: 3px solid var(--green); }
+        .layer-card.orchestration { border-left: 3px solid var(--yellow); }
+        
+        /* CODE PANEL */
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(20,184,166,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: 14px; font-weight: 600; }
+        .footer-brand span { color: var(--brand-orange); }
+        .footer-meta { font-size: 12px; color: var(--text-muted); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .arch-compare { grid-template-columns: 1fr; }
+            .tools-grid, .quality-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔧 Category 02</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Data Architecture</a></li>
+            <li><a href="#pipeline"><span class="nav-icon">⚙️</span> ETL/ELT Pipelines</a></li>
+            <li><a href="#processing"><span class="nav-icon">⚡</span> Batch vs Stream</a></li>
+            <li><a href="#quality"><span class="nav-icon">✅</span> Data Quality</a></li>
+            <li><a href="#stack"><span class="nav-icon">📚</span> Modern Data Stack</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools & Platforms</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🔧 Category 02</span>
+                <h1>Data Engineering</h1>
+                <p>Design and build robust data infrastructure. From ingestion pipelines to data warehouses, master the systems that power modern analytics and AI applications.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">175 ZB</div><div class="hero-metric-label">Global Data by 2025</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">$138B</div><div class="hero-metric-label">Data Infra Market</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">68%</div><div class="hero-metric-label">Data Unused</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5x</div><div class="hero-metric-label">ROI on Quality Data</div></div>
+            </div>
+        </section>
+
+        <!-- DATA ARCHITECTURE -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Data Architecture Patterns</h2>
+                    <p>Compare data lake, warehouse, and lakehouse architectures</p>
+                </div>
+            </div>
+            
+            <div class="arch-compare">
+                <div class="arch-card lake">
+                    <div class="arch-header">
+                        <div class="arch-icon">🌊</div>
+                        <div class="arch-title">Data Lake</div>
+                        <div class="arch-subtitle">Schema-on-read storage</div>
+                    </div>
+                    <div class="arch-body">
+                        <div class="arch-desc">Raw data storage at scale. Store all data types in native format, apply schema when querying. Ideal for data exploration and ML workloads.</div>
+                        <ul class="arch-traits">
+                            <li><span class="label">Schema</span><span class="value">On-read (flexible)</span></li>
+                            <li><span class="label">Data Types</span><span class="value">All (structured, semi, unstructured)</span></li>
+                            <li><span class="label">Cost</span><span class="value">💰 Low storage cost</span></li>
+                            <li><span class="label">Query Speed</span><span class="value">⚡ Variable</span></li>
+                            <li><span class="label">Best For</span><span class="value">ML, exploration, raw storage</span></li>
+                            <li><span class="label">Examples</span><span class="value">S3, ADLS, GCS</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="arch-card warehouse">
+                    <div class="arch-header">
+                        <div class="arch-icon">🏭</div>
+                        <div class="arch-title">Data Warehouse</div>
+                        <div class="arch-subtitle">Schema-on-write analytics</div>
+                    </div>
+                    <div class="arch-body">
+                        <div class="arch-desc">Optimized for analytical queries. Pre-defined schemas, ACID transactions, fast SQL performance. Powers BI dashboards and reports.</div>
+                        <ul class="arch-traits">
+                            <li><span class="label">Schema</span><span class="value">On-write (strict)</span></li>
+                            <li><span class="label">Data Types</span><span class="value">Structured only</span></li>
+                            <li><span class="label">Cost</span><span class="value">💰💰💰 Higher (compute)</span></li>
+                            <li><span class="label">Query Speed</span><span class="value">⚡⚡⚡ Fast SQL</span></li>
+                            <li><span class="label">Best For</span><span class="value">BI, reporting, analytics</span></li>
+                            <li><span class="label">Examples</span><span class="value">Snowflake, BigQuery, Redshift</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="arch-card lakehouse">
+                    <div class="arch-header">
+                        <div class="arch-icon">🏠</div>
+                        <div class="arch-title">Data Lakehouse</div>
+                        <div class="arch-subtitle">Best of both worlds</div>
+                    </div>
+                    <div class="arch-body">
+                        <div class="arch-desc">Combines lake flexibility with warehouse performance. ACID transactions on object storage, supports both SQL analytics and ML workloads.</div>
+                        <ul class="arch-traits">
+                            <li><span class="label">Schema</span><span class="value">Both (flexible + enforced)</span></li>
+                            <li><span class="label">Data Types</span><span class="value">All types supported</span></li>
+                            <li><span class="label">Cost</span><span class="value">💰💰 Balanced</span></li>
+                            <li><span class="label">Query Speed</span><span class="value">⚡⚡ Fast + flexible</span></li>
+                            <li><span class="label">Best For</span><span class="value">Unified analytics + ML</span></li>
+                            <li><span class="label">Examples</span><span class="value">Databricks, Delta Lake, Iceberg</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ETL/ELT PIPELINE -->
+        <section class="module" id="pipeline">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>ETL vs ELT Pipelines</h2>
+                    <p>Data movement and transformation patterns for modern architectures</p>
+                </div>
+            </div>
+            
+            <!-- Visual Comparison -->
+            <div class="pipeline-viz">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">📊 Pipeline Architecture Deep Dive</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 500" style="width: 100%; height: auto;">
+                        <defs>
+                            <marker id="etlArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#F59E0B"/>
+                            </marker>
+                            <marker id="eltArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#14B8A6"/>
+                            </marker>
+                        </defs>
+                        
+                        <!-- ETL Section -->
+                        <g transform="translate(20, 20)">
+                            <rect x="0" y="0" width="860" height="200" rx="12" fill="#F59E0B08" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="430" y="30" text-anchor="middle" fill="#FBBF24" font-size="16" font-weight="700">ETL — Extract, Transform, Load</text>
+                            <text x="430" y="48" text-anchor="middle" fill="#6a6a7a" font-size="10">Transform BEFORE loading • Best when: compute is cheaper than storage, need data cleansing before warehouse</text>
+                            
+                            <!-- Source -->
+                            <g transform="translate(30, 70)">
+                                <rect width="130" height="100" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                                <text x="65" y="25" text-anchor="middle" fill="#60A5FA" font-size="12" font-weight="600">SOURCES</text>
+                                <text x="65" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">• Databases (Oracle, SQL)</text>
+                                <text x="65" y="60" text-anchor="middle" fill="#a0a0b0" font-size="9">• APIs & SaaS apps</text>
+                                <text x="65" y="75" text-anchor="middle" fill="#a0a0b0" font-size="9">• Flat files (CSV, JSON)</text>
+                                <text x="65" y="90" text-anchor="middle" fill="#a0a0b0" font-size="9">• Legacy systems</text>
+                            </g>
+                            
+                            <!-- Arrow to Transform -->
+                            <line x1="165" y1="120" x2="210" y2="120" stroke="#F59E0B" stroke-width="3" marker-end="url(#etlArrow)"/>
+                            <text x="187" y="108" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">EXTRACT</text>
+                            
+                            <!-- Transform Server (HIGHLIGHTED) -->
+                            <g transform="translate(220, 60)">
+                                <rect width="200" height="120" rx="8" fill="#F59E0B25" stroke="#F59E0B" stroke-width="3"/>
+                                <text x="100" y="25" text-anchor="middle" fill="#FBBF24" font-size="12" font-weight="700">⚡ TRANSFORM</text>
+                                <text x="100" y="42" text-anchor="middle" fill="#F59E0B" font-size="9">(ETL Server / Staging)</text>
+                                <line x1="20" y1="52" x2="180" y2="52" stroke="#F59E0B40"/>
+                                <text x="100" y="68" text-anchor="middle" fill="#a0a0b0" font-size="9">• Data cleansing & validation</text>
+                                <text x="100" y="82" text-anchor="middle" fill="#a0a0b0" font-size="9">• Business rule application</text>
+                                <text x="100" y="96" text-anchor="middle" fill="#a0a0b0" font-size="9">• Schema conformance</text>
+                                <text x="100" y="110" text-anchor="middle" fill="#a0a0b0" font-size="9">• Aggregations & joins</text>
+                            </g>
+                            
+                            <!-- Arrow to Warehouse -->
+                            <line x1="425" y1="120" x2="470" y2="120" stroke="#F59E0B" stroke-width="3" marker-end="url(#etlArrow)"/>
+                            <text x="447" y="108" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">LOAD</text>
+                            
+                            <!-- Warehouse -->
+                            <g transform="translate(480, 70)">
+                                <rect width="160" height="100" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                                <text x="80" y="25" text-anchor="middle" fill="#A78BFA" font-size="12" font-weight="600">DATA WAREHOUSE</text>
+                                <text x="80" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">• Clean, structured data</text>
+                                <text x="80" y="60" text-anchor="middle" fill="#a0a0b0" font-size="9">• Star/snowflake schema</text>
+                                <text x="80" y="75" text-anchor="middle" fill="#a0a0b0" font-size="9">• Ready for BI queries</text>
+                                <text x="80" y="90" text-anchor="middle" fill="#6a6a7a" font-size="8">Teradata, Oracle DW</text>
+                            </g>
+                            
+                            <!-- Arrow to Consumers -->
+                            <line x1="645" y1="120" x2="690" y2="120" stroke="#8B5CF6" stroke-width="2"/>
+                            
+                            <!-- Consumers -->
+                            <g transform="translate(700, 80)">
+                                <rect width="130" height="80" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                                <text x="65" y="25" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">CONSUMERS</text>
+                                <text x="65" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">• BI Dashboards</text>
+                                <text x="65" y="60" text-anchor="middle" fill="#a0a0b0" font-size="9">• Reports</text>
+                                <text x="65" y="75" text-anchor="middle" fill="#a0a0b0" font-size="9">• OLAP Cubes</text>
+                            </g>
+                        </g>
+                        
+                        <!-- ELT Section -->
+                        <g transform="translate(20, 240)">
+                            <rect x="0" y="0" width="860" height="200" rx="12" fill="#14B8A608" stroke="#14B8A6" stroke-width="2"/>
+                            <text x="430" y="30" text-anchor="middle" fill="#2DD4BF" font-size="16" font-weight="700">ELT — Extract, Load, Transform</text>
+                            <text x="430" y="48" text-anchor="middle" fill="#6a6a7a" font-size="10">Load raw FIRST, transform in-place • Best when: cloud warehouse has compute power, need raw data access</text>
+                            
+                            <!-- Source -->
+                            <g transform="translate(30, 70)">
+                                <rect width="130" height="100" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                                <text x="65" y="25" text-anchor="middle" fill="#60A5FA" font-size="12" font-weight="600">SOURCES</text>
+                                <text x="65" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">• Cloud databases</text>
+                                <text x="65" y="60" text-anchor="middle" fill="#a0a0b0" font-size="9">• SaaS applications</text>
+                                <text x="65" y="75" text-anchor="middle" fill="#a0a0b0" font-size="9">• Event streams</text>
+                                <text x="65" y="90" text-anchor="middle" fill="#a0a0b0" font-size="9">• IoT / Sensors</text>
+                            </g>
+                            
+                            <!-- Arrow to Raw Zone -->
+                            <line x1="165" y1="120" x2="210" y2="120" stroke="#3B82F6" stroke-width="3"/>
+                            <text x="187" y="108" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">EXTRACT</text>
+                            
+                            <!-- Raw Zone / Lake -->
+                            <g transform="translate(220, 70)">
+                                <rect width="160" height="100" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                                <text x="80" y="25" text-anchor="middle" fill="#A78BFA" font-size="12" font-weight="600">LOAD RAW</text>
+                                <text x="80" y="42" text-anchor="middle" fill="#8B5CF6" font-size="9">(Landing Zone)</text>
+                                <text x="80" y="60" text-anchor="middle" fill="#a0a0b0" font-size="9">• Raw, unprocessed data</text>
+                                <text x="80" y="75" text-anchor="middle" fill="#a0a0b0" font-size="9">• Schema-on-read</text>
+                                <text x="80" y="90" text-anchor="middle" fill="#6a6a7a" font-size="8">Snowflake, BigQuery, Databricks</text>
+                            </g>
+                            
+                            <!-- Arrow to Transform -->
+                            <line x1="385" y1="120" x2="430" y2="120" stroke="#14B8A6" stroke-width="3" marker-end="url(#eltArrow)"/>
+                            <text x="407" y="108" text-anchor="middle" fill="#2DD4BF" font-size="9" font-weight="600">QUERY</text>
+                            
+                            <!-- Transform IN WAREHOUSE (HIGHLIGHTED) -->
+                            <g transform="translate(440, 60)">
+                                <rect width="200" height="120" rx="8" fill="#14B8A625" stroke="#14B8A6" stroke-width="3"/>
+                                <text x="100" y="25" text-anchor="middle" fill="#2DD4BF" font-size="12" font-weight="700">⚡ TRANSFORM</text>
+                                <text x="100" y="42" text-anchor="middle" fill="#14B8A6" font-size="9">(In-Warehouse with dbt)</text>
+                                <line x1="20" y1="52" x2="180" y2="52" stroke="#14B8A640"/>
+                                <text x="100" y="68" text-anchor="middle" fill="#a0a0b0" font-size="9">• SQL-based transforms</text>
+                                <text x="100" y="82" text-anchor="middle" fill="#a0a0b0" font-size="9">• Materialized views</text>
+                                <text x="100" y="96" text-anchor="middle" fill="#a0a0b0" font-size="9">• Incremental models</text>
+                                <text x="100" y="110" text-anchor="middle" fill="#a0a0b0" font-size="9">• Version controlled</text>
+                            </g>
+                            
+                            <!-- Arrow to Consumers -->
+                            <line x1="645" y1="120" x2="690" y2="120" stroke="#14B8A6" stroke-width="2"/>
+                            
+                            <!-- Consumers (Broader) -->
+                            <g transform="translate(700, 70)">
+                                <rect width="130" height="100" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                                <text x="65" y="25" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">CONSUMERS</text>
+                                <text x="65" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">• BI & Analytics</text>
+                                <text x="65" y="60" text-anchor="middle" fill="#a0a0b0" font-size="9">• ML / Data Science</text>
+                                <text x="65" y="75" text-anchor="middle" fill="#a0a0b0" font-size="9">• Reverse ETL</text>
+                                <text x="65" y="90" text-anchor="middle" fill="#a0a0b0" font-size="9">• Operational Apps</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Key difference callout -->
+                        <g transform="translate(20, 460)">
+                            <rect width="420" height="30" rx="6" fill="#F59E0B15" stroke="#F59E0B"/>
+                            <text x="210" y="20" text-anchor="middle" fill="#FBBF24" font-size="10">ETL: Transform happens on separate ETL server BEFORE warehouse</text>
+                        </g>
+                        <g transform="translate(460, 460)">
+                            <rect width="420" height="30" rx="6" fill="#14B8A615" stroke="#14B8A6"/>
+                            <text x="210" y="20" text-anchor="middle" fill="#2DD4BF" font-size="10">ELT: Transform happens INSIDE the warehouse using its compute</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Detailed Comparison Table -->
+            <div style="display: grid; grid-template-columns: 200px 1fr 1fr; gap: 2px; background: var(--border-color); border-radius: 12px; overflow: hidden; margin-top: 20px;">
+                <div style="background: var(--bg-card-alt); padding: 14px 16px; font-size: 12px; font-weight: 600;">Dimension</div>
+                <div style="background: var(--bg-card-alt); padding: 14px 16px; font-size: 12px; font-weight: 600; color: #FBBF24;">🔶 ETL (Traditional)</div>
+                <div style="background: var(--bg-card-alt); padding: 14px 16px; font-size: 12px; font-weight: 600; color: #2DD4BF;">🔷 ELT (Modern)</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Transform Location</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Separate ETL server / staging area</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Inside cloud data warehouse</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Data Landing</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Clean, structured data only</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Raw data preserved (data lake pattern)</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Scalability</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Limited by ETL server capacity</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Scales with warehouse (elastic compute)</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Flexibility</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Schema changes require pipeline rebuild</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Re-transform raw data as needs evolve</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Cost Model</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Pay for always-on ETL infrastructure</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Pay-per-query compute (Snowflake credits)</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Data Latency</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Batch-oriented (hourly/daily)</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Near real-time possible with streaming ingest</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Best For</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">On-prem, regulated industries, small data</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Cloud-native, big data, agile analytics</div>
+                
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px; color: var(--text-muted);">Tools</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">Informatica, Talend, SSIS, DataStage</div>
+                <div style="background: var(--bg-card); padding: 12px 16px; font-size: 11px;">dbt, Fivetran + Snowflake, Airbyte + BigQuery</div>
+            </div>
+            
+            <!-- When to Use Each -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+                <div style="background: linear-gradient(135deg, #F59E0B15, transparent); border: 1px solid #F59E0B; border-radius: 12px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #FBBF24; margin-bottom: 12px;">🔶 Choose ETL When...</div>
+                    <ul style="list-style: none; font-size: 11px; color: var(--text-secondary); line-height: 2;">
+                        <li>✓ On-premises data warehouse (no elastic compute)</li>
+                        <li>✓ Strict data governance requires cleansing before load</li>
+                        <li>✓ Complex transformations need specialized ETL tools</li>
+                        <li>✓ Source data is sensitive and shouldn't be stored raw</li>
+                        <li>✓ Legacy systems with limited warehouse capacity</li>
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(135deg, #14B8A615, transparent); border: 1px solid #14B8A6; border-radius: 12px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #2DD4BF; margin-bottom: 12px;">🔷 Choose ELT When...</div>
+                    <ul style="list-style: none; font-size: 11px; color: var(--text-secondary); line-height: 2;">
+                        <li>✓ Using cloud warehouse (Snowflake, BigQuery, Databricks)</li>
+                        <li>✓ Want to preserve raw data for future unknown use cases</li>
+                        <li>✓ Need agility—transform logic changes frequently</li>
+                        <li>✓ Large data volumes that benefit from MPP compute</li>
+                        <li>✓ Data teams prefer SQL-based transformations (dbt)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BATCH VS STREAM -->
+        <section class="module" id="processing">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Batch vs Stream Processing</h2>
+                    <p>Choose the right processing paradigm for your latency and throughput requirements</p>
+                </div>
+            </div>
+            
+            <!-- Visual Architecture Comparison -->
+            <div class="pipeline-viz">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">⚡ Processing Architecture Patterns</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 380" style="width: 100%; height: auto;">
+                        <!-- Batch Processing -->
+                        <g transform="translate(20, 20)">
+                            <rect x="0" y="0" width="420" height="160" rx="10" fill="#3B82F610" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="210" y="25" text-anchor="middle" fill="#60A5FA" font-size="14" font-weight="700">🗃️ BATCH PROCESSING</text>
+                            <text x="210" y="42" text-anchor="middle" fill="#6a6a7a" font-size="9">Process complete datasets at scheduled intervals</text>
+                            
+                            <!-- Data blocks -->
+                            <g transform="translate(30, 60)">
+                                <rect width="25" height="25" rx="3" fill="#3B82F650" stroke="#3B82F6"/>
+                                <rect x="30" y="0" width="25" height="25" rx="3" fill="#3B82F650" stroke="#3B82F6"/>
+                                <rect x="60" y="0" width="25" height="25" rx="3" fill="#3B82F650" stroke="#3B82F6"/>
+                                <rect x="0" y="30" width="25" height="25" rx="3" fill="#3B82F650" stroke="#3B82F6"/>
+                                <rect x="30" y="30" width="25" height="25" rx="3" fill="#3B82F650" stroke="#3B82F6"/>
+                                <rect x="60" y="30" width="25" height="25" rx="3" fill="#3B82F650" stroke="#3B82F6"/>
+                                <text x="42" y="80" text-anchor="middle" fill="#6a6a7a" font-size="8">Data Block</text>
+                            </g>
+                            
+                            <!-- Arrow -->
+                            <path d="M 130 95 L 180 95" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="155" y="88" text-anchor="middle" fill="#3B82F6" font-size="8">Schedule</text>
+                            
+                            <!-- Processing -->
+                            <g transform="translate(190, 65)">
+                                <rect width="80" height="60" rx="6" fill="#1a1a2e" stroke="#3B82F6"/>
+                                <text x="40" y="25" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">PROCESS</text>
+                                <text x="40" y="40" text-anchor="middle" fill="#6a6a7a" font-size="8">All at once</text>
+                                <text x="40" y="52" text-anchor="middle" fill="#6a6a7a" font-size="8">⏰ Hourly/Daily</text>
+                            </g>
+                            
+                            <!-- Arrow -->
+                            <path d="M 280 95 L 320 95" stroke="#3B82F6" stroke-width="2"/>
+                            
+                            <!-- Output -->
+                            <g transform="translate(330, 65)">
+                                <rect width="70" height="60" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="35" y="25" text-anchor="middle" fill="#34D399" font-size="9" font-weight="600">OUTPUT</text>
+                                <text x="35" y="40" text-anchor="middle" fill="#6a6a7a" font-size="8">Complete</text>
+                                <text x="35" y="52" text-anchor="middle" fill="#6a6a7a" font-size="8">results</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Stream Processing -->
+                        <g transform="translate(460, 20)">
+                            <rect x="0" y="0" width="420" height="160" rx="10" fill="#F59E0B10" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="210" y="25" text-anchor="middle" fill="#FBBF24" font-size="14" font-weight="700">⚡ STREAM PROCESSING</text>
+                            <text x="210" y="42" text-anchor="middle" fill="#6a6a7a" font-size="9">Process data continuously as it arrives</text>
+                            
+                            <!-- Stream of events -->
+                            <g transform="translate(30, 75)">
+                                <circle cx="0" cy="0" r="8" fill="#F59E0B"/>
+                                <circle cx="20" cy="0" r="8" fill="#F59E0B"/>
+                                <circle cx="40" cy="0" r="8" fill="#F59E0B"/>
+                                <circle cx="60" cy="0" r="8" fill="#F59E0B80"/>
+                                <circle cx="80" cy="0" r="8" fill="#F59E0B50"/>
+                                <path d="M 90 0 L 110 0" stroke="#F59E0B" stroke-dasharray="3"/>
+                                <text x="40" y="25" text-anchor="middle" fill="#6a6a7a" font-size="8">Event Stream</text>
+                            </g>
+                            
+                            <!-- Arrow -->
+                            <path d="M 145 75 L 185 75" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="165" y="68" text-anchor="middle" fill="#F59E0B" font-size="8">Continuous</text>
+                            
+                            <!-- Processing -->
+                            <g transform="translate(195, 45)">
+                                <rect width="80" height="60" rx="6" fill="#1a1a2e" stroke="#F59E0B"/>
+                                <text x="40" y="25" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">PROCESS</text>
+                                <text x="40" y="40" text-anchor="middle" fill="#6a6a7a" font-size="8">Per-event or</text>
+                                <text x="40" y="52" text-anchor="middle" fill="#6a6a7a" font-size="8">micro-batch</text>
+                            </g>
+                            
+                            <!-- Arrow -->
+                            <path d="M 285 75 L 325 75" stroke="#F59E0B" stroke-width="2"/>
+                            
+                            <!-- Output -->
+                            <g transform="translate(335, 45)">
+                                <rect width="70" height="60" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="35" y="25" text-anchor="middle" fill="#34D399" font-size="9" font-weight="600">OUTPUT</text>
+                                <text x="35" y="40" text-anchor="middle" fill="#6a6a7a" font-size="8">Real-time</text>
+                                <text x="35" y="52" text-anchor="middle" fill="#6a6a7a" font-size="8">updates</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Lambda/Kappa Architecture -->
+                        <g transform="translate(20, 200)">
+                            <rect x="0" y="0" width="860" height="160" rx="10" fill="#8B5CF610" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="430" y="25" text-anchor="middle" fill="#A78BFA" font-size="14" font-weight="700">🔄 UNIFIED / LAMBDA ARCHITECTURE</text>
+                            <text x="430" y="42" text-anchor="middle" fill="#6a6a7a" font-size="9">Combine batch accuracy with streaming speed — many modern tools support both!</text>
+                            
+                            <!-- Sources -->
+                            <g transform="translate(30, 60)">
+                                <rect width="80" height="80" rx="6" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="40" y="30" text-anchor="middle" fill="#a0a0b0" font-size="10" font-weight="600">SOURCE</text>
+                                <text x="40" y="50" text-anchor="middle" fill="#6a6a7a" font-size="8">Events +</text>
+                                <text x="40" y="62" text-anchor="middle" fill="#6a6a7a" font-size="8">Historical</text>
+                            </g>
+                            
+                            <!-- Split into two paths -->
+                            <path d="M 115 85 L 150 85 L 150 70 L 180 70" stroke="#3B82F6" stroke-width="2"/>
+                            <path d="M 115 115 L 150 115 L 150 130 L 180 130" stroke="#F59E0B" stroke-width="2"/>
+                            
+                            <!-- Batch Path -->
+                            <g transform="translate(185, 50)">
+                                <rect width="120" height="45" rx="4" fill="#3B82F620" stroke="#3B82F6"/>
+                                <text x="60" y="18" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">BATCH LAYER</text>
+                                <text x="60" y="33" text-anchor="middle" fill="#6a6a7a" font-size="8">Accurate, complete</text>
+                            </g>
+                            
+                            <!-- Speed Path -->
+                            <g transform="translate(185, 105)">
+                                <rect width="120" height="45" rx="4" fill="#F59E0B20" stroke="#F59E0B"/>
+                                <text x="60" y="18" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">SPEED LAYER</text>
+                                <text x="60" y="33" text-anchor="middle" fill="#6a6a7a" font-size="8">Fast, approximate</text>
+                            </g>
+                            
+                            <!-- Merge -->
+                            <path d="M 310 73 L 340 73 L 340 100 L 370 100" stroke="#3B82F6" stroke-width="2"/>
+                            <path d="M 310 127 L 340 127 L 340 100 L 370 100" stroke="#F59E0B" stroke-width="2"/>
+                            
+                            <!-- Serving -->
+                            <g transform="translate(375, 70)">
+                                <rect width="100" height="60" rx="6" fill="#8B5CF630" stroke="#8B5CF6"/>
+                                <text x="50" y="22" text-anchor="middle" fill="#A78BFA" font-size="9" font-weight="600">SERVING</text>
+                                <text x="50" y="36" text-anchor="middle" fill="#6a6a7a" font-size="8">Merge views</text>
+                                <text x="50" y="50" text-anchor="middle" fill="#6a6a7a" font-size="8">Query layer</text>
+                            </g>
+                            
+                            <!-- Arrow to output -->
+                            <path d="M 480 100 L 510 100" stroke="#8B5CF6" stroke-width="2"/>
+                            
+                            <!-- Output -->
+                            <g transform="translate(515, 70)">
+                                <rect width="90" height="60" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="45" y="22" text-anchor="middle" fill="#34D399" font-size="9" font-weight="600">OUTPUT</text>
+                                <text x="45" y="38" text-anchor="middle" fill="#6a6a7a" font-size="8">Best of both:</text>
+                                <text x="45" y="50" text-anchor="middle" fill="#6a6a7a" font-size="8">Fast + Accurate</text>
+                            </g>
+                            
+                            <!-- Unified tools list -->
+                            <g transform="translate(630, 55)">
+                                <text x="0" y="12" fill="#A78BFA" font-size="10" font-weight="600">Unified Engines:</text>
+                                <text x="0" y="30" fill="#a0a0b0" font-size="9">• Apache Spark (batch + structured streaming)</text>
+                                <text x="0" y="45" fill="#a0a0b0" font-size="9">• Apache Flink (native streaming + batch)</text>
+                                <text x="0" y="60" fill="#a0a0b0" font-size="9">• Apache Beam (unified programming model)</text>
+                                <text x="0" y="75" fill="#a0a0b0" font-size="9">• Databricks (Delta Live Tables)</text>
+                                <text x="0" y="90" fill="#a0a0b0" font-size="9">• Kafka Streams + ksqlDB</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Detailed Comparison -->
+            <div style="display: grid; grid-template-columns: 180px 1fr 1fr 1fr; gap: 2px; background: var(--border-color); border-radius: 12px; overflow: hidden; margin-top: 20px;">
+                <div style="background: var(--bg-card-alt); padding: 12px; font-size: 11px; font-weight: 600;">Characteristic</div>
+                <div style="background: var(--bg-card-alt); padding: 12px; font-size: 11px; font-weight: 600; color: #60A5FA;">🗃️ Batch</div>
+                <div style="background: var(--bg-card-alt); padding: 12px; font-size: 11px; font-weight: 600; color: #FBBF24;">⚡ Stream</div>
+                <div style="background: var(--bg-card-alt); padding: 12px; font-size: 11px; font-weight: 600; color: #A78BFA;">🔄 Micro-Batch</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Latency</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Minutes → Hours</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Milliseconds → Seconds</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Seconds → Minutes</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Data Boundary</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Bounded (known start/end)</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Unbounded (infinite stream)</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Unbounded, windowed</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Processing</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Full dataset scans</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Per-event or time windows</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Small batches (e.g., 10s)</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">State Management</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Stateless (recompute all)</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Stateful (checkpoints, exactly-once)</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Hybrid state handling</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Fault Tolerance</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Re-run entire job</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Checkpoint recovery</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Checkpoint + replay</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Complexity</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">⭐⭐ Lower (simpler debugging)</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">⭐⭐⭐⭐ Higher (ordering, late data)</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">⭐⭐⭐ Medium</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Cost Efficiency</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Spot instances, schedule off-peak</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Always-on infrastructure</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Moderate (can scale down)</div>
+                
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px; color: var(--text-muted);">Example Use Cases</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">ETL, reports, ML training, backfills</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Fraud detection, live dashboards, IoT</div>
+                <div style="background: var(--bg-card); padding: 10px 12px; font-size: 10px;">Near-real-time analytics, CDC</div>
+            </div>
+            
+            <!-- Tools Grid -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px;">
+                <div style="background: var(--bg-card); border: 1px solid #3B82F6; border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; color: #60A5FA; margin-bottom: 12px;">🗃️ Batch-First Tools</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Apache Hive</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Presto / Trino</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">dbt</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">AWS Glue</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Snowflake Tasks</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">BigQuery Scheduled</span>
+                    </div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid #F59E0B; border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; color: #FBBF24; margin-bottom: 12px;">⚡ Stream-First Tools</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Apache Kafka</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Apache Flink</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Kafka Streams</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">AWS Kinesis</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">GCP Pub/Sub</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px;">Azure Event Hubs</span>
+                    </div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid #8B5CF6; border-radius: 12px; padding: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; color: #A78BFA; margin-bottom: 12px;">🔄 Unified (Both) Tools</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span style="font-size: 10px; padding: 4px 10px; background: #8B5CF620; border-radius: 4px; color: #A78BFA;">Apache Spark</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: #8B5CF620; border-radius: 4px; color: #A78BFA;">Apache Beam</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: #8B5CF620; border-radius: 4px; color: #A78BFA;">Databricks</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: #8B5CF620; border-radius: 4px; color: #A78BFA;">Materialize</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: #8B5CF620; border-radius: 4px; color: #A78BFA;">RisingWave</span>
+                        <span style="font-size: 10px; padding: 4px 10px; background: #8B5CF620; border-radius: 4px; color: #A78BFA;">Decodable</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA QUALITY -->
+        <section class="module" id="quality">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Data Quality Dimensions</h2>
+                    <p>Measure, monitor, and improve data quality across the six core dimensions</p>
+                </div>
+            </div>
+            
+            <!-- Data Quality Framework Visualization -->
+            <div class="pipeline-viz">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">✅ Data Quality Framework — Detection → Measurement → Remediation</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 340" style="width: 100%; height: auto;">
+                        <!-- Center Hub -->
+                        <circle cx="450" cy="170" r="60" fill="#14B8A620" stroke="#14B8A6" stroke-width="3"/>
+                        <text x="450" y="160" text-anchor="middle" fill="#2DD4BF" font-size="12" font-weight="700">DATA</text>
+                        <text x="450" y="178" text-anchor="middle" fill="#2DD4BF" font-size="12" font-weight="700">QUALITY</text>
+                        <text x="450" y="196" text-anchor="middle" fill="#6a6a7a" font-size="9">Score: 94%</text>
+                        
+                        <!-- Dimension 1: Accuracy (top) -->
+                        <g transform="translate(400, 20)">
+                            <rect width="100" height="70" rx="8" fill="#EF444420" stroke="#EF4444" stroke-width="2"/>
+                            <text x="50" y="22" text-anchor="middle" fill="#F87171" font-size="11" font-weight="700">ACCURACY</text>
+                            <text x="50" y="40" text-anchor="middle" fill="#a0a0b0" font-size="8">Data reflects</text>
+                            <text x="50" y="52" text-anchor="middle" fill="#a0a0b0" font-size="8">real-world truth</text>
+                            <text x="50" y="66" text-anchor="middle" fill="#EF4444" font-size="10" font-weight="600">98.2%</text>
+                        </g>
+                        <line x1="450" y1="90" x2="450" y2="110" stroke="#EF4444" stroke-width="2"/>
+                        
+                        <!-- Dimension 2: Completeness (top-right) -->
+                        <g transform="translate(560, 60)">
+                            <rect width="100" height="70" rx="8" fill="#10B98120" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="22" text-anchor="middle" fill="#34D399" font-size="11" font-weight="700">COMPLETENESS</text>
+                            <text x="50" y="40" text-anchor="middle" fill="#a0a0b0" font-size="8">No missing</text>
+                            <text x="50" y="52" text-anchor="middle" fill="#a0a0b0" font-size="8">values/records</text>
+                            <text x="50" y="66" text-anchor="middle" fill="#10B981" font-size="10" font-weight="600">96.5%</text>
+                        </g>
+                        <line x1="510" y1="130" x2="560" y2="95" stroke="#10B981" stroke-width="2"/>
+                        
+                        <!-- Dimension 3: Consistency (bottom-right) -->
+                        <g transform="translate(560, 210)">
+                            <rect width="100" height="70" rx="8" fill="#3B82F620" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="50" y="22" text-anchor="middle" fill="#60A5FA" font-size="11" font-weight="700">CONSISTENCY</text>
+                            <text x="50" y="40" text-anchor="middle" fill="#a0a0b0" font-size="8">Same across</text>
+                            <text x="50" y="52" text-anchor="middle" fill="#a0a0b0" font-size="8">all systems</text>
+                            <text x="50" y="66" text-anchor="middle" fill="#3B82F6" font-size="10" font-weight="600">91.3%</text>
+                        </g>
+                        <line x1="510" y1="200" x2="560" y2="245" stroke="#3B82F6" stroke-width="2"/>
+                        
+                        <!-- Dimension 4: Timeliness (bottom) -->
+                        <g transform="translate(400, 250)">
+                            <rect width="100" height="70" rx="8" fill="#F59E0B20" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="50" y="22" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="700">TIMELINESS</text>
+                            <text x="50" y="40" text-anchor="middle" fill="#a0a0b0" font-size="8">Available when</text>
+                            <text x="50" y="52" text-anchor="middle" fill="#a0a0b0" font-size="8">needed, current</text>
+                            <text x="50" y="66" text-anchor="middle" fill="#F59E0B" font-size="10" font-weight="600">94.8%</text>
+                        </g>
+                        <line x1="450" y1="230" x2="450" y2="250" stroke="#F59E0B" stroke-width="2"/>
+                        
+                        <!-- Dimension 5: Validity (bottom-left) -->
+                        <g transform="translate(240, 210)">
+                            <rect width="100" height="70" rx="8" fill="#8B5CF620" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="50" y="22" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="700">VALIDITY</text>
+                            <text x="50" y="40" text-anchor="middle" fill="#a0a0b0" font-size="8">Conforms to</text>
+                            <text x="50" y="52" text-anchor="middle" fill="#a0a0b0" font-size="8">rules & formats</text>
+                            <text x="50" y="66" text-anchor="middle" fill="#8B5CF6" font-size="10" font-weight="600">97.1%</text>
+                        </g>
+                        <line x1="390" y1="200" x2="340" y2="245" stroke="#8B5CF6" stroke-width="2"/>
+                        
+                        <!-- Dimension 6: Uniqueness (top-left) -->
+                        <g transform="translate(240, 60)">
+                            <rect width="100" height="70" rx="8" fill="#EC489920" stroke="#EC4899" stroke-width="2"/>
+                            <text x="50" y="22" text-anchor="middle" fill="#F472B6" font-size="11" font-weight="700">UNIQUENESS</text>
+                            <text x="50" y="40" text-anchor="middle" fill="#a0a0b0" font-size="8">No duplicate</text>
+                            <text x="50" y="52" text-anchor="middle" fill="#a0a0b0" font-size="8">records</text>
+                            <text x="50" y="66" text-anchor="middle" fill="#EC4899" font-size="10" font-weight="600">99.4%</text>
+                        </g>
+                        <line x1="390" y1="130" x2="340" y2="95" stroke="#EC4899" stroke-width="2"/>
+                        
+                        <!-- Right side: Quality checks -->
+                        <g transform="translate(700, 40)">
+                            <text x="0" y="0" fill="#fff" font-size="12" font-weight="600">Quality Checks</text>
+                            <g transform="translate(0, 15)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Schema validation</text>
+                            </g>
+                            <g transform="translate(0, 47)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Null checks</text>
+                            </g>
+                            <g transform="translate(0, 79)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Range/bounds validation</text>
+                            </g>
+                            <g transform="translate(0, 111)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Referential integrity</text>
+                            </g>
+                            <g transform="translate(0, 143)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Freshness (SLA tracking)</text>
+                            </g>
+                            <g transform="translate(0, 175)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Distribution anomalies</text>
+                            </g>
+                            <g transform="translate(0, 207)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Cross-source consistency</text>
+                            </g>
+                            <g transform="translate(0, 239)">
+                                <rect width="180" height="26" rx="4" fill="#1a1a2e"/>
+                                <text x="10" y="17" fill="#a0a0b0" font-size="9">✓ Custom business rules</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Left side: Impact -->
+                        <g transform="translate(20, 40)">
+                            <text x="0" y="0" fill="#fff" font-size="12" font-weight="600">Poor Quality Impact</text>
+                            <g transform="translate(0, 15)">
+                                <rect width="180" height="40" rx="4" fill="#EF444420" stroke="#EF4444"/>
+                                <text x="10" y="17" fill="#F87171" font-size="9" font-weight="600">💰 Cost</text>
+                                <text x="10" y="32" fill="#a0a0b0" font-size="8">$12.9M avg annual loss</text>
+                            </g>
+                            <g transform="translate(0, 65)">
+                                <rect width="180" height="40" rx="4" fill="#F59E0B20" stroke="#F59E0B"/>
+                                <text x="10" y="17" fill="#FBBF24" font-size="9" font-weight="600">⏱️ Time</text>
+                                <text x="10" y="32" fill="#a0a0b0" font-size="8">40% of analyst time wasted</text>
+                            </g>
+                            <g transform="translate(0, 115)">
+                                <rect width="180" height="40" rx="4" fill="#8B5CF620" stroke="#8B5CF6"/>
+                                <text x="10" y="17" fill="#A78BFA" font-size="9" font-weight="600">📉 Trust</text>
+                                <text x="10" y="32" fill="#a0a0b0" font-size="8">Users abandon dashboards</text>
+                            </g>
+                            <g transform="translate(0, 165)">
+                                <rect width="180" height="40" rx="4" fill="#EC489920" stroke="#EC4899"/>
+                                <text x="10" y="17" fill="#F472B6" font-size="9" font-weight="600">⚠️ Compliance</text>
+                                <text x="10" y="32" fill="#a0a0b0" font-size="8">GDPR/HIPAA violations</text>
+                            </g>
+                            <g transform="translate(0, 215)">
+                                <rect width="180" height="40" rx="4" fill="#3B82F620" stroke="#3B82F6"/>
+                                <text x="10" y="17" fill="#60A5FA" font-size="9" font-weight="600">🤖 ML Impact</text>
+                                <text x="10" y="32" fill="#a0a0b0" font-size="8">Garbage in = garbage out</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Detailed Dimension Breakdown -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #EF4444;">
+                    <div style="font-size: 13px; font-weight: 700; color: #F87171; margin-bottom: 8px;">🎯 Accuracy</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Does the data correctly represent the real-world entity or event it describes?</div>
+                    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">HOW TO MEASURE:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Sample audit vs source of truth</li>
+                        <li>• Reconciliation reports (finance)</li>
+                        <li>• User feedback / data corrections</li>
+                    </ul>
+                    <div style="font-size: 9px; color: var(--text-muted); margin: 8px 0; font-weight: 600;">COMMON ISSUES:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Typos in manual entry</li>
+                        <li>• Outdated reference data</li>
+                        <li>• Incorrect data type conversions</li>
+                    </ul>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #10B981;">
+                    <div style="font-size: 13px; font-weight: 700; color: #34D399; margin-bottom: 8px;">✅ Completeness</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Is all required data present? Are there missing values, records, or attributes?</div>
+                    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">HOW TO MEASURE:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Null/empty field percentage</li>
+                        <li>• Row counts vs expected</li>
+                        <li>• Required field coverage %</li>
+                    </ul>
+                    <div style="font-size: 9px; color: var(--text-muted); margin: 8px 0; font-weight: 600;">COMMON ISSUES:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Optional fields left blank</li>
+                        <li>• Dropped records in ETL</li>
+                        <li>• Late-arriving data</li>
+                    </ul>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #3B82F6;">
+                    <div style="font-size: 13px; font-weight: 700; color: #60A5FA; margin-bottom: 8px;">🔄 Consistency</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Is the same data represented identically across different systems and tables?</div>
+                    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">HOW TO MEASURE:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Cross-system reconciliation</li>
+                        <li>• Duplicate key detection</li>
+                        <li>• Hash comparison between sources</li>
+                    </ul>
+                    <div style="font-size: 9px; color: var(--text-muted); margin: 8px 0; font-weight: 600;">COMMON ISSUES:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Different date formats</li>
+                        <li>• Conflicting customer IDs</li>
+                        <li>• Unsynchronized updates</li>
+                    </ul>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #F59E0B;">
+                    <div style="font-size: 13px; font-weight: 700; color: #FBBF24; margin-bottom: 8px;">⏰ Timeliness</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Is data available when needed? Is it current enough for its intended use?</div>
+                    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">HOW TO MEASURE:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Data freshness (age of records)</li>
+                        <li>• SLA compliance %</li>
+                        <li>• Pipeline latency tracking</li>
+                    </ul>
+                    <div style="font-size: 9px; color: var(--text-muted); margin: 8px 0; font-weight: 600;">COMMON ISSUES:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Batch job delays</li>
+                        <li>• Source system latency</li>
+                        <li>• Time zone misalignment</li>
+                    </ul>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #8B5CF6;">
+                    <div style="font-size: 13px; font-weight: 700; color: #A78BFA; margin-bottom: 8px;">✔️ Validity</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Does data conform to defined formats, types, ranges, and business rules?</div>
+                    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">HOW TO MEASURE:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Schema validation errors</li>
+                        <li>• Business rule violations</li>
+                        <li>• Regex pattern matching</li>
+                    </ul>
+                    <div style="font-size: 9px; color: var(--text-muted); margin: 8px 0; font-weight: 600;">COMMON ISSUES:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Invalid email formats</li>
+                        <li>• Out-of-range values</li>
+                        <li>• Wrong enum/category values</li>
+                    </ul>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; border-top: 3px solid #EC4899;">
+                    <div style="font-size: 13px; font-weight: 700; color: #F472B6; margin-bottom: 8px;">🔑 Uniqueness</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Are there duplicate records that should be unique? Is the primary key truly unique?</div>
+                    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">HOW TO MEASURE:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Duplicate key count</li>
+                        <li>• Fuzzy matching for near-dupes</li>
+                        <li>• Distinct ratio analysis</li>
+                    </ul>
+                    <div style="font-size: 9px; color: var(--text-muted); margin: 8px 0; font-weight: 600;">COMMON ISSUES:</div>
+                    <ul style="list-style: none; font-size: 9px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>• Double-loaded batches</li>
+                        <li>• Merge/acquisition duplicates</li>
+                        <li>• Weak identity resolution</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Tools -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 20px;">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">🛠️ Data Quality Tools & Frameworks</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="font-size: 10px; padding: 6px 12px; background: linear-gradient(135deg, #10B98130, transparent); border: 1px solid #10B981; border-radius: 6px; color: #34D399;">Great Expectations</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: linear-gradient(135deg, #3B82F630, transparent); border: 1px solid #3B82F6; border-radius: 6px; color: #60A5FA;">Monte Carlo</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: linear-gradient(135deg, #8B5CF630, transparent); border: 1px solid #8B5CF6; border-radius: 6px; color: #A78BFA;">dbt Tests</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: linear-gradient(135deg, #F59E0B30, transparent); border: 1px solid #F59E0B; border-radius: 6px; color: #FBBF24;">Soda</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: linear-gradient(135deg, #EC489930, transparent); border: 1px solid #EC4899; border-radius: 6px; color: #F472B6;">Atlan</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: linear-gradient(135deg, #06B6D430, transparent); border: 1px solid #06B6D4; border-radius: 6px; color: #22D3EE;">Datafold</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 6px;">Anomalo</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 6px;">Bigeye</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 6px;">Lightup</span>
+                    <span style="font-size: 10px; padding: 6px 12px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 6px;">Talend DQ</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODERN DATA STACK -->
+        <section class="module" id="stack">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Modern Data Stack</h2>
+                    <p>Layered architecture for cloud-native data platforms — from sources to consumption</p>
+                </div>
+            </div>
+            
+            <!-- Stack Visualization -->
+            <div class="pipeline-viz">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">📚 Modern Data Stack Architecture — Data flows bottom → top</div>
+                </div>
+                <div class="pipeline-canvas">
+                    <svg viewBox="0 0 900 600" style="width: 100%; height: auto;">
+                        <!-- Layer 6: Consumption (Top) -->
+                        <g transform="translate(20, 20)">
+                            <rect x="0" y="0" width="860" height="80" rx="10" fill="#10B98115" stroke="#10B981" stroke-width="2"/>
+                            <text x="30" y="25" fill="#34D399" font-size="11" font-weight="700">CONSUMPTION LAYER</text>
+                            <text x="30" y="42" fill="#6a6a7a" font-size="9">End users access insights through various interfaces</text>
+                            
+                            <g transform="translate(30, 50)">
+                                <rect width="100" height="24" rx="4" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="50" y="16" text-anchor="middle" fill="#34D399" font-size="9">📊 BI Tools</text>
+                            </g>
+                            <g transform="translate(140, 50)">
+                                <rect width="100" height="24" rx="4" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="50" y="16" text-anchor="middle" fill="#34D399" font-size="9">📈 Dashboards</text>
+                            </g>
+                            <g transform="translate(250, 50)">
+                                <rect width="100" height="24" rx="4" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="50" y="16" text-anchor="middle" fill="#34D399" font-size="9">🤖 ML Models</text>
+                            </g>
+                            <g transform="translate(360, 50)">
+                                <rect width="100" height="24" rx="4" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="50" y="16" text-anchor="middle" fill="#34D399" font-size="9">📱 Applications</text>
+                            </g>
+                            <g transform="translate(470, 50)">
+                                <rect width="100" height="24" rx="4" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="50" y="16" text-anchor="middle" fill="#34D399" font-size="9">📝 Reports</text>
+                            </g>
+                            
+                            <!-- Tools list -->
+                            <g transform="translate(600, 50)">
+                                <text x="0" y="8" fill="#6a6a7a" font-size="8">Tableau, Looker, Power BI, Metabase, Mode, Hex, Sigma</text>
+                                <text x="0" y="20" fill="#6a6a7a" font-size="8">Jupyter, Streamlit, Retool, Internal Apps</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 5: Reverse ETL / Activation -->
+                        <g transform="translate(20, 115)">
+                            <rect x="0" y="0" width="420" height="70" rx="10" fill="#EC489915" stroke="#EC4899" stroke-width="2"/>
+                            <text x="20" y="22" fill="#F472B6" font-size="11" font-weight="700">REVERSE ETL / ACTIVATION</text>
+                            <text x="20" y="38" fill="#6a6a7a" font-size="9">Sync warehouse data back to operational tools</text>
+                            <g transform="translate(20, 48)">
+                                <text x="0" y="12" fill="#a0a0b0" font-size="9">Census • Hightouch • Polytomic • Omnata • Grouparoo</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 5b: Semantic Layer -->
+                        <g transform="translate(460, 115)">
+                            <rect x="0" y="0" width="420" height="70" rx="10" fill="#F59E0B15" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="20" y="22" fill="#FBBF24" font-size="11" font-weight="700">SEMANTIC / METRICS LAYER</text>
+                            <text x="20" y="38" fill="#6a6a7a" font-size="9">Consistent metric definitions across tools</text>
+                            <g transform="translate(20, 48)">
+                                <text x="0" y="12" fill="#a0a0b0" font-size="9">dbt Semantic Layer • Cube • LookML • AtScale • Metricflow</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 4: Transformation -->
+                        <g transform="translate(20, 200)">
+                            <rect x="0" y="0" width="860" height="90" rx="10" fill="#8B5CF615" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="30" y="25" fill="#A78BFA" font-size="11" font-weight="700">TRANSFORMATION LAYER</text>
+                            <text x="30" y="42" fill="#6a6a7a" font-size="9">Model, transform, and test data using SQL and orchestration</text>
+                            
+                            <g transform="translate(30, 55)">
+                                <rect width="120" height="28" rx="4" fill="#8B5CF630" stroke="#8B5CF6"/>
+                                <text x="60" y="18" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">dbt</text>
+                            </g>
+                            <g transform="translate(160, 55)">
+                                <rect width="90" height="28" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="45" y="18" text-anchor="middle" fill="#a0a0b0" font-size="9">Dataform</text>
+                            </g>
+                            <g transform="translate(260, 55)">
+                                <rect width="90" height="28" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="45" y="18" text-anchor="middle" fill="#a0a0b0" font-size="9">SQLMesh</text>
+                            </g>
+                            <g transform="translate(360, 55)">
+                                <rect width="90" height="28" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="45" y="18" text-anchor="middle" fill="#a0a0b0" font-size="9">Coalesce</text>
+                            </g>
+                            
+                            <!-- Orchestration -->
+                            <g transform="translate(500, 55)">
+                                <rect width="180" height="28" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="90" y="12" text-anchor="middle" fill="#6a6a7a" font-size="8">ORCHESTRATION</text>
+                                <text x="90" y="24" text-anchor="middle" fill="#a0a0b0" font-size="9">Airflow • Dagster • Prefect</text>
+                            </g>
+                            
+                            <!-- Observability -->
+                            <g transform="translate(690, 55)">
+                                <rect width="160" height="28" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="80" y="12" text-anchor="middle" fill="#6a6a7a" font-size="8">OBSERVABILITY</text>
+                                <text x="80" y="24" text-anchor="middle" fill="#a0a0b0" font-size="9">Monte Carlo • Soda • GE</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 3: Storage -->
+                        <g transform="translate(20, 310)">
+                            <rect x="0" y="0" width="860" height="100" rx="10" fill="#3B82F615" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="30" y="25" fill="#60A5FA" font-size="11" font-weight="700">STORAGE LAYER — Cloud Data Warehouse / Lakehouse</text>
+                            <text x="30" y="42" fill="#6a6a7a" font-size="9">Scalable, elastic compute + storage with SQL interface</text>
+                            
+                            <!-- Major platforms -->
+                            <g transform="translate(30, 55)">
+                                <rect width="130" height="38" rx="6" fill="#60A5FA20" stroke="#3B82F6" stroke-width="2"/>
+                                <text x="65" y="16" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">Snowflake</text>
+                                <text x="65" y="30" text-anchor="middle" fill="#6a6a7a" font-size="8">Warehouse</text>
+                            </g>
+                            <g transform="translate(170, 55)">
+                                <rect width="130" height="38" rx="6" fill="#14B8A620" stroke="#14B8A6" stroke-width="2"/>
+                                <text x="65" y="16" text-anchor="middle" fill="#2DD4BF" font-size="10" font-weight="600">Databricks</text>
+                                <text x="65" y="30" text-anchor="middle" fill="#6a6a7a" font-size="8">Lakehouse</text>
+                            </g>
+                            <g transform="translate(310, 55)">
+                                <rect width="130" height="38" rx="6" fill="#F59E0B20" stroke="#F59E0B" stroke-width="2"/>
+                                <text x="65" y="16" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">BigQuery</text>
+                                <text x="65" y="30" text-anchor="middle" fill="#6a6a7a" font-size="8">Serverless DW</text>
+                            </g>
+                            <g transform="translate(450, 55)">
+                                <rect width="130" height="38" rx="6" fill="#EC489920" stroke="#EC4899" stroke-width="2"/>
+                                <text x="65" y="16" text-anchor="middle" fill="#F472B6" font-size="10" font-weight="600">Redshift</text>
+                                <text x="65" y="30" text-anchor="middle" fill="#6a6a7a" font-size="8">AWS MPP</text>
+                            </g>
+                            
+                            <!-- Table formats -->
+                            <g transform="translate(600, 55)">
+                                <rect width="250" height="38" rx="6" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="125" y="14" text-anchor="middle" fill="#6a6a7a" font-size="8">OPEN TABLE FORMATS</text>
+                                <text x="125" y="30" text-anchor="middle" fill="#a0a0b0" font-size="9">Delta Lake • Apache Iceberg • Apache Hudi</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 2: Ingestion -->
+                        <g transform="translate(20, 430)">
+                            <rect x="0" y="0" width="520" height="80" rx="10" fill="#14B8A615" stroke="#14B8A6" stroke-width="2"/>
+                            <text x="20" y="22" fill="#2DD4BF" font-size="11" font-weight="700">BATCH INGESTION</text>
+                            <text x="20" y="38" fill="#6a6a7a" font-size="9">Extract & load from SaaS, databases, files</text>
+                            
+                            <g transform="translate(20, 48)">
+                                <rect width="80" height="24" rx="4" fill="#14B8A630" stroke="#14B8A6"/>
+                                <text x="40" y="16" text-anchor="middle" fill="#2DD4BF" font-size="9">Fivetran</text>
+                            </g>
+                            <g transform="translate(110, 48)">
+                                <rect width="80" height="24" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="40" y="16" text-anchor="middle" fill="#a0a0b0" font-size="9">Airbyte</text>
+                            </g>
+                            <g transform="translate(200, 48)">
+                                <rect width="80" height="24" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="40" y="16" text-anchor="middle" fill="#a0a0b0" font-size="9">Stitch</text>
+                            </g>
+                            <g transform="translate(290, 48)">
+                                <rect width="80" height="24" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="40" y="16" text-anchor="middle" fill="#a0a0b0" font-size="9">Meltano</text>
+                            </g>
+                            <g transform="translate(380, 48)">
+                                <rect width="120" height="24" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="60" y="16" text-anchor="middle" fill="#a0a0b0" font-size="9">Hevo • Matillion</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 2b: Streaming -->
+                        <g transform="translate(560, 430)">
+                            <rect x="0" y="0" width="320" height="80" rx="10" fill="#EF444415" stroke="#EF4444" stroke-width="2"/>
+                            <text x="20" y="22" fill="#F87171" font-size="11" font-weight="700">STREAMING INGESTION</text>
+                            <text x="20" y="38" fill="#6a6a7a" font-size="9">Real-time event streams, CDC</text>
+                            
+                            <g transform="translate(20, 48)">
+                                <rect width="80" height="24" rx="4" fill="#EF444430" stroke="#EF4444"/>
+                                <text x="40" y="16" text-anchor="middle" fill="#F87171" font-size="9">Kafka</text>
+                            </g>
+                            <g transform="translate(110, 48)">
+                                <rect width="80" height="24" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="40" y="16" text-anchor="middle" fill="#a0a0b0" font-size="9">Confluent</text>
+                            </g>
+                            <g transform="translate(200, 48)">
+                                <rect width="100" height="24" rx="4" fill="#1a1a2e" stroke="#6a6a7a"/>
+                                <text x="50" y="16" text-anchor="middle" fill="#a0a0b0" font-size="9">Debezium CDC</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Layer 1: Sources (Bottom) -->
+                        <g transform="translate(20, 530)">
+                            <rect x="0" y="0" width="860" height="60" rx="10" fill="#6a6a7a15" stroke="#6a6a7a" stroke-width="2"/>
+                            <text x="30" y="22" fill="#a0a0b0" font-size="11" font-weight="700">DATA SOURCES</text>
+                            <text x="30" y="42" fill="#6a6a7a" font-size="9">SaaS Apps • Databases • APIs • Files • Events • IoT • Logs • Webhooks</text>
+                            
+                            <!-- Source icons -->
+                            <g transform="translate(400, 15)">
+                                <text x="0" y="15" fill="#6a6a7a" font-size="9">Salesforce • HubSpot • Stripe • Postgres • MySQL • MongoDB • S3 • Segment • Snowplow</text>
+                                <text x="0" y="30" fill="#6a6a7a" font-size="9">Google Analytics • Shopify • Zendesk • Jira • GitHub • Slack • REST APIs • SFTP</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Key Principles -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">☁️</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Cloud-Native</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">SaaS tools, pay-per-use, no infrastructure management</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔌</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Best-of-Breed</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Mix & match specialized tools vs monolithic suites</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">ELT Pattern</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Load raw data first, transform in-warehouse with SQL</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔄</div>
+                    <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Version Control</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">GitOps for pipelines, dbt models, IaC deployment</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Data Engineering Tools</h2>
+                    <p>Essential platforms for building data infrastructure</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">⚡</div>
+                        <div>
+                            <div class="tool-name">Apache Spark</div>
+                            <div class="tool-vendor">Apache</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Unified analytics engine for large-scale data processing, SQL, streaming, and ML</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Processing</span>
+                        <span class="tool-tag">SQL</span>
+                        <span class="tool-tag">Streaming</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔄</div>
+                        <div>
+                            <div class="tool-name">dbt</div>
+                            <div class="tool-vendor">dbt Labs</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">SQL-based transformation tool enabling analytics engineering with version control</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Transform</span>
+                        <span class="tool-tag">SQL</span>
+                        <span class="tool-tag">ELT</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🌀</div>
+                        <div>
+                            <div class="tool-name">Apache Airflow</div>
+                            <div class="tool-vendor">Apache</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Workflow orchestration platform for scheduling and monitoring data pipelines</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Orchestration</span>
+                        <span class="tool-tag">DAGs</span>
+                        <span class="tool-tag">Scheduling</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📨</div>
+                        <div>
+                            <div class="tool-name">Apache Kafka</div>
+                            <div class="tool-vendor">Apache/Confluent</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Distributed event streaming platform for real-time data pipelines</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Streaming</span>
+                        <span class="tool-tag">Events</span>
+                        <span class="tool-tag">Real-time</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">❄️</div>
+                        <div>
+                            <div class="tool-name">Snowflake</div>
+                            <div class="tool-vendor">Snowflake</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Cloud data platform with separated compute and storage, zero-copy cloning</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Warehouse</span>
+                        <span class="tool-tag">Cloud</span>
+                        <span class="tool-tag">SQL</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🧱</div>
+                        <div>
+                            <div class="tool-name">Databricks</div>
+                            <div class="tool-vendor">Databricks</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Unified lakehouse platform combining data engineering, science, and analytics</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Lakehouse</span>
+                        <span class="tool-tag">Spark</span>
+                        <span class="tool-tag">Unity</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔗</div>
+                        <div>
+                            <div class="tool-name">Fivetran</div>
+                            <div class="tool-vendor">Fivetran</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Automated data integration with 300+ pre-built connectors and sync</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Ingestion</span>
+                        <span class="tool-tag">ELT</span>
+                        <span class="tool-tag">Connectors</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🌊</div>
+                        <div>
+                            <div class="tool-name">Apache Flink</div>
+                            <div class="tool-vendor">Apache</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Stateful stream processing with exactly-once semantics and low latency</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Streaming</span>
+                        <span class="tool-tag">Stateful</span>
+                        <span class="tool-tag">Real-time</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT SECTION -->
+        <section class="module" id="agents">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Data Engineering Agent</h2>
+                    <p>AI-powered assistant for pipeline development and optimization</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔧</div>
+                    <div class="agent-name">DataEngineerAgent</div>
+                    <div class="agent-role">Pipeline Architect</div>
+                    <div class="agent-desc">Automates data pipeline design, implementation, and monitoring. Handles schema evolution, data quality checks, and performance optimization across the entire data stack.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automated pipeline generation</li>
+                        <li>Schema drift detection</li>
+                        <li>Data quality monitoring</li>
+                        <li>Performance optimization</li>
+                        <li>Cost analysis and reduction</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Pipeline Definition</div>
+                        <div class="code-tab">dbt Model</div>
+                        <div class="code-filename">data_pipeline.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># data_pipeline.py - Data Engineering Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> airflow.decorators <span class="code-keyword">import</span> dag, task
+
+<span class="code-function">data_engineer</span> = Agent(
+    role=<span class="code-string">"Data Engineer"</span>,
+    goal=<span class="code-string">"Build reliable, scalable data pipelines"</span>,
+    backstory=<span class="code-string">"Expert in ETL, streaming, and data quality"</span>,
+    tools=[
+        SchemaAnalyzer(),
+        PipelineBuilder(),
+        DataQualityChecker(),
+        PerformanceProfiler(),
+    ]
+)
+
+<span class="code-function">pipeline_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze source schema and data patterns
+    2. Design optimal pipeline architecture
+    3. Implement data quality checks
+    4. Configure monitoring and alerting
+    5. Optimize for cost and performance
+    """</span>,
+    agent=data_engineer,
+    expected_output=<span class="code-string">"Production-ready pipeline with 99.9% SLA"</span>
+)
+
+<span class="code-comment"># Airflow DAG generated by agent</span>
+@dag(schedule=<span class="code-string">"0 * * * *"</span>, catchup=<span class="code-keyword">False</span>)
+<span class="code-keyword">def</span> <span class="code-function">sales_pipeline</span>():
+    extract = extract_from_sources()
+    transform = apply_transformations(extract)
+    load = load_to_warehouse(transform)
+    validate = run_quality_checks(load)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
+        <div class="footer-meta">Category 2 of 29 • Data Engineering</div>
+    </div>
+</footer>
+
+</body>
+</html>

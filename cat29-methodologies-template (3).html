@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodologies & Frameworks | Category 29 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --red: #EF4444;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 8px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px 24px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 36px; padding: 24px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 4px 14px; border-radius: 9999px; font-size: 11px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: 22px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); }
+        
+        .module { margin-bottom: 36px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* METHODOLOGY SELECTOR */
+        .method-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+        .method-toggles {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .method-toggle {
+            padding: 8px 16px;
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .method-toggle:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .method-toggle.active { background: var(--cat-glow); border-color: var(--cat-primary); color: var(--cat-light); }
+        .method-toggle-icon { font-size: 16px; }
+        
+        /* METHODOLOGY PANELS */
+        .method-panel { display: none; animation: fadeIn 0.3s ease; }
+        .method-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .method-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+        .method-icon-large {
+            width: 56px;
+            height: 56px;
+            background: var(--cat-glow);
+            border: 2px solid var(--cat-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .method-title-block { flex: 1; }
+        .method-title-block h3 { font-size: 18px; margin-bottom: 4px; }
+        .method-title-block .tagline { font-size: 11px; color: var(--cat-light); margin-bottom: 6px; }
+        .method-title-block p { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+        .method-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 100px;
+        }
+        .method-stat {
+            background: var(--bg-card-alt);
+            border-radius: 8px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+        .method-stat-value { font-size: 14px; font-weight: 700; color: var(--cat-light); }
+        .method-stat-label { font-size: 8px; color: var(--text-muted); }
+        
+        /* SCRUM FRAMEWORK */
+        .scrum-framework {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .scrum-header {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .scrum-header-icon { font-size: 18px; }
+        .scrum-header-title { font-size: 14px; font-weight: 700; }
+        .scrum-body { padding: 16px; }
+        
+        .scrum-cycle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+        .scrum-phase {
+            min-width: 120px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+            position: relative;
+        }
+        .scrum-phase.highlight { border-color: var(--blue); }
+        .scrum-phase-icon { font-size: 20px; margin-bottom: 6px; }
+        .scrum-phase-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+        .scrum-phase-duration { font-size: 9px; color: var(--text-muted); margin-bottom: 6px; }
+        .scrum-phase-desc { font-size: 9px; color: var(--text-secondary); line-height: 1.4; }
+        .scrum-arrow {
+            font-size: 16px;
+            color: var(--blue);
+            flex-shrink: 0;
+        }
+        
+        .scrum-roles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .scrum-role {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .scrum-role-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .scrum-role-icon { font-size: 20px; }
+        .scrum-role-name { font-size: 13px; font-weight: 700; }
+        .scrum-role-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+        .scrum-role-tasks { list-style: none; }
+        .scrum-role-tasks li {
+            font-size: 10px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .scrum-role-tasks li:last-child { border-bottom: none; }
+        .scrum-role-tasks li::before { content: '→'; color: var(--blue); font-size: 10px; }
+        
+        .scrum-artifacts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .scrum-artifact {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .scrum-artifact-icon { font-size: 24px; margin-bottom: 6px; }
+        .scrum-artifact-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+        .scrum-artifact-desc { font-size: 10px; color: var(--text-muted); line-height: 1.4; }
+        
+        /* CI/CD PIPELINE */
+        .cicd-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .cicd-header {
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cicd-header-left { display: flex; align-items: center; gap: 8px; }
+        .cicd-header-icon { font-size: 18px; }
+        .cicd-header-title { font-size: 14px; font-weight: 700; }
+        .cicd-header-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+        .cicd-body { padding: 16px; }
+        
+        .pipeline-flow {
+            display: flex;
+            align-items: stretch;
+            gap: 2px;
+            margin-bottom: 16px;
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .pipeline-stage {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            position: relative;
+            background: var(--bg-dark);
+        }
+        .pipeline-stage::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 10px solid transparent;
+            border-left-color: var(--bg-dark);
+            z-index: 1;
+        }
+        .pipeline-stage:last-child::after { display: none; }
+        .pipeline-stage.code { border-top: 3px solid var(--blue); }
+        .pipeline-stage.build { border-top: 3px solid var(--cyan); }
+        .pipeline-stage.test { border-top: 3px solid var(--yellow); }
+        .pipeline-stage.release { border-top: 3px solid var(--violet); }
+        .pipeline-stage.deploy { border-top: 3px solid var(--green); }
+        .pipeline-stage.monitor { border-top: 3px solid var(--pink); }
+        
+        .pipeline-icon { font-size: 20px; margin-bottom: 6px; }
+        .pipeline-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+        .pipeline-tools { font-size: 9px; color: var(--text-muted); margin-bottom: 8px; }
+        .pipeline-actions {
+            text-align: left;
+            font-size: 9px;
+            color: var(--text-secondary);
+            padding-left: 8px;
+        }
+        .pipeline-actions li { margin-bottom: 3px; }
+        
+        .pipeline-iteration {
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .iteration-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .iteration-title { font-size: 12px; font-weight: 700; }
+        .iteration-time { font-size: 11px; color: var(--green); }
+        .iteration-steps {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+        .iteration-step {
+            min-width: 100px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .iteration-step.success { border-color: var(--green); }
+        .iteration-step.running { border-color: var(--yellow); }
+        .iteration-step.pending { border-color: var(--border-color); opacity: 0.6; }
+        .iteration-step-icon { font-size: 16px; margin-bottom: 4px; }
+        .iteration-step-name { font-size: 10px; font-weight: 600; margin-bottom: 3px; }
+        .iteration-step-status { font-size: 9px; color: var(--text-muted); }
+        
+        /* KANBAN BOARD */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .kanban-column {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .kanban-column-header {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .kanban-column-name { font-size: 11px; font-weight: 700; }
+        .kanban-column-count {
+            background: var(--bg-dark);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+        }
+        .kanban-column-body { padding: 8px; min-height: 120px; }
+        .kanban-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+        .kanban-card:last-child { margin-bottom: 0; }
+        .kanban-card-title { font-weight: 600; margin-bottom: 6px; }
+        .kanban-card-meta { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 9px; }
+        .kanban-wip {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--yellow);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+        }
+        
+        /* METHODOLOGY PRINCIPLES */
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .principle-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .principle-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--cat-glow);
+            border: 2px solid var(--cat-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--cat-light);
+            margin: 0 auto 8px;
+        }
+        .principle-title { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+        .principle-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+        
+        /* COMPARISON TABLE */
+        .comparison-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .comparison-header {
+            background: var(--bg-card-alt);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .comparison-title { font-size: 14px; font-weight: 700; }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table th {
+            background: var(--bg-card-alt);
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .comparison-table th:first-child { width: 120px; }
+        .comparison-table td {
+            padding: 10px 12px;
+            font-size: 10px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .comparison-table .method-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .comparison-table .method-icon { font-size: 16px; }
+        .rating-cell {
+            display: flex;
+            gap: 3px;
+        }
+        .rating-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .rating-dot.filled { background: var(--cat-primary); }
+        .fit-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        .fit-badge.excellent { background: rgba(16,185,129,0.2); color: var(--green); }
+        .fit-badge.good { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .fit-badge.moderate { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        .fit-badge.poor { background: rgba(239,68,68,0.2); color: var(--red); }
+        
+        /* PM TOOLS */
+        .tools-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .tools-header {
+            background: var(--bg-card-alt);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tools-title { font-size: 14px; font-weight: 700; }
+        .tools-filter {
+            display: flex;
+            gap: 6px;
+        }
+        .filter-btn {
+            padding: 4px 10px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .filter-btn.active { background: var(--cat-glow); border-color: var(--cat-primary); color: var(--cat-light); }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px;
+        }
+        .tool-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            transition: all 0.2s;
+        }
+        .tool-card:hover { border-color: var(--cat-primary); }
+        .tool-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .tool-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .tool-name { font-size: 12px; font-weight: 700; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+        .tool-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .tool-feature {
+            font-size: 8px;
+            padding: 2px 6px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+        .tool-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        .tool-price { font-size: 10px; color: var(--green); font-weight: 600; }
+        .tool-rating { font-size: 10px; color: var(--yellow); }
+        
+        /* SAFe FRAMEWORK */
+        .safe-framework {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .safe-header {
+            background: linear-gradient(135deg, var(--violet), var(--pink));
+            padding: 12px 16px;
+        }
+        .safe-header-title { font-size: 14px; font-weight: 700; }
+        .safe-body { padding: 16px; }
+        
+        .safe-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .safe-layer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 10px;
+        }
+        .safe-layer.portfolio { background: linear-gradient(90deg, rgba(139,92,246,0.2), transparent); border-left: 4px solid var(--violet); }
+        .safe-layer.large { background: linear-gradient(90deg, rgba(236,72,153,0.2), transparent); border-left: 4px solid var(--pink); }
+        .safe-layer.essential { background: linear-gradient(90deg, rgba(59,130,246,0.2), transparent); border-left: 4px solid var(--blue); }
+        .safe-layer.team { background: linear-gradient(90deg, rgba(16,185,129,0.2), transparent); border-left: 4px solid var(--green); }
+        .safe-layer-icon { font-size: 24px; }
+        .safe-layer-content { flex: 1; }
+        .safe-layer-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+        .safe-layer-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+        .safe-layer-elements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .safe-element {
+            font-size: 9px;
+            padding: 3px 8px;
+            background: var(--bg-card-alt);
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+        
+        /* BEST PRACTICES */
+        .practices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .practice-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .practice-icon { font-size: 22px; margin-bottom: 10px; }
+        .practice-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        .practice-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.6; }
+        .practice-tips { list-style: none; }
+        .practice-tips li {
+            font-size: 10px;
+            color: var(--text-secondary);
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+        }
+        .practice-tips li:last-child { border-bottom: none; }
+        .practice-tips li::before { content: '✓'; color: var(--green); }
+        
+        /* WATERFALL DIAGRAM */
+        .waterfall-diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .waterfall-header {
+            background: linear-gradient(135deg, var(--blue), var(--violet));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .waterfall-header-icon { font-size: 18px; }
+        .waterfall-header-title { font-size: 14px; font-weight: 700; }
+        .waterfall-body { padding: 16px; }
+        .waterfall-cascade {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .waterfall-phase {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card-alt);
+            border-left: 4px solid var(--phase-color);
+            margin-left: calc(var(--wf-indent, 0) * 20px);
+        }
+        .waterfall-phase:nth-child(1) { --wf-indent: 0; }
+        .waterfall-phase:nth-child(3) { --wf-indent: 1; margin-left: 20px; }
+        .waterfall-phase:nth-child(5) { --wf-indent: 2; margin-left: 40px; }
+        .waterfall-phase:nth-child(7) { --wf-indent: 3; margin-left: 60px; }
+        .waterfall-phase:nth-child(9) { --wf-indent: 4; margin-left: 80px; }
+        .waterfall-phase:nth-child(11) { --wf-indent: 5; margin-left: 100px; }
+        .wf-phase-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--phase-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .wf-phase-content { flex: 1; }
+        .wf-phase-name { font-size: 13px; font-weight: 700; }
+        .wf-phase-duration { font-size: 10px; color: var(--text-muted); }
+        .wf-phase-tasks {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .wf-phase-tasks span {
+            font-size: 9px;
+            padding: 3px 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+        .wf-phase-output {
+            font-size: 11px;
+            color: var(--phase-color);
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .waterfall-connector {
+            display: flex;
+            align-items: center;
+            padding: 6px 0 6px 40px;
+        }
+        .waterfall-connector::before {
+            content: '';
+            width: 2px;
+            height: 18px;
+            background: var(--border-color);
+            margin-right: 10px;
+        }
+        .wf-gate {
+            font-size: 9px;
+            padding: 3px 10px;
+            background: rgba(16,185,129,0.2);
+            color: var(--green);
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .waterfall-traits {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .wf-trait {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .wf-trait.pros { border-top: 3px solid var(--green); }
+        .wf-trait.cons { border-top: 3px solid var(--yellow); }
+        .wf-trait.docs { border-top: 3px solid var(--blue); }
+        .wf-trait-header { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+        .wf-trait ul { list-style: none; }
+        .wf-trait li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; }
+        
+        /* LEAN WASTES */
+        .lean-wastes {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .lean-wastes-header {
+            background: linear-gradient(135deg, var(--red), var(--yellow));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lean-wastes-icon { font-size: 18px; }
+        .lean-wastes-title { font-size: 14px; font-weight: 700; }
+        .lean-wastes-body { padding: 16px; }
+        .waste-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .waste-item {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .waste-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            margin: 0 auto 8px;
+        }
+        .waste-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+        .waste-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
+        .waste-fix { font-size: 10px; color: var(--green); font-weight: 500; }
+        
+        /* VALUE STREAM */
+        .lean-value-stream {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .vs-header {
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .vs-icon { font-size: 18px; }
+        .vs-title { font-size: 14px; font-weight: 700; }
+        .vs-body { padding: 16px; }
+        .vs-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 14px;
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+        }
+        .vs-stage {
+            flex: 1;
+            max-width: 120px;
+            padding: 12px 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .vs-stage.value {
+            background: rgba(16,185,129,0.2);
+            border: 1px solid var(--green);
+        }
+        .vs-stage-type { font-size: 9px; color: var(--green); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .vs-stage-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+        .vs-stage-time { font-size: 11px; color: var(--text-muted); }
+        .vs-wait {
+            min-width: 60px;
+            padding: 10px 8px;
+            background: rgba(239,68,68,0.15);
+            border: 1px dashed var(--red);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .vs-wait-label { font-size: 9px; color: var(--red); text-transform: uppercase; }
+        .vs-wait-time { font-size: 11px; font-weight: 600; color: var(--red); }
+        .vs-summary {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            padding: 12px;
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+        }
+        .vs-metric {
+            text-align: center;
+        }
+        .vs-metric-label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+        .vs-metric-value { font-size: 14px; font-weight: 700; }
+        .vs-metric-value.good { color: var(--green); }
+        .vs-metric-value.bad { color: var(--red); }
+        
+        /* LEAN PRINCIPLES */
+        .lean-principles {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .lp-header {
+            background: var(--bg-card-alt);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .lp-icon { font-size: 18px; }
+        .lp-title { font-size: 14px; font-weight: 700; }
+        .lp-body { padding: 16px; }
+        .lp-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .lp-item {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .lp-item.highlight {
+            border-color: var(--cat-primary);
+            background: var(--cat-glow);
+        }
+        .lp-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--cat-glow);
+            border: 1px solid var(--cat-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--cat-light);
+            flex-shrink: 0;
+        }
+        .lp-content { flex: 1; }
+        .lp-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+        .lp-desc { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-logo span { color: var(--brand-orange); }
+        .footer-meta { font-size: 13px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+    
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">📋 Category 29</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview" class="active">📊 Overview</a></li>
+                <li><a href="#methodologies">🔄 Methodologies</a></li>
+                <li><a href="#comparison">⚖️ Comparison Matrix</a></li>
+                <li><a href="#tools">🛠️ PM Tools</a></li>
+                <li><a href="#practices">💡 Best Practices</a></li>
+            </ul>
+        </div>
+    </aside>
+    
+    <div class="main-wrapper">
+        <main class="main-content">
+            <!-- HERO -->
+            <section class="hero-compact" id="overview">
+                <div class="hero-left">
+                    <div class="hero-tag">📋 Category 29</div>
+                    <h1>Methodologies & Frameworks</h1>
+                    <p>Master the frameworks that drive successful project delivery—from Agile and Scrum to DevOps and SAFe. Choose the right methodology for your team, project, and organizational context.</p>
+                </div>
+                <div class="hero-metrics">
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">6</div>
+                        <div class="hero-metric-label">Core Methodologies</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">71%</div>
+                        <div class="hero-metric-label">Agile Adoption Rate</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">28%</div>
+                        <div class="hero-metric-label">Delivery Improvement</div>
+                    </div>
+                    <div class="hero-metric">
+                        <div class="hero-metric-value">12</div>
+                        <div class="hero-metric-label">PM Tools Compared</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- METHODOLOGY SELECTOR -->
+            <section class="module" id="methodologies">
+                <div class="module-header">
+                    <div class="module-icon">🔄</div>
+                    <div class="module-info">
+                        <h2>Methodology Deep Dives</h2>
+                        <p>Explore each framework's principles, practices, and implementation details</p>
+                    </div>
+                </div>
+                
+                <div class="method-nav">
+                    <div class="method-toggles">
+                        <div class="method-toggle active" data-method="scrum">
+                            <span class="method-toggle-icon">🔄</span> Scrum
+                        </div>
+                        <div class="method-toggle" data-method="kanban">
+                            <span class="method-toggle-icon">📋</span> Kanban
+                        </div>
+                        <div class="method-toggle" data-method="devops">
+                            <span class="method-toggle-icon">♾️</span> DevOps & CI/CD
+                        </div>
+                        <div class="method-toggle" data-method="safe">
+                            <span class="method-toggle-icon">🏢</span> SAFe
+                        </div>
+                        <div class="method-toggle" data-method="waterfall">
+                            <span class="method-toggle-icon">📊</span> Waterfall
+                        </div>
+                        <div class="method-toggle" data-method="lean">
+                            <span class="method-toggle-icon">🎯</span> Lean
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SCRUM PANEL -->
+                <div class="method-panel active" id="scrum">
+                    <div class="method-header">
+                        <div class="method-icon-large">🔄</div>
+                        <div class="method-title-block">
+                            <h3>Scrum Framework</h3>
+                            <div class="tagline">Iterative delivery through time-boxed sprints</div>
+                            <p>Scrum is an agile framework for developing, delivering, and sustaining complex products. It emphasizes iterative progress, team collaboration, and continuous improvement through defined roles, events, and artifacts. Teams work in fixed-length sprints (typically 2 weeks) to deliver potentially shippable increments.</p>
+                        </div>
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">58%</div>
+                                <div class="method-stat-label">Market Share</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">3-9</div>
+                                <div class="method-stat-label">Team Size</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">1-4 wk</div>
+                                <div class="method-stat-label">Sprint Length</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scrum-framework">
+                        <div class="scrum-header">
+                            <span class="scrum-header-icon">🔄</span>
+                            <span class="scrum-header-title">The Scrum Sprint Cycle</span>
+                        </div>
+                        <div class="scrum-body">
+                            <div class="scrum-cycle">
+                                <div class="scrum-phase">
+                                    <div class="scrum-phase-icon">📝</div>
+                                    <div class="scrum-phase-name">Product Backlog</div>
+                                    <div class="scrum-phase-duration">Ongoing</div>
+                                    <div class="scrum-phase-desc">Prioritized list of features, requirements, and fixes</div>
+                                </div>
+                                <div class="scrum-arrow">→</div>
+                                <div class="scrum-phase highlight">
+                                    <div class="scrum-phase-icon">🎯</div>
+                                    <div class="scrum-phase-name">Sprint Planning</div>
+                                    <div class="scrum-phase-duration">4-8 hours</div>
+                                    <div class="scrum-phase-desc">Select items, define sprint goal, create sprint backlog</div>
+                                </div>
+                                <div class="scrum-arrow">→</div>
+                                <div class="scrum-phase highlight">
+                                    <div class="scrum-phase-icon">⚡</div>
+                                    <div class="scrum-phase-name">Sprint Execution</div>
+                                    <div class="scrum-phase-duration">1-4 weeks</div>
+                                    <div class="scrum-phase-desc">Daily standups, development, testing, integration</div>
+                                </div>
+                                <div class="scrum-arrow">→</div>
+                                <div class="scrum-phase">
+                                    <div class="scrum-phase-icon">🎬</div>
+                                    <div class="scrum-phase-name">Sprint Review</div>
+                                    <div class="scrum-phase-duration">2-4 hours</div>
+                                    <div class="scrum-phase-desc">Demo increment, gather feedback, adapt backlog</div>
+                                </div>
+                                <div class="scrum-arrow">→</div>
+                                <div class="scrum-phase">
+                                    <div class="scrum-phase-icon">🔍</div>
+                                    <div class="scrum-phase-name">Sprint Retro</div>
+                                    <div class="scrum-phase-duration">1.5-3 hours</div>
+                                    <div class="scrum-phase-desc">Inspect process, identify improvements, commit to actions</div>
+                                </div>
+                                <div class="scrum-arrow">↻</div>
+                            </div>
+                            
+                            <div class="scrum-roles">
+                                <div class="scrum-role">
+                                    <div class="scrum-role-header">
+                                        <span class="scrum-role-icon">👑</span>
+                                        <span class="scrum-role-name">Product Owner</span>
+                                    </div>
+                                    <div class="scrum-role-desc">Maximizes product value by managing and prioritizing the backlog</div>
+                                    <ul class="scrum-role-tasks">
+                                        <li>Define and communicate product vision</li>
+                                        <li>Create and prioritize backlog items</li>
+                                        <li>Accept or reject work results</li>
+                                        <li>Represent stakeholder interests</li>
+                                        <li>Make scope/priority decisions</li>
+                                    </ul>
+                                </div>
+                                <div class="scrum-role">
+                                    <div class="scrum-role-header">
+                                        <span class="scrum-role-icon">🛡️</span>
+                                        <span class="scrum-role-name">Scrum Master</span>
+                                    </div>
+                                    <div class="scrum-role-desc">Serves the team by facilitating Scrum and removing impediments</div>
+                                    <ul class="scrum-role-tasks">
+                                        <li>Facilitate Scrum events</li>
+                                        <li>Coach team on Scrum practices</li>
+                                        <li>Remove blockers and impediments</li>
+                                        <li>Shield team from distractions</li>
+                                        <li>Foster continuous improvement</li>
+                                    </ul>
+                                </div>
+                                <div class="scrum-role">
+                                    <div class="scrum-role-header">
+                                        <span class="scrum-role-icon">👥</span>
+                                        <span class="scrum-role-name">Development Team</span>
+                                    </div>
+                                    <div class="scrum-role-desc">Cross-functional group that delivers potentially shippable increments</div>
+                                    <ul class="scrum-role-tasks">
+                                        <li>Self-organize to accomplish goals</li>
+                                        <li>Estimate and commit to work</li>
+                                        <li>Design, develop, test, deploy</li>
+                                        <li>Collaborate daily at standups</li>
+                                        <li>Collectively own quality</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="scrum-artifacts">
+                                <div class="scrum-artifact">
+                                    <div class="scrum-artifact-icon">📚</div>
+                                    <div class="scrum-artifact-name">Product Backlog</div>
+                                    <div class="scrum-artifact-desc">Ordered list of everything needed in the product. Single source of requirements.</div>
+                                </div>
+                                <div class="scrum-artifact">
+                                    <div class="scrum-artifact-icon">📋</div>
+                                    <div class="scrum-artifact-name">Sprint Backlog</div>
+                                    <div class="scrum-artifact-desc">Selected items for sprint plus plan to deliver them. Owned by dev team.</div>
+                                </div>
+                                <div class="scrum-artifact">
+                                    <div class="scrum-artifact-icon">📦</div>
+                                    <div class="scrum-artifact-name">Product Increment</div>
+                                    <div class="scrum-artifact-desc">Sum of all completed items. Must be "Done" and potentially releasable.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- KANBAN PANEL -->
+                <div class="method-panel" id="kanban">
+                    <div class="method-header">
+                        <div class="method-icon-large">📋</div>
+                        <div class="method-title-block">
+                            <h3>Kanban Method</h3>
+                            <div class="tagline">Continuous flow with visual work management</div>
+                            <p>Kanban is a lean method for managing knowledge work with an emphasis on just-in-time delivery and continuous improvement. Unlike Scrum's time-boxed iterations, Kanban enables continuous flow of work items through defined stages. Work-in-progress limits prevent overload and expose bottlenecks.</p>
+                        </div>
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">7%</div>
+                                <div class="method-stat-label">Pure Kanban</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">Any</div>
+                                <div class="method-stat-label">Team Size</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">Flow</div>
+                                <div class="method-stat-label">Cadence</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-board">
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span class="kanban-column-name">Backlog</span>
+                                <span class="kanban-column-count">8</span>
+                            </div>
+                            <div class="kanban-column-body">
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">User auth redesign</div>
+                                    <div class="kanban-card-meta"><span>5 pts</span><span>P1</span></div>
+                                </div>
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">API rate limiting</div>
+                                    <div class="kanban-card-meta"><span>3 pts</span><span>P2</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span class="kanban-column-name">Ready</span>
+                                <span class="kanban-column-count">3</span>
+                            </div>
+                            <div class="kanban-column-body">
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">Dashboard widgets</div>
+                                    <div class="kanban-card-meta"><span>3 pts</span><span>P1</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span class="kanban-column-name">In Progress</span>
+                                <span class="kanban-wip">WIP: 3</span>
+                            </div>
+                            <div class="kanban-column-body">
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">Payment integration</div>
+                                    <div class="kanban-card-meta"><span>8 pts</span><span>@alice</span></div>
+                                </div>
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">Email notifications</div>
+                                    <div class="kanban-card-meta"><span>2 pts</span><span>@bob</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span class="kanban-column-name">Review</span>
+                                <span class="kanban-wip">WIP: 2</span>
+                            </div>
+                            <div class="kanban-column-body">
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">Search optimization</div>
+                                    <div class="kanban-card-meta"><span>5 pts</span><span>@carol</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="kanban-column-header">
+                                <span class="kanban-column-name">Done</span>
+                                <span class="kanban-column-count">12</span>
+                            </div>
+                            <div class="kanban-column-body">
+                                <div class="kanban-card">
+                                    <div class="kanban-card-title">User profile page</div>
+                                    <div class="kanban-card-meta"><span>3 pts</span><span>✓</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="principles-grid">
+                        <div class="principle-card">
+                            <div class="principle-number">1</div>
+                            <div class="principle-title">Visualize Work</div>
+                            <div class="principle-desc">Make all work visible on a board so the team can see status, blockers, and flow at a glance</div>
+                        </div>
+                        <div class="principle-card">
+                            <div class="principle-number">2</div>
+                            <div class="principle-title">Limit WIP</div>
+                            <div class="principle-desc">Set explicit limits on work-in-progress to prevent overload and improve throughput</div>
+                        </div>
+                        <div class="principle-card">
+                            <div class="principle-number">3</div>
+                            <div class="principle-title">Manage Flow</div>
+                            <div class="principle-desc">Monitor and optimize the smooth movement of work through all stages</div>
+                        </div>
+                        <div class="principle-card">
+                            <div class="principle-number">4</div>
+                            <div class="principle-title">Improve Continuously</div>
+                            <div class="principle-desc">Use metrics like cycle time and throughput to drive ongoing improvements</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DEVOPS PANEL -->
+                <div class="method-panel" id="devops">
+                    <div class="method-header">
+                        <div class="method-icon-large">♾️</div>
+                        <div class="method-title-block">
+                            <h3>DevOps & CI/CD</h3>
+                            <div class="tagline">Continuous integration, delivery, and deployment</div>
+                            <p>DevOps unifies software development and IT operations to shorten the development lifecycle and deliver high-quality software continuously. CI/CD pipelines automate building, testing, and deployment, enabling teams to release changes frequently and reliably. The goal is to eliminate the friction between writing code and running it in production.</p>
+                        </div>
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">83%</div>
+                                <div class="method-stat-label">Adoption Rate</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">208x</div>
+                                <div class="method-stat-label">Deploy Frequency</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">106x</div>
+                                <div class="method-stat-label">Faster Recovery</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cicd-section">
+                        <div class="cicd-header">
+                            <div class="cicd-header-left">
+                                <span class="cicd-header-icon">🔄</span>
+                                <span class="cicd-header-title">CI/CD Pipeline Architecture</span>
+                            </div>
+                            <span class="cicd-header-badge">End-to-End Automation</span>
+                        </div>
+                        <div class="cicd-body">
+                            <div class="pipeline-flow">
+                                <div class="pipeline-stage code">
+                                    <div class="pipeline-icon">💻</div>
+                                    <div class="pipeline-name">Code</div>
+                                    <div class="pipeline-tools">Git, GitHub, GitLab</div>
+                                    <ul class="pipeline-actions">
+                                        <li>• Feature branches</li>
+                                        <li>• Code review</li>
+                                        <li>• Merge to main</li>
+                                    </ul>
+                                </div>
+                                <div class="pipeline-stage build">
+                                    <div class="pipeline-icon">🔨</div>
+                                    <div class="pipeline-name">Build</div>
+                                    <div class="pipeline-tools">Maven, npm, Docker</div>
+                                    <ul class="pipeline-actions">
+                                        <li>• Compile source</li>
+                                        <li>• Install dependencies</li>
+                                        <li>• Create artifacts</li>
+                                    </ul>
+                                </div>
+                                <div class="pipeline-stage test">
+                                    <div class="pipeline-icon">🧪</div>
+                                    <div class="pipeline-name">Test</div>
+                                    <div class="pipeline-tools">Jest, Selenium, SonarQube</div>
+                                    <ul class="pipeline-actions">
+                                        <li>• Unit tests</li>
+                                        <li>• Integration tests</li>
+                                        <li>• Security scans</li>
+                                    </ul>
+                                </div>
+                                <div class="pipeline-stage release">
+                                    <div class="pipeline-icon">📦</div>
+                                    <div class="pipeline-name">Release</div>
+                                    <div class="pipeline-tools">Artifactory, ECR, GCR</div>
+                                    <ul class="pipeline-actions">
+                                        <li>• Version tagging</li>
+                                        <li>• Push to registry</li>
+                                        <li>• Generate changelog</li>
+                                    </ul>
+                                </div>
+                                <div class="pipeline-stage deploy">
+                                    <div class="pipeline-icon">🚀</div>
+                                    <div class="pipeline-name">Deploy</div>
+                                    <div class="pipeline-tools">K8s, Terraform, ArgoCD</div>
+                                    <ul class="pipeline-actions">
+                                        <li>• Staging deploy</li>
+                                        <li>• Canary/Blue-green</li>
+                                        <li>• Production release</li>
+                                    </ul>
+                                </div>
+                                <div class="pipeline-stage monitor">
+                                    <div class="pipeline-icon">📊</div>
+                                    <div class="pipeline-name">Monitor</div>
+                                    <div class="pipeline-tools">Datadog, Prometheus</div>
+                                    <ul class="pipeline-actions">
+                                        <li>• Health checks</li>
+                                        <li>• Error tracking</li>
+                                        <li>• Performance metrics</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="pipeline-iteration">
+                                <div class="iteration-header">
+                                    <span class="iteration-title">🔄 Pipeline Run #1847 — feature/user-dashboard</span>
+                                    <span class="iteration-time">✓ Completed in 8m 42s</span>
+                                </div>
+                                <div class="iteration-steps">
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Checkout</div>
+                                        <div class="iteration-step-status">4s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Install Deps</div>
+                                        <div class="iteration-step-status">1m 12s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Lint</div>
+                                        <div class="iteration-step-status">28s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Unit Tests</div>
+                                        <div class="iteration-step-status">2m 4s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Build</div>
+                                        <div class="iteration-step-status">1m 38s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Security Scan</div>
+                                        <div class="iteration-step-status">1m 52s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Push Image</div>
+                                        <div class="iteration-step-status">48s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Deploy Staging</div>
+                                        <div class="iteration-step-status">36s</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pipeline-iteration">
+                                <div class="iteration-header">
+                                    <span class="iteration-title">🔄 Pipeline Run #1846 — fix/payment-error</span>
+                                    <span class="iteration-time" style="color: var(--red);">✗ Failed at Unit Tests</span>
+                                </div>
+                                <div class="iteration-steps">
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Checkout</div>
+                                        <div class="iteration-step-status">3s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Install Deps</div>
+                                        <div class="iteration-step-status">1m 8s</div>
+                                    </div>
+                                    <div class="iteration-step success">
+                                        <div class="iteration-step-icon">✓</div>
+                                        <div class="iteration-step-name">Lint</div>
+                                        <div class="iteration-step-status">26s</div>
+                                    </div>
+                                    <div class="iteration-step" style="border-color: var(--red);">
+                                        <div class="iteration-step-icon" style="color: var(--red);">✗</div>
+                                        <div class="iteration-step-name">Unit Tests</div>
+                                        <div class="iteration-step-status">3 failed</div>
+                                    </div>
+                                    <div class="iteration-step pending">
+                                        <div class="iteration-step-icon">○</div>
+                                        <div class="iteration-step-name">Build</div>
+                                        <div class="iteration-step-status">Skipped</div>
+                                    </div>
+                                    <div class="iteration-step pending">
+                                        <div class="iteration-step-icon">○</div>
+                                        <div class="iteration-step-name">Security Scan</div>
+                                        <div class="iteration-step-status">Skipped</div>
+                                    </div>
+                                    <div class="iteration-step pending">
+                                        <div class="iteration-step-icon">○</div>
+                                        <div class="iteration-step-name">Push Image</div>
+                                        <div class="iteration-step-status">Skipped</div>
+                                    </div>
+                                    <div class="iteration-step pending">
+                                        <div class="iteration-step-icon">○</div>
+                                        <div class="iteration-step-name">Deploy Staging</div>
+                                        <div class="iteration-step-status">Skipped</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SAFe PANEL -->
+                <div class="method-panel" id="safe">
+                    <div class="method-header">
+                        <div class="method-icon-large">🏢</div>
+                        <div class="method-title-block">
+                            <h3>SAFe (Scaled Agile Framework)</h3>
+                            <div class="tagline">Enterprise-scale agile for large organizations</div>
+                            <p>SAFe provides a structured approach for scaling agile practices across large enterprises with multiple teams. It organizes work at portfolio, large solution, and team levels, synchronizing through Program Increments (PIs) and Agile Release Trains (ARTs). SAFe addresses the complexity of coordinating hundreds of people toward common business objectives.</p>
+                        </div>
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">53%</div>
+                                <div class="method-stat-label">Enterprise Choice</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">50-125</div>
+                                <div class="method-stat-label">ART Size</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">8-12 wk</div>
+                                <div class="method-stat-label">PI Cadence</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="safe-framework">
+                        <div class="safe-header">
+                            <span class="safe-header-title">SAFe Configuration Layers</span>
+                        </div>
+                        <div class="safe-body">
+                            <div class="safe-layers">
+                                <div class="safe-layer portfolio">
+                                    <span class="safe-layer-icon">🏛️</span>
+                                    <div class="safe-layer-content">
+                                        <div class="safe-layer-name">Portfolio Level</div>
+                                        <div class="safe-layer-desc">Strategic themes, portfolio vision, and Lean budgeting across value streams</div>
+                                        <div class="safe-layer-elements">
+                                            <span class="safe-element">Strategic Themes</span>
+                                            <span class="safe-element">Portfolio Kanban</span>
+                                            <span class="safe-element">Lean Budgets</span>
+                                            <span class="safe-element">Value Streams</span>
+                                            <span class="safe-element">Epic Owners</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="safe-layer large">
+                                    <span class="safe-layer-icon">🏗️</span>
+                                    <div class="safe-layer-content">
+                                        <div class="safe-layer-name">Large Solution Level</div>
+                                        <div class="safe-layer-desc">Coordinates multiple ARTs building complex systems requiring additional roles</div>
+                                        <div class="safe-layer-elements">
+                                            <span class="safe-element">Solution Train</span>
+                                            <span class="safe-element">Solution Architect</span>
+                                            <span class="safe-element">Capabilities</span>
+                                            <span class="safe-element">Supplier Integration</span>
+                                            <span class="safe-element">Pre/Post PI Planning</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="safe-layer essential">
+                                    <span class="safe-layer-icon">🚂</span>
+                                    <div class="safe-layer-content">
+                                        <div class="safe-layer-name">Essential / Program Level (ART)</div>
+                                        <div class="safe-layer-desc">Agile Release Train—5-12 teams aligned to a common mission, synchronized delivery</div>
+                                        <div class="safe-layer-elements">
+                                            <span class="safe-element">Release Train Engineer</span>
+                                            <span class="safe-element">Product Management</span>
+                                            <span class="safe-element">System Architect</span>
+                                            <span class="safe-element">PI Planning</span>
+                                            <span class="safe-element">System Demo</span>
+                                            <span class="safe-element">Inspect & Adapt</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="safe-layer team">
+                                    <span class="safe-layer-icon">👥</span>
+                                    <div class="safe-layer-content">
+                                        <div class="safe-layer-name">Team Level</div>
+                                        <div class="safe-layer-desc">Cross-functional agile teams using Scrum, Kanban, or XP within the ART</div>
+                                        <div class="safe-layer-elements">
+                                            <span class="safe-element">Scrum Master</span>
+                                            <span class="safe-element">Product Owner</span>
+                                            <span class="safe-element">Dev Team</span>
+                                            <span class="safe-element">Iterations</span>
+                                            <span class="safe-element">Team Backlog</span>
+                                            <span class="safe-element">Built-in Quality</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- WATERFALL PANEL -->
+                <div class="method-panel" id="waterfall">
+                    <div class="method-header">
+                        <div class="method-icon-large">📊</div>
+                        <div class="method-title-block">
+                            <h3>Waterfall</h3>
+                            <div class="tagline">Sequential phases with defined milestones</div>
+                            <p>Waterfall is a linear, sequential approach where each phase must be completed before the next begins. Originally from manufacturing and construction, it works best for projects with well-defined requirements, regulatory constraints, or dependencies that prevent iteration.</p>
+                        </div>
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">14%</div>
+                                <div class="method-stat-label">Current Usage</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">Fixed</div>
+                                <div class="method-stat-label">Scope</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">6-24 mo</div>
+                                <div class="method-stat-label">Typical Duration</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="waterfall-diagram">
+                        <div class="waterfall-header">
+                            <span class="waterfall-header-icon">📊</span>
+                            <span class="waterfall-header-title">The Waterfall Cascade</span>
+                        </div>
+                        <div class="waterfall-body">
+                            <div class="waterfall-cascade">
+                                <div class="waterfall-phase" style="--phase-color: var(--blue);">
+                                    <div class="wf-phase-num">1</div>
+                                    <div class="wf-phase-content">
+                                        <div class="wf-phase-name">Requirements</div>
+                                        <div class="wf-phase-duration">4-8 weeks</div>
+                                        <div class="wf-phase-tasks">
+                                            <span>Stakeholder interviews</span>
+                                            <span>BRD/SRS documents</span>
+                                            <span>Sign-off gate</span>
+                                        </div>
+                                    </div>
+                                    <div class="wf-phase-output">📄 Requirements Spec</div>
+                                </div>
+                                <div class="waterfall-connector">
+                                    <div class="wf-gate">✓ Gate</div>
+                                </div>
+                                <div class="waterfall-phase" style="--phase-color: var(--cyan);">
+                                    <div class="wf-phase-num">2</div>
+                                    <div class="wf-phase-content">
+                                        <div class="wf-phase-name">Design</div>
+                                        <div class="wf-phase-duration">6-12 weeks</div>
+                                        <div class="wf-phase-tasks">
+                                            <span>System architecture</span>
+                                            <span>Technical design</span>
+                                            <span>Design review</span>
+                                        </div>
+                                    </div>
+                                    <div class="wf-phase-output">📐 Design Docs</div>
+                                </div>
+                                <div class="waterfall-connector">
+                                    <div class="wf-gate">✓ Gate</div>
+                                </div>
+                                <div class="waterfall-phase" style="--phase-color: var(--violet);">
+                                    <div class="wf-phase-num">3</div>
+                                    <div class="wf-phase-content">
+                                        <div class="wf-phase-name">Implementation</div>
+                                        <div class="wf-phase-duration">12-24 weeks</div>
+                                        <div class="wf-phase-tasks">
+                                            <span>Code development</span>
+                                            <span>Unit testing</span>
+                                            <span>Code review</span>
+                                        </div>
+                                    </div>
+                                    <div class="wf-phase-output">💻 Working Code</div>
+                                </div>
+                                <div class="waterfall-connector">
+                                    <div class="wf-gate">✓ Gate</div>
+                                </div>
+                                <div class="waterfall-phase" style="--phase-color: var(--yellow);">
+                                    <div class="wf-phase-num">4</div>
+                                    <div class="wf-phase-content">
+                                        <div class="wf-phase-name">Verification</div>
+                                        <div class="wf-phase-duration">4-8 weeks</div>
+                                        <div class="wf-phase-tasks">
+                                            <span>Integration testing</span>
+                                            <span>System testing</span>
+                                            <span>UAT</span>
+                                        </div>
+                                    </div>
+                                    <div class="wf-phase-output">✅ Test Reports</div>
+                                </div>
+                                <div class="waterfall-connector">
+                                    <div class="wf-gate">✓ Gate</div>
+                                </div>
+                                <div class="waterfall-phase" style="--phase-color: var(--green);">
+                                    <div class="wf-phase-num">5</div>
+                                    <div class="wf-phase-content">
+                                        <div class="wf-phase-name">Deployment</div>
+                                        <div class="wf-phase-duration">2-4 weeks</div>
+                                        <div class="wf-phase-tasks">
+                                            <span>Release to prod</span>
+                                            <span>Training</span>
+                                            <span>Documentation</span>
+                                        </div>
+                                    </div>
+                                    <div class="wf-phase-output">🚀 Live System</div>
+                                </div>
+                                <div class="waterfall-connector">
+                                    <div class="wf-gate">✓ Gate</div>
+                                </div>
+                                <div class="waterfall-phase" style="--phase-color: var(--pink);">
+                                    <div class="wf-phase-num">6</div>
+                                    <div class="wf-phase-content">
+                                        <div class="wf-phase-name">Maintenance</div>
+                                        <div class="wf-phase-duration">Ongoing</div>
+                                        <div class="wf-phase-tasks">
+                                            <span>Bug fixes</span>
+                                            <span>Enhancements</span>
+                                            <span>Support</span>
+                                        </div>
+                                    </div>
+                                    <div class="wf-phase-output">🔧 Updates</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="waterfall-traits">
+                        <div class="wf-trait pros">
+                            <div class="wf-trait-header">✅ Best For</div>
+                            <ul>
+                                <li>Regulated industries (FDA, SOX)</li>
+                                <li>Fixed-price contracts</li>
+                                <li>Hardware + software projects</li>
+                                <li>Well-understood requirements</li>
+                                <li>External dependencies/vendors</li>
+                            </ul>
+                        </div>
+                        <div class="wf-trait cons">
+                            <div class="wf-trait-header">⚠️ Challenges</div>
+                            <ul>
+                                <li>Late discovery of issues</li>
+                                <li>Costly requirement changes</li>
+                                <li>Long time to first delivery</li>
+                                <li>Limited customer feedback</li>
+                                <li>Risk loaded to end of project</li>
+                            </ul>
+                        </div>
+                        <div class="wf-trait docs">
+                            <div class="wf-trait-header">📄 Key Documents</div>
+                            <ul>
+                                <li>Business Requirements Doc (BRD)</li>
+                                <li>System Requirements Spec (SRS)</li>
+                                <li>Technical Design Document</li>
+                                <li>Test Plan & Test Cases</li>
+                                <li>Deployment Runbook</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- LEAN PANEL -->
+                <div class="method-panel" id="lean">
+                    <div class="method-header">
+                        <div class="method-icon-large">🎯</div>
+                        <div class="method-title-block">
+                            <h3>Lean Development</h3>
+                            <div class="tagline">Eliminate waste, amplify learning, deliver fast</div>
+                            <p>Lean software development adapts principles from Lean manufacturing to software. It focuses on eliminating waste (activities that don't add customer value), empowering teams, building quality in, and optimizing the whole system rather than individual parts.</p>
+                        </div>
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">7</div>
+                                <div class="method-stat-label">Core Principles</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">8</div>
+                                <div class="method-stat-label">Types of Waste</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">∞</div>
+                                <div class="method-stat-label">Improvement</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 8 WASTES DIAGRAM -->
+                    <div class="lean-wastes">
+                        <div class="lean-wastes-header">
+                            <span class="lean-wastes-icon">🗑️</span>
+                            <span class="lean-wastes-title">The 8 Wastes of Software Development (DOWNTIME)</span>
+                        </div>
+                        <div class="lean-wastes-body">
+                            <div class="waste-grid">
+                                <div class="waste-item">
+                                    <div class="waste-letter">D</div>
+                                    <div class="waste-name">Defects</div>
+                                    <div class="waste-desc">Bugs, rework, technical debt</div>
+                                    <div class="waste-fix">→ TDD, code review, CI</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">O</div>
+                                    <div class="waste-name">Overproduction</div>
+                                    <div class="waste-desc">Features nobody uses</div>
+                                    <div class="waste-fix">→ MVP, validate early</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">W</div>
+                                    <div class="waste-name">Waiting</div>
+                                    <div class="waste-desc">Blocked on approvals, deps</div>
+                                    <div class="waste-fix">→ Reduce handoffs, WIP</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">N</div>
+                                    <div class="waste-name">Non-utilized talent</div>
+                                    <div class="waste-desc">Underused skills, silos</div>
+                                    <div class="waste-fix">→ Cross-functional teams</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">T</div>
+                                    <div class="waste-name">Transportation</div>
+                                    <div class="waste-desc">Handoffs between teams</div>
+                                    <div class="waste-fix">→ Co-located, DevOps</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">I</div>
+                                    <div class="waste-name">Inventory</div>
+                                    <div class="waste-desc">Partially done work, queues</div>
+                                    <div class="waste-fix">→ Limit WIP, small batches</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">M</div>
+                                    <div class="waste-name">Motion</div>
+                                    <div class="waste-desc">Task switching, context loss</div>
+                                    <div class="waste-fix">→ Focus time, flow state</div>
+                                </div>
+                                <div class="waste-item">
+                                    <div class="waste-letter">E</div>
+                                    <div class="waste-name">Extra processing</div>
+                                    <div class="waste-desc">Over-engineering, gold plating</div>
+                                    <div class="waste-fix">→ YAGNI, just enough</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- VALUE STREAM -->
+                    <div class="lean-value-stream">
+                        <div class="vs-header">
+                            <span class="vs-icon">📈</span>
+                            <span class="vs-title">Value Stream: Idea → Customer Value</span>
+                        </div>
+                        <div class="vs-body">
+                            <div class="vs-flow">
+                                <div class="vs-stage value">
+                                    <div class="vs-stage-type">Value</div>
+                                    <div class="vs-stage-name">Coding</div>
+                                    <div class="vs-stage-time">2 days</div>
+                                </div>
+                                <div class="vs-wait">
+                                    <div class="vs-wait-label">Wait</div>
+                                    <div class="vs-wait-time">3 days</div>
+                                </div>
+                                <div class="vs-stage value">
+                                    <div class="vs-stage-type">Value</div>
+                                    <div class="vs-stage-name">Review</div>
+                                    <div class="vs-stage-time">2 hrs</div>
+                                </div>
+                                <div class="vs-wait">
+                                    <div class="vs-wait-label">Wait</div>
+                                    <div class="vs-wait-time">1 day</div>
+                                </div>
+                                <div class="vs-stage value">
+                                    <div class="vs-stage-type">Value</div>
+                                    <div class="vs-stage-name">Testing</div>
+                                    <div class="vs-stage-time">4 hrs</div>
+                                </div>
+                                <div class="vs-wait">
+                                    <div class="vs-wait-label">Wait</div>
+                                    <div class="vs-wait-time">5 days</div>
+                                </div>
+                                <div class="vs-stage value">
+                                    <div class="vs-stage-type">Value</div>
+                                    <div class="vs-stage-name">Deploy</div>
+                                    <div class="vs-stage-time">30 min</div>
+                                </div>
+                            </div>
+                            <div class="vs-summary">
+                                <div class="vs-metric">
+                                    <span class="vs-metric-label">Lead Time:</span>
+                                    <span class="vs-metric-value bad">11.5 days</span>
+                                </div>
+                                <div class="vs-metric">
+                                    <span class="vs-metric-label">Value Time:</span>
+                                    <span class="vs-metric-value good">2.7 days</span>
+                                </div>
+                                <div class="vs-metric">
+                                    <span class="vs-metric-label">Efficiency:</span>
+                                    <span class="vs-metric-value bad">23%</span>
+                                </div>
+                                <div class="vs-metric">
+                                    <span class="vs-metric-label">Goal:</span>
+                                    <span class="vs-metric-value good">>40%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 7 PRINCIPLES -->
+                    <div class="lean-principles">
+                        <div class="lp-header">
+                            <span class="lp-icon">🎯</span>
+                            <span class="lp-title">The 7 Lean Principles</span>
+                        </div>
+                        <div class="lp-body">
+                            <div class="lp-grid">
+                                <div class="lp-item">
+                                    <div class="lp-num">1</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Eliminate Waste</div>
+                                        <div class="lp-desc">Remove anything that doesn't add customer value</div>
+                                    </div>
+                                </div>
+                                <div class="lp-item">
+                                    <div class="lp-num">2</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Amplify Learning</div>
+                                        <div class="lp-desc">Short feedback cycles and experiments</div>
+                                    </div>
+                                </div>
+                                <div class="lp-item">
+                                    <div class="lp-num">3</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Decide Late</div>
+                                        <div class="lp-desc">Defer commitment until last responsible moment</div>
+                                    </div>
+                                </div>
+                                <div class="lp-item">
+                                    <div class="lp-num">4</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Deliver Fast</div>
+                                        <div class="lp-desc">Reduce cycle time and batch sizes</div>
+                                    </div>
+                                </div>
+                                <div class="lp-item">
+                                    <div class="lp-num">5</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Empower Teams</div>
+                                        <div class="lp-desc">Push decisions to lowest level possible</div>
+                                    </div>
+                                </div>
+                                <div class="lp-item">
+                                    <div class="lp-num">6</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Build Quality In</div>
+                                        <div class="lp-desc">Prevent defects, don't find them</div>
+                                    </div>
+                                </div>
+                                <div class="lp-item highlight">
+                                    <div class="lp-num">7</div>
+                                    <div class="lp-content">
+                                        <div class="lp-name">Optimize the Whole</div>
+                                        <div class="lp-desc">Focus on end-to-end flow, not local gains</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- COMPARISON MATRIX -->
+            <section class="module" id="comparison">
+                <div class="module-header">
+                    <div class="module-icon">⚖️</div>
+                    <div class="module-info">
+                        <h2>Methodology Comparison</h2>
+                        <p>Side-by-side analysis to choose the right approach</p>
+                    </div>
+                </div>
+                
+                <div class="comparison-section">
+                    <div class="comparison-header">
+                        <span class="comparison-title">Framework Comparison Matrix</span>
+                    </div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Methodology</th>
+                                <th>Best For</th>
+                                <th>Team Size</th>
+                                <th>Flexibility</th>
+                                <th>Predictability</th>
+                                <th>Documentation</th>
+                                <th>Scaling</th>
+                                <th>Learning Curve</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="method-name"><span class="method-icon">🔄</span> Scrum</span></td>
+                                <td>Product development, innovation, cross-functional teams</td>
+                                <td>3-9</td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="fit-badge moderate">Moderate</span></td>
+                                <td><span class="fit-badge good">Medium</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="method-name"><span class="method-icon">📋</span> Kanban</span></td>
+                                <td>Operations, support, continuous flow work</td>
+                                <td>Any</td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="fit-badge excellent">Excellent</span></td>
+                                <td><span class="fit-badge excellent">Easy</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="method-name"><span class="method-icon">♾️</span> DevOps</span></td>
+                                <td>Software delivery, automation, SRE</td>
+                                <td>Any</td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="fit-badge excellent">Excellent</span></td>
+                                <td><span class="fit-badge poor">Steep</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="method-name"><span class="method-icon">🏢</span> SAFe</span></td>
+                                <td>Enterprise programs, regulated industries</td>
+                                <td>50-125+</td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="fit-badge excellent">Built-in</span></td>
+                                <td><span class="fit-badge poor">Steep</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="method-name"><span class="method-icon">📊</span> Waterfall</span></td>
+                                <td>Construction, hardware, compliance-heavy</td>
+                                <td>Any</td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                    </div>
+                                </td>
+                                <td><span class="fit-badge good">Good</span></td>
+                                <td><span class="fit-badge excellent">Easy</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="method-name"><span class="method-icon">🎯</span> Lean</span></td>
+                                <td>Startups, process improvement, efficiency</td>
+                                <td>Any</td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-cell">
+                                        <span class="rating-dot filled"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                        <span class="rating-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="fit-badge good">Good</span></td>
+                                <td><span class="fit-badge good">Medium</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- PM TOOLS -->
+            <section class="module" id="tools">
+                <div class="module-header">
+                    <div class="module-icon">🛠️</div>
+                    <div class="module-info">
+                        <h2>Project Management Tools</h2>
+                        <p>Software platforms to support your chosen methodology</p>
+                    </div>
+                </div>
+                
+                <div class="tools-section">
+                    <div class="tools-header">
+                        <span class="tools-title">PM Tool Landscape</span>
+                        <div class="tools-filter">
+                            <span class="filter-btn active">All</span>
+                            <span class="filter-btn">Agile</span>
+                            <span class="filter-btn">Enterprise</span>
+                            <span class="filter-btn">DevOps</span>
+                        </div>
+                    </div>
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🔵</div>
+                                <div>
+                                    <div class="tool-name">Jira</div>
+                                    <div class="tool-vendor">Atlassian</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Industry-leading agile project management with powerful workflow customization, reporting, and integrations.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Scrum</span>
+                                <span class="tool-feature">Kanban</span>
+                                <span class="tool-feature">Roadmaps</span>
+                                <span class="tool-feature">DevOps</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$7.75/user/mo</span>
+                                <span class="tool-rating">⭐ 4.3</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🟠</div>
+                                <div>
+                                    <div class="tool-name">Asana</div>
+                                    <div class="tool-vendor">Asana</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Flexible work management for teams of all sizes. Strong on goals, portfolios, and cross-functional visibility.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Lists</span>
+                                <span class="tool-feature">Boards</span>
+                                <span class="tool-feature">Timeline</span>
+                                <span class="tool-feature">Goals</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$10.99/user/mo</span>
+                                <span class="tool-rating">⭐ 4.4</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🟣</div>
+                                <div>
+                                    <div class="tool-name">Monday.com</div>
+                                    <div class="tool-vendor">Monday</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Visual work OS with highly customizable boards, automations, and dashboards for any workflow.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Custom Views</span>
+                                <span class="tool-feature">Automations</span>
+                                <span class="tool-feature">Dashboards</span>
+                                <span class="tool-feature">CRM</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$9/seat/mo</span>
+                                <span class="tool-rating">⭐ 4.5</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🟢</div>
+                                <div>
+                                    <div class="tool-name">Linear</div>
+                                    <div class="tool-vendor">Linear</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Modern issue tracking built for speed. Keyboard-first design, cycles, and beautiful UI for product teams.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Cycles</span>
+                                <span class="tool-feature">Roadmaps</span>
+                                <span class="tool-feature">GitHub Sync</span>
+                                <span class="tool-feature">Triage</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$8/user/mo</span>
+                                <span class="tool-rating">⭐ 4.8</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">⬛</div>
+                                <div>
+                                    <div class="tool-name">Notion</div>
+                                    <div class="tool-vendor">Notion Labs</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">All-in-one workspace combining docs, databases, and project management in a flexible, blocks-based system.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Docs</span>
+                                <span class="tool-feature">Databases</span>
+                                <span class="tool-feature">Wikis</span>
+                                <span class="tool-feature">AI</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$8/user/mo</span>
+                                <span class="tool-rating">⭐ 4.6</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🔷</div>
+                                <div>
+                                    <div class="tool-name">Azure DevOps</div>
+                                    <div class="tool-vendor">Microsoft</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Complete DevOps suite with boards, repos, pipelines, test plans, and artifacts in one platform.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Boards</span>
+                                <span class="tool-feature">Repos</span>
+                                <span class="tool-feature">Pipelines</span>
+                                <span class="tool-feature">Test Plans</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$6/user/mo</span>
+                                <span class="tool-rating">⭐ 4.3</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🦊</div>
+                                <div>
+                                    <div class="tool-name">GitLab</div>
+                                    <div class="tool-vendor">GitLab</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Complete DevSecOps platform with source control, CI/CD, security scanning, and project management.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Issues</span>
+                                <span class="tool-feature">CI/CD</span>
+                                <span class="tool-feature">Security</span>
+                                <span class="tool-feature">Registry</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$29/user/mo</span>
+                                <span class="tool-rating">⭐ 4.4</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🎨</div>
+                                <div>
+                                    <div class="tool-name">ClickUp</div>
+                                    <div class="tool-vendor">ClickUp</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Feature-rich productivity platform with docs, whiteboards, goals, and highly customizable views.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Views</span>
+                                <span class="tool-feature">Docs</span>
+                                <span class="tool-feature">Whiteboards</span>
+                                <span class="tool-feature">Goals</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$7/user/mo</span>
+                                <span class="tool-rating">⭐ 4.5</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">📊</div>
+                                <div>
+                                    <div class="tool-name">Smartsheet</div>
+                                    <div class="tool-vendor">Smartsheet</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Spreadsheet-style project management with powerful automation, reporting, and resource management.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Gantt</span>
+                                <span class="tool-feature">Resources</span>
+                                <span class="tool-feature">Automations</span>
+                                <span class="tool-feature">Reports</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$9/user/mo</span>
+                                <span class="tool-rating">⭐ 4.4</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🚀</div>
+                                <div>
+                                    <div class="tool-name">Shortcut</div>
+                                    <div class="tool-vendor">Shortcut</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Project management built for product development teams with stories, epics, and roadmap planning.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Stories</span>
+                                <span class="tool-feature">Epics</span>
+                                <span class="tool-feature">Milestones</span>
+                                <span class="tool-feature">Reports</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$8.50/user/mo</span>
+                                <span class="tool-rating">⭐ 4.5</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">📅</div>
+                                <div>
+                                    <div class="tool-name">Microsoft Project</div>
+                                    <div class="tool-vendor">Microsoft</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Enterprise project management with Gantt charts, resource leveling, and portfolio management.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Gantt</span>
+                                <span class="tool-feature">Resources</span>
+                                <span class="tool-feature">Portfolio</span>
+                                <span class="tool-feature">Reporting</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">$10/user/mo</span>
+                                <span class="tool-rating">⭐ 4.1</span>
+                            </div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <div class="tool-logo">🏢</div>
+                                <div>
+                                    <div class="tool-name">Planview</div>
+                                    <div class="tool-vendor">Planview</div>
+                                </div>
+                            </div>
+                            <div class="tool-desc">Enterprise work and resource management for PMOs. Strategic portfolio planning and capacity management.</div>
+                            <div class="tool-features">
+                                <span class="tool-feature">Portfolio</span>
+                                <span class="tool-feature">Capacity</span>
+                                <span class="tool-feature">SAFe</span>
+                                <span class="tool-feature">Lean</span>
+                            </div>
+                            <div class="tool-meta">
+                                <span class="tool-price">Custom</span>
+                                <span class="tool-rating">⭐ 4.2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- BEST PRACTICES -->
+            <section class="module" id="practices">
+                <div class="module-header">
+                    <div class="module-icon">💡</div>
+                    <div class="module-info">
+                        <h2>Implementation Best Practices</h2>
+                        <p>Guidance for successful methodology adoption</p>
+                    </div>
+                </div>
+                
+                <div class="practices-grid">
+                    <div class="practice-card">
+                        <div class="practice-icon">🎯</div>
+                        <div class="practice-title">Start with Why</div>
+                        <div class="practice-desc">Understand the problems you're solving before choosing a methodology. Don't adopt Scrum just because it's popular.</div>
+                        <ul class="practice-tips">
+                            <li>Identify current pain points and constraints</li>
+                            <li>Define success metrics before transformation</li>
+                            <li>Get executive sponsorship and buy-in</li>
+                            <li>Communicate the "why" to all stakeholders</li>
+                        </ul>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-icon">👥</div>
+                        <div class="practice-title">Invest in People</div>
+                        <div class="practice-desc">Methodologies are only as good as the people practicing them. Training and coaching are essential investments.</div>
+                        <ul class="practice-tips">
+                            <li>Provide formal training and certifications</li>
+                            <li>Hire experienced coaches for the first year</li>
+                            <li>Create internal communities of practice</li>
+                            <li>Celebrate learning, not just delivery</li>
+                        </ul>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-icon">🔄</div>
+                        <div class="practice-title">Iterate on Process</div>
+                        <div class="practice-desc">Your process should evolve. Start with the basics, then adapt based on what you learn about your context.</div>
+                        <ul class="practice-tips">
+                            <li>Start simple—don't over-engineer process</li>
+                            <li>Hold regular retrospectives on process itself</li>
+                            <li>Measure process metrics, not just outcomes</li>
+                            <li>Be willing to experiment and fail fast</li>
+                        </ul>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-icon">🛠️</div>
+                        <div class="practice-title">Tools Support Process</div>
+                        <div class="practice-desc">Tools should enable your methodology, not define it. Choose tools that fit your process, not the reverse.</div>
+                        <ul class="practice-tips">
+                            <li>Define process before selecting tools</li>
+                            <li>Start with minimal tooling complexity</li>
+                            <li>Ensure tools integrate with existing systems</li>
+                            <li>Train teams thoroughly on tool usage</li>
+                        </ul>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-icon">📊</div>
+                        <div class="practice-title">Measure What Matters</div>
+                        <div class="practice-desc">Focus on outcomes over outputs. Velocity is meaningless if you're not delivering customer value.</div>
+                        <ul class="practice-tips">
+                            <li>Track lead time and cycle time</li>
+                            <li>Measure customer satisfaction and NPS</li>
+                            <li>Monitor team health and sustainability</li>
+                            <li>Avoid vanity metrics like story points delivered</li>
+                        </ul>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-icon">🌱</div>
+                        <div class="practice-title">Embrace Hybrid Approaches</div>
+                        <div class="practice-desc">Most successful organizations blend methodologies. Pure approaches rarely survive contact with reality.</div>
+                        <ul class="practice-tips">
+                            <li>Take what works from multiple frameworks</li>
+                            <li>Adapt practices to your organizational culture</li>
+                            <li>Different teams may need different approaches</li>
+                            <li>Document your customizations and rationale</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo"><span>STRATEGY</span>HUB</div>
+            <div class="footer-meta">Category 29: Methodologies & Frameworks | Blueprint Technologies cOS</div>
+        </div>
+    </footer>
+    
+    <script>
+        // Methodology toggle functionality
+        document.querySelectorAll('.method-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                document.querySelectorAll('.method-toggle').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+                const methodId = this.getAttribute('data-method');
+                document.getElementById(methodId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

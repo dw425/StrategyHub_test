@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbots & Conversational AI | Category 06 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 06 - CONVERSATION TEAL */
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --danger-red: #EF4444;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --purple: #8B5CF6;
+            --blue: #3B82F6;
+            --pink: #EC4899;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           HEADER
+        ══════════════════════════════════════════════════════════════════════ */
+        header { 
+            background: var(--bg-card); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: var(--space-md) var(--space-xl); 
+            position: fixed; 
+            top: 0; left: 0; right: 0; 
+            z-index: 1000; 
+            height: var(--header-height); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           SIDEBAR - Clean without numbers
+        ══════════════════════════════════════════════════════════════════════ */
+        .sidebar { 
+            position: fixed; 
+            top: var(--header-height); 
+            left: 0; 
+            width: var(--sidebar-width); 
+            height: calc(100vh - var(--header-height)); 
+            background: var(--bg-card); 
+            border-right: 1px solid var(--border-color); 
+            overflow-y: auto; 
+            z-index: 100; 
+            padding: var(--space-lg) 0; 
+        }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { 
+            font-size: var(--font-xs); 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            color: var(--cat-light); 
+            padding: 0 var(--space-lg); 
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--space-sm); 
+            padding: var(--space-sm) var(--space-lg); 
+            color: var(--text-secondary); 
+            text-decoration: none; 
+            font-size: var(--font-sm); 
+            border-left: 3px solid transparent; 
+            transition: all 0.2s; 
+        }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           MAIN CONTENT
+        ══════════════════════════════════════════════════════════════════════ */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           HERO
+        ══════════════════════════════════════════════════════════════════════ */
+        .hero-compact { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: var(--space-xl); 
+            margin-bottom: var(--space-3xl); 
+            padding: var(--space-xl); 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-xl); 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           SECTION HEADERS
+        ══════════════════════════════════════════════════════════════════════ */
+        .section-header { margin-bottom: var(--space-xl); }
+        .section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .section-title { font-size: var(--font-2xl); margin-bottom: var(--space-sm); }
+        .section-desc { font-size: var(--font-base); color: var(--text-secondary); max-width: 700px; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           MODULES (from cat15)
+        ══════════════════════════════════════════════════════════════════════ */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        /* DESCRIPTION BLOCK */
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           ARCHITECTURE DIAGRAM
+        ══════════════════════════════════════════════════════════════════════ */
+        .arch-diagram { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); margin-bottom: var(--space-xl); overflow: hidden; }
+        .arch-diagram-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-color); background: var(--bg-card-alt); }
+        .arch-diagram-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .arch-legend { display: flex; gap: var(--space-md); }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: var(--font-xs); color: var(--text-muted); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .legend-dot.nlu { background: var(--blue); }
+        .legend-dot.dialog { background: var(--warning-yellow); }
+        .legend-dot.response { background: var(--cat-primary); }
+        .legend-dot.context { background: var(--purple); }
+        .arch-canvas { padding: var(--space-lg); min-height: 400px; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           TOOL CARDS
+        ══════════════════════════════════════════════════════════════════════ */
+        .tools-section { margin-bottom: var(--space-xl); }
+        .tools-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+        .tools-header h3 { font-size: var(--font-lg); }
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           BEST PRACTICES (2-column)
+        ══════════════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .practice-card-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .practice-card-icon { width: 36px; height: 36px; background: var(--cat-glow); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .practice-card-title { font-size: var(--font-base); font-weight: 600; }
+        .practice-card p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-md); }
+        .practice-card p:last-child { margin-bottom: 0; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           AGENT SECTION + CODE PANEL
+        ══════════════════════════════════════════════════════════════════════ */
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-section-header { margin-bottom: var(--space-lg); }
+        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
+        
+        /* CODE PANEL */
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(20,184,166,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 450px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #7EE787; }
+        .code-number { color: #79C0FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           CREW SHOWCASE
+        ══════════════════════════════════════════════════════════════════════ */
+        .crew-section { margin-bottom: var(--space-xl); }
+        .crew-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .crew-header { padding: var(--space-lg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-lg); }
+        .crew-icon { font-size: 32px; }
+        .crew-title h3 { font-size: var(--font-lg); margin-bottom: 2px; }
+        .crew-title p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .crew-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); padding: var(--space-xl); }
+        .crew-member { text-align: center; padding: var(--space-lg); background: var(--bg-card-alt); border-radius: var(--radius-lg); border: 1px solid var(--border-color); transition: all 0.3s; }
+        .crew-member:hover { border-color: var(--cat-primary); transform: translateY(-4px); }
+        .crew-member-icon { width: 56px; height: 56px; margin: 0 auto var(--space-md); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid rgba(255,255,255,0.2); }
+        .crew-member-icon.nlu { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+        .crew-member-icon.dialog { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .crew-member-icon.response { background: linear-gradient(135deg, var(--cat-primary), var(--cat-dark)); }
+        .crew-member-icon.context { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+        .crew-member-icon.sentiment { background: linear-gradient(135deg, #EC4899, #BE185D); }
+        .crew-member-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .crew-member-role { font-size: var(--font-xs); color: var(--text-muted); }
+        .crew-flow { display: flex; align-items: center; justify-content: center; gap: var(--space-sm); padding: var(--space-md) var(--space-xl); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .crew-flow-step { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); }
+        .crew-flow-arrow { color: var(--cat-light); }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           EXAMPLE CONVERSATION
+        ══════════════════════════════════════════════════════════════════════ */
+        .convo-example { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .convo-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-sm); }
+        .convo-header-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .convo-header-dot.red { background: #EF4444; }
+        .convo-header-dot.yellow { background: #F59E0B; }
+        .convo-header-dot.green { background: #10B981; }
+        .convo-header-title { margin-left: var(--space-md); font-size: var(--font-sm); color: var(--text-muted); }
+        .convo-body { padding: var(--space-xl); }
+        .convo-message { display: flex; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .convo-message:last-child { margin-bottom: 0; }
+        .convo-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .convo-avatar.user { background: var(--blue); }
+        .convo-avatar.bot { background: var(--cat-primary); }
+        .convo-bubble { background: var(--bg-card-alt); border-radius: var(--radius-lg); padding: var(--space-md) var(--space-lg); max-width: 80%; }
+        .convo-bubble.user { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .convo-bubble.bot { background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.3); }
+        .convo-text { font-size: var(--font-sm); color: var(--text-primary); line-height: 1.6; }
+        .convo-meta { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-xs); }
+        .convo-annotations { margin-top: var(--space-lg); padding-top: var(--space-lg); border-top: 1px solid var(--border-color); }
+        .convo-annotation { display: flex; align-items: flex-start; gap: var(--space-sm); margin-bottom: var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); }
+        .convo-annotation-label { background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 2px 8px; border-radius: var(--radius-sm); color: var(--cat-light); font-weight: 500; white-space: nowrap; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           PLATFORM COMPARISON
+        ══════════════════════════════════════════════════════════════════════ */
+        .platforms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .platform-card:hover { border-color: var(--cat-light); }
+        .platform-header { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-lg); border-bottom: 1px solid var(--border-color); }
+        .platform-logo { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .platform-logo.dialogflow { background: #FF9800; }
+        .platform-logo.lex { background: #232F3E; }
+        .platform-logo.rasa { background: #5A17EE; }
+        .platform-logo.azure { background: #0078D4; }
+        .platform-info h4 { font-size: var(--font-lg); margin-bottom: 2px; }
+        .platform-info span { font-size: var(--font-xs); color: var(--text-muted); }
+        .platform-body { padding: var(--space-lg); }
+        .platform-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); }
+        .platform-features { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
+        .platform-feature { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); }
+        .platform-feature::before { content: '✓'; color: var(--cat-light); }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           DIVIDER
+        ══════════════════════════════════════════════════════════════════════ */
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           FOOTER
+        ══════════════════════════════════════════════════════════════════════ */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: var(--font-base); font-weight: 600; }
+        .footer-brand span { color: var(--brand-orange); }
+        .footer-meta { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        /* ══════════════════════════════════════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════════════════════════════════════ */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .platforms-grid { grid-template-columns: 1fr; }
+            .crew-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            .crew-grid { grid-template-columns: repeat(2, 1fr); }
+            .crew-flow { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════════════════════════════════ -->
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     SIDEBAR - Clean without numbered badges
+══════════════════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">💬 Category 06</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">🏠</span> Category Overview</a></li>
+            <li><a href="#nlu"><span class="nav-icon">🧠</span> NLU & Intent Recognition</a></li>
+            <li><a href="#dialog"><span class="nav-icon">🔄</span> Dialog Management</a></li>
+            <li><a href="#response"><span class="nav-icon">💬</span> Response Generation</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🤖</span> Chatbot Platforms</a></li>
+            <li><a href="#voice"><span class="nav-icon">🎙️</span> Voice Assistants</a></li>
+            <li><a href="#enterprise"><span class="nav-icon">🚀</span> Enterprise Copilots</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- ══════════════════════════════════════════════════════════════════════
+             HERO
+        ══════════════════════════════════════════════════════════════════════ -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">💬 Category 06</span>
+                <h1>Chatbots & Conversational AI</h1>
+                <p>Build intelligent virtual assistants that understand context, manage dialog state, and generate natural responses at enterprise scale.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">$15.5B</div><div class="hero-metric-label">Market Size 2028</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">80%</div><div class="hero-metric-label">Queries Automated</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">30%</div><div class="hero-metric-label">Cost Reduction</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;2s</div><div class="hero-metric-label">Response Time</div></div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════════════════════
+             MODULE 1: NLU & INTENT RECOGNITION
+        ══════════════════════════════════════════════════════════════════════════════ -->
+        <section class="module" id="nlu">
+            <div class="module-header">
+                <div class="module-icon">🧠</div>
+                <div class="module-info">
+                    <h2>NLU & Intent Recognition</h2>
+                    <p>Understanding what users want from their natural language input</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Natural Language Understanding (NLU) is the foundation of every conversational AI system. It transforms unstructured user input into structured data that your application can act upon. Modern NLU pipelines combine traditional ML classifiers with transformer-based models to achieve high accuracy across diverse user expressions.</p>
+                <p>The core components include intent classification (what the user wants to do), entity extraction (key parameters from the input), and sentiment analysis (emotional context). Getting NLU right is critical—poor intent recognition cascades into failed conversations and frustrated users.</p>
+            </div>
+            
+            <!-- Architecture Diagram -->
+            <div class="arch-diagram">
+                <div class="arch-diagram-header">
+                    <div class="arch-diagram-title">🔄 Conversational AI Pipeline</div>
+                    <div class="arch-legend">
+                        <div class="legend-item"><div class="legend-dot nlu"></div>NLU</div>
+                        <div class="legend-item"><div class="legend-dot dialog"></div>Dialog</div>
+                        <div class="legend-item"><div class="legend-dot response"></div>Response</div>
+                        <div class="legend-item"><div class="legend-dot context"></div>Context</div>
+                    </div>
+                </div>
+                <div class="arch-canvas">
+                    <svg width="100%" height="380" viewBox="0 0 1050 380">
+                        <defs>
+                            <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+                                <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                            <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#14B8A6"/>
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)"/>
+                        
+                        <!-- User Input -->
+                        <rect x="20" y="140" width="130" height="100" rx="12" fill="#1a1a2e" stroke="#3B82F6"/>
+                        <text x="85" y="175" text-anchor="middle" fill="#60A5FA" font-size="28">👤</text>
+                        <text x="85" y="205" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="600">User Input</text>
+                        <text x="85" y="225" text-anchor="middle" fill="#6a6a7a" font-size="10">"Book flight to NYC"</text>
+                        
+                        <!-- Arrow 1 -->
+                        <line x1="155" y1="190" x2="195" y2="190" stroke="#14B8A6" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- NLU Engine -->
+                        <rect x="200" y="120" width="160" height="140" rx="12" fill="#1a1a2e" stroke="#3B82F6"/>
+                        <text x="280" y="145" text-anchor="middle" fill="#3B82F6" font-size="10" font-weight="600">NLU ENGINE</text>
+                        <rect x="215" y="155" width="130" height="30" rx="6" fill="#12121a" stroke="#3B82F6"/>
+                        <text x="280" y="175" text-anchor="middle" fill="#60A5FA" font-size="10">Intent: book_flight</text>
+                        <rect x="215" y="190" width="130" height="30" rx="6" fill="#12121a" stroke="#8B5CF6"/>
+                        <text x="280" y="210" text-anchor="middle" fill="#A78BFA" font-size="10">Entity: NYC</text>
+                        <rect x="215" y="225" width="130" height="25" rx="6" fill="#12121a" stroke="#10B981"/>
+                        <text x="280" y="242" text-anchor="middle" fill="#34D399" font-size="10">Confidence: 0.94</text>
+                        
+                        <!-- Arrow 2 -->
+                        <line x1="365" y1="190" x2="405" y2="190" stroke="#14B8A6" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Dialog Manager -->
+                        <rect x="410" y="120" width="160" height="140" rx="12" fill="#1a1a2e" stroke="#F59E0B"/>
+                        <text x="490" y="145" text-anchor="middle" fill="#F59E0B" font-size="10" font-weight="600">DIALOG MANAGER</text>
+                        <rect x="425" y="155" width="130" height="30" rx="6" fill="#12121a" stroke="#F59E0B"/>
+                        <text x="490" y="175" text-anchor="middle" fill="#FBBF24" font-size="10">State: collecting_info</text>
+                        <rect x="425" y="190" width="130" height="30" rx="6" fill="#12121a" stroke="#F59E0B"/>
+                        <text x="490" y="210" text-anchor="middle" fill="#FBBF24" font-size="10">Next: ask_date</text>
+                        <rect x="425" y="225" width="130" height="25" rx="6" fill="#12121a" stroke="#F59E0B"/>
+                        <text x="490" y="242" text-anchor="middle" fill="#FBBF24" font-size="10">Slots: [dest ✓]</text>
+                        
+                        <!-- Arrow 3 -->
+                        <line x1="575" y1="190" x2="615" y2="190" stroke="#14B8A6" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Response Generator -->
+                        <rect x="620" y="120" width="160" height="140" rx="12" fill="#1a1a2e" stroke="#14B8A6"/>
+                        <text x="700" y="145" text-anchor="middle" fill="#14B8A6" font-size="10" font-weight="600">RESPONSE GEN</text>
+                        <rect x="635" y="155" width="130" height="45" rx="6" fill="#12121a" stroke="#14B8A6"/>
+                        <text x="700" y="175" text-anchor="middle" fill="#2DD4BF" font-size="10">Template + LLM</text>
+                        <text x="700" y="192" text-anchor="middle" fill="#6a6a7a" font-size="9">NLG Pipeline</text>
+                        <rect x="635" y="205" width="130" height="45" rx="6" fill="#12121a" stroke="#14B8A6"/>
+                        <text x="700" y="225" text-anchor="middle" fill="#2DD4BF" font-size="10">"When would you</text>
+                        <text x="700" y="242" text-anchor="middle" fill="#2DD4BF" font-size="10">like to travel?"</text>
+                        
+                        <!-- Arrow 4 -->
+                        <line x1="785" y1="190" x2="825" y2="190" stroke="#14B8A6" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Output -->
+                        <rect x="830" y="140" width="130" height="100" rx="12" fill="#1a1a2e" stroke="#14B8A6"/>
+                        <text x="895" y="175" text-anchor="middle" fill="#2DD4BF" font-size="28">💬</text>
+                        <text x="895" y="205" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="600">Bot Response</text>
+                        <text x="895" y="225" text-anchor="middle" fill="#6a6a7a" font-size="10">Sent to User</text>
+                        
+                        <!-- Context Memory (below) -->
+                        <rect x="350" y="290" width="350" height="70" rx="12" fill="#1a1a2e" stroke="#8B5CF6"/>
+                        <text x="525" y="315" text-anchor="middle" fill="#8B5CF6" font-size="10" font-weight="600">CONTEXT MEMORY</text>
+                        <text x="525" y="340" text-anchor="middle" fill="#A78BFA" font-size="11">Session State • Conversation History • User Profile • Slot Values</text>
+                        
+                        <!-- Vertical connectors to context -->
+                        <line x1="280" y1="260" x2="280" y2="280" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="280" y1="280" x2="400" y2="290" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="490" y1="260" x2="490" y2="290" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="700" y1="260" x2="700" y2="280" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="700" y1="280" x2="650" y2="290" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Tool Cards -->
+            <div class="tools-section">
+                <div class="tools-header"><h3>🛠️ Key Tools & Frameworks</h3></div>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🟠</div>
+                            <div class="tool-card-name">Dialogflow CX</div>
+                        </div>
+                        <div class="tool-card-desc">Google's enterprise NLU with visual flow builder, 30+ language support, and Vertex AI integration for generative features.</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🟣</div>
+                            <div class="tool-card-name">Rasa NLU</div>
+                        </div>
+                        <div class="tool-card-desc">Open-source NLU with DIET classifier, custom entity extraction, and full control over training data and models.</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🔷</div>
+                            <div class="tool-card-name">Amazon Lex</div>
+                        </div>
+                        <div class="tool-card-desc">AWS conversational AI with Alexa technology, Lambda integration, and Amazon Connect for contact centers.</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-card-icon">🟢</div>
+                            <div class="tool-card-name">spaCy + Transformers</div>
+                        </div>
+                        <div class="tool-card-desc">Industrial-strength NLP library with custom NER, dependency parsing, and HuggingFace model integration.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Best Practices -->
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-card-header">
+                        <div class="practice-card-icon">✅</div>
+                        <div class="practice-card-title">Why NLU Matters</div>
+                    </div>
+                    <p>Intent recognition accuracy directly determines user satisfaction. A chatbot that misunderstands 20% of requests creates frustrated users who abandon self-service. Top-performing NLU systems achieve 95%+ intent accuracy through careful training data curation and continuous improvement loops.</p>
+                    <p>Entity extraction captures the parameters needed to fulfill requests. Missing a date, location, or product name means asking users to repeat themselves—a major UX friction point that erodes trust in automation.</p>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-card-header">
+                        <div class="practice-card-icon">🚀</div>
+                        <div class="practice-card-title">Implementation Guide</div>
+                    </div>
+                    <p>Start with 50-100 training examples per intent. Use real user utterances from logs, support tickets, or user research—synthetic data often misses natural variations. Include typos, abbreviations, and colloquialisms.</p>
+                    <p>Implement confidence thresholds: high confidence (>0.85) triggers direct action, medium (0.5-0.85) confirms with user, low (<0.5) escalates to fallback or human. Monitor intent confusion matrices weekly to identify overlap issues.</p>
+                </div>
+            </div>
+            
+            <!-- Agent + Code Section -->
+            <div class="agent-section">
+                <div class="agent-section-header">
+                    <div class="agent-section-tag">Agent This</div>
+                    <div class="agent-section-title">NLU Training Agent</div>
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-info">
+                        <div class="agent-avatar">🧠</div>
+                        <div class="agent-name">IntentTrainer</div>
+                        <div class="agent-role">NLU Model Optimization</div>
+                        <p class="agent-desc">Analyzes conversation logs to identify missing intents, generates training utterances, and optimizes entity extraction rules for higher accuracy.</p>
+                        <ul class="agent-capabilities">
+                            <li>Auto-generate training utterances from logs</li>
+                            <li>Identify intent confusion patterns</li>
+                            <li>Suggest entity annotation improvements</li>
+                            <li>A/B test model versions</li>
+                            <li>Monitor accuracy metrics in production</li>
+                        </ul>
+                    </div>
+                    <div class="code-panel">
+                        <div class="code-header">
+                            <div class="code-tabs">
+                                <div class="code-tab active">Python</div>
+                                <div class="code-tab">YAML</div>
+                                <div class="code-tab">JSON</div>
+                            </div>
+                            <div class="code-filename">nlu_agent.py</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><span class="code-comment"># NLU Training Agent - Blueprint cOS</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+<span class="code-keyword">class</span> <span class="code-function">NLUTrainingAgent</span>:
+    <span class="code-string">"""Agent for improving NLU model accuracy."""</span>
+    
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self):
+        self.llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+        self.agent = Agent(
+            role=<span class="code-string">"NLU Training Specialist"</span>,
+            goal=<span class="code-string">"Improve intent recognition accuracy"</span>,
+            backstory=<span class="code-string">"""Expert in conversational AI 
+            with deep knowledge of NLU architectures."""</span>,
+            llm=self.llm
+        )
+    
+    <span class="code-keyword">def</span> <span class="code-function">generate_training_data</span>(self, intent: str, examples: int = <span class="code-number">50</span>):
+        <span class="code-string">"""Generate diverse training utterances for an intent."""</span>
+        task = Task(
+            description=<span class="code-string">f"""Generate {examples} natural variations 
+            for intent: {intent}. Include:
+            - Formal and casual phrasing
+            - Common typos and abbreviations
+            - Different sentence structures
+            - Regional variations"""</span>,
+            expected_output=<span class="code-string">"List of training utterances"</span>,
+            agent=self.agent
+        )
+        <span class="code-keyword">return</span> Crew(agents=[self.agent], tasks=[task]).kickoff()
+    
+    <span class="code-keyword">def</span> <span class="code-function">analyze_confusion</span>(self, confusion_matrix: dict):
+        <span class="code-string">"""Identify and fix intent overlap issues."""</span>
+        task = Task(
+            description=<span class="code-string">f"""Analyze confusion matrix: {confusion_matrix}
+            Identify overlapping intents and recommend:
+            - Intent merging or splitting
+            - Additional training examples
+            - Entity-based disambiguation"""</span>,
+            expected_output=<span class="code-string">"Actionable recommendations"</span>,
+            agent=self.agent
+        )
+        <span class="code-keyword">return</span> Crew(agents=[self.agent], tasks=[task]).kickoff()</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ══════════════════════════════════════════════════════════════════════════════
+             MODULE 2: DIALOG MANAGEMENT
+        ══════════════════════════════════════════════════════════════════════════════ -->
+        <section class="module" id="dialog">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Dialog Management</h2>
+                    <p>Orchestrating multi-turn conversations with state and context</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Dialog management is the brain of your chatbot—it decides what to do next based on user input, conversation history, and business rules. Modern dialog systems range from simple state machines to sophisticated neural approaches that learn optimal policies from data.</p>
+                <p>The key challenges include maintaining context across turns, handling interruptions and topic switches gracefully, managing slot-filling for complex tasks, and knowing when to escalate to humans. A well-designed dialog manager feels natural and helpful; a poor one traps users in frustrating loops.</p>
+            </div>
+            
+            <!-- Example Conversation -->
+            <div class="convo-example">
+                <div class="convo-header">
+                    <span class="convo-header-dot red"></span>
+                    <span class="convo-header-dot yellow"></span>
+                    <span class="convo-header-dot green"></span>
+                    <span class="convo-header-title">Flight Booking Conversation Example</span>
+                </div>
+                <div class="convo-body">
+                    <div class="convo-message">
+                        <div class="convo-avatar user">👤</div>
+                        <div class="convo-bubble user">
+                            <div class="convo-text">I need to book a flight to New York</div>
+                            <div class="convo-meta">Intent: book_flight • Entity: destination=NYC</div>
+                        </div>
+                    </div>
+                    <div class="convo-message">
+                        <div class="convo-avatar bot">🤖</div>
+                        <div class="convo-bubble bot">
+                            <div class="convo-text">I'd be happy to help you book a flight to New York! When would you like to travel?</div>
+                            <div class="convo-meta">State: collecting_date • Slot filled: destination ✓</div>
+                        </div>
+                    </div>
+                    <div class="convo-message">
+                        <div class="convo-avatar user">👤</div>
+                        <div class="convo-bubble user">
+                            <div class="convo-text">Next Friday, and actually make it a round trip</div>
+                            <div class="convo-meta">Intent: provide_date + modify_booking • Entities: date, trip_type</div>
+                        </div>
+                    </div>
+                    <div class="convo-message">
+                        <div class="convo-avatar bot">🤖</div>
+                        <div class="convo-bubble bot">
+                            <div class="convo-text">Got it—round trip to NYC departing Friday, December 13th. When would you like to return?</div>
+                            <div class="convo-meta">State: collecting_return_date • Slots: destination ✓, depart_date ✓, trip_type ✓</div>
+                        </div>
+                    </div>
+                    <div class="convo-annotations">
+                        <div class="convo-annotation">
+                            <span class="convo-annotation-label">Context Tracking</span>
+                            Dialog manager maintained NYC context without user repeating it
+                        </div>
+                        <div class="convo-annotation">
+                            <span class="convo-annotation-label">Multi-Intent</span>
+                            Handled date + trip type modification in single turn
+                        </div>
+                        <div class="convo-annotation">
+                            <span class="convo-annotation-label">Slot Filling</span>
+                            Progressive collection of required booking parameters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Crew Showcase -->
+            <div class="crew-section">
+                <div class="crew-container">
+                    <div class="crew-header">
+                        <div class="crew-icon">👥</div>
+                        <div class="crew-title">
+                            <h3>Conversation Quality Crew</h3>
+                            <p>Multi-agent system ensuring optimal dialog flow and user experience</p>
+                        </div>
+                    </div>
+                    <div class="crew-grid">
+                        <div class="crew-member">
+                            <div class="crew-member-icon nlu">🧠</div>
+                            <div class="crew-member-name">NLU Agent</div>
+                            <div class="crew-member-role">Intent & Entity</div>
+                        </div>
+                        <div class="crew-member">
+                            <div class="crew-member-icon dialog">🔄</div>
+                            <div class="crew-member-name">Dialog Agent</div>
+                            <div class="crew-member-role">State Management</div>
+                        </div>
+                        <div class="crew-member">
+                            <div class="crew-member-icon context">📚</div>
+                            <div class="crew-member-name">Context Agent</div>
+                            <div class="crew-member-role">Memory & History</div>
+                        </div>
+                        <div class="crew-member">
+                            <div class="crew-member-icon response">💬</div>
+                            <div class="crew-member-name">Response Agent</div>
+                            <div class="crew-member-role">NLG & Tone</div>
+                        </div>
+                        <div class="crew-member">
+                            <div class="crew-member-icon sentiment">❤️</div>
+                            <div class="crew-member-name">Sentiment Agent</div>
+                            <div class="crew-member-role">Emotion & Escalation</div>
+                        </div>
+                    </div>
+                    <div class="crew-flow">
+                        <span class="crew-flow-step">User Input</span>
+                        <span class="crew-flow-arrow">→</span>
+                        <span class="crew-flow-step">NLU Agent</span>
+                        <span class="crew-flow-arrow">→</span>
+                        <span class="crew-flow-step">Context Agent</span>
+                        <span class="crew-flow-arrow">→</span>
+                        <span class="crew-flow-step">Dialog Agent</span>
+                        <span class="crew-flow-arrow">→</span>
+                        <span class="crew-flow-step">Response Agent</span>
+                        <span class="crew-flow-arrow">→</span>
+                        <span class="crew-flow-step">User</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent + Code for Dialog -->
+            <div class="agent-section">
+                <div class="agent-section-header">
+                    <div class="agent-section-tag">Agent This</div>
+                    <div class="agent-section-title">Dialog Flow Optimizer</div>
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-info">
+                        <div class="agent-avatar">🔄</div>
+                        <div class="agent-name">FlowOptimizer</div>
+                        <div class="agent-role">Conversation Path Analysis</div>
+                        <p class="agent-desc">Analyzes conversation logs to identify bottlenecks, dead ends, and optimization opportunities in dialog flows.</p>
+                        <ul class="agent-capabilities">
+                            <li>Map conversation paths from logs</li>
+                            <li>Identify drop-off points</li>
+                            <li>Suggest flow improvements</li>
+                            <li>Generate fallback strategies</li>
+                            <li>Optimize slot-filling sequences</li>
+                        </ul>
+                    </div>
+                    <div class="code-panel">
+                        <div class="code-header">
+                            <div class="code-tabs">
+                                <div class="code-tab active">Python</div>
+                                <div class="code-tab">YAML</div>
+                            </div>
+                            <div class="code-filename">dialog_crew.py</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><span class="code-comment"># Multi-Agent Dialog System - Blueprint cOS</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+
+<span class="code-comment"># Define specialized agents</span>
+nlu_agent = Agent(
+    role=<span class="code-string">"NLU Specialist"</span>,
+    goal=<span class="code-string">"Extract intent and entities accurately"</span>,
+    backstory=<span class="code-string">"Expert in understanding user language"</span>
+)
+
+dialog_agent = Agent(
+    role=<span class="code-string">"Dialog Manager"</span>,
+    goal=<span class="code-string">"Determine optimal next action"</span>,
+    backstory=<span class="code-string">"Master of conversation flow control"</span>
+)
+
+response_agent = Agent(
+    role=<span class="code-string">"Response Generator"</span>,
+    goal=<span class="code-string">"Craft natural, helpful responses"</span>,
+    backstory=<span class="code-string">"Expert copywriter for conversational UX"</span>
+)
+
+<span class="code-comment"># Create conversation crew</span>
+conversation_crew = Crew(
+    agents=[nlu_agent, dialog_agent, response_agent],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">def</span> <span class="code-function">process_message</span>(user_input: str, context: dict):
+    <span class="code-string">"""Process user message through agent crew."""</span>
+    tasks = [
+        Task(
+            description=<span class="code-string">f"Parse: {user_input}"</span>,
+            agent=nlu_agent,
+            expected_output=<span class="code-string">"Intent and entities"</span>
+        ),
+        Task(
+            description=<span class="code-string">"Determine next dialog action"</span>,
+            agent=dialog_agent,
+            expected_output=<span class="code-string">"Dialog decision"</span>
+        ),
+        Task(
+            description=<span class="code-string">"Generate user response"</span>,
+            agent=response_agent,
+            expected_output=<span class="code-string">"Natural language response"</span>
+        )
+    ]
+    <span class="code-keyword">return</span> conversation_crew.kickoff(tasks=tasks)</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ══════════════════════════════════════════════════════════════════════════════
+             MODULE 3: PLATFORMS
+        ══════════════════════════════════════════════════════════════════════════════ -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Chatbot Platforms</h2>
+                    <p>Enterprise platforms for building and deploying conversational AI</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Choosing the right chatbot platform depends on your technical requirements, team expertise, and integration needs. Cloud platforms like Dialogflow and Lex offer rapid development with managed infrastructure, while open-source options like Rasa provide full customization and data control.</p>
+            </div>
+            
+            <div class="platforms-grid">
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo dialogflow">🟠</div>
+                        <div class="platform-info">
+                            <h4>Google Dialogflow CX</h4>
+                            <span>Enterprise Conversational AI</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <p class="platform-desc">Visual flow builder with state machine approach. Native Vertex AI integration enables generative AI features and advanced NLU.</p>
+                        <div class="platform-features">
+                            <div class="platform-feature">30+ Languages</div>
+                            <div class="platform-feature">Visual Flow Builder</div>
+                            <div class="platform-feature">Vertex AI Integration</div>
+                            <div class="platform-feature">Telephony Gateway</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo lex">🔷</div>
+                        <div class="platform-info">
+                            <h4>Amazon Lex V2</h4>
+                            <span>AWS Conversational AI</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <p class="platform-desc">Same technology powering Alexa. Deep AWS integration with Lambda, Connect, and Bedrock for generative capabilities.</p>
+                        <div class="platform-features">
+                            <div class="platform-feature">Alexa Technology</div>
+                            <div class="platform-feature">Lambda Integration</div>
+                            <div class="platform-feature">Amazon Connect</div>
+                            <div class="platform-feature">Bedrock Support</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo rasa">🟣</div>
+                        <div class="platform-info">
+                            <h4>Rasa Pro</h4>
+                            <span>Open Source Framework</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <p class="platform-desc">Full control over training data, models, and deployment. CALM framework for LLM-powered assistants with guardrails.</p>
+                        <div class="platform-features">
+                            <div class="platform-feature">Self-Hosted</div>
+                            <div class="platform-feature">Full Customization</div>
+                            <div class="platform-feature">CALM Framework</div>
+                            <div class="platform-feature">No Vendor Lock-in</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo azure">🔵</div>
+                        <div class="platform-info">
+                            <h4>Azure AI Bot Service</h4>
+                            <span>Microsoft Ecosystem</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <p class="platform-desc">Copilot Studio for no-code development. Native Teams, Power Platform, and Azure OpenAI integration.</p>
+                        <div class="platform-features">
+                            <div class="platform-feature">Copilot Studio</div>
+                            <div class="platform-feature">Teams Integration</div>
+                            <div class="platform-feature">Power Platform</div>
+                            <div class="platform-feature">Azure OpenAI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════════════════════════════ -->
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
+        <div class="footer-meta">Category 06: Chatbots & Conversational AI | Blueprint Technologies cOS</div>
+    </div>
+</footer>
+
+</body>
+</html>

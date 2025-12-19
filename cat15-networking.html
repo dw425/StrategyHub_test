@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --danger-red: #EF4444;
+            --success-green: #22C55E;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --purple: #8B5CF6;
+            --sidebar-width: 240px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; cursor: pointer; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 20px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        .section-header { margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); }
+        .section-icon { width: 40px; height: 40px; background: var(--cat-glow); border: 1px solid var(--cat-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .section-title { font-size: var(--font-lg); font-weight: 600; }
+        .section-subtitle { font-size: var(--font-xs); color: var(--text-muted); }
+        
+        .description-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .description-section p { color: var(--text-secondary); margin-bottom: var(--space-md); font-size: var(--font-base); }
+        .description-section p:last-child { margin-bottom: 0; }
+        
+        .diagram-section { margin-bottom: var(--space-xl); }
+        .diagram-container { display: grid; grid-template-columns: 1fr 260px; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .diagram-main { padding: var(--space-lg); }
+        .diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .diagram-title { font-size: var(--font-base); display: flex; align-items: center; gap: var(--space-sm); }
+        .legend { display: flex; gap: var(--space-md); }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: var(--font-xs); color: var(--text-muted); }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .legend-dot.aws { background: var(--aws-orange); }
+        .legend-dot.azure { background: var(--azure-blue); }
+        .legend-dot.gcp { background: var(--gcp-blue); }
+        .legend-dot.onprem { background: var(--purple); }
+        .legend-dot.security { background: var(--danger-red); }
+        
+        .diagram-canvas { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); position: relative; overflow: hidden; padding: var(--space-lg); }
+        .connections-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .conn { stroke-width: 2; fill: none; opacity: 0; stroke-dasharray: 8 4; transition: opacity 0.3s; }
+        .conn.visible { opacity: 0.6; animation: flow 1s linear infinite; }
+        @keyframes flow { to { stroke-dashoffset: -12; } }
+        
+        .grid-section { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .grid-section:last-child { margin-bottom: 0; }
+        .grid-group { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-sm); }
+        .group-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: var(--space-sm); padding-bottom: var(--space-xs); border-bottom: 1px solid var(--border-color); }
+        .group-label.aws { color: var(--aws-orange); border-color: rgba(255,153,0,0.3); }
+        .group-label.azure { color: var(--azure-blue); border-color: rgba(0,120,212,0.3); }
+        .group-label.gcp { color: var(--gcp-blue); border-color: rgba(66,133,244,0.3); }
+        .group-label.purple { color: var(--purple); border-color: rgba(139,92,246,0.3); }
+        .group-label.red { color: var(--danger-red); border-color: rgba(239,68,68,0.3); }
+        .group-label.green { color: var(--success-green); border-color: rgba(34,197,94,0.3); }
+        
+        .node-row { display: flex; gap: var(--space-sm); flex-wrap: wrap; position: relative; z-index: 5; }
+        .node { width: 64px; text-align: center; cursor: pointer; transition: all 0.3s; opacity: 0.25; transform: scale(0.9); }
+        .node.visible { opacity: 1; transform: scale(1); }
+        .node:hover { transform: scale(1.08); z-index: 10; }
+        .node-icon { width: 44px; height: 44px; margin: 0 auto 4px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s; }
+        .node.visible .node-icon { border-color: var(--cat-primary); box-shadow: 0 0 20px var(--cat-glow); }
+        .node-icon.aws { border-color: var(--aws-orange) !important; }
+        .node-icon.azure { border-color: var(--azure-blue) !important; }
+        .node-icon.gcp { border-color: var(--gcp-blue) !important; }
+        .node-icon.purple { border-color: var(--purple) !important; }
+        .node-icon.red { border-color: var(--danger-red) !important; }
+        .node-label { font-size: 9px; color: var(--text-muted); line-height: 1.2; }
+        .node.visible .node-label { color: var(--text-secondary); }
+        
+        .toggle-panel { background: var(--bg-card-alt); border-left: 1px solid var(--border-color); padding: var(--space-md); overflow-y: auto; max-height: 600px; }
+        .panel-header { margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .panel-header h4 { font-size: var(--font-sm); margin-bottom: 2px; }
+        .panel-header p { font-size: var(--font-xs); color: var(--text-muted); }
+        .toggle-group { margin-bottom: var(--space-sm); }
+        .toggle-group-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: var(--space-xs); font-weight: 600; }
+        .toggle-item { display: flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-sm); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 3px; cursor: pointer; transition: all 0.2s; }
+        .toggle-item:hover { border-color: var(--cat-primary); }
+        .toggle-item.active { background: var(--cat-glow); border-color: var(--cat-primary); }
+        .toggle-icon { font-size: 12px; }
+        .toggle-label { font-size: 10px; color: var(--text-secondary); flex: 1; }
+        .toggle-item.active .toggle-label { color: var(--text-primary); }
+        .toggle-check { width: 14px; height: 14px; border: 2px solid var(--border-color); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: transparent; }
+        .toggle-item.active .toggle-check { background: var(--cat-primary); border-color: var(--cat-primary); color: white; }
+        .complexity-meter { margin-top: var(--space-md); padding-top: var(--space-sm); border-top: 1px solid var(--border-color); }
+        .meter-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-xs); }
+        .meter-bar { height: 6px; background: var(--bg-card); border-radius: var(--radius-full); overflow: hidden; }
+        .meter-fill { height: 100%; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); border-radius: var(--radius-full); transition: width 0.5s; }
+        
+        .module-tabs-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-tabs-header { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: var(--space-md); }
+        .module-tabs { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+        .module-tab { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); font-size: var(--font-sm); cursor: pointer; transition: all 0.2s; }
+        .module-tab:hover { color: var(--text-secondary); border-color: var(--cat-primary); }
+        .module-tab.active { background: var(--cat-glow); border-color: var(--cat-primary); color: var(--cat-light); }
+        .module-tab .tab-num { font-weight: 600; margin-right: var(--space-xs); }
+        
+        /* Dynamic Module Content */
+        .module-content { display: none; }
+        .module-content.active { display: block; }
+        
+        .tools-section { margin-bottom: var(--space-xl); }
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        @media (max-width: 1200px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+        .tool-icon { width: 40px; height: 40px; background: var(--cat-glow); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: var(--font-sm); font-weight: 600; }
+        .tool-desc { font-size: var(--font-xs); color: var(--text-secondary); line-height: 1.5; }
+        
+        .practices-section { margin-bottom: var(--space-xl); }
+        .practices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .practice-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); font-size: var(--font-base); font-weight: 600; }
+        .practice-header .icon { font-size: 18px; }
+        .practice-content { color: var(--text-secondary); font-size: var(--font-sm); }
+        .practice-content ul { margin-left: var(--space-lg); margin-top: var(--space-sm); }
+        .practice-content li { margin-bottom: var(--space-xs); }
+        .practice-stats { display: flex; gap: var(--space-lg); margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-color); }
+        .stat { text-align: center; }
+        .stat-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        
+        .module-diagram-section { margin-bottom: var(--space-xl); }
+        .lifecycle-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); display: grid; grid-template-columns: 180px 1fr 180px; gap: var(--space-lg); align-items: center; }
+        .lifecycle-stats { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .lifecycle-stat { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-md); }
+        .lifecycle-stat-label { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: 2px; }
+        .lifecycle-stat-value { font-size: var(--font-lg); font-weight: 600; }
+        .lifecycle-stat-value.highlight { color: var(--cat-light); }
+        
+        .orbit-container { position: relative; width: 300px; height: 300px; margin: 0 auto; }
+        .orbit-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90px; height: 90px; background: linear-gradient(135deg, var(--cat-primary), var(--cat-light)); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 0 40px var(--cat-glow); }
+        .orbit-center-icon { font-size: 24px; margin-bottom: 2px; }
+        .orbit-center-text { font-size: 10px; font-weight: 600; }
+        .orbit-track { position: absolute; top: 50%; left: 50%; width: 240px; height: 240px; border: 2px dashed var(--border-color); border-radius: 50%; transform: translate(-50%, -50%); animation: rotate 30s linear infinite; }
+        .orbit-node { position: absolute; width: 60px; height: 60px; background: var(--bg-card); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: counter-rotate 30s linear infinite; box-shadow: 0 0 20px var(--cat-glow); }
+        .orbit-node-icon { font-size: 18px; margin-bottom: 2px; }
+        .orbit-node-text { font-size: 8px; font-weight: 600; text-align: center; }
+        .orbit-node:nth-child(1) { top: -30px; left: 50%; margin-left: -30px; }
+        .orbit-node:nth-child(2) { top: 35px; right: -30px; }
+        .orbit-node:nth-child(3) { bottom: -10px; right: 20px; }
+        .orbit-node:nth-child(4) { bottom: -10px; left: 20px; }
+        .orbit-node:nth-child(5) { top: 35px; left: -30px; }
+        @keyframes rotate { to { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes counter-rotate { to { transform: rotate(-360deg); } }
+        
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-header { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-lg); border-bottom: 1px solid var(--border-color); }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-primary), var(--purple)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .agent-info h3 { font-size: var(--font-lg); margin-bottom: 2px; }
+        .agent-info p { font-size: var(--font-xs); color: var(--text-secondary); }
+        .agent-capabilities { display: flex; gap: var(--space-xs); margin-top: var(--space-sm); flex-wrap: wrap; }
+        .capability-tag { background: var(--cat-glow); border: 1px solid var(--cat-primary); padding: 2px var(--space-sm); border-radius: var(--radius-full); font-size: 10px; color: var(--cat-light); }
+        
+        .agent-body { display: grid; grid-template-columns: 1fr 1fr; }
+        .code-panel { border-right: 1px solid var(--border-color); }
+        .code-tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: var(--space-sm) var(--space-md); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-content { padding: var(--space-md); max-height: 320px; overflow-y: auto; }
+        .code-block { background: var(--bg-dark); border-radius: var(--radius-md); padding: var(--space-md); font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; line-height: 1.6; overflow-x: auto; white-space: pre; }
+        .code-block .comment { color: #6A737D; }
+        .code-block .keyword { color: #FF7B72; }
+        .code-block .string { color: #A5D6FF; }
+        .code-block .function { color: #D2A8FF; }
+        .code-block .property { color: #7EE787; }
+        
+        .output-panel { padding: var(--space-md); }
+        .output-header { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .output-content { background: var(--bg-dark); border-radius: var(--radius-md); padding: var(--space-md); font-family: monospace; font-size: 11px; }
+        .output-line { margin-bottom: var(--space-xs); display: flex; align-items: center; gap: var(--space-sm); }
+        .output-line .check { color: var(--success-green); }
+        .output-line .info { color: var(--cat-light); }
+        .output-line .warn { color: var(--aws-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            .lifecycle-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">Networking</div>
+        <ul class="sidebar-nav">
+            <li><a class="active" onclick="switchModule(0)"><span class="nav-icon">🏗️</span> Network Architecture</a></li>
+            <li><a onclick="switchModule(1)"><span class="nav-icon">🔍</span> DNS & Service Discovery</a></li>
+            <li><a onclick="switchModule(2)"><span class="nav-icon">⚖️</span> Load Balancing</a></li>
+            <li><a onclick="switchModule(3)"><span class="nav-icon">🌐</span> CDN & Edge Computing</a></li>
+            <li><a onclick="switchModule(4)"><span class="nav-icon">🔗</span> VPN & Connectivity</a></li>
+            <li><a onclick="switchModule(5)"><span class="nav-icon">🤖</span> Network Automation</a></li>
+            <li><a onclick="switchModule(6)"><span class="nav-icon">📡</span> SD-WAN & SASE</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- CATEGORY HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🌐 Category 15</div>
+                <h1>Networking</h1>
+                <p>Enterprise network architecture, connectivity, and software-defined infrastructure for modern multi-cloud organizations.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">7</div><div class="hero-metric-label">Modules</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">56</div><div class="hero-metric-label">Tools</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.99%</div><div class="hero-metric-label">Availability Target</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">7</div><div class="hero-metric-label">Agents</div></div>
+            </div>
+        </section>
+        
+        <!-- CATEGORY DESCRIPTION -->
+        <section class="description-section">
+            <p>Modern enterprise networking spans multi-cloud environments, hybrid connectivity, and software-defined infrastructure. This category covers the full spectrum from foundational network architecture to advanced SD-WAN and SASE implementations.</p>
+            <p>Each module provides tools, best practices, implementation patterns, and AI agents to accelerate your networking initiatives across AWS, Azure, GCP, and on-premises environments.</p>
+        </section>
+        
+        <!-- INTERACTIVE ARCHITECTURE DIAGRAM -->
+        <section class="diagram-section">
+            <div class="section-header">
+                <div class="section-icon">🏗️</div>
+                <div>
+                    <div class="section-title">Enterprise Network Overview</div>
+                    <div class="section-subtitle">Interactive multi-cloud network topology</div>
+                </div>
+            </div>
+            
+            <div class="diagram-container">
+                <div class="diagram-main">
+                    <div class="diagram-header">
+                        <div class="diagram-title">☁️ Multi-Cloud Architecture</div>
+                        <div class="legend">
+                            <div class="legend-item"><div class="legend-dot aws"></div>AWS</div>
+                            <div class="legend-item"><div class="legend-dot azure"></div>Azure</div>
+                            <div class="legend-item"><div class="legend-dot gcp"></div>GCP</div>
+                            <div class="legend-item"><div class="legend-dot onprem"></div>On-Prem</div>
+                            <div class="legend-item"><div class="legend-dot security"></div>Security</div>
+                        </div>
+                    </div>
+                    
+                    <div class="diagram-canvas" id="canvas">
+                        <svg class="connections-svg" id="connectionsSvg"></svg>
+                        
+                        <div class="grid-section">
+                            <div class="grid-group">
+                                <div class="group-label">Edge / CDN</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="cloudfront"><div class="node-icon">☁️</div><div class="node-label">CloudFront</div></div>
+                                    <div class="node" data-node="fastly"><div class="node-icon">🚀</div><div class="node-label">Fastly</div></div>
+                                    <div class="node" data-node="akamai"><div class="node-icon">🌍</div><div class="node-label">Akamai</div></div>
+                                </div>
+                            </div>
+                            <div class="grid-group">
+                                <div class="group-label red">Security Perimeter</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="waf"><div class="node-icon red">🛡️</div><div class="node-label">WAF</div></div>
+                                    <div class="node" data-node="firewall"><div class="node-icon red">🔥</div><div class="node-label">Firewall</div></div>
+                                    <div class="node" data-node="ddos"><div class="node-icon red">🎯</div><div class="node-label">DDoS</div></div>
+                                    <div class="node" data-node="ids"><div class="node-icon red">🔐</div><div class="node-label">IDS</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-section">
+                            <div class="grid-group">
+                                <div class="group-label">Load Balancing</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="alb"><div class="node-icon aws">⚖️</div><div class="node-label">ALB</div></div>
+                                    <div class="node visible" data-node="nlb"><div class="node-icon aws">⚖️</div><div class="node-label">NLB</div></div>
+                                    <div class="node" data-node="appgw"><div class="node-icon azure">⚖️</div><div class="node-label">App GW</div></div>
+                                    <div class="node" data-node="httplb"><div class="node-icon gcp">⚖️</div><div class="node-label">HTTP LB</div></div>
+                                </div>
+                            </div>
+                            <div class="grid-group">
+                                <div class="group-label">Transit & Mesh</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="transitgw"><div class="node-icon aws">🔗</div><div class="node-label">Transit GW</div></div>
+                                    <div class="node" data-node="vwan"><div class="node-icon azure">🔗</div><div class="node-label">Virtual WAN</div></div>
+                                    <div class="node" data-node="ncc"><div class="node-icon gcp">🔗</div><div class="node-label">NCC</div></div>
+                                    <div class="node visible" data-node="consul"><div class="node-icon">🎯</div><div class="node-label">Consul</div></div>
+                                    <div class="node" data-node="istio"><div class="node-icon">🕸️</div><div class="node-label">Istio</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-section">
+                            <div class="grid-group">
+                                <div class="group-label aws">AWS Workloads</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="webtier"><div class="node-icon aws">🖥️</div><div class="node-label">Web Tier</div></div>
+                                    <div class="node visible" data-node="apptier"><div class="node-icon aws">⚙️</div><div class="node-label">App Tier</div></div>
+                                    <div class="node" data-node="rds"><div class="node-icon aws">💾</div><div class="node-label">RDS</div></div>
+                                </div>
+                            </div>
+                            <div class="grid-group">
+                                <div class="group-label azure">Azure Workloads</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="aks"><div class="node-icon azure">☸️</div><div class="node-label">AKS</div></div>
+                                    <div class="node" data-node="functions"><div class="node-icon azure">⚡</div><div class="node-label">Functions</div></div>
+                                    <div class="node" data-node="sqldb"><div class="node-icon azure">💾</div><div class="node-label">SQL DB</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-section">
+                            <div class="grid-group">
+                                <div class="group-label gcp">GCP Workloads</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="gke"><div class="node-icon gcp">☸️</div><div class="node-label">GKE</div></div>
+                                    <div class="node" data-node="aiplatform"><div class="node-icon gcp">🤖</div><div class="node-label">AI Platform</div></div>
+                                    <div class="node" data-node="bigquery"><div class="node-icon gcp">💾</div><div class="node-label">BigQuery</div></div>
+                                </div>
+                            </div>
+                            <div class="grid-group">
+                                <div class="group-label purple">On-Premises</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="dcfirewall"><div class="node-icon purple">🔥</div><div class="node-label">DC Firewall</div></div>
+                                    <div class="node visible" data-node="coreswitch"><div class="node-icon purple">🔀</div><div class="node-label">Core Switch</div></div>
+                                    <div class="node" data-node="vmware"><div class="node-icon purple">🖥️</div><div class="node-label">VMware</div></div>
+                                    <div class="node" data-node="san"><div class="node-icon purple">💾</div><div class="node-label">SAN/NAS</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-section">
+                            <div class="grid-group">
+                                <div class="group-label">Hybrid Connectivity</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="directconnect"><div class="node-icon aws">🔗</div><div class="node-label">Direct Connect</div></div>
+                                    <div class="node" data-node="expressroute"><div class="node-icon azure">🔗</div><div class="node-label">ExpressRoute</div></div>
+                                </div>
+                            </div>
+                            <div class="grid-group">
+                                <div class="group-label green">Monitoring</div>
+                                <div class="node-row">
+                                    <div class="node visible" data-node="siem"><div class="node-icon">🔍</div><div class="node-label">SIEM</div></div>
+                                    <div class="node" data-node="grafana"><div class="node-icon">📊</div><div class="node-label">Grafana</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="toggle-panel">
+                    <div class="panel-header">
+                        <h4>Component Toggles</h4>
+                        <p>Toggle to show connections</p>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-group-title">Edge / CDN</div>
+                        <div class="toggle-item active" data-toggle="cloudfront"><span class="toggle-icon">☁️</span><span class="toggle-label">CloudFront</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="fastly"><span class="toggle-icon">🚀</span><span class="toggle-label">Fastly</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="akamai"><span class="toggle-icon">🌍</span><span class="toggle-label">Akamai</span><span class="toggle-check">✓</span></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-group-title">Security</div>
+                        <div class="toggle-item active" data-toggle="waf"><span class="toggle-icon">🛡️</span><span class="toggle-label">WAF</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="firewall"><span class="toggle-icon">🔥</span><span class="toggle-label">Firewall</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="ddos"><span class="toggle-icon">🎯</span><span class="toggle-label">DDoS</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="ids"><span class="toggle-icon">🔐</span><span class="toggle-label">IDS</span><span class="toggle-check">✓</span></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-group-title">Load Balancing</div>
+                        <div class="toggle-item active" data-toggle="alb"><span class="toggle-icon">⚖️</span><span class="toggle-label">AWS ALB</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="nlb"><span class="toggle-icon">⚖️</span><span class="toggle-label">AWS NLB</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="appgw"><span class="toggle-icon">⚖️</span><span class="toggle-label">Azure App GW</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="httplb"><span class="toggle-icon">⚖️</span><span class="toggle-label">GCP HTTP LB</span><span class="toggle-check">✓</span></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-group-title">Transit & Mesh</div>
+                        <div class="toggle-item active" data-toggle="transitgw"><span class="toggle-icon">🔗</span><span class="toggle-label">Transit GW</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="vwan"><span class="toggle-icon">🔗</span><span class="toggle-label">Virtual WAN</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="ncc"><span class="toggle-icon">🔗</span><span class="toggle-label">NCC</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="consul"><span class="toggle-icon">🎯</span><span class="toggle-label">Consul</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="istio"><span class="toggle-icon">🕸️</span><span class="toggle-label">Istio</span><span class="toggle-check">✓</span></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-group-title">Workloads</div>
+                        <div class="toggle-item active" data-toggle="webtier"><span class="toggle-icon">🖥️</span><span class="toggle-label">AWS Web</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="apptier"><span class="toggle-icon">⚙️</span><span class="toggle-label">AWS App</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="rds"><span class="toggle-icon">💾</span><span class="toggle-label">AWS RDS</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="aks"><span class="toggle-icon">☸️</span><span class="toggle-label">Azure AKS</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="functions"><span class="toggle-icon">⚡</span><span class="toggle-label">Functions</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="sqldb"><span class="toggle-icon">💾</span><span class="toggle-label">SQL DB</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="gke"><span class="toggle-icon">☸️</span><span class="toggle-label">GCP GKE</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="aiplatform"><span class="toggle-icon">🤖</span><span class="toggle-label">AI Platform</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="bigquery"><span class="toggle-icon">💾</span><span class="toggle-label">BigQuery</span><span class="toggle-check">✓</span></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-group-title">On-Prem & Connectivity</div>
+                        <div class="toggle-item active" data-toggle="dcfirewall"><span class="toggle-icon">🔥</span><span class="toggle-label">DC Firewall</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="coreswitch"><span class="toggle-icon">🔀</span><span class="toggle-label">Core Switch</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="vmware"><span class="toggle-icon">🖥️</span><span class="toggle-label">VMware</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="san"><span class="toggle-icon">💾</span><span class="toggle-label">SAN/NAS</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="directconnect"><span class="toggle-icon">🔗</span><span class="toggle-label">Direct Connect</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="expressroute"><span class="toggle-icon">🔗</span><span class="toggle-label">ExpressRoute</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item active" data-toggle="siem"><span class="toggle-icon">🔍</span><span class="toggle-label">SIEM</span><span class="toggle-check">✓</span></div>
+                        <div class="toggle-item" data-toggle="grafana"><span class="toggle-icon">📊</span><span class="toggle-label">Grafana</span><span class="toggle-check">✓</span></div>
+                    </div>
+                    
+                    <div class="complexity-meter">
+                        <div class="meter-label"><span>Network Complexity</span><span id="complexityValue">48%</span></div>
+                        <div class="meter-bar"><div class="meter-fill" id="complexityFill" style="width: 48%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- MODULE TABS -->
+        <section class="module-tabs-section">
+            <div class="module-tabs-header">Select Module</div>
+            <div class="module-tabs">
+                <div class="module-tab active" onclick="switchModule(0)"><span class="tab-num">01</span>Network Architecture</div>
+                <div class="module-tab" onclick="switchModule(1)"><span class="tab-num">02</span>DNS & Service Discovery</div>
+                <div class="module-tab" onclick="switchModule(2)"><span class="tab-num">03</span>Load Balancing</div>
+                <div class="module-tab" onclick="switchModule(3)"><span class="tab-num">04</span>CDN & Edge Computing</div>
+                <div class="module-tab" onclick="switchModule(4)"><span class="tab-num">05</span>VPN & Connectivity</div>
+                <div class="module-tab" onclick="switchModule(5)"><span class="tab-num">06</span>Network Automation</div>
+                <div class="module-tab" onclick="switchModule(6)"><span class="tab-num">07</span>SD-WAN & SASE</div>
+            </div>
+        </section>
+        
+        <!-- ========== DYNAMIC MODULE CONTENT ========== -->
+        
+        <!-- MODULE 1: Network Architecture -->
+        <div class="module-content active" id="module-0">
+            
+            <section class="tools-section">
+                <div class="section-header">
+                    <div class="section-icon">🛠️</div>
+                    <div>
+                        <div class="section-title">Essential Tools</div>
+                        <div class="section-subtitle">Industry-standard tools for network architecture</div>
+                    </div>
+                </div>
+                <div class="tools-grid">
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">🏗️</div><div class="tool-name">Terraform</div></div><div class="tool-desc">Infrastructure as Code tool for provisioning multi-cloud network resources.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">🚀</div><div class="tool-name">Pulumi</div></div><div class="tool-desc">Modern IaC platform using Python, TypeScript, and Go for cloud infrastructure.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">📋</div><div class="tool-name">NetBox</div></div><div class="tool-desc">Open-source IPAM and DCIM tool for documenting network topology.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">📊</div><div class="tool-name">Lucidchart</div></div><div class="tool-desc">Cloud-based diagramming for network architecture with icon libraries.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">🔬</div><div class="tool-name">Cisco DNA Center</div></div><div class="tool-desc">Intent-based networking controller for enterprise network automation.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">🦈</div><div class="tool-name">Wireshark</div></div><div class="tool-desc">Network protocol analyzer for deep packet inspection and troubleshooting.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">🗺️</div><div class="tool-name">Nmap</div></div><div class="tool-desc">Network discovery and security auditing for hosts and services.</div></div>
+                    <div class="tool-card"><div class="tool-card-header"><div class="tool-icon">🎓</div><div class="tool-name">Packet Tracer</div></div><div class="tool-desc">Cisco network simulation for designing and testing topologies.</div></div>
+                </div>
+            </section>
+            
+            <section class="practices-section">
+                <div class="section-header">
+                    <div class="section-icon">✅</div>
+                    <div>
+                        <div class="section-title">Best Practices</div>
+                        <div class="section-subtitle">Industry-proven approaches for network architecture</div>
+                    </div>
+                </div>
+                <div class="practices-grid">
+                    <div class="practice-card">
+                        <div class="practice-header"><span class="icon">💡</span>Why It's a Best Practice</div>
+                        <div class="practice-content">
+                            Organizations with documented network architectures experience fewer outages:
+                            <ul>
+                                <li>Consistent deployment patterns across environments</li>
+                                <li>Faster onboarding of new team members</li>
+                                <li>Reduced configuration drift and security gaps</li>
+                                <li>Simplified compliance auditing</li>
+                            </ul>
+                        </div>
+                        <div class="practice-stats">
+                            <div class="stat"><div class="stat-value">60%</div><div class="stat-label">Fewer Outages</div></div>
+                            <div class="stat"><div class="stat-value">3x</div><div class="stat-label">Faster Resolution</div></div>
+                            <div class="stat"><div class="stat-value">45%</div><div class="stat-label">Cost Reduction</div></div>
+                        </div>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-header"><span class="icon">🔧</span>How to Implement</div>
+                        <div class="practice-content">
+                            Start by documenting current state, then adopt IaC:
+                            <ul>
+                                <li>Create comprehensive network diagrams with IP schemes</li>
+                                <li>Define VPC/VNet CIDR blocks with room for growth</li>
+                                <li>Implement transit gateway for multi-VPC connectivity</li>
+                                <li>Establish naming conventions and tagging standards</li>
+                                <li>Use Terraform modules for repeatable patterns</li>
+                                <li>Set up automated compliance scanning</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="module-diagram-section">
+                <div class="section-header">
+                    <div class="section-icon">🔄</div>
+                    <div>
+                        <div class="section-title">Implementation Lifecycle</div>
+                        <div class="section-subtitle">Phases of network architecture deployment</div>
+                    </div>
+                </div>
+                <div class="lifecycle-container">
+                    <div class="lifecycle-stats">
+                        <div class="lifecycle-stat"><div class="lifecycle-stat-label">Total Duration</div><div class="lifecycle-stat-value highlight">6-10 weeks</div></div>
+                        <div class="lifecycle-stat"><div class="lifecycle-stat-label">Team Size</div><div class="lifecycle-stat-value">3-5 engineers</div></div>
+                        <div class="lifecycle-stat"><div class="lifecycle-stat-label">Complexity</div><div class="lifecycle-stat-value">High</div></div>
+                    </div>
+                    <div class="orbit-container">
+                        <div class="orbit-center"><div class="orbit-center-icon">🏗️</div><div class="orbit-center-text">Network</div></div>
+                        <div class="orbit-track">
+                            <div class="orbit-node"><div class="orbit-node-icon">📐</div><div class="orbit-node-text">Design</div></div>
+                            <div class="orbit-node"><div class="orbit-node-icon">🚀</div><div class="orbit-node-text">Deploy</div></div>
+                            <div class="orbit-node"><div class="orbit-node-icon">📊</div><div class="orbit-node-text">Monitor</div></div>
+                            <div class="orbit-node"><div class="orbit-node-icon">⚡</div><div class="orbit-node-text">Optimize</div></div>
+                            <div class="orbit-node"><div class="orbit-node-icon">🔒</div><div class="orbit-node-text">Secure</div></div>
+                        </div>
+                    </div>
+                    <div class="lifecycle-stats">
+                        <div class="lifecycle-stat"><div class="lifecycle-stat-label">Design Phase</div><div class="lifecycle-stat-value">2-4 weeks</div></div>
+                        <div class="lifecycle-stat"><div class="lifecycle-stat-label">Deploy Phase</div><div class="lifecycle-stat-value">1-2 weeks</div></div>
+                        <div class="lifecycle-stat"><div class="lifecycle-stat-label">Optimization</div><div class="lifecycle-stat-value">Ongoing</div></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="agent-section">
+                <div class="section-header">
+                    <div class="section-icon">🤖</div>
+                    <div>
+                        <div class="section-title">NetArchitect Agent</div>
+                        <div class="section-subtitle">AI-powered network design and validation</div>
+                    </div>
+                </div>
+                <div class="agent-container">
+                    <div class="agent-header">
+                        <div class="agent-avatar">🌐</div>
+                        <div class="agent-info">
+                            <h3>NetArchitect</h3>
+                            <p>Automated multi-cloud network design, validation, and compliance checking</p>
+                            <div class="agent-capabilities">
+                                <span class="capability-tag">VPC Design</span>
+                                <span class="capability-tag">CIDR Planning</span>
+                                <span class="capability-tag">Security Groups</span>
+                                <span class="capability-tag">Route Tables</span>
+                                <span class="capability-tag">Transit Gateway</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agent-body">
+                        <div class="code-panel">
+                            <div class="code-tabs">
+                                <div class="code-tab active" onclick="switchCodeTab(0, 'terraform')">Terraform</div>
+                                <div class="code-tab" onclick="switchCodeTab(0, 'python')">Python</div>
+                            </div>
+                            <div class="code-content">
+                                <div class="code-block" id="module-0-terraform"><span class="comment"># Multi-Cloud Network Architecture</span>
+
+<span class="keyword">module</span> <span class="string">"aws_vpc"</span> {
+  <span class="property">source</span>  = <span class="string">"./modules/aws-vpc"</span>
+  
+  <span class="property">vpc_cidr</span>           = <span class="string">"10.0.0.0/16"</span>
+  <span class="property">availability_zones</span> = [<span class="string">"us-east-1a"</span>, <span class="string">"us-east-1b"</span>]
+  
+  <span class="property">public_subnets</span>  = [<span class="string">"10.0.1.0/24"</span>, <span class="string">"10.0.2.0/24"</span>]
+  <span class="property">private_subnets</span> = [<span class="string">"10.0.10.0/24"</span>, <span class="string">"10.0.11.0/24"</span>]
+  
+  <span class="property">enable_nat_gateway</span> = <span class="keyword">true</span>
+  <span class="property">enable_vpn_gateway</span> = <span class="keyword">true</span>
+}
+
+<span class="keyword">resource</span> <span class="string">"aws_ec2_transit_gateway"</span> <span class="string">"main"</span> {
+  <span class="property">description</span> = <span class="string">"Main Transit Gateway"</span>
+  <span class="property">dns_support</span> = <span class="string">"enable"</span>
+}</div>
+                                <div class="code-block" id="module-0-python" style="display: none;"><span class="comment"># Network Validation Script</span>
+
+<span class="keyword">import</span> boto3
+<span class="keyword">from</span> netarchitect <span class="keyword">import</span> NetworkValidator
+
+<span class="keyword">class</span> <span class="function">VPCValidator</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="property">self</span>):
+        <span class="property">self</span>.ec2 = boto3.client(<span class="string">'ec2'</span>)
+        <span class="property">self</span>.validator = NetworkValidator()
+    
+    <span class="keyword">def</span> <span class="function">validate_cidr</span>(<span class="property">self</span>, cidrs):
+        conflicts = <span class="property">self</span>.validator.check_overlaps(cidrs)
+        <span class="keyword">if</span> conflicts:
+            <span class="keyword">raise</span> ValueError(<span class="string">f"Conflicts: {conflicts}"</span>)
+        <span class="keyword">return</span> <span class="keyword">True</span>
+
+validator = VPCValidator()
+validator.validate_cidr([<span class="string">'10.0.0.0/16'</span>, <span class="string">'10.1.0.0/16'</span>])</div>
+                            </div>
+                        </div>
+                        <div class="output-panel">
+                            <div class="output-header"><span>📋</span> Agent Output</div>
+                            <div class="output-content">
+                                <div class="output-line"><span class="check">✓</span> CIDR blocks validated - no overlaps</div>
+                                <div class="output-line"><span class="check">✓</span> Subnet sizing approved (256 hosts)</div>
+                                <div class="output-line"><span class="check">✓</span> Transit Gateway routes configured</div>
+                                <div class="output-line"><span class="check">✓</span> Security groups follow least-privilege</div>
+                                <div class="output-line"><span class="info">ℹ</span> NAT Gateway provisioned in 2 AZs</div>
+                                <div class="output-line"><span class="info">ℹ</span> VPC Flow Logs enabled</div>
+                                <div class="output-line"><span class="warn">⚠</span> Consider VPC endpoints for S3</div>
+                                <div class="output-line"><span class="check">✓</span> Network ACLs configured</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+        
+        <!-- PLACEHOLDER FOR OTHER MODULES -->
+        <div class="module-content" id="module-1">
+            <div class="description-section" style="text-align: center; padding: 80px;">
+                <h2 style="margin-bottom: 16px;">🔍 DNS & Service Discovery</h2>
+                <p>Module content coming soon...</p>
+            </div>
+        </div>
+        <div class="module-content" id="module-2">
+            <div class="description-section" style="text-align: center; padding: 80px;">
+                <h2 style="margin-bottom: 16px;">⚖️ Load Balancing</h2>
+                <p>Module content coming soon...</p>
+            </div>
+        </div>
+        <div class="module-content" id="module-3">
+            <div class="description-section" style="text-align: center; padding: 80px;">
+                <h2 style="margin-bottom: 16px;">🌐 CDN & Edge Computing</h2>
+                <p>Module content coming soon...</p>
+            </div>
+        </div>
+        <div class="module-content" id="module-4">
+            <div class="description-section" style="text-align: center; padding: 80px;">
+                <h2 style="margin-bottom: 16px;">🔗 VPN & Connectivity</h2>
+                <p>Module content coming soon...</p>
+            </div>
+        </div>
+        <div class="module-content" id="module-5">
+            <div class="description-section" style="text-align: center; padding: 80px;">
+                <h2 style="margin-bottom: 16px;">🤖 Network Automation</h2>
+                <p>Module content coming soon...</p>
+            </div>
+        </div>
+        <div class="module-content" id="module-6">
+            <div class="description-section" style="text-align: center; padding: 80px;">
+                <h2 style="margin-bottom: 16px;">📡 SD-WAN & SASE</h2>
+                <p>Module content coming soon...</p>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+// Connection data
+const connections = [
+    ['cloudfront', 'waf', '#3B82F6'], ['fastly', 'waf', '#3B82F6'], ['akamai', 'waf', '#3B82F6'],
+    ['waf', 'firewall', '#EF4444'], ['firewall', 'ddos', '#EF4444'], ['ddos', 'ids', '#EF4444'],
+    ['waf', 'alb', '#EF4444'], ['waf', 'nlb', '#EF4444'], ['firewall', 'appgw', '#EF4444'], ['firewall', 'httplb', '#EF4444'],
+    ['alb', 'transitgw', '#FF9900'], ['nlb', 'transitgw', '#FF9900'], ['appgw', 'vwan', '#0078D4'], ['httplb', 'ncc', '#4285F4'],
+    ['transitgw', 'consul', '#22C55E'], ['vwan', 'istio', '#22C55E'], ['ncc', 'istio', '#22C55E'],
+    ['transitgw', 'webtier', '#FF9900'], ['webtier', 'apptier', '#FF9900'], ['apptier', 'rds', '#FF9900'],
+    ['vwan', 'aks', '#0078D4'], ['aks', 'functions', '#0078D4'], ['functions', 'sqldb', '#0078D4'],
+    ['ncc', 'gke', '#4285F4'], ['gke', 'aiplatform', '#4285F4'], ['aiplatform', 'bigquery', '#4285F4'],
+    ['dcfirewall', 'coreswitch', '#8B5CF6'], ['coreswitch', 'vmware', '#8B5CF6'], ['vmware', 'san', '#8B5CF6'],
+    ['directconnect', 'transitgw', '#FF9900'], ['expressroute', 'vwan', '#0078D4'],
+    ['coreswitch', 'directconnect', '#8B5CF6'], ['coreswitch', 'expressroute', '#8B5CF6'],
+    ['siem', 'waf', '#22C55E'], ['siem', 'webtier', '#22C55E'], ['grafana', 'aks', '#22C55E'], ['grafana', 'gke', '#22C55E'],
+];
+
+const canvas = document.getElementById('canvas');
+const svg = document.getElementById('connectionsSvg');
+
+function getNodeCenter(nodeId) {
+    const node = document.querySelector(`[data-node="${nodeId}"]`);
+    if (!node) return null;
+    const nodeRect = node.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    return { x: nodeRect.left - canvasRect.left + nodeRect.width / 2, y: nodeRect.top - canvasRect.top + nodeRect.height / 2 - 8 };
+}
+
+function isNodeVisible(nodeId) {
+    const node = document.querySelector(`[data-node="${nodeId}"]`);
+    return node && node.classList.contains('visible');
+}
+
+function drawConnections() {
+    svg.innerHTML = '';
+    connections.forEach(([from, to, color]) => {
+        const fromPos = getNodeCenter(from);
+        const toPos = getNodeCenter(to);
+        if (!fromPos || !toPos) return;
+        
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const dx = toPos.x - fromPos.x, dy = toPos.y - fromPos.y;
+        const midX = (fromPos.x + toPos.x) / 2, midY = (fromPos.y + toPos.y) / 2;
+        const curve = Math.min(Math.abs(dx), Math.abs(dy)) * 0.4;
+        const ctrlX = midX + (Math.abs(dy) > Math.abs(dx) ? curve : 0);
+        const ctrlY = midY + (Math.abs(dx) > Math.abs(dy) ? curve : 0);
+        
+        path.setAttribute('d', `M ${fromPos.x} ${fromPos.y} Q ${ctrlX} ${ctrlY} ${toPos.x} ${toPos.y}`);
+        path.setAttribute('stroke', color);
+        path.setAttribute('class', 'conn');
+        if (isNodeVisible(from) && isNodeVisible(to)) path.classList.add('visible');
+        svg.appendChild(path);
+    });
+}
+
+// Toggle functionality
+document.querySelectorAll('.toggle-item').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+        toggle.classList.toggle('active');
+        const node = document.querySelector(`[data-node="${toggle.dataset.toggle}"]`);
+        if (node) node.classList.toggle('visible');
+        drawConnections();
+        const active = document.querySelectorAll('.toggle-item.active').length;
+        const total = document.querySelectorAll('.toggle-item').length;
+        const pct = Math.round((active / total) * 100);
+        document.getElementById('complexityValue').textContent = pct + '%';
+        document.getElementById('complexityFill').style.width = pct + '%';
+    });
+});
+
+// Module switching
+function switchModule(index) {
+    // Update tabs
+    document.querySelectorAll('.module-tab').forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+    });
+    // Update sidebar
+    document.querySelectorAll('.sidebar-nav a').forEach((link, i) => {
+        link.classList.toggle('active', i === index);
+    });
+    // Update content
+    document.querySelectorAll('.module-content').forEach((content, i) => {
+        content.classList.toggle('active', i === index);
+    });
+}
+
+// Code tab switching
+function switchCodeTab(moduleIndex, tab) {
+    const container = document.getElementById(`module-${moduleIndex}`);
+    if (!container) return;
+    
+    container.querySelectorAll('.code-tab').forEach(t => {
+        t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
+    });
+    
+    const terraformBlock = document.getElementById(`module-${moduleIndex}-terraform`);
+    const pythonBlock = document.getElementById(`module-${moduleIndex}-python`);
+    
+    if (terraformBlock) terraformBlock.style.display = tab === 'terraform' ? 'block' : 'none';
+    if (pythonBlock) pythonBlock.style.display = tab === 'python' ? 'block' : 'none';
+}
+
+// Initialize
+drawConnections();
+window.addEventListener('resize', drawConnections);
+</script>
+
+</body>
+</html>

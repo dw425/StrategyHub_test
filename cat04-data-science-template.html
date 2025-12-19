@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science | Category 04 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 04 - DATA SCIENCE PINK */
+            --brand-orange: #FF9900;
+            --cat-primary: #EC4899;
+            --cat-light: #F472B6;
+            --cat-dark: #DB2777;
+            --cat-glow: rgba(236, 72, 153, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* CRISP-DM PROCESS */
+        .process-wheel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .process-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .process-title { font-size: 14px; font-weight: 600; }
+        .process-badge { font-size: 10px; padding: 4px 10px; background: var(--cat-glow); color: var(--cat-light); border-radius: 20px; }
+        
+        /* EXPERIMENT LIFECYCLE */
+        .lifecycle-flow { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding: 4px; }
+        .lifecycle-stage { flex: 1; min-width: 140px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; position: relative; }
+        .lifecycle-stage::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: var(--cat-primary); font-size: 14px; z-index: 1; }
+        .lifecycle-stage:last-child::after { display: none; }
+        .lifecycle-num { width: 24px; height: 24px; background: var(--cat-glow); border: 1px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--cat-light); margin-bottom: 8px; }
+        .lifecycle-title { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .lifecycle-desc { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+        
+        /* STATISTICAL METHODS */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stats-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .stats-header { padding: 14px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
+        .stats-icon { font-size: 24px; }
+        .stats-title { font-size: 14px; font-weight: 600; }
+        .stats-body { padding: 14px; }
+        .stats-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .stats-methods { list-style: none; }
+        .stats-methods li { font-size: 10px; padding: 6px 10px; background: var(--bg-card-alt); border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .stats-methods li::before { content: '•'; color: var(--cat-light); }
+        
+        /* FEATURE ENGINEERING */
+        .feature-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; }
+        .feature-icon { font-size: 28px; margin-bottom: 8px; }
+        .feature-name { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+        .feature-examples { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+        
+        /* MODEL SELECTION */
+        .model-matrix { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .model-table { width: 100%; border-collapse: collapse; }
+        .model-table th { background: var(--bg-card-alt); padding: 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .model-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); }
+        .model-table tr:last-child td { border-bottom: none; }
+        .model-table tr:hover td { background: var(--bg-hover); }
+        .model-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .model-icon { font-size: 16px; }
+        .use-case-tag { font-size: 8px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+        .use-case-tag.classification { background: rgba(16,185,129,0.2); color: var(--green); }
+        .use-case-tag.regression { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .use-case-tag.timeseries { background: rgba(139,92,246,0.2); color: var(--violet); }
+        .use-case-tag.nlp { background: rgba(236,72,153,0.2); color: var(--pink); }
+        
+        /* EXPERIMENT TRACKING */
+        .tracking-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .tracking-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .tracking-title { font-size: 13px; font-weight: 600; }
+        .tracking-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-tag { font-size: 8px; padding: 2px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        /* NOTEBOOK PREVIEW */
+        .notebook-preview { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .notebook-header { padding: 10px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .notebook-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .notebook-dot.red { background: #EF4444; }
+        .notebook-dot.yellow { background: #F59E0B; }
+        .notebook-dot.green { background: #10B981; }
+        .notebook-title { margin-left: 8px; font-size: 11px; color: var(--text-muted); }
+        .notebook-cells { padding: 0; }
+        .notebook-cell { border-bottom: 1px solid var(--border-color); }
+        .notebook-cell:last-child { border-bottom: none; }
+        .cell-header { padding: 8px 16px; background: var(--bg-card-alt); display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-muted); }
+        .cell-type { padding: 2px 6px; border-radius: 4px; font-size: 9px; }
+        .cell-type.code { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .cell-type.markdown { background: rgba(139,92,246,0.2); color: var(--violet); }
+        .cell-type.output { background: rgba(16,185,129,0.2); color: var(--green); }
+        .cell-content { padding: 12px 16px; font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; background: var(--bg-dark); }
+        .cell-content.markdown-content { background: var(--bg-card); font-family: inherit; }
+        .cell-content pre { margin: 0; white-space: pre-wrap; }
+        
+        /* CODE PANEL */
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(236,72,153,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: 14px; font-weight: 600; }
+        .footer-brand span { color: var(--brand-orange); }
+        .footer-meta { font-size: 12px; color: var(--text-muted); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .stats-grid { grid-template-columns: 1fr; }
+            .tools-grid, .feature-types { grid-template-columns: repeat(2, 1fr); }
+            .lifecycle-flow { flex-direction: column; }
+            .lifecycle-stage::after { display: none; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔬 Category 04</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="#process"><span class="nav-icon">🔄</span> CRISP-DM Process</a></li>
+            <li><a href="#statistics"><span class="nav-icon">📊</span> Statistical Methods</a></li>
+            <li><a href="#features"><span class="nav-icon">⚙️</span> Feature Engineering</a></li>
+            <li><a href="#models"><span class="nav-icon">🤖</span> Model Selection</a></li>
+            <li><a href="#experiments"><span class="nav-icon">🧪</span> Experimentation</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools Scorecard</a></li>
+            <li><a href="#usecases"><span class="nav-icon">🎯</span> Use Cases</a></li>
+            <li><a href="#simplified"><span class="nav-icon">🚀</span> Getting Started</a></li>
+            <li><a href="#agents"><span class="nav-icon">🤖</span> DS Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🔬 Category 04</span>
+                <h1>Data Science</h1>
+                <p>Apply scientific methods to extract knowledge from data. Combine statistics, machine learning, and domain expertise to solve complex business problems and drive data-driven decisions.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">$103B</div><div class="hero-metric-label">DS Market by 2027</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">36%</div><div class="hero-metric-label">Job Growth Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">87%</div><div class="hero-metric-label">Companies Investing</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">$150K</div><div class="hero-metric-label">Avg DS Salary</div></div>
+            </div>
+        </section>
+
+        <!-- CRISP-DM PROCESS -->
+        <section class="module" id="process">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>CRISP-DM Methodology</h2>
+                    <p>Cross-Industry Standard Process for Data Mining — the proven 6-phase framework</p>
+                </div>
+            </div>
+            
+            <!-- CRISP-DM as Clean 6-Phase Journey -->
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px;">
+                <!-- Phase 1: Business Understanding -->
+                <div style="background: linear-gradient(135deg, #3B82F620 0%, #3B82F610 100%); border: 2px solid #3B82F6; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #0a0a14; border: 2px solid #3B82F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #60A5FA;">1</div>
+                    <div style="margin-top: 12px; font-size: 11px; font-weight: 700; color: #60A5FA;">Business Understanding</div>
+                    <div style="height: 1px; background: #3B82F640; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0; line-height: 1.5;">
+                        Define objectives<br>
+                        Assess situation<br>
+                        Set success criteria<br>
+                        Create project plan
+                    </div>
+                    <div style="margin-top: 8px; font-size: 7px; color: #3B82F6; font-weight: 600;">2-4 WEEKS</div>
+                </div>
+                
+                <!-- Phase 2: Data Understanding -->
+                <div style="background: linear-gradient(135deg, #06B6D420 0%, #06B6D410 100%); border: 2px solid #06B6D4; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #0a0a14; border: 2px solid #06B6D4; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #22D3EE;">2</div>
+                    <div style="margin-top: 12px; font-size: 11px; font-weight: 700; color: #22D3EE;">Data Understanding</div>
+                    <div style="height: 1px; background: #06B6D440; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0; line-height: 1.5;">
+                        Collect initial data<br>
+                        Describe & explore<br>
+                        Verify quality<br>
+                        Identify issues
+                    </div>
+                    <div style="margin-top: 8px; font-size: 7px; color: #06B6D4; font-weight: 600;">2-3 WEEKS</div>
+                </div>
+                
+                <!-- Phase 3: Data Preparation -->
+                <div style="background: linear-gradient(135deg, #8B5CF620 0%, #8B5CF610 100%); border: 2px solid #8B5CF6; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #0a0a14; border: 2px solid #8B5CF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #A78BFA;">3</div>
+                    <div style="margin-top: 12px; font-size: 11px; font-weight: 700; color: #A78BFA;">Data Preparation</div>
+                    <div style="height: 1px; background: #8B5CF640; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0; line-height: 1.5;">
+                        Select & clean data<br>
+                        Feature engineering<br>
+                        Transform & format<br>
+                        Integrate datasets
+                    </div>
+                    <div style="margin-top: 8px; font-size: 7px; color: #8B5CF6; font-weight: 600;">4-8 WEEKS</div>
+                </div>
+                
+                <!-- Phase 4: Modeling -->
+                <div style="background: linear-gradient(135deg, #EC489930 0%, #EC489915 100%); border: 3px solid #EC4899; border-radius: 12px; padding: 16px; text-align: center; position: relative; box-shadow: 0 0 20px #EC489930;">
+                    <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 32px; height: 32px; background: #0a0a14; border: 3px solid #EC4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #F472B6;">4</div>
+                    <div style="margin-top: 14px; font-size: 12px; font-weight: 700; color: #F472B6;">Modeling</div>
+                    <div style="height: 1px; background: #EC489940; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0; line-height: 1.5;">
+                        Select techniques<br>
+                        Build & train models<br>
+                        Tune parameters<br>
+                        Cross-validate
+                    </div>
+                    <div style="margin-top: 8px; font-size: 7px; color: #EC4899; font-weight: 600;">4-6 WEEKS</div>
+                </div>
+                
+                <!-- Phase 5: Evaluation -->
+                <div style="background: linear-gradient(135deg, #F59E0B20 0%, #F59E0B10 100%); border: 2px solid #F59E0B; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #0a0a14; border: 2px solid #F59E0B; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #FBBF24;">5</div>
+                    <div style="margin-top: 12px; font-size: 11px; font-weight: 700; color: #FBBF24;">Evaluation</div>
+                    <div style="height: 1px; background: #F59E0B40; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0; line-height: 1.5;">
+                        Evaluate results<br>
+                        Review process<br>
+                        Business validation<br>
+                        Determine next steps
+                    </div>
+                    <div style="margin-top: 8px; font-size: 7px; color: #F59E0B; font-weight: 600;">2-3 WEEKS</div>
+                </div>
+                
+                <!-- Phase 6: Deployment -->
+                <div style="background: linear-gradient(135deg, #10B98120 0%, #10B98110 100%); border: 2px solid #10B981; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+                    <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #0a0a14; border: 2px solid #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #34D399;">6</div>
+                    <div style="margin-top: 12px; font-size: 11px; font-weight: 700; color: #34D399;">Deployment</div>
+                    <div style="height: 1px; background: #10B98140; margin: 8px 0;"></div>
+                    <div style="font-size: 8px; color: #a0a0b0; line-height: 1.5;">
+                        Plan deployment<br>
+                        Monitor & maintain<br>
+                        Produce final report<br>
+                        Review project
+                    </div>
+                    <div style="margin-top: 8px; font-size: 7px; color: #10B981; font-weight: 600;">2-4 WEEKS</div>
+                </div>
+            </div>
+            
+            <!-- Iteration Note -->
+            <div style="display: flex; align-items: center; gap: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 16px;">
+                <div style="font-size: 24px;">🔄</div>
+                <div>
+                    <div style="font-size: 11px; font-weight: 600; color: var(--cat-light);">Iterative Process</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">CRISP-DM is cyclical — evaluation findings often lead back to business understanding or data preparation. Most projects iterate 2-5 times before deployment.</div>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 8px;">
+                    <div style="background: var(--bg-card-alt); padding: 8px 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 14px; font-weight: 700; color: #EC4899;">60%</div>
+                        <div style="font-size: 7px; color: var(--text-muted);">Time in Data Prep</div>
+                    </div>
+                    <div style="background: var(--bg-card-alt); padding: 8px 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 14px; font-weight: 700; color: #3B82F6;">3-6 mo</div>
+                        <div style="font-size: 7px; color: var(--text-muted);">Typical Project</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATISTICAL METHODS -->
+        <section class="module" id="statistics">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Statistical Methods</h2>
+                    <p>Foundation techniques for data analysis, inference, and modeling</p>
+                </div>
+            </div>
+            
+            <!-- Comprehensive Stats Table -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                    <thead>
+                        <tr style="background: #1a1a2e;">
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600; width: 140px;">Category</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Methods</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">When to Use</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px; font-weight: 600; color: #60A5FA;">📈 Descriptive</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Mean, Median, Mode, Std Dev, Variance, Percentiles, IQR, Skewness, Kurtosis</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Summarize data distribution, identify outliers, understand shape</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);"><code>df.describe()</code> → Quick profile of all numeric columns</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px; font-weight: 600; color: #06B6D4;">🎯 Hypothesis Testing</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">t-test (1-sample, 2-sample, paired), Chi-square, Mann-Whitney U, Wilcoxon, Kolmogorov-Smirnov</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Compare groups, test assumptions, validate differences are significant</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Is treatment group conversion rate > control? → 2-sample t-test</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px; font-weight: 600; color: #8B5CF6;">📊 ANOVA</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">One-way ANOVA, Two-way ANOVA, MANOVA, ANCOVA, Repeated Measures, Post-hoc (Tukey, Bonferroni)</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Compare 3+ groups, analyze variance across factors</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Do 4 marketing campaigns have different ROI? → One-way ANOVA</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px; font-weight: 600; color: #EC4899;">🔗 Correlation</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Pearson (linear), Spearman (rank), Kendall (ordinal), Point-biserial, Partial correlation</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Measure relationships between variables, detect multicollinearity</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Is ad spend correlated with revenue? → Pearson r = 0.85</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px; font-weight: 600; color: #10B981;">📉 Regression</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Linear, Multiple, Polynomial, Logistic, Poisson, Ridge, Lasso, Elastic Net, Quantile</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Predict outcomes, understand drivers, model relationships</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Predict house price from features → Multiple Linear Regression</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px; font-weight: 600; color: #F59E0B;">⏱️ Time Series</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">ARIMA, SARIMA, Exponential Smoothing, Holt-Winters, STL Decomposition, Granger Causality</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Forecast future values, detect seasonality, analyze trends</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Forecast next quarter sales → SARIMA with seasonal adjustment</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px; font-weight: 600; color: #EF4444;">🎲 Probability</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Bayes' Theorem, Conditional Probability, Distributions (Normal, Binomial, Poisson, Exponential)</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Model uncertainty, calculate likelihoods, Bayesian inference</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Given positive test, P(disease)? → Bayes' Theorem</td>
+                        </tr>
+                        <tr style="background: #0a0a12;">
+                            <td style="padding: 10px; font-weight: 600; color: #14B8A6;">🔬 Non-Parametric</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Kruskal-Wallis, Friedman, Sign Test, Permutation Tests, Bootstrap, Kernel Density</td>
+                            <td style="padding: 10px; color: var(--text-muted);">When normality assumptions violated, small samples, ordinal data</td>
+                            <td style="padding: 10px; font-size: 9px; color: var(--text-muted);">Compare medians with skewed data → Kruskal-Wallis test</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Key Concepts Quick Reference -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #60A5FA; margin-bottom: 8px;">📐 P-Value</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">Probability of observing results if null hypothesis is true. p < 0.05 typically considered significant.</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #10B981; margin-bottom: 8px;">📊 Confidence Interval</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">Range where true parameter lies with X% confidence. 95% CI means 95 of 100 samples contain true value.</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #F59E0B; margin-bottom: 8px;">📈 Effect Size</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">Magnitude of difference (Cohen's d, R²). Large samples can show significance for tiny effects.</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #EC4899; margin-bottom: 8px;">⚡ Statistical Power</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">Probability of detecting true effect. 80% power standard. Increases with sample size.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURE ENGINEERING -->
+        <section class="module" id="features">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Feature Engineering</h2>
+                    <p>Transform raw data into predictive signals — where domain expertise meets data science</p>
+                </div>
+            </div>
+            
+            <!-- Feature Engineering Table with Examples -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                    <thead>
+                        <tr style="background: #1a1a2e;">
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600; width: 130px;">Technique</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Description</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Methods</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Code Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #60A5FA;">🔢 Numeric Scaling</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Normalize range for algorithms sensitive to scale (SVM, kNN, Neural Nets)</td>
+                            <td style="padding: 10px; color: var(--text-muted);">StandardScaler (z-score), MinMaxScaler (0-1), RobustScaler</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">scaler.fit_transform(X[['age','income']])</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #EC4899;">🏷️ Categorical Encoding</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Convert categories to numbers while preserving meaning</td>
+                            <td style="padding: 10px; color: var(--text-muted);">One-hot, Label, Target, Frequency, Binary, Ordinal</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">pd.get_dummies(df, columns=['city'])</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #10B981;">📅 Temporal Features</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Extract time-based signals from datetime columns</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Day/Month/Year, DayOfWeek, Hour, IsWeekend, Quarter, Cyclical</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">df['dow'] = df['date'].dt.dayofweek</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #8B5CF6;">⏳ Lag Features</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Use historical values as predictors (time series)</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Lag (t-1, t-7), Rolling mean/std, Expanding stats, Diff</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">df['sales_lag7'] = df['sales'].shift(7)</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #F59E0B;">📝 Text Features</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Convert text into numeric representations</td>
+                            <td style="padding: 10px; color: var(--text-muted);">TF-IDF, Word2Vec, BERT embeddings, N-grams, Sentiment</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">TfidfVectorizer().fit_transform(texts)</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #06B6D4;">🔀 Interactions</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Combine features to capture relationships</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Products, Ratios, Differences, Polynomial combinations</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">df['price_per_sqft'] = df['price']/df['sqft']</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #EF4444;">📉 Binning</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Convert continuous to categorical (reduce noise, handle outliers)</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Equal-width, Equal-frequency, Custom bins, K-means bins</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">pd.cut(df['age'], bins=[0,18,35,50,100])</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #14B8A6;">📊 Aggregations</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Create features by grouping and summarizing</td>
+                            <td style="padding: 10px; color: var(--text-muted);">GroupBy stats (mean, count, max), Window functions</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">df.groupby('user')['orders'].transform('mean')</code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #A78BFA;">🔍 Missing Values</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Handle nulls with imputation or indicators</td>
+                            <td style="padding: 10px; color: var(--text-muted);">Mean/Median/Mode fill, KNN impute, Indicator columns</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">SimpleImputer(strategy='median').fit_transform(X)</code></td>
+                        </tr>
+                        <tr style="background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 600; color: #F472B6;">🎯 Dim Reduction</span></td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Reduce features while preserving information</td>
+                            <td style="padding: 10px; color: var(--text-muted);">PCA, t-SNE, UMAP, Feature selection (RFE, LASSO)</td>
+                            <td style="padding: 10px; font-size: 9px;"><code style="color: #34D399;">PCA(n_components=10).fit_transform(X)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Feature Engineering Best Practices -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div style="background: #10B98115; border: 1px solid #10B981; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #34D399; margin-bottom: 6px;">✅ DO</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">
+                        • Create features before train/test split<br>
+                        • Use domain knowledge for interactions<br>
+                        • Handle leakage (no future data in features)<br>
+                        • Document all transformations
+                    </div>
+                </div>
+                <div style="background: #EF444415; border: 1px solid #EF4444; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #F87171; margin-bottom: 6px;">❌ DON'T</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">
+                        • Fit scalers on test data<br>
+                        • Create too many sparse features<br>
+                        • Ignore feature correlation<br>
+                        • Over-engineer without validation
+                    </div>
+                </div>
+                <div style="background: #3B82F615; border: 1px solid #3B82F6; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #60A5FA; margin-bottom: 6px;">💡 PRO TIP</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5;">
+                        • Start simple, iterate based on model feedback<br>
+                        • Use feature importance to prune<br>
+                        • Automate with sklearn Pipelines<br>
+                        • Consider AutoML for feature search
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODEL SELECTION -->
+        <section class="module" id="models">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Model Selection Guide</h2>
+                    <p>Choose the right algorithm for your problem type</p>
+                </div>
+            </div>
+            
+            <div class="model-matrix">
+                <table class="model-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Use Cases</th>
+                            <th>Pros</th>
+                            <th>Cons</th>
+                            <th>When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="model-name"><span class="model-icon">📈</span> Linear/Logistic Regression</div></td>
+                            <td><span class="use-case-tag regression">Regression</span><span class="use-case-tag classification">Classification</span></td>
+                            <td>Interpretable, fast, baseline</td>
+                            <td>Assumes linearity</td>
+                            <td>Baseline model, need interpretability</td>
+                        </tr>
+                        <tr>
+                            <td><div class="model-name"><span class="model-icon">🌲</span> Random Forest</div></td>
+                            <td><span class="use-case-tag classification">Classification</span><span class="use-case-tag regression">Regression</span></td>
+                            <td>Handles non-linearity, robust</td>
+                            <td>Less interpretable, slower</td>
+                            <td>Tabular data, feature importance</td>
+                        </tr>
+                        <tr>
+                            <td><div class="model-name"><span class="model-icon">🚀</span> XGBoost/LightGBM</div></td>
+                            <td><span class="use-case-tag classification">Classification</span><span class="use-case-tag regression">Regression</span></td>
+                            <td>State-of-art for tabular, fast</td>
+                            <td>Prone to overfitting</td>
+                            <td>Competitions, production tabular</td>
+                        </tr>
+                        <tr>
+                            <td><div class="model-name"><span class="model-icon">🧠</span> Neural Networks</div></td>
+                            <td><span class="use-case-tag classification">Classification</span><span class="use-case-tag nlp">NLP</span></td>
+                            <td>Learns complex patterns</td>
+                            <td>Needs lots of data, black box</td>
+                            <td>Images, text, large datasets</td>
+                        </tr>
+                        <tr>
+                            <td><div class="model-name"><span class="model-icon">📊</span> ARIMA/Prophet</div></td>
+                            <td><span class="use-case-tag timeseries">Time Series</span></td>
+                            <td>Handles seasonality, trends</td>
+                            <td>Univariate, assumes patterns</td>
+                            <td>Forecasting, demand prediction</td>
+                        </tr>
+                        <tr>
+                            <td><div class="model-name"><span class="model-icon">🎯</span> K-Means/DBSCAN</div></td>
+                            <td><span class="use-case-tag classification">Clustering</span></td>
+                            <td>Unsupervised, exploratory</td>
+                            <td>Needs tuning, assumes shapes</td>
+                            <td>Segmentation, anomaly detection</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- EXPERIMENTATION -->
+        <section class="module" id="experiments">
+            <div class="module-header">
+                <div class="module-icon">🧪</div>
+                <div class="module-info">
+                    <h2>Experiment Tracking</h2>
+                    <p>Systematic approach to model development and comparison</p>
+                </div>
+            </div>
+            
+            <div class="lifecycle-flow">
+                <div class="lifecycle-stage">
+                    <div class="lifecycle-num">1</div>
+                    <div class="lifecycle-title">Hypothesis</div>
+                    <div class="lifecycle-desc">Define what you're testing and expected outcome</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="lifecycle-num">2</div>
+                    <div class="lifecycle-title">Design</div>
+                    <div class="lifecycle-desc">Plan experiment, define metrics, set baselines</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="lifecycle-num">3</div>
+                    <div class="lifecycle-title">Implement</div>
+                    <div class="lifecycle-desc">Build model variants, log parameters</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="lifecycle-num">4</div>
+                    <div class="lifecycle-title">Execute</div>
+                    <div class="lifecycle-desc">Run experiments, track metrics</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="lifecycle-num">5</div>
+                    <div class="lifecycle-title">Analyze</div>
+                    <div class="lifecycle-desc">Compare results, statistical significance</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="lifecycle-num">6</div>
+                    <div class="lifecycle-title">Document</div>
+                    <div class="lifecycle-desc">Record learnings, share findings</div>
+                </div>
+            </div>
+            
+            <div class="tracking-viz">
+                <div class="tracking-header">
+                    <div class="tracking-title">📊 Experiment Comparison Dashboard</div>
+                </div>
+                <div class="tracking-canvas">
+                    <svg viewBox="0 0 900 200" style="width: 100%; height: auto;">
+                        <!-- Experiment runs table -->
+                        <g transform="translate(20, 20)">
+                            <!-- Header -->
+                            <rect width="860" height="30" rx="4" fill="#1a1a2e"/>
+                            <text x="20" y="20" fill="#6a6a7a" font-size="10" font-weight="600">Run</text>
+                            <text x="120" y="20" fill="#6a6a7a" font-size="10" font-weight="600">Model</text>
+                            <text x="260" y="20" fill="#6a6a7a" font-size="10" font-weight="600">Accuracy</text>
+                            <text x="360" y="20" fill="#6a6a7a" font-size="10" font-weight="600">F1 Score</text>
+                            <text x="460" y="20" fill="#6a6a7a" font-size="10" font-weight="600">AUC</text>
+                            <text x="560" y="20" fill="#6a6a7a" font-size="10" font-weight="600">Train Time</text>
+                            <text x="680" y="20" fill="#6a6a7a" font-size="10" font-weight="600">Parameters</text>
+                            
+                            <!-- Run 1 - Best -->
+                            <rect y="35" width="860" height="35" rx="4" fill="#EC489910" stroke="#EC4899" stroke-width="1"/>
+                            <text x="20" y="57" fill="#F472B6" font-size="10" font-weight="600">run_042</text>
+                            <text x="120" y="57" fill="#fff" font-size="10">XGBoost v3</text>
+                            <text x="260" y="57" fill="#34D399" font-size="11" font-weight="600">94.2%</text>
+                            <text x="360" y="57" fill="#34D399" font-size="11" font-weight="600">0.923</text>
+                            <text x="460" y="57" fill="#34D399" font-size="11" font-weight="600">0.971</text>
+                            <text x="560" y="57" fill="#fff" font-size="10">2.3 min</text>
+                            <text x="680" y="57" fill="#6a6a7a" font-size="9">lr=0.05, depth=8, est=500</text>
+                            <text x="830" y="57" fill="#34D399" font-size="9">★ Best</text>
+                            
+                            <!-- Run 2 -->
+                            <rect y="75" width="860" height="35" rx="4" fill="#12121a"/>
+                            <text x="20" y="97" fill="#A78BFA" font-size="10">run_041</text>
+                            <text x="120" y="97" fill="#fff" font-size="10">Random Forest</text>
+                            <text x="260" y="97" fill="#fff" font-size="10">92.8%</text>
+                            <text x="360" y="97" fill="#fff" font-size="10">0.901</text>
+                            <text x="460" y="97" fill="#fff" font-size="10">0.958</text>
+                            <text x="560" y="97" fill="#fff" font-size="10">4.1 min</text>
+                            <text x="680" y="97" fill="#6a6a7a" font-size="9">n_est=200, depth=12</text>
+                            
+                            <!-- Run 3 -->
+                            <rect y="115" width="860" height="35" rx="4" fill="#12121a"/>
+                            <text x="20" y="137" fill="#A78BFA" font-size="10">run_040</text>
+                            <text x="120" y="137" fill="#fff" font-size="10">Logistic Reg</text>
+                            <text x="260" y="137" fill="#fff" font-size="10">88.5%</text>
+                            <text x="360" y="137" fill="#fff" font-size="10">0.856</text>
+                            <text x="460" y="137" fill="#fff" font-size="10">0.921</text>
+                            <text x="560" y="137" fill="#fff" font-size="10">0.2 min</text>
+                            <text x="680" y="137" fill="#6a6a7a" font-size="9">C=1.0, penalty=l2</text>
+                            
+                            <!-- Run 4 -->
+                            <rect y="155" width="860" height="35" rx="4" fill="#12121a"/>
+                            <text x="20" y="177" fill="#A78BFA" font-size="10">run_039</text>
+                            <text x="120" y="177" fill="#fff" font-size="10">Neural Net</text>
+                            <text x="260" y="177" fill="#fff" font-size="10">93.1%</text>
+                            <text x="360" y="177" fill="#fff" font-size="10">0.912</text>
+                            <text x="460" y="177" fill="#fff" font-size="10">0.965</text>
+                            <text x="560" y="177" fill="#EF4444" font-size="10">15.2 min</text>
+                            <text x="680" y="177" fill="#6a6a7a" font-size="9">layers=[64,32], epochs=50</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA SCIENCE TOOLS SCORECARD -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Data Science Tools Scorecard</h2>
+                    <p>Top 10 platforms for analysis, modeling, and ML ops (scored 1-5)</p>
+                </div>
+            </div>
+            
+            <!-- Scorecard Table -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background: #1a1a2e;">
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Tool</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Ease</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">ML</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Scale</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Collab</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Deploy</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Eco</th>
+                            <th style="padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600;">Cost</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Best For</th>
+                            <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-weight: 600;">Key Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #EC4899;">Databricks</span><div style="font-size: 9px; color: #6a6a7a;">Databricks</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Enterprise ML at scale</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Unity Catalog, MLflow native, Spark</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #60A5FA;">Jupyter</span><div style="font-size: 9px; color: #6a6a7a;">Project Jupyter</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Exploration & prototyping</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Universal standard, interactive</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #F59E0B;">SageMaker</span><div style="font-size: 9px; color: #6a6a7a;">AWS</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">AWS-native MLOps</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">End-to-end, managed training</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #10B981;">MLflow</span><div style="font-size: 9px; color: #6a6a7a;">Databricks</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Experiment tracking</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">OSS standard, model registry</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #8B5CF6;">Weights & Biases</span><div style="font-size: 9px; color: #6a6a7a;">W&B</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #FBBF24; font-weight: 700;">$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Deep learning teams</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Best visualization, sweeps</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #06B6D4;">scikit-learn</span><div style="font-size: 9px; color: #6a6a7a;">Open Source</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">1</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Classical ML</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Consistent API, batteries included</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #EF4444;">Vertex AI</span><div style="font-size: 9px; color: #6a6a7a;">Google Cloud</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #EF4444; font-weight: 700;">$$$$</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">GCP-native MLOps</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">AutoML, Feature Store, Pipelines</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color); background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #14B8A6;">Hugging Face</span><div style="font-size: 9px; color: #6a6a7a;">Hugging Face</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">$/Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">NLP & LLMs</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Model hub, Transformers library</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #F472B6;">Optuna</span><div style="font-size: 9px; color: #6a6a7a;">Preferred Networks</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">2</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #EF4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700;">1</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Hyperparameter tuning</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Bayesian optimization, pruning</td>
+                        </tr>
+                        <tr style="background: #0a0a12;">
+                            <td style="padding: 10px;"><span style="font-weight: 700; color: #A78BFA;">Ray</span><div style="font-size: 9px; color: #6a6a7a;">Anyscale</div></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">5</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #FBBF24; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">3</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center;"><span style="background: #34D399; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700;">4</span></td>
+                            <td style="padding: 8px; text-align: center; color: #34D399; font-weight: 700;">Free</td>
+                            <td style="padding: 10px; color: var(--text-secondary);">Distributed ML</td>
+                            <td style="padding: 10px; color: var(--text-muted); font-size: 10px;">Ray Tune, Ray Serve, scaling</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Legend Row -->
+            <div style="display: flex; gap: 24px; margin-top: 12px; font-size: 10px; color: var(--text-muted); align-items: center;">
+                <div><span style="background: #34D399; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 700;">4-5</span> Excellent</div>
+                <div><span style="background: #FBBF24; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 700;">3</span> Good</div>
+                <div><span style="background: #EF4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 700;">1-2</span> Limited</div>
+                <div style="height: 16px; width: 1px; background: var(--border-color);"></div>
+                <div><b>ML</b>=ML Capabilities</div>
+                <div><b>Collab</b>=Collaboration</div>
+                <div><b>Deploy</b>=Deployment</div>
+                <div><b>Eco</b>=Ecosystem</div>
+            </div>
+        </section>
+
+        <!-- DATA SCIENCE USE CASES -->
+        <section class="module" id="usecases">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Top 5 Data Science Use Cases</h2>
+                    <p>High-impact applications that deliver measurable business value</p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+                <!-- Use Case 1: Churn Prediction -->
+                <div style="background: linear-gradient(135deg, #EF444420 0%, #EF444410 100%); border: 2px solid #EF4444; border-radius: 12px; padding: 16px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 12px; background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 10px;">#1</div>
+                    <div style="font-size: 24px; margin: 8px 0;">📉</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #F87171; margin-bottom: 6px;">Customer Churn</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">Predict which customers will leave, enabling proactive retention campaigns.</div>
+                    <div style="border-top: 1px solid #EF444440; padding-top: 8px;">
+                        <div style="font-size: 8px; color: var(--text-muted);">MODEL: Logistic Reg, XGBoost</div>
+                        <div style="font-size: 8px; color: var(--text-muted);">ROI: 15-25% churn reduction</div>
+                        <div style="font-size: 8px; color: #F87171; font-weight: 600;">$500K-$5M annual savings</div>
+                    </div>
+                </div>
+                
+                <!-- Use Case 2: Demand Forecasting -->
+                <div style="background: linear-gradient(135deg, #3B82F620 0%, #3B82F610 100%); border: 2px solid #3B82F6; border-radius: 12px; padding: 16px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 12px; background: #3B82F6; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 10px;">#2</div>
+                    <div style="font-size: 24px; margin: 8px 0;">📊</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #60A5FA; margin-bottom: 6px;">Demand Forecasting</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">Predict future demand to optimize inventory, staffing, and supply chain.</div>
+                    <div style="border-top: 1px solid #3B82F640; padding-top: 8px;">
+                        <div style="font-size: 8px; color: var(--text-muted);">MODEL: ARIMA, Prophet, LSTM</div>
+                        <div style="font-size: 8px; color: var(--text-muted);">ROI: 20-40% inventory reduction</div>
+                        <div style="font-size: 8px; color: #60A5FA; font-weight: 600;">$1M-$10M working capital</div>
+                    </div>
+                </div>
+                
+                <!-- Use Case 3: Fraud Detection -->
+                <div style="background: linear-gradient(135deg, #F59E0B20 0%, #F59E0B10 100%); border: 2px solid #F59E0B; border-radius: 12px; padding: 16px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 12px; background: #F59E0B; color: #000; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 10px;">#3</div>
+                    <div style="font-size: 24px; margin: 8px 0;">🛡️</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #FBBF24; margin-bottom: 6px;">Fraud Detection</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">Identify fraudulent transactions in real-time to prevent financial losses.</div>
+                    <div style="border-top: 1px solid #F59E0B40; padding-top: 8px;">
+                        <div style="font-size: 8px; color: var(--text-muted);">MODEL: Isolation Forest, Neural Net</div>
+                        <div style="font-size: 8px; color: var(--text-muted);">ROI: 50-80% fraud reduction</div>
+                        <div style="font-size: 8px; color: #FBBF24; font-weight: 600;">$2M-$20M loss prevention</div>
+                    </div>
+                </div>
+                
+                <!-- Use Case 4: Recommendation Engine -->
+                <div style="background: linear-gradient(135deg, #EC489920 0%, #EC489910 100%); border: 2px solid #EC4899; border-radius: 12px; padding: 16px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 12px; background: #EC4899; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 10px;">#4</div>
+                    <div style="font-size: 24px; margin: 8px 0;">🎁</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #F472B6; margin-bottom: 6px;">Recommendations</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">Personalize product/content suggestions to increase engagement and revenue.</div>
+                    <div style="border-top: 1px solid #EC489940; padding-top: 8px;">
+                        <div style="font-size: 8px; color: var(--text-muted);">MODEL: Collab Filter, Matrix Factor</div>
+                        <div style="font-size: 8px; color: var(--text-muted);">ROI: 10-35% revenue lift</div>
+                        <div style="font-size: 8px; color: #F472B6; font-weight: 600;">$1M-$50M incremental rev</div>
+                    </div>
+                </div>
+                
+                <!-- Use Case 5: Customer Segmentation -->
+                <div style="background: linear-gradient(135deg, #10B98120 0%, #10B98110 100%); border: 2px solid #10B981; border-radius: 12px; padding: 16px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 12px; background: #10B981; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 10px;">#5</div>
+                    <div style="font-size: 24px; margin: 8px 0;">👥</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #34D399; margin-bottom: 6px;">Customer Segments</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">Group customers by behavior for targeted marketing and personalization.</div>
+                    <div style="border-top: 1px solid #10B98140; padding-top: 8px;">
+                        <div style="font-size: 8px; color: var(--text-muted);">MODEL: K-Means, DBSCAN, RFM</div>
+                        <div style="font-size: 8px; color: var(--text-muted);">ROI: 20-50% campaign lift</div>
+                        <div style="font-size: 8px; color: #34D399; font-weight: 600;">$200K-$2M marketing ROI</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA SCIENCE SIMPLIFIED -->
+        <section class="module" id="simplified">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Data Science Simplified</h2>
+                    <p>Start making an impact today — no PhD required</p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Left: The Simple Explanation -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--cat-light); margin-bottom: 12px;">🎯 What Data Science Really Is</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+                        Data science is simply <strong style="color: #fff;">using data to answer questions and make better decisions</strong>. You don't need complex algorithms to start — most business value comes from basic analysis done well.
+                    </div>
+                    
+                    <div style="background: var(--bg-card-alt); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+                        <div style="font-size: 11px; font-weight: 600; color: #F59E0B; margin-bottom: 8px;">💡 The 80/20 Rule of Data Science</div>
+                        <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.6;">
+                            <strong>80% of the value</strong> comes from simple techniques: descriptive stats, basic regression, and clear visualization. <strong>20% of projects</strong> actually need advanced ML. Start simple.
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 11px; font-weight: 600; color: #10B981; margin-bottom: 8px;">✅ You're Ready If You Can:</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.8;">
+                        • Ask a specific business question<br>
+                        • Access relevant data (even Excel works)<br>
+                        • Calculate averages and percentages<br>
+                        • Create a chart that tells a story
+                    </div>
+                </div>
+                
+                <!-- Right: Quick Start Example -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--cat-light); margin-bottom: 12px;">⚡ Start Today: 30-Minute Project</div>
+                    
+                    <div style="background: #0a0a14; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-family: monospace;">
+                        <div style="font-size: 10px; color: #6a6a7a; margin-bottom: 6px;"># Your first data science project</div>
+                        <div style="font-size: 10px; color: #A5D6FF;">
+                            <span style="color: #FF7B72;">import</span> pandas <span style="color: #FF7B72;">as</span> pd<br><br>
+                            <span style="color: #6A737D;"># 1. Load your data (any CSV)</span><br>
+                            df = pd.read_csv(<span style="color: #A5D6FF;">'sales.csv'</span>)<br><br>
+                            <span style="color: #6A737D;"># 2. Ask a question: What's our best month?</span><br>
+                            monthly = df.groupby(<span style="color: #A5D6FF;">'month'</span>)[<span style="color: #A5D6FF;">'revenue'</span>].sum()<br><br>
+                            <span style="color: #6A737D;"># 3. Visualize the answer</span><br>
+                            monthly.plot(kind=<span style="color: #A5D6FF;">'bar'</span>)<br><br>
+                            <span style="color: #6A737D;"># 4. Find insight: "December is 3x higher"</span><br>
+                            <span style="color: #6A737D;"># 5. Take action: Staff up for holidays!</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                        <div style="background: #3B82F615; border: 1px solid #3B82F6; border-radius: 6px; padding: 10px; text-align: center;">
+                            <div style="font-size: 16px;">📊</div>
+                            <div style="font-size: 9px; font-weight: 600; color: #60A5FA;">Describe</div>
+                            <div style="font-size: 8px; color: var(--text-muted);">What happened?</div>
+                        </div>
+                        <div style="background: #EC489915; border: 1px solid #EC4899; border-radius: 6px; padding: 10px; text-align: center;">
+                            <div style="font-size: 16px;">🔍</div>
+                            <div style="font-size: 9px; font-weight: 600; color: #F472B6;">Analyze</div>
+                            <div style="font-size: 8px; color: var(--text-muted);">Why did it happen?</div>
+                        </div>
+                        <div style="background: #10B98115; border: 1px solid #10B981; border-radius: 6px; padding: 10px; text-align: center;">
+                            <div style="font-size: 16px;">🎯</div>
+                            <div style="font-size: 9px; font-weight: 600; color: #34D399;">Act</div>
+                            <div style="font-size: 8px; color: var(--text-muted);">What should we do?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom: Next Steps -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 20px; margin-bottom: 6px;">📚</div>
+                    <div style="font-size: 10px; font-weight: 600; color: #fff;">Week 1</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Learn Pandas basics<br>Load & explore data</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 20px; margin-bottom: 6px;">📈</div>
+                    <div style="font-size: 10px; font-weight: 600; color: #fff;">Week 2</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Master visualization<br>Tell stories with data</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 20px; margin-bottom: 6px;">🔬</div>
+                    <div style="font-size: 10px; font-weight: 600; color: #fff;">Week 3</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">Basic statistics<br>Correlation & regression</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center;">
+                    <div style="font-size: 20px; margin-bottom: 6px;">🤖</div>
+                    <div style="font-size: 10px; font-weight: 600; color: #fff;">Week 4</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">First ML model<br>scikit-learn basics</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT SECTION -->
+        <section class="module" id="agents">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Data Science Agent</h2>
+                    <p>AI-powered assistant for end-to-end data science workflows</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔬</div>
+                    <div class="agent-name">DataScienceAgent</div>
+                    <div class="agent-role">ML Research Specialist</div>
+                    <div class="agent-desc">Automates the complete data science workflow from EDA through model deployment. Handles feature engineering, model selection, hyperparameter tuning, and generates comprehensive analysis reports.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automated exploratory data analysis</li>
+                        <li>Feature engineering suggestions</li>
+                        <li>Multi-model comparison</li>
+                        <li>Hyperparameter optimization</li>
+                        <li>Model interpretation (SHAP)</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Analysis Task</div>
+                        <div class="code-filename">ds_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># ds_agent.py - Data Science Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">data_scientist</span> = Agent(
+    role=<span class="code-string">"Senior Data Scientist"</span>,
+    goal=<span class="code-string">"Build high-performing predictive models"</span>,
+    backstory=<span class="code-string">"PhD in Statistics with 10 years ML experience"</span>,
+    tools=[
+        DataProfiler(),
+        FeatureEngineer(),
+        ModelSelector(),
+        HyperparamTuner(),
+        ModelInterpreter(),
+    ]
+)
+
+<span class="code-function">modeling_task</span> = Task(
+    description=<span class="code-string">"""
+    Objective: Predict customer churn with >90% accuracy
+    
+    1. Profile dataset and identify quality issues
+    2. Engineer features from transaction history
+    3. Compare baseline models (LR, RF, XGB, NN)
+    4. Tune top performer with Optuna
+    5. Generate SHAP explanations for top drivers
+    6. Create deployment-ready model package
+    """</span>,
+    agent=data_scientist,
+    expected_output=<span class="code-string">"Production model with documentation"</span>
+)
+
+<span class="code-comment"># Execute workflow</span>
+crew = Crew(agents=[data_scientist], tasks=[modeling_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
+        <div class="footer-meta">Category 4 of 29 • Data Science</div>
+    </div>
+</footer>
+
+</body>
+</html>

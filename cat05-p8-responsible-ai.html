@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsible AI | Generative AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EC4899;
+            --cat-light: #F472B6;
+            --cat-glow: rgba(236, 72, 153, 0.15);
+            --page-primary: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* SAFETY FRAMEWORK */
+        .safety-framework { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .safety-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .safety-title { font-size: 13px; font-weight: 600; }
+        .safety-body { padding: 24px; }
+        .safety-layers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .safety-layer { background: var(--bg-card-alt); border-radius: 12px; padding: 20px; text-align: center; border-top: 3px solid var(--border-color); }
+        .safety-layer.input { border-top-color: var(--blue); }
+        .safety-layer.model { border-top-color: var(--violet); }
+        .safety-layer.output { border-top-color: var(--green); }
+        .safety-layer.human { border-top-color: var(--yellow); }
+        .safety-layer-icon { font-size: 28px; margin-bottom: 10px; }
+        .safety-layer-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .safety-layer-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+        
+        /* RISK GRID */
+        .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .risk-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .risk-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .risk-level { font-size: 20px; }
+        .risk-title { font-size: 14px; font-weight: 600; }
+        .risk-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .risk-examples { list-style: none; }
+        .risk-examples li { font-size: 10px; color: var(--text-muted); padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+        .risk-examples li::before { content: '•'; color: var(--page-light); }
+        
+        /* BIAS DETECTION */
+        .bias-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .bias-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .bias-types { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
+        .bias-type { background: var(--bg-card-alt); border-radius: 10px; padding: 16px; border-left: 3px solid var(--border-color); }
+        .bias-type.data { border-left-color: var(--red); }
+        .bias-type.algorithmic { border-left-color: var(--yellow); }
+        .bias-type.interaction { border-left-color: var(--blue); }
+        .bias-type.deployment { border-left-color: var(--violet); }
+        .bias-type-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+        .bias-type-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+        .bias-mitigation { background: var(--bg-dark); border-radius: 8px; padding: 16px; }
+        .bias-mitigation-title { font-size: 11px; font-weight: 600; color: var(--page-light); margin-bottom: 8px; }
+        .bias-mitigation-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+        .bias-mitigation-list li { font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .bias-mitigation-list li::before { content: '✓'; color: var(--green); }
+        
+        /* GUARDRAILS */
+        .guardrails-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .guardrail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .guardrail-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        .guardrail-icon { font-size: 24px; }
+        .guardrail-title { font-size: 13px; font-weight: 600; }
+        .guardrail-body { padding: 16px; }
+        .guardrail-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .guardrail-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+        .guardrail-tool { font-size: 9px; padding: 4px 8px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        /* ETHICS CHECKLIST */
+        .checklist { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .checklist-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .checklist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .checklist-item { background: var(--bg-card-alt); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+        .checklist-box { width: 20px; height: 20px; border: 2px solid var(--page-primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--page-light); font-size: 12px; flex-shrink: 0; }
+        .checklist-text { font-size: 11px; color: var(--text-secondary); }
+        
+        /* COMPLIANCE TABLE */
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 10px 16px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); }
+        .code-filename { margin-left: auto; padding: 10px 16px; font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; background: var(--bg-dark); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-function { color: var(--page-light); }
+        .code-comment { color: var(--text-muted); }
+        
+        /* RELATED PAGES */
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🎨 Category 05</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat05-generative-ai-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat05-p1-llm-fundamentals.html"><span class="nav-icon">🧠</span> 5.1 LLM Fundamentals</a></li>
+            <li><a href="cat05-p2-prompt-engineering.html"><span class="nav-icon">✍️</span> 5.2 Prompt Engineering</a></li>
+            <li><a href="cat05-p3-rag-systems.html"><span class="nav-icon">🔍</span> 5.3 RAG Systems</a></li>
+            <li><a href="cat05-p4-fine-tuning.html"><span class="nav-icon">🎯</span> 5.4 Fine-Tuning</a></li>
+            <li><a href="cat05-p5-embeddings.html"><span class="nav-icon">📊</span> 5.5 Embeddings</a></li>
+            <li><a href="cat05-p6-model-evaluation.html"><span class="nav-icon">📈</span> 5.6 Evaluation</a></li>
+            <li><a href="cat05-p7-multimodal.html"><span class="nav-icon">🖼️</span> 5.7 Multimodal</a></li>
+            <li><a href="cat05-p8-responsible-ai.html" class="active"><span class="nav-icon">⚖️</span> 5.8 Responsible AI</a></li>
+            <li><a href="cat05-p9-deployment.html"><span class="nav-icon">🚀</span> 5.9 Deployment</a></li>
+            <li><a href="cat05-p10-cost-optimization.html"><span class="nav-icon">💰</span> 5.10 Cost</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">⚖️ Page 5.8</div>
+                <h1>Responsible AI</h1>
+                <p>Build AI systems that are safe, fair, and trustworthy. Learn about safety frameworks, bias mitigation, guardrails, and ethical deployment practices.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Safety</div>
+                    <div class="hero-metric-label">Harm Prevention</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Fairness</div>
+                    <div class="hero-metric-label">Bias Mitigation</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Trust</div>
+                    <div class="hero-metric-label">Transparency</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Guard</div>
+                    <div class="hero-metric-label">Content Filters</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Why Responsible AI?</h2>
+                    <p>Building trustworthy AI systems</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Stakes Are High</h3>
+                <p>Large language models can generate harmful content, perpetuate biases, leak private information, and be misused for malicious purposes. Responsible AI practices aren't just ethical imperatives—they're business necessities. One viral incident of harmful AI output can destroy brand reputation and invite regulatory scrutiny.</p>
+                <p>Responsible AI encompasses several dimensions: <strong>safety</strong> (preventing harmful outputs), <strong>fairness</strong> (avoiding discriminatory behavior), <strong>privacy</strong> (protecting user data), <strong>transparency</strong> (explainability and disclosure), and <strong>accountability</strong> (clear ownership and oversight).</p>
+                <p>The good news: robust frameworks, tools, and best practices exist. From Constitutional AI and RLHF for alignment, to guardrails for content filtering, to bias audits for fairness—you can build AI systems that are both powerful and responsible. The key is building safety in from the start, not bolting it on later.</p>
+            </div>
+        </section>
+
+        <!-- SAFETY FRAMEWORK -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🛡️</div>
+                <div class="module-info">
+                    <h2>Defense in Depth</h2>
+                    <p>Multi-layer safety architecture</p>
+                </div>
+            </div>
+            <div class="safety-framework">
+                <div class="safety-header">
+                    <div class="safety-title">🔒 Four Layers of AI Safety</div>
+                </div>
+                <div class="safety-body">
+                    <div class="safety-layers">
+                        <div class="safety-layer input">
+                            <div class="safety-layer-icon">📥</div>
+                            <div class="safety-layer-title">Input Filtering</div>
+                            <div class="safety-layer-desc">Block malicious prompts, jailbreak attempts, and prohibited content before reaching the model.</div>
+                        </div>
+                        <div class="safety-layer model">
+                            <div class="safety-layer-icon">🧠</div>
+                            <div class="safety-layer-title">Model Alignment</div>
+                            <div class="safety-layer-desc">RLHF, Constitutional AI, and safety fine-tuning to make the model inherently safer.</div>
+                        </div>
+                        <div class="safety-layer output">
+                            <div class="safety-layer-icon">📤</div>
+                            <div class="safety-layer-title">Output Filtering</div>
+                            <div class="safety-layer-desc">Scan responses for harmful content, PII, and policy violations before delivery.</div>
+                        </div>
+                        <div class="safety-layer human">
+                            <div class="safety-layer-icon">👤</div>
+                            <div class="safety-layer-title">Human Oversight</div>
+                            <div class="safety-layer-desc">Logging, monitoring, feedback loops, and human review for high-risk outputs.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RISK CATEGORIES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Risk Categories</h2>
+                    <p>Understanding what can go wrong</p>
+                </div>
+            </div>
+            <div class="risk-grid">
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-level">🔴</div>
+                        <div class="risk-title">Harmful Content</div>
+                    </div>
+                    <div class="risk-desc">Model generates content that could cause harm to users or society.</div>
+                    <ul class="risk-examples">
+                        <li>Violence or self-harm instructions</li>
+                        <li>Illegal activity guidance</li>
+                        <li>Explicit or CSAM content</li>
+                        <li>Dangerous misinformation</li>
+                    </ul>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-level">🟠</div>
+                        <div class="risk-title">Bias & Discrimination</div>
+                    </div>
+                    <div class="risk-desc">Model exhibits unfair treatment based on protected characteristics.</div>
+                    <ul class="risk-examples">
+                        <li>Racial or gender stereotypes</li>
+                        <li>Discriminatory recommendations</li>
+                        <li>Unequal performance across groups</li>
+                        <li>Exclusionary language</li>
+                    </ul>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-header">
+                        <div class="risk-level">🟡</div>
+                        <div class="risk-title">Privacy & Security</div>
+                    </div>
+                    <div class="risk-desc">Model leaks sensitive information or is exploited by attackers.</div>
+                    <ul class="risk-examples">
+                        <li>PII in training data leaked</li>
+                        <li>Prompt injection attacks</li>
+                        <li>Jailbreaking system prompts</li>
+                        <li>Data exfiltration</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BIAS DETECTION -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Bias Detection & Mitigation</h2>
+                    <p>Building fair AI systems</p>
+                </div>
+            </div>
+            <div class="bias-section">
+                <div class="bias-title">🔍 Types of Bias in AI Systems</div>
+                <div class="bias-types">
+                    <div class="bias-type data">
+                        <div class="bias-type-title">📊 Data Bias</div>
+                        <div class="bias-type-desc">Training data over/under-represents certain groups or reflects historical discrimination. Internet text contains societal biases that models learn.</div>
+                    </div>
+                    <div class="bias-type algorithmic">
+                        <div class="bias-type-title">🔧 Algorithmic Bias</div>
+                        <div class="bias-type-desc">Model architecture or training objectives amplify certain biases. Attention mechanisms may weight biased patterns more strongly.</div>
+                    </div>
+                    <div class="bias-type interaction">
+                        <div class="bias-type-title">💬 Interaction Bias</div>
+                        <div class="bias-type-desc">How users interact with AI affects outputs. Feedback loops can reinforce biased behavior over time.</div>
+                    </div>
+                    <div class="bias-type deployment">
+                        <div class="bias-type-title">🚀 Deployment Bias</div>
+                        <div class="bias-type-desc">AI performs differently in real-world contexts than test environments. Certain populations may have less access or benefit.</div>
+                    </div>
+                </div>
+                <div class="bias-mitigation">
+                    <div class="bias-mitigation-title">✅ Mitigation Strategies</div>
+                    <ul class="bias-mitigation-list">
+                        <li>Diverse and representative training data</li>
+                        <li>Regular bias audits across demographics</li>
+                        <li>Fairness constraints in training</li>
+                        <li>Red-teaming with diverse testers</li>
+                        <li>Debiasing techniques (counterfactual, INLP)</li>
+                        <li>Inclusive prompt engineering</li>
+                        <li>Disaggregated evaluation metrics</li>
+                        <li>Community feedback mechanisms</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- GUARDRAILS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🚧</div>
+                <div class="module-info">
+                    <h2>Guardrails & Content Filtering</h2>
+                    <p>Runtime safety mechanisms</p>
+                </div>
+            </div>
+            <div class="guardrails-grid">
+                <div class="guardrail-card">
+                    <div class="guardrail-header">
+                        <div class="guardrail-icon">🛡️</div>
+                        <div class="guardrail-title">Input Guardrails</div>
+                    </div>
+                    <div class="guardrail-body">
+                        <div class="guardrail-desc">Filter user inputs before processing. Detect jailbreak attempts, prompt injections, and prohibited content requests.</div>
+                        <div class="guardrail-tools">
+                            <span class="guardrail-tool">NeMo Guardrails</span>
+                            <span class="guardrail-tool">Guardrails AI</span>
+                            <span class="guardrail-tool">LlamaGuard</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="guardrail-card">
+                    <div class="guardrail-header">
+                        <div class="guardrail-icon">🔍</div>
+                        <div class="guardrail-title">Output Validation</div>
+                    </div>
+                    <div class="guardrail-body">
+                        <div class="guardrail-desc">Scan model outputs for harmful content, PII leakage, and policy violations before returning to users.</div>
+                        <div class="guardrail-tools">
+                            <span class="guardrail-tool">OpenAI Moderation</span>
+                            <span class="guardrail-tool">Perspective API</span>
+                            <span class="guardrail-tool">Azure Content Safety</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="guardrail-card">
+                    <div class="guardrail-header">
+                        <div class="guardrail-icon">📋</div>
+                        <div class="guardrail-title">Topic Boundaries</div>
+                    </div>
+                    <div class="guardrail-body">
+                        <div class="guardrail-desc">Constrain conversation to allowed topics. Politely refuse off-topic requests and redirect to supported use cases.</div>
+                        <div class="guardrail-tools">
+                            <span class="guardrail-tool">Intent Classification</span>
+                            <span class="guardrail-tool">Topic Detection</span>
+                            <span class="guardrail-tool">Dialog Rails</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ETHICS CHECKLIST -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Responsible AI Checklist</h2>
+                    <p>Pre-deployment verification</p>
+                </div>
+            </div>
+            <div class="checklist">
+                <div class="checklist-title">📋 Before Deploying Your AI System</div>
+                <div class="checklist-grid">
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Conducted bias audits across demographic groups</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Implemented input and output guardrails</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Red-teamed for jailbreaks and adversarial attacks</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Documented model limitations and failure modes</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Set up monitoring for harmful outputs</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Created user feedback and reporting mechanisms</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Defined clear escalation paths for incidents</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Ensured compliance with regulations (GDPR, AI Act)</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Disclosed AI use to users where appropriate</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-box">✓</div>
+                        <div class="checklist-text">Established human oversight for high-risk decisions</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered safety specialist</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">⚖️</div>
+                    <div class="agent-name">ResponsibleAIAgent</div>
+                    <div class="agent-role">AI Safety & Ethics Specialist</div>
+                    <div class="agent-desc">Expert in AI safety, fairness, and responsible deployment. Helps audit systems for bias, implement guardrails, ensure regulatory compliance, and build trustworthy AI applications.</div>
+                    <ul class="agent-capabilities">
+                        <li>Conduct bias audits</li>
+                        <li>Design guardrail systems</li>
+                        <li>Red-team for vulnerabilities</li>
+                        <li>Ensure regulatory compliance</li>
+                        <li>Create safety documentation</li>
+                        <li>Set up monitoring systems</li>
+                        <li>Design human oversight workflows</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Safety Audit</div>
+                        <div class="code-filename">responsible_ai_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># responsible_ai_agent.py - Responsible AI Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">rai_agent</span> = Agent(
+    role=<span class="code-string">"Responsible AI Specialist"</span>,
+    goal=<span class="code-string">"Ensure AI systems are safe and fair"</span>,
+    backstory=<span class="code-string">"""Expert in AI ethics, safety, and 
+    responsible deployment. Deep knowledge of bias 
+    detection, guardrail systems, Constitutional AI,
+    and regulatory frameworks (EU AI Act, GDPR).
+    Has audited dozens of production AI systems and
+    implemented safety measures that prevented major
+    incidents."""</span>,
+    tools=[
+        BiasAuditor(),
+        GuardrailTester(),
+        RedTeamSimulator(),
+        ComplianceChecker(),
+        SafetyMonitor(),
+    ]
+)
+
+<span class="code-function">rai_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Audit system for bias across demographics
+    2. Test guardrails against adversarial inputs
+    3. Red-team for jailbreaks and exploits
+    4. Check regulatory compliance requirements
+    5. Set up safety monitoring and alerting
+    6. Create incident response procedures
+    7. Document safety measures and limitations
+    """</span>,
+    agent=rai_agent,
+    expected_output=<span class="code-string">"Safety certification report"</span>
+)
+
+<span class="code-comment"># Execute safety audit</span>
+crew = Crew(agents=[rai_agent], tasks=[rai_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat05-p6-model-evaluation.html" class="related-card">
+                    <div class="related-num">Page 5.6</div>
+                    <div class="related-title">Model Evaluation</div>
+                    <div class="related-desc">Evaluate fairness and safety metrics</div>
+                </a>
+                <a href="cat05-p4-fine-tuning.html" class="related-card">
+                    <div class="related-num">Page 5.4</div>
+                    <div class="related-title">Fine-Tuning</div>
+                    <div class="related-desc">Safety-aware model customization</div>
+                </a>
+                <a href="cat05-p9-deployment.html" class="related-card">
+                    <div class="related-num">Page 5.9</div>
+                    <div class="related-title">LLM Deployment</div>
+                    <div class="related-desc">Deploy with safety guardrails</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat05-p7-multimodal.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">5.7: Multimodal AI</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 5.8 of 10</div>
+        <a href="cat05-p9-deployment.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">5.9: LLM Deployment</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>
