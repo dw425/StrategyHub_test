@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Analytics | Analytics & BI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            --page-primary: #14B8A6;
+            --page-light: #2DD4BF;
+            --page-glow: rgba(20, 184, 166, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .maturity-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .maturity-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; position: relative; }
+        .maturity-card::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+        .maturity-card:last-child::after { display: none; }
+        .maturity-num { font-size: 20px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; }
+        .maturity-title { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .maturity-desc { font-size: 9px; color: var(--text-muted); }
+        
+        .technique-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .technique-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .technique-icon { font-size: 28px; margin-bottom: 12px; }
+        .technique-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .technique-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .technique-uses { list-style: none; }
+        .technique-uses li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .technique-uses li::before { content: '→'; color: var(--page-light); }
+        
+        .tool-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .tool-icon { font-size: 24px; margin-bottom: 8px; }
+        .tool-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .tool-type { font-size: 9px; color: var(--text-muted); }
+        
+        .integration-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .integration-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .integration-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .integration-icon { font-size: 24px; }
+        .integration-title { font-size: 14px; font-weight: 600; }
+        .integration-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .integration-list { list-style: none; }
+        .integration-list li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .integration-list li::before { content: '✓'; color: var(--green); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(20,184,166,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .integration-grid, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .maturity-grid, .tool-grid { grid-template-columns: repeat(2, 1fr); }
+            .technique-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat03-analytics-bi-overview.html">Analytics & BI</a>
+        <span class="sep">/</span>
+        <span class="current">Advanced Analytics</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 03</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat03-analytics-bi-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#maturity"><span class="nav-icon">📈</span> Maturity Model</a></li>
+            <li><a href="#techniques"><span class="nav-icon">🔬</span> Techniques</a></li>
+            <li><a href="#tools"><span class="nav-icon">🔧</span> Tools</a></li>
+            <li><a href="#integration"><span class="nav-icon">🔗</span> BI Integration</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat03-p1-bi-platforms.html"><span class="nav-icon">📊</span> BI Platforms</a></li>
+            <li><a href="cat03-p2-self-service.html"><span class="nav-icon">🙋</span> Self-Service</a></li>
+            <li><a href="cat03-p3-semantic-layer.html"><span class="nav-icon">🧊</span> Semantic Layer</a></li>
+            <li><a href="cat03-p4-visualization.html"><span class="nav-icon">📈</span> Visualization</a></li>
+            <li><a href="cat03-p5-dashboard-design.html"><span class="nav-icon">🎨</span> Dashboard Design</a></li>
+            <li><a href="cat03-p6-embedded.html"><span class="nav-icon">🔌</span> Embedded Analytics</a></li>
+            <li><a href="cat03-p7-realtime.html"><span class="nav-icon">⚡</span> Real-Time</a></li>
+            <li><a href="cat03-p8-advanced.html" class="active"><span class="nav-icon">🔮</span> Advanced Analytics</a></li>
+            <li><a href="cat03-p9-mobile-bi.html"><span class="nav-icon">📱</span> Mobile BI</a></li>
+            <li><a href="cat03-p10-bi-governance.html"><span class="nav-icon">🏛️</span> BI Governance</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🔮 Page 3.8</span>
+                <h1>Advanced Analytics</h1>
+                <p>Go beyond descriptive reporting into predictive and prescriptive analytics. Learn statistical techniques, forecasting methods, and how to integrate ML models with your BI workflows.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">Predict</div><div class="hero-metric-label">What Will Happen</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Prescribe</div><div class="hero-metric-label">What Should We Do</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">ML + BI</div><div class="hero-metric-label">Models in Dashboards</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Auto</div><div class="hero-metric-label">AI-Powered Insights</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Beyond Reporting</h2>
+                    <p>From hindsight to foresight</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>The Analytics Spectrum</h3>
+                <p>Most organizations are stuck in descriptive analytics—dashboards showing what happened. Advanced analytics moves up the value chain: diagnostic analytics (why it happened), predictive analytics (what will happen), and prescriptive analytics (what should we do). Each level adds more value but requires more sophistication.</p>
+                
+                <h3>Statistical Rigor in BI</h3>
+                <p>Advanced analytics brings statistical techniques into business intelligence. Instead of just showing metrics, you explain variance, calculate confidence intervals, test hypotheses, and quantify uncertainty. The shift from "revenue increased 5%" to "revenue increased 5% ± 2% with 95% confidence" is the difference between reporting and analysis.</p>
+                
+                <h3>ML-Powered Insights</h3>
+                <p>Machine learning enables automated insight discovery. Anomaly detection surfaces unexpected patterns. Forecasting predicts future values. Clustering segments customers automatically. These capabilities are increasingly built into modern BI tools as "augmented analytics"—making advanced techniques accessible to business users.</p>
+            </div>
+        </section>
+
+        <!-- ANALYTICS MATURITY -->
+        <section class="module" id="maturity">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Analytics Maturity Model</h2>
+                    <p>The journey to prescriptive</p>
+                </div>
+            </div>
+            
+            <div class="maturity-grid">
+                <div class="maturity-card">
+                    <div class="maturity-num">1</div>
+                    <div class="maturity-title">Descriptive</div>
+                    <div class="maturity-desc">What happened? Reports, dashboards, KPIs</div>
+                </div>
+                <div class="maturity-card">
+                    <div class="maturity-num">2</div>
+                    <div class="maturity-title">Diagnostic</div>
+                    <div class="maturity-desc">Why did it happen? Root cause, drill-down</div>
+                </div>
+                <div class="maturity-card">
+                    <div class="maturity-num">3</div>
+                    <div class="maturity-title">Predictive</div>
+                    <div class="maturity-desc">What will happen? Forecasts, models</div>
+                </div>
+                <div class="maturity-card">
+                    <div class="maturity-num">4</div>
+                    <div class="maturity-title">Prescriptive</div>
+                    <div class="maturity-desc">What should we do? Optimization, simulation</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECHNIQUES -->
+        <section class="module" id="techniques">
+            <div class="module-header">
+                <div class="module-icon">🔬</div>
+                <div class="module-info">
+                    <h2>Key Techniques</h2>
+                    <p>Statistical and ML methods</p>
+                </div>
+            </div>
+            
+            <div class="technique-grid">
+                <div class="technique-card">
+                    <div class="technique-icon">📉</div>
+                    <div class="technique-title">Time Series Forecasting</div>
+                    <div class="technique-desc">Predict future values based on historical patterns. Seasonality, trends, and cycles.</div>
+                    <ul class="technique-uses">
+                        <li>Revenue forecasting</li>
+                        <li>Demand planning</li>
+                        <li>Capacity planning</li>
+                        <li>Budget projections</li>
+                    </ul>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-icon">🚨</div>
+                    <div class="technique-title">Anomaly Detection</div>
+                    <div class="technique-desc">Automatically identify outliers and unusual patterns in data streams.</div>
+                    <ul class="technique-uses">
+                        <li>Fraud detection</li>
+                        <li>System monitoring</li>
+                        <li>Quality control</li>
+                        <li>Security alerts</li>
+                    </ul>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-icon">👥</div>
+                    <div class="technique-title">Clustering & Segmentation</div>
+                    <div class="technique-desc">Group similar entities together. Find natural patterns in populations.</div>
+                    <ul class="technique-uses">
+                        <li>Customer segmentation</li>
+                        <li>Product grouping</li>
+                        <li>Market analysis</li>
+                        <li>Cohort discovery</li>
+                    </ul>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-icon">🔗</div>
+                    <div class="technique-title">Regression Analysis</div>
+                    <div class="technique-desc">Understand relationships between variables. Quantify impact and causation.</div>
+                    <ul class="technique-uses">
+                        <li>Price elasticity</li>
+                        <li>Attribution modeling</li>
+                        <li>Driver analysis</li>
+                        <li>What-if scenarios</li>
+                    </ul>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-icon">🎯</div>
+                    <div class="technique-title">Classification & Scoring</div>
+                    <div class="technique-desc">Predict categorical outcomes. Score likelihood of events.</div>
+                    <ul class="technique-uses">
+                        <li>Churn prediction</li>
+                        <li>Lead scoring</li>
+                        <li>Risk classification</li>
+                        <li>Propensity models</li>
+                    </ul>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-icon">⚡</div>
+                    <div class="technique-title">Optimization</div>
+                    <div class="technique-desc">Find best solutions given constraints. Maximize or minimize objectives.</div>
+                    <ul class="technique-uses">
+                        <li>Resource allocation</li>
+                        <li>Route optimization</li>
+                        <li>Portfolio optimization</li>
+                        <li>Pricing optimization</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Advanced analytics toolkit</p>
+                </div>
+            </div>
+            
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🐍</div>
+                    <div class="tool-name">Python</div>
+                    <div class="tool-type">scikit-learn, statsmodels</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">R</div>
+                    <div class="tool-type">Statistical computing</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔶</div>
+                    <div class="tool-name">Databricks ML</div>
+                    <div class="tool-type">MLflow, AutoML</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">❄️</div>
+                    <div class="tool-name">Snowpark ML</div>
+                    <div class="tool-type">ML in Snowflake</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🤖</div>
+                    <div class="tool-name">ThoughtSpot</div>
+                    <div class="tool-type">AI-powered analytics</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📈</div>
+                    <div class="tool-name">Tableau Einstein</div>
+                    <div class="tool-type">Augmented analytics</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">💡</div>
+                    <div class="tool-name">Power BI Copilot</div>
+                    <div class="tool-type">AI insights</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📐</div>
+                    <div class="tool-name">Mode</div>
+                    <div class="tool-type">SQL + Python notebooks</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BI INTEGRATION -->
+        <section class="module" id="integration">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Integrating ML with BI</h2>
+                    <p>Models meet dashboards</p>
+                </div>
+            </div>
+            
+            <div class="integration-grid">
+                <div class="integration-card">
+                    <div class="integration-header">
+                        <div class="integration-icon">📊</div>
+                        <div class="integration-title">Model Outputs in Dashboards</div>
+                    </div>
+                    <div class="integration-desc">Surface predictions and scores directly in BI tools. Make ML accessible to business users without code.</div>
+                    <ul class="integration-list">
+                        <li>Prediction columns in data models</li>
+                        <li>Score visualizations and thresholds</li>
+                        <li>Confidence intervals on forecasts</li>
+                        <li>Automated anomaly highlighting</li>
+                    </ul>
+                </div>
+                
+                <div class="integration-card">
+                    <div class="integration-header">
+                        <div class="integration-icon">⚙️</div>
+                        <div class="integration-title">Feature Store Integration</div>
+                    </div>
+                    <div class="integration-desc">Share features between ML models and BI dashboards. Single source of truth for metrics and features.</div>
+                    <ul class="integration-list">
+                        <li>Reusable feature definitions</li>
+                        <li>Consistent metrics across ML and BI</li>
+                        <li>Real-time feature serving</li>
+                        <li>Version-controlled features</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for advanced analytics</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with clear business questions</li>
+                        <li>Validate models with holdout data</li>
+                        <li>Communicate uncertainty (confidence intervals)</li>
+                        <li>Monitor model drift over time</li>
+                        <li>Document assumptions and limitations</li>
+                        <li>Make insights actionable</li>
+                        <li>Build trust with explainability</li>
+                        <li>Iterate based on feedback</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't use ML where simple rules suffice</li>
+                        <li>Avoid overfitting to historical data</li>
+                        <li>Never deploy without validation</li>
+                        <li>Don't ignore domain expertise</li>
+                        <li>Avoid black-box models for high-stakes decisions</li>
+                        <li>Don't confuse correlation with causation</li>
+                        <li>Never present predictions as facts</li>
+                        <li>Don't automate without human review</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered advanced analytics</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔮</div>
+                    <div class="agent-name">AdvancedAnalyticsAgent</div>
+                    <div class="agent-role">Predictive Analytics Specialist</div>
+                    <div class="agent-desc">Expert in statistical analysis, machine learning integration, and predictive modeling. Specializes in bringing advanced techniques into BI workflows.</div>
+                    <ul class="agent-capabilities">
+                        <li>Select appropriate techniques</li>
+                        <li>Build forecasting models</li>
+                        <li>Detect anomalies</li>
+                        <li>Segment customers</li>
+                        <li>Integrate ML with BI</li>
+                        <li>Explain model outputs</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Analytics Task</div>
+                        <div class="code-filename">advanced_analytics_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># advanced_analytics_agent.py - Advanced Analytics Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">analytics_agent</span> = Agent(
+    role=<span class="code-string">"Advanced Analytics Specialist"</span>,
+    goal=<span class="code-string">"Enable predictive and prescriptive analytics"</span>,
+    backstory=<span class="code-string">"""Expert in statistical analysis, ML 
+    techniques, and BI integration. Deep knowledge 
+    of forecasting, anomaly detection, clustering, 
+    and model deployment for business users."""</span>,
+    tools=[
+        TechniqueSelector(),
+        ForecastBuilder(),
+        AnomalyDetector(),
+        SegmentAnalyzer(),
+        ModelIntegrator(),
+        ExplainabilityTool(),
+    ]
+)
+
+<span class="code-function">analytics_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Understand business question
+    2. Select appropriate technique
+    3. Prepare and validate data
+    4. Build and test model
+    5. Integrate with BI platform
+    6. Create explanatory visuals
+    7. Document limitations
+    8. Set up monitoring
+    """</span>,
+    agent=analytics_agent,
+    expected_output=<span class="code-string">"Deployed analytics solution"</span>
+)
+
+<span class="code-comment"># Execute advanced analytics</span>
+crew = Crew(agents=[analytics_agent], tasks=[analytics_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat03-p4-visualization.html" class="related-card">
+                    <div class="related-num">Page 3.4</div>
+                    <div class="related-title">Data Visualization</div>
+                    <div class="related-desc">Visualize predictions</div>
+                </a>
+                <a href="../category-01/cat01-p1-ml-fundamentals.html" class="related-card">
+                    <div class="related-num">Page 1.1</div>
+                    <div class="related-title">ML Fundamentals</div>
+                    <div class="related-desc">Machine learning basics</div>
+                </a>
+                <a href="cat03-p3-semantic-layer.html" class="related-card">
+                    <div class="related-num">Page 3.3</div>
+                    <div class="related-title">Semantic Layer</div>
+                    <div class="related-desc">Metrics for ML features</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat03-p7-realtime.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">3.7: Real-Time Analytics</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 3.8 of 10</div>
+        <a href="cat03-p9-mobile-bi.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">3.9: Mobile BI</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

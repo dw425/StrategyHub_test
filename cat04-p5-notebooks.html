@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebooks & Collaboration | Data Science | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #6366F1;
+            --cat-light: #818CF8;
+            --page-primary: #EC4899;
+            --page-light: #F472B6;
+            --page-glow: rgba(236, 72, 153, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --red: #EF4444;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: #252538; color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .platform-icon { font-size: 32px; margin-bottom: 12px; }
+        .platform-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .platform-tag { font-size: 10px; color: var(--page-light); margin-bottom: 12px; }
+        .platform-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .platform-features { list-style: none; }
+        .platform-features li { font-size: 10px; padding: 3px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .platform-features li::before { content: '✓'; color: var(--green); }
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        @media (max-width: 1024px) { .sidebar { display: none; } .main-wrapper { margin-left: 0; } footer { margin-left: 0; } .hero-compact, .best-practices { grid-template-columns: 1fr; } .platform-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<header><div class="logo"><span>STRATEGY</span>HUB</div></header>
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔬 Category 04</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat04-data-science-overview.html">🏠 Overview</a></li>
+            <li><a href="cat04-p1-crisp-dm.html">🔄 CRISP-DM</a></li>
+            <li><a href="cat04-p2-statistical-methods.html">📊 Statistical Methods</a></li>
+            <li><a href="cat04-p3-feature-engineering.html">⚙️ Feature Engineering</a></li>
+            <li><a href="cat04-p4-python-stack.html">🐍 Python Stack</a></li>
+            <li><a href="cat04-p5-notebooks.html" class="active">📓 Notebooks</a></li>
+            <li><a href="cat04-p6-experiment-tracking.html">🧪 Experiment Tracking</a></li>
+            <li><a href="cat04-p7-model-evaluation.html">🎯 Model Evaluation</a></li>
+            <li><a href="cat04-p8-use-cases.html">💼 Use Cases</a></li>
+        </ul>
+    </div>
+</aside>
+<div class="main-wrapper">
+    <div class="main-content">
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📓 Page 4.5</span>
+                <h1>Notebooks & Collaboration</h1>
+                <p>Interactive computing environments for data science. Compare Jupyter, Databricks Notebooks, Google Colab, and learn best practices for reproducible, collaborative analysis.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">Jupyter</div><div class="hero-metric-label">Industry Standard</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Databricks</div><div class="hero-metric-label">Enterprise Scale</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Colab</div><div class="hero-metric-label">Free GPU/TPU</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Git</div><div class="hero-metric-label">Version Control</div></div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📓</div>
+                <div class="module-info">
+                    <h2>Notebook Platforms</h2>
+                    <p>Interactive computing environments</p>
+                </div>
+            </div>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-icon">📓</div>
+                    <div class="platform-name">Jupyter</div>
+                    <div class="platform-tag">Open Source Standard</div>
+                    <div class="platform-desc">The original interactive notebook. Run locally or on servers. Language-agnostic with kernels for Python, R, Julia.</div>
+                    <ul class="platform-features">
+                        <li>JupyterLab modern interface</li>
+                        <li>Extensions ecosystem</li>
+                        <li>nbconvert export</li>
+                        <li>JupyterHub for teams</li>
+                    </ul>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">🔷</div>
+                    <div class="platform-name">Databricks Notebooks</div>
+                    <div class="platform-tag">Enterprise Collaboration</div>
+                    <div class="platform-desc">Collaborative notebooks on Spark clusters. Real-time co-editing, version control, job scheduling built-in.</div>
+                    <ul class="platform-features">
+                        <li>Real-time collaboration</li>
+                        <li>Git integration</li>
+                        <li>Spark cluster access</li>
+                        <li>MLflow integration</li>
+                    </ul>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">☁️</div>
+                    <div class="platform-name">Google Colab</div>
+                    <div class="platform-tag">Free Cloud Notebooks</div>
+                    <div class="platform-desc">Free Jupyter notebooks with GPU/TPU access. Great for learning, prototyping, and sharing demos.</div>
+                    <ul class="platform-features">
+                        <li>Free GPU/TPU runtime</li>
+                        <li>Google Drive integration</li>
+                        <li>Easy sharing</li>
+                        <li>Pre-installed libraries</li>
+                    </ul>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">🆚</div>
+                    <div class="platform-name">VS Code Notebooks</div>
+                    <div class="platform-tag">IDE Integration</div>
+                    <div class="platform-desc">Jupyter notebooks inside VS Code. Full IDE features: intellisense, debugging, Git, extensions.</div>
+                    <ul class="platform-features">
+                        <li>IDE integration</li>
+                        <li>Variable explorer</li>
+                        <li>Debug support</li>
+                        <li>Copilot assistance</li>
+                    </ul>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">☁️</div>
+                    <div class="platform-name">SageMaker Studio</div>
+                    <div class="platform-tag">AWS ML Platform</div>
+                    <div class="platform-desc">Fully managed notebooks on AWS. Integrated with SageMaker training, deployment, and MLOps tools.</div>
+                    <ul class="platform-features">
+                        <li>Managed infrastructure</li>
+                        <li>SageMaker integration</li>
+                        <li>Auto-scaling</li>
+                        <li>Built-in Git</li>
+                    </ul>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">🔮</div>
+                    <div class="platform-name">Hex</div>
+                    <div class="platform-tag">Collaborative Analytics</div>
+                    <div class="platform-desc">Modern collaborative data workspace. SQL + Python, app publishing, and team collaboration features.</div>
+                    <ul class="platform-features">
+                        <li>SQL + Python cells</li>
+                        <li>Published apps</li>
+                        <li>Team collaboration</li>
+                        <li>Data connections</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Notebook guidelines</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Run cells top-to-bottom before sharing</li>
+                        <li>Use meaningful variable names</li>
+                        <li>Include markdown documentation</li>
+                        <li>Clear outputs before committing to Git</li>
+                        <li>Use %pip install for reproducibility</li>
+                        <li>Refactor repeated code into functions</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't run cells out of order</li>
+                        <li>Avoid hidden state from deleted cells</li>
+                        <li>Never commit credentials in notebooks</li>
+                        <li>Don't use notebooks for production code</li>
+                        <li>Avoid 1000+ line notebooks</li>
+                        <li>Don't skip kernel restart testing</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<footer>
+    <div class="footer-nav">
+        <a href="cat04-p4-python-stack.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous</div><div class="footer-link-title">4.4: Python Stack</div></div></a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 4.5 of 8</div>
+        <a href="cat04-p6-experiment-tracking.html" class="footer-link"><div><div class="footer-link-label">Next</div><div class="footer-link-title">4.6: Experiment Tracking</div></div><span>→</span></a>
+    </div>
+</footer>
+</body>
+</html>

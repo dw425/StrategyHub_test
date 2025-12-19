@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Fundamentals | Generative AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EC4899;
+            --cat-light: #F472B6;
+            --cat-dark: #DB2777;
+            --cat-glow: rgba(236, 72, 153, 0.15);
+            --page-primary: #3B82F6;
+            --page-light: #60A5FA;
+            --page-glow: rgba(59, 130, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* TRANSFORMER ARCHITECTURE DIAGRAM */
+        .transformer-diagram { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .transformer-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .transformer-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .transformer-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .transformer-canvas { padding: 24px; background: var(--bg-dark); }
+        .transformer-flow { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .transformer-block { background: var(--bg-card-alt); border: 2px solid var(--border-color); border-radius: 12px; padding: 16px 20px; text-align: center; min-width: 100px; }
+        .transformer-block.input { border-color: var(--cyan); background: rgba(6, 182, 212, 0.1); }
+        .transformer-block.embed { border-color: var(--blue); background: rgba(59, 130, 246, 0.1); }
+        .transformer-block.attention { border-color: var(--pink); background: rgba(236, 72, 153, 0.1); }
+        .transformer-block.ffn { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+        .transformer-block.norm { border-color: var(--violet); background: rgba(139, 92, 246, 0.1); }
+        .transformer-block.output { border-color: var(--yellow); background: rgba(245, 158, 11, 0.1); }
+        .transformer-block-icon { font-size: 24px; margin-bottom: 8px; }
+        .transformer-block-title { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .transformer-block-desc { font-size: 9px; color: var(--text-muted); }
+        .transformer-arrow { font-size: 20px; color: var(--text-muted); }
+        .transformer-stack { display: flex; flex-direction: column; gap: 8px; align-items: center; padding: 16px; border: 2px dashed var(--border-color); border-radius: 12px; background: rgba(139, 92, 246, 0.05); }
+        .transformer-repeat { font-size: 10px; color: var(--page-light); background: var(--bg-card-alt); padding: 4px 12px; border-radius: 9999px; margin-top: 8px; }
+        .transformer-legend { display: flex; gap: 16px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-muted); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+        
+        /* ATTENTION HEATMAP */
+        .attention-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .attention-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .attention-subtitle { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+        .attention-matrix { display: grid; grid-template-columns: 50px repeat(6, 1fr); gap: 2px; font-size: 10px; margin-bottom: 16px; }
+        .attention-cell { padding: 10px 4px; text-align: center; border-radius: 4px; }
+        .attention-header { color: var(--text-muted); font-weight: 600; background: var(--bg-card-alt); font-size: 9px; }
+        .attention-row { color: var(--text-muted); font-weight: 600; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 9px; }
+        .attention-score { color: var(--text-primary); font-family: monospace; font-size: 9px; }
+        .att-5 { background: rgba(236, 72, 153, 0.9); color: white; }
+        .att-4 { background: rgba(236, 72, 153, 0.7); }
+        .att-3 { background: rgba(236, 72, 153, 0.5); }
+        .att-2 { background: rgba(236, 72, 153, 0.3); }
+        .att-1 { background: rgba(236, 72, 153, 0.15); }
+        .attention-caption { font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px; background: var(--bg-card-alt); border-radius: 8px; }
+        
+        /* TOKENIZATION DEMO */
+        .token-demo { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .token-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .token-title { font-size: 13px; font-weight: 600; }
+        .token-type { font-size: 10px; padding: 3px 10px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .token-body { padding: 20px; }
+        .token-input { background: var(--bg-dark); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 14px; margin-bottom: 12px; color: var(--text-primary); border-left: 3px solid var(--cyan); }
+        .token-label { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; font-weight: 600; }
+        .token-arrow { text-align: center; font-size: 20px; color: var(--page-light); margin: 12px 0; }
+        .token-output { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .token { background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 6px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; transition: all 0.2s; }
+        .token:hover { transform: translateY(-2px); border-color: var(--page-light); }
+        .token-text { font-family: monospace; font-size: 12px; font-weight: 600; }
+        .token-id { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+        .token-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+        .token-stat { background: var(--bg-card-alt); border-radius: 8px; padding: 12px; text-align: center; }
+        .token-stat-value { font-size: 18px; font-weight: 700; color: var(--page-light); }
+        .token-stat-label { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* CONCEPT CARDS */
+        .concept-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.2s; }
+        .concept-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .concept-icon { font-size: 32px; margin-bottom: 12px; }
+        .concept-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .concept-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* MODEL COMPARISON */
+        .model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .model-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.2s; }
+        .model-card:hover { border-color: var(--page-primary); }
+        .model-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        .model-icon { font-size: 32px; }
+        .model-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+        .model-info span { font-size: 10px; color: var(--text-muted); }
+        .model-body { padding: 16px; }
+        .model-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+        .model-stat { background: var(--bg-card-alt); border-radius: 6px; padding: 10px; }
+        .model-stat-label { font-size: 9px; color: var(--text-muted); margin-bottom: 2px; }
+        .model-stat-value { font-size: 13px; font-weight: 600; color: var(--page-light); }
+        .model-features { list-style: none; }
+        .model-features li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .model-features li::before { content: '✓'; color: var(--green); }
+        
+        /* COMPARISON TABLE */
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .compare-tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .compare-tag.excellent { background: rgba(16,185,129,0.2); color: var(--green); }
+        .compare-tag.good { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .compare-tag.moderate { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        
+        /* TIMELINE */
+        .timeline { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .timeline-title { font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+        .timeline-items { display: flex; justify-content: space-between; position: relative; }
+        .timeline-items::before { content: ''; position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: var(--border-color); }
+        .timeline-item { text-align: center; position: relative; flex: 1; }
+        .timeline-dot { width: 40px; height: 40px; background: var(--bg-card-alt); border: 2px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; position: relative; z-index: 1; font-size: 16px; }
+        .timeline-year { font-size: 12px; font-weight: 600; color: var(--page-light); margin-bottom: 4px; }
+        .timeline-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .timeline-desc { font-size: 9px; color: var(--text-muted); }
+        
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 10px 16px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); }
+        .code-filename { margin-left: auto; padding: 10px 16px; font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; background: var(--bg-dark); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-function { color: var(--page-light); }
+        .code-comment { color: var(--text-muted); }
+        
+        /* RELATED PAGES */
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat05-generative-ai-overview.html">Generative AI</a>
+        <span class="sep">/</span>
+        <span class="current">LLM Fundamentals</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🎨 Category 05</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat05-generative-ai-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat05-p1-llm-fundamentals.html" class="active"><span class="nav-icon">🧠</span> 5.1 LLM Fundamentals</a></li>
+            <li><a href="cat05-p2-prompt-engineering.html"><span class="nav-icon">✍️</span> 5.2 Prompt Engineering</a></li>
+            <li><a href="cat05-p3-rag-systems.html"><span class="nav-icon">🔍</span> 5.3 RAG Systems</a></li>
+            <li><a href="cat05-p4-fine-tuning.html"><span class="nav-icon">🎯</span> 5.4 Fine-Tuning</a></li>
+            <li><a href="cat05-p5-embeddings.html"><span class="nav-icon">📊</span> 5.5 Embeddings</a></li>
+            <li><a href="cat05-p6-model-evaluation.html"><span class="nav-icon">📈</span> 5.6 Evaluation</a></li>
+            <li><a href="cat05-p7-multimodal.html"><span class="nav-icon">🖼️</span> 5.7 Multimodal</a></li>
+            <li><a href="cat05-p8-responsible-ai.html"><span class="nav-icon">⚖️</span> 5.8 Responsible AI</a></li>
+            <li><a href="cat05-p9-deployment.html"><span class="nav-icon">🚀</span> 5.9 Deployment</a></li>
+            <li><a href="cat05-p10-cost-optimization.html"><span class="nav-icon">💰</span> 5.10 Cost</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🧠 Page 5.1</div>
+                <h1>LLM Fundamentals</h1>
+                <p>Understand how large language models work under the hood. From transformer architecture and attention mechanisms to tokenization and the mathematics that power modern AI systems.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">2017</div>
+                    <div class="hero-metric-label">Transformers Paper</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">1.8T</div>
+                    <div class="hero-metric-label">GPT-4 Parameters</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">128K</div>
+                    <div class="hero-metric-label">Context Windows</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">BPE</div>
+                    <div class="hero-metric-label">Tokenization</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What Are LLMs?</h2>
+                    <p>The foundation of modern AI</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Large Language Models Explained</h3>
+                <p>Large Language Models (LLMs) are neural networks trained on massive text datasets to predict the next token in a sequence. They use the transformer architecture, which revolutionized NLP in 2017 with its attention mechanism that allows the model to consider all parts of the input simultaneously, rather than processing sequentially like previous RNN-based models.</p>
+                <p>Modern LLMs like GPT-4, Claude, Gemini, and Llama contain billions to trillions of parameters and can perform a wide range of tasks from text generation to reasoning, translation, coding, and more—all from a single model without task-specific training. This emergent capability comes from scale: as models grow larger and train on more data, they develop increasingly sophisticated language understanding.</p>
+                <p>The key insight behind LLMs is that predicting the next word requires understanding context, grammar, facts, reasoning, and even common sense. By training on trillions of tokens from the internet, books, and code, these models implicitly learn a compressed representation of human knowledge.</p>
+            </div>
+        </section>
+
+        <!-- KEY CONCEPTS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Key Concepts</h2>
+                    <p>Building blocks of language models</p>
+                </div>
+            </div>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">🔤</div>
+                    <div class="concept-title">Tokens</div>
+                    <div class="concept-desc">Text split into subword units. "Hello" might be one token, "unhappiness" might be 3 tokens.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <div class="concept-title">Embeddings</div>
+                    <div class="concept-desc">Tokens converted to dense vectors capturing semantic meaning in high-dimensional space.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-title">Attention</div>
+                    <div class="concept-desc">Mechanism to weigh relevance between all token pairs, enabling context understanding.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📐</div>
+                    <div class="concept-title">Parameters</div>
+                    <div class="concept-desc">Learned weights in the model. GPT-4 has ~1.8T parameters across 120 layers.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRANSFORMER ARCHITECTURE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Transformer Architecture</h2>
+                    <p>The building blocks of modern LLMs</p>
+                </div>
+            </div>
+            <div class="transformer-diagram">
+                <div class="transformer-header">
+                    <div class="transformer-title">🔄 Decoder-Only Transformer (GPT/Claude/Llama Style)</div>
+                    <div class="transformer-badge">Simplified Architecture</div>
+                </div>
+                <div class="transformer-canvas">
+                    <div class="transformer-flow">
+                        <div class="transformer-block input">
+                            <div class="transformer-block-icon">📝</div>
+                            <div class="transformer-block-title">Input Text</div>
+                            <div class="transformer-block-desc">"Hello world"</div>
+                        </div>
+                        <div class="transformer-arrow">→</div>
+                        <div class="transformer-block embed">
+                            <div class="transformer-block-icon">🔢</div>
+                            <div class="transformer-block-title">Tokenize + Embed</div>
+                            <div class="transformer-block-desc">Token + Position</div>
+                        </div>
+                        <div class="transformer-arrow">→</div>
+                        <div class="transformer-stack">
+                            <div class="transformer-block attention">
+                                <div class="transformer-block-icon">🎯</div>
+                                <div class="transformer-block-title">Multi-Head Attention</div>
+                                <div class="transformer-block-desc">Q, K, V projections</div>
+                            </div>
+                            <div class="transformer-block norm">
+                                <div class="transformer-block-icon">📏</div>
+                                <div class="transformer-block-title">Layer Norm</div>
+                                <div class="transformer-block-desc">+ Residual</div>
+                            </div>
+                            <div class="transformer-block ffn">
+                                <div class="transformer-block-icon">⚡</div>
+                                <div class="transformer-block-title">Feed Forward</div>
+                                <div class="transformer-block-desc">MLP + GELU</div>
+                            </div>
+                            <div class="transformer-block norm">
+                                <div class="transformer-block-icon">📏</div>
+                                <div class="transformer-block-title">Layer Norm</div>
+                                <div class="transformer-block-desc">+ Residual</div>
+                            </div>
+                            <div class="transformer-repeat">× N layers (32-96+)</div>
+                        </div>
+                        <div class="transformer-arrow">→</div>
+                        <div class="transformer-block output">
+                            <div class="transformer-block-icon">🎲</div>
+                            <div class="transformer-block-title">Output Head</div>
+                            <div class="transformer-block-desc">Next Token Prob</div>
+                        </div>
+                    </div>
+                    <div class="transformer-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--cyan);"></div> Input</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--blue);"></div> Embedding</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--pink);"></div> Attention</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--violet);"></div> Normalization</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--green);"></div> Feed Forward</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--yellow);"></div> Output</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ATTENTION HEATMAP -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Self-Attention Mechanism</h2>
+                    <p>How transformers understand context</p>
+                </div>
+            </div>
+            <div class="attention-viz">
+                <div class="attention-title">🔥 Attention Weight Visualization</div>
+                <div class="attention-subtitle">Sentence: "The cat sat on the mat" — Each row shows what that token attends to</div>
+                <div class="attention-matrix">
+                    <div class="attention-cell"></div>
+                    <div class="attention-cell attention-header">The</div>
+                    <div class="attention-cell attention-header">cat</div>
+                    <div class="attention-cell attention-header">sat</div>
+                    <div class="attention-cell attention-header">on</div>
+                    <div class="attention-cell attention-header">the</div>
+                    <div class="attention-cell attention-header">mat</div>
+                    
+                    <div class="attention-cell attention-row">The</div>
+                    <div class="attention-cell attention-score att-5">0.45</div>
+                    <div class="attention-cell attention-score att-3">0.28</div>
+                    <div class="attention-cell attention-score att-1">0.12</div>
+                    <div class="attention-cell attention-score att-1">0.07</div>
+                    <div class="attention-cell attention-score att-1">0.05</div>
+                    <div class="attention-cell attention-score att-1">0.03</div>
+                    
+                    <div class="attention-cell attention-row">cat</div>
+                    <div class="attention-cell attention-score att-3">0.22</div>
+                    <div class="attention-cell attention-score att-5">0.42</div>
+                    <div class="attention-cell attention-score att-2">0.18</div>
+                    <div class="attention-cell attention-score att-1">0.08</div>
+                    <div class="attention-cell attention-score att-1">0.06</div>
+                    <div class="attention-cell attention-score att-1">0.04</div>
+                    
+                    <div class="attention-cell attention-row">sat</div>
+                    <div class="attention-cell attention-score att-1">0.08</div>
+                    <div class="attention-cell attention-score att-4">0.38</div>
+                    <div class="attention-cell attention-score att-4">0.32</div>
+                    <div class="attention-cell attention-score att-2">0.12</div>
+                    <div class="attention-cell attention-score att-1">0.06</div>
+                    <div class="attention-cell attention-score att-1">0.04</div>
+                    
+                    <div class="attention-cell attention-row">on</div>
+                    <div class="attention-cell attention-score att-1">0.05</div>
+                    <div class="attention-cell attention-score att-2">0.15</div>
+                    <div class="attention-cell attention-score att-3">0.28</div>
+                    <div class="attention-cell attention-score att-4">0.32</div>
+                    <div class="attention-cell attention-score att-1">0.12</div>
+                    <div class="attention-cell attention-score att-1">0.08</div>
+                    
+                    <div class="attention-cell attention-row">mat</div>
+                    <div class="attention-cell attention-score att-1">0.04</div>
+                    <div class="attention-cell attention-score att-2">0.18</div>
+                    <div class="attention-cell attention-score att-2">0.15</div>
+                    <div class="attention-cell attention-score att-2">0.18</div>
+                    <div class="attention-cell attention-score att-3">0.22</div>
+                    <div class="attention-cell attention-score att-3">0.23</div>
+                </div>
+                <div class="attention-caption">💡 Higher values (darker pink) = stronger attention. Notice "sat" strongly attends to "cat" (who's sitting), and "mat" attends to preposition "on" and article "the" for grammatical context. Self-attention allows each token to gather relevant information from all other tokens in parallel.</div>
+            </div>
+        </section>
+
+        <!-- TOKENIZATION -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✂️</div>
+                <div class="module-info">
+                    <h2>Tokenization</h2>
+                    <p>How text becomes numbers for the model</p>
+                </div>
+            </div>
+            <div class="token-demo">
+                <div class="token-header">
+                    <div class="token-title">BPE Tokenization Example</div>
+                    <div class="token-type">cl100k_base (GPT-4)</div>
+                </div>
+                <div class="token-body">
+                    <div class="token-label">Input Text</div>
+                    <div class="token-input">"Hello, how are you doing today? I'm learning about LLMs!"</div>
+                    <div class="token-arrow">↓ Tokenize via Byte-Pair Encoding</div>
+                    <div class="token-label">Output Tokens</div>
+                    <div class="token-output">
+                        <div class="token"><span class="token-text">Hello</span><span class="token-id">ID: 9906</span></div>
+                        <div class="token"><span class="token-text">,</span><span class="token-id">ID: 11</span></div>
+                        <div class="token"><span class="token-text">Ġhow</span><span class="token-id">ID: 1268</span></div>
+                        <div class="token"><span class="token-text">Ġare</span><span class="token-id">ID: 527</span></div>
+                        <div class="token"><span class="token-text">Ġyou</span><span class="token-id">ID: 499</span></div>
+                        <div class="token"><span class="token-text">Ġdoing</span><span class="token-id">ID: 3815</span></div>
+                        <div class="token"><span class="token-text">Ġtoday</span><span class="token-id">ID: 3063</span></div>
+                        <div class="token"><span class="token-text">?</span><span class="token-id">ID: 30</span></div>
+                        <div class="token"><span class="token-text">ĠI</span><span class="token-id">ID: 358</span></div>
+                        <div class="token"><span class="token-text">'m</span><span class="token-id">ID: 2846</span></div>
+                        <div class="token"><span class="token-text">Ġlearning</span><span class="token-id">ID: 6975</span></div>
+                        <div class="token"><span class="token-text">Ġabout</span><span class="token-id">ID: 922</span></div>
+                        <div class="token"><span class="token-text">ĠLL</span><span class="token-id">ID: 27624</span></div>
+                        <div class="token"><span class="token-text">Ms</span><span class="token-id">ID: 4931</span></div>
+                        <div class="token"><span class="token-text">!</span><span class="token-id">ID: 0</span></div>
+                    </div>
+                    <div class="token-stats">
+                        <div class="token-stat">
+                            <div class="token-stat-value">15</div>
+                            <div class="token-stat-label">Total Tokens</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-value">56</div>
+                            <div class="token-stat-label">Characters</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-value">3.7</div>
+                            <div class="token-stat-label">Chars/Token Avg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Why Tokenization Matters</h3>
+                <p><strong>Ġ = space prefix:</strong> The "Ġ" character indicates a space before the token. This helps the model understand word boundaries without explicitly encoding spaces as separate tokens.</p>
+                <p><strong>Subword splitting:</strong> Notice "LLMs" becomes ["ĠLL", "Ms"] — two tokens. Rare or compound words get split into common subwords, allowing the model to handle any text while keeping vocabulary size manageable (~100K tokens).</p>
+                <p><strong>Cost implications:</strong> You pay per token for API calls. Understanding tokenization helps estimate costs: ~4 characters per token on average for English, but varies by language and content type.</p>
+            </div>
+        </section>
+
+        <!-- MODEL TIMELINE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Evolution of LLMs</h2>
+                    <p>Key milestones in language model development</p>
+                </div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-title">Major LLM Milestones</div>
+                <div class="timeline-items">
+                    <div class="timeline-item">
+                        <div class="timeline-dot">📄</div>
+                        <div class="timeline-year">2017</div>
+                        <div class="timeline-name">Transformers</div>
+                        <div class="timeline-desc">Attention Is All You Need</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">🔵</div>
+                        <div class="timeline-year">2018</div>
+                        <div class="timeline-name">BERT / GPT-1</div>
+                        <div class="timeline-desc">Pre-training revolution</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">🚀</div>
+                        <div class="timeline-year">2020</div>
+                        <div class="timeline-name">GPT-3</div>
+                        <div class="timeline-desc">175B params, few-shot</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">💬</div>
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-name">ChatGPT</div>
+                        <div class="timeline-desc">RLHF alignment</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">⭐</div>
+                        <div class="timeline-year">2023-24</div>
+                        <div class="timeline-name">GPT-4 / Claude 3</div>
+                        <div class="timeline-desc">Multimodal, reasoning</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODEL COMPARISON -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🏆</div>
+                <div class="module-info">
+                    <h2>Frontier Models Comparison</h2>
+                    <p>Current state-of-the-art LLMs</p>
+                </div>
+            </div>
+            <div class="model-grid">
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">🤖</div>
+                        <div class="model-info">
+                            <h3>GPT-4o</h3>
+                            <span>OpenAI • May 2024</span>
+                        </div>
+                    </div>
+                    <div class="model-body">
+                        <div class="model-stats">
+                            <div class="model-stat">
+                                <div class="model-stat-label">Context</div>
+                                <div class="model-stat-value">128K tokens</div>
+                            </div>
+                            <div class="model-stat">
+                                <div class="model-stat-label">API Cost</div>
+                                <div class="model-stat-value">$5 / 1M input</div>
+                            </div>
+                        </div>
+                        <ul class="model-features">
+                            <li>Multimodal (text, image, audio)</li>
+                            <li>Real-time voice conversation</li>
+                            <li>Best-in-class coding ability</li>
+                            <li>Function calling & JSON mode</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">🧠</div>
+                        <div class="model-info">
+                            <h3>Claude 3.5 Sonnet</h3>
+                            <span>Anthropic • June 2024</span>
+                        </div>
+                    </div>
+                    <div class="model-body">
+                        <div class="model-stats">
+                            <div class="model-stat">
+                                <div class="model-stat-label">Context</div>
+                                <div class="model-stat-value">200K tokens</div>
+                            </div>
+                            <div class="model-stat">
+                                <div class="model-stat-label">API Cost</div>
+                                <div class="model-stat-value">$3 / 1M input</div>
+                            </div>
+                        </div>
+                        <ul class="model-features">
+                            <li>Longest context window</li>
+                            <li>Strong reasoning & analysis</li>
+                            <li>Constitutional AI safety</li>
+                            <li>Excellent at writing tasks</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">💎</div>
+                        <div class="model-info">
+                            <h3>Gemini 1.5 Pro</h3>
+                            <span>Google • Feb 2024</span>
+                        </div>
+                    </div>
+                    <div class="model-body">
+                        <div class="model-stats">
+                            <div class="model-stat">
+                                <div class="model-stat-label">Context</div>
+                                <div class="model-stat-value">1M tokens</div>
+                            </div>
+                            <div class="model-stat">
+                                <div class="model-stat-label">API Cost</div>
+                                <div class="model-stat-value">$1.25 / 1M input</div>
+                            </div>
+                        </div>
+                        <ul class="model-features">
+                            <li>Massive 1M token context</li>
+                            <li>Native multimodal (video)</li>
+                            <li>Google Search grounding</li>
+                            <li>Efficient MoE architecture</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">🦙</div>
+                        <div class="model-info">
+                            <h3>Llama 3.1 405B</h3>
+                            <span>Meta • July 2024</span>
+                        </div>
+                    </div>
+                    <div class="model-body">
+                        <div class="model-stats">
+                            <div class="model-stat">
+                                <div class="model-stat-label">Context</div>
+                                <div class="model-stat-value">128K tokens</div>
+                            </div>
+                            <div class="model-stat">
+                                <div class="model-stat-label">License</div>
+                                <div class="model-stat-value">Open weights</div>
+                            </div>
+                        </div>
+                        <ul class="model-features">
+                            <li>Fully open source weights</li>
+                            <li>Self-hostable, no API fees</li>
+                            <li>Competitive with GPT-4</li>
+                            <li>8B, 70B, 405B variants</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON TABLE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Architecture Comparison</h2>
+                    <p>Technical differences between model families</p>
+                </div>
+            </div>
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">📋 Model Architecture Details</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Parameters</th>
+                            <th>Layers</th>
+                            <th>Attention Heads</th>
+                            <th>Training Data</th>
+                            <th>Reasoning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GPT-4</strong></td>
+                            <td>~1.8T (MoE)</td>
+                            <td>120</td>
+                            <td>96 per layer</td>
+                            <td>~13T tokens</td>
+                            <td><span class="compare-tag excellent">Excellent</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Claude 3 Opus</strong></td>
+                            <td>Undisclosed</td>
+                            <td>~96</td>
+                            <td>Undisclosed</td>
+                            <td>Undisclosed</td>
+                            <td><span class="compare-tag excellent">Excellent</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gemini Ultra</strong></td>
+                            <td>~1T+ (MoE)</td>
+                            <td>~64</td>
+                            <td>MoE routing</td>
+                            <td>Multimodal corpus</td>
+                            <td><span class="compare-tag excellent">Excellent</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Llama 3.1 405B</strong></td>
+                            <td>405B (dense)</td>
+                            <td>126</td>
+                            <td>128 per layer</td>
+                            <td>15T+ tokens</td>
+                            <td><span class="compare-tag good">Very Good</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mistral Large</strong></td>
+                            <td>~123B</td>
+                            <td>~80</td>
+                            <td>Grouped Query</td>
+                            <td>Undisclosed</td>
+                            <td><span class="compare-tag good">Very Good</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered LLM assistant</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🧠</div>
+                    <div class="agent-name">LLMExpertAgent</div>
+                    <div class="agent-role">LLM Architecture Specialist</div>
+                    <div class="agent-desc">Expert in LLM architecture, transformer internals, and model capabilities. Helps you understand how models work, compare architectures, and select the right model for your specific use case and constraints.</div>
+                    <ul class="agent-capabilities">
+                        <li>Explain attention mechanisms in depth</li>
+                        <li>Compare model architectures and tradeoffs</li>
+                        <li>Analyze tokenization strategies</li>
+                        <li>Recommend models for specific use cases</li>
+                        <li>Debug unexpected model behaviors</li>
+                        <li>Optimize inference configurations</li>
+                        <li>Estimate costs and performance</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Analysis Task</div>
+                        <div class="code-filename">llm_expert_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># llm_expert_agent.py - LLM Expert Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">llm_expert</span> = Agent(
+    role=<span class="code-string">"LLM Architecture Expert"</span>,
+    goal=<span class="code-string">"Help understand LLM internals and selection"</span>,
+    backstory=<span class="code-string">"""Deep expertise in transformer architecture, 
+    attention mechanisms, tokenization strategies, and 
+    model capabilities. Trained on research papers from 
+    'Attention Is All You Need' through GPT-4, Claude, 
+    and latest open-source models. Can explain complex 
+    concepts simply and recommend optimal models."""</span>,
+    tools=[
+        ModelAnalyzer(),
+        TokenizerInspector(),
+        AttentionVisualizer(),
+        BenchmarkComparer(),
+        CostEstimator(),
+    ]
+)
+
+<span class="code-function">analysis_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Understand user's LLM requirements and constraints
+    2. Analyze relevant model architectures
+    3. Compare capabilities, context, and pricing
+    4. Explain key technical differences
+    5. Recommend optimal model selection
+    6. Provide implementation guidance
+    7. Estimate costs for expected usage
+    """</span>,
+    agent=llm_expert,
+    expected_output=<span class="code-string">"Model recommendation with rationale"</span>
+)
+
+<span class="code-comment"># Execute analysis</span>
+crew = Crew(agents=[llm_expert], tasks=[analysis_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat05-p2-prompt-engineering.html" class="related-card">
+                    <div class="related-num">Page 5.2</div>
+                    <div class="related-title">Prompt Engineering</div>
+                    <div class="related-desc">Master prompting techniques for optimal LLM outputs</div>
+                </a>
+                <a href="cat05-p5-embeddings.html" class="related-card">
+                    <div class="related-num">Page 5.5</div>
+                    <div class="related-title">Embeddings & Vectors</div>
+                    <div class="related-desc">Understand vector representations for semantic search</div>
+                </a>
+                <a href="cat05-p6-model-evaluation.html" class="related-card">
+                    <div class="related-num">Page 5.6</div>
+                    <div class="related-title">Model Evaluation</div>
+                    <div class="related-desc">Benchmark and compare LLM performance objectively</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat05-generative-ai-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 5.1 of 10</div>
+        <a href="cat05-p2-prompt-engineering.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">5.2: Prompt Engineering</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

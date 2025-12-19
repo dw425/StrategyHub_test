@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science Use Cases | Data Science | Strategy Hub</title>
+    <style>
+        :root { --brand-orange: #FF9900; --cat-primary: #6366F1; --cat-light: #818CF8; --page-primary: #8B5CF6; --page-light: #A78BFA; --page-glow: rgba(139, 92, 246, 0.15); --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-card-alt: #1a1a2e; --border-color: #2a2a3e; --text-primary: #ffffff; --text-secondary: #a0a0b0; --text-muted: #6a6a7a; --green: #10B981; --red: #EF4444; --blue: #3B82F6; --yellow: #F59E0B; --cyan: #06B6D4; --pink: #EC4899; --sidebar-width: 260px; --header-height: 60px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: #252538; color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        .usecase-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
+        .usecase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; }
+        .usecase-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        .usecase-card.churn::before { background: var(--red); }
+        .usecase-card.forecast::before { background: var(--blue); }
+        .usecase-card.segment::before { background: var(--green); }
+        .usecase-card.recommend::before { background: var(--yellow); }
+        .usecase-card.fraud::before { background: var(--pink); }
+        .usecase-card.pricing::before { background: var(--cyan); }
+        .usecase-icon { font-size: 32px; margin-bottom: 12px; }
+        .usecase-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .usecase-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .usecase-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .usecase-detail { background: var(--bg-card-alt); border-radius: 8px; padding: 12px; }
+        .usecase-detail-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .usecase-detail-value { font-size: 11px; color: var(--text-secondary); }
+        .industry-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .industry-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .industry-icon { font-size: 24px; margin-bottom: 8px; }
+        .industry-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .industry-uses { font-size: 9px; color: var(--text-muted); }
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        @media (max-width: 1024px) { .sidebar { display: none; } .main-wrapper { margin-left: 0; } footer { margin-left: 0; } .hero-compact, .usecase-grid, .best-practices { grid-template-columns: 1fr; } .industry-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<header><div class="logo"><span>STRATEGY</span>HUB</div></header>
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔬 Category 04</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat04-data-science-overview.html">🏠 Overview</a></li>
+            <li><a href="cat04-p1-crisp-dm.html">🔄 CRISP-DM</a></li>
+            <li><a href="cat04-p2-statistical-methods.html">📊 Statistical Methods</a></li>
+            <li><a href="cat04-p3-feature-engineering.html">⚙️ Feature Engineering</a></li>
+            <li><a href="cat04-p4-python-stack.html">🐍 Python Stack</a></li>
+            <li><a href="cat04-p5-notebooks.html">📓 Notebooks</a></li>
+            <li><a href="cat04-p6-experiment-tracking.html">🧪 Experiment Tracking</a></li>
+            <li><a href="cat04-p7-model-evaluation.html">🎯 Model Evaluation</a></li>
+            <li><a href="cat04-p8-use-cases.html" class="active">💼 Use Cases</a></li>
+        </ul>
+    </div>
+</aside>
+<div class="main-wrapper">
+    <div class="main-content">
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">💼 Page 4.8</span>
+                <h1>Data Science Use Cases</h1>
+                <p>Real-world applications that deliver business value. From churn prediction to demand forecasting, see how data science solves actual problems across industries.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">Churn</div><div class="hero-metric-label">Retain Customers</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Forecast</div><div class="hero-metric-label">Predict Demand</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Segment</div><div class="hero-metric-label">Know Customers</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Recommend</div><div class="hero-metric-label">Personalize</div></div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>High-Impact Use Cases</h2>
+                    <p>Proven data science applications</p>
+                </div>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-card churn">
+                    <div class="usecase-icon">🚪</div>
+                    <div class="usecase-name">Churn Prediction</div>
+                    <div class="usecase-desc">Identify customers likely to leave before they do. Enable proactive retention campaigns and reduce customer acquisition costs.</div>
+                    <div class="usecase-details">
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Model Type</div>
+                            <div class="usecase-detail-value">Classification (Random Forest, XGBoost, Logistic Regression)</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Key Features</div>
+                            <div class="usecase-detail-value">Recency, frequency, tenure, support tickets, usage decline</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Metrics</div>
+                            <div class="usecase-detail-value">AUC-ROC, Precision@K, Lift</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Business Impact</div>
+                            <div class="usecase-detail-value">5-25% reduction in churn rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="usecase-card forecast">
+                    <div class="usecase-icon">📈</div>
+                    <div class="usecase-name">Demand Forecasting</div>
+                    <div class="usecase-desc">Predict future demand for inventory planning, staffing, and capacity. Reduce stockouts and overstock costs.</div>
+                    <div class="usecase-details">
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Model Type</div>
+                            <div class="usecase-detail-value">Time Series (ARIMA, Prophet, LSTM, LightGBM)</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Key Features</div>
+                            <div class="usecase-detail-value">Seasonality, holidays, promotions, weather, trends</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Metrics</div>
+                            <div class="usecase-detail-value">MAPE, RMSE, Forecast Bias</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Business Impact</div>
+                            <div class="usecase-detail-value">10-30% inventory cost reduction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="usecase-card segment">
+                    <div class="usecase-icon">👥</div>
+                    <div class="usecase-name">Customer Segmentation</div>
+                    <div class="usecase-desc">Group customers by behavior, value, and needs. Enable targeted marketing and personalized experiences.</div>
+                    <div class="usecase-details">
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Model Type</div>
+                            <div class="usecase-detail-value">Clustering (K-Means, DBSCAN, Hierarchical)</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Key Features</div>
+                            <div class="usecase-detail-value">RFM, demographics, behavior, preferences</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Metrics</div>
+                            <div class="usecase-detail-value">Silhouette Score, Business interpretability</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Business Impact</div>
+                            <div class="usecase-detail-value">15-40% campaign ROI improvement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="usecase-card recommend">
+                    <div class="usecase-icon">🎁</div>
+                    <div class="usecase-name">Recommendation Systems</div>
+                    <div class="usecase-desc">Suggest products, content, or actions based on user behavior and preferences. Drive engagement and cross-sell.</div>
+                    <div class="usecase-details">
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Model Type</div>
+                            <div class="usecase-detail-value">Collaborative Filtering, Matrix Factorization, Deep Learning</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Key Features</div>
+                            <div class="usecase-detail-value">User-item interactions, embeddings, context</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Metrics</div>
+                            <div class="usecase-detail-value">NDCG, MAP, CTR, Conversion</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Business Impact</div>
+                            <div class="usecase-detail-value">10-35% increase in conversions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="usecase-card fraud">
+                    <div class="usecase-icon">🔒</div>
+                    <div class="usecase-name">Fraud Detection</div>
+                    <div class="usecase-desc">Identify fraudulent transactions in real-time. Balance fraud prevention with customer experience.</div>
+                    <div class="usecase-details">
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Model Type</div>
+                            <div class="usecase-detail-value">Anomaly Detection, Classification, Graph Neural Networks</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Key Features</div>
+                            <div class="usecase-detail-value">Transaction patterns, device fingerprint, velocity</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Metrics</div>
+                            <div class="usecase-detail-value">Precision, Recall, False Positive Rate</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Business Impact</div>
+                            <div class="usecase-detail-value">50-80% fraud loss reduction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="usecase-card pricing">
+                    <div class="usecase-icon">💰</div>
+                    <div class="usecase-name">Dynamic Pricing</div>
+                    <div class="usecase-desc">Optimize prices based on demand, competition, and customer willingness to pay. Maximize revenue and margins.</div>
+                    <div class="usecase-details">
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Model Type</div>
+                            <div class="usecase-detail-value">Regression, Reinforcement Learning, Causal Inference</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Key Features</div>
+                            <div class="usecase-detail-value">Demand elasticity, competitor prices, inventory</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Metrics</div>
+                            <div class="usecase-detail-value">Revenue, Margin, Price Elasticity</div>
+                        </div>
+                        <div class="usecase-detail">
+                            <div class="usecase-detail-label">Business Impact</div>
+                            <div class="usecase-detail-value">2-10% revenue increase</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🏢</div>
+                <div class="module-info">
+                    <h2>Industry Applications</h2>
+                    <p>Sector-specific use cases</p>
+                </div>
+            </div>
+            <div class="industry-grid">
+                <div class="industry-card">
+                    <div class="industry-icon">🏦</div>
+                    <div class="industry-name">Financial Services</div>
+                    <div class="industry-uses">Credit scoring, fraud, risk</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">🛒</div>
+                    <div class="industry-name">Retail</div>
+                    <div class="industry-uses">Demand, pricing, personalization</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">🏥</div>
+                    <div class="industry-name">Healthcare</div>
+                    <div class="industry-uses">Diagnosis, readmission, drug discovery</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">🏭</div>
+                    <div class="industry-name">Manufacturing</div>
+                    <div class="industry-uses">Predictive maintenance, quality</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">📱</div>
+                    <div class="industry-name">Tech/SaaS</div>
+                    <div class="industry-uses">Churn, engagement, upsell</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">🚗</div>
+                    <div class="industry-name">Transportation</div>
+                    <div class="industry-uses">Route optimization, demand</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">⚡</div>
+                    <div class="industry-name">Energy</div>
+                    <div class="industry-uses">Load forecasting, maintenance</div>
+                </div>
+                <div class="industry-card">
+                    <div class="industry-icon">📺</div>
+                    <div class="industry-name">Media</div>
+                    <div class="industry-uses">Content recommendation, ads</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Use case implementation guidelines</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with clear business problem and success metrics</li>
+                        <li>Validate with stakeholders before building</li>
+                        <li>Establish baseline performance first</li>
+                        <li>Design for deployment from day one</li>
+                        <li>Monitor model performance in production</li>
+                        <li>Measure business impact, not just model accuracy</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't start with a solution looking for a problem</li>
+                        <li>Never skip the data understanding phase</li>
+                        <li>Avoid scope creep mid-project</li>
+                        <li>Don't over-engineer the first version</li>
+                        <li>Never deploy without stakeholder buy-in</li>
+                        <li>Don't ignore model maintenance needs</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<footer>
+    <div class="footer-nav">
+        <a href="cat04-p7-model-evaluation.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous</div><div class="footer-link-title">4.7: Model Evaluation</div></div></a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 4.8 of 8</div>
+        <a href="../category-05/cat05-genai-overview.html" class="footer-link"><div><div class="footer-link-label">Next Category</div><div class="footer-link-title">05: Generative AI</div></div><span>→</span></a>
+    </div>
+</footer>
+</body>
+</html>

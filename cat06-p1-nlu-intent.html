@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLU & Intent Recognition | Chatbots & Conversational AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #3B82F6;
+            --page-light: #60A5FA;
+            --page-glow: rgba(59, 130, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: var(--bg-hover); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 40px; }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 48px; padding: 40px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--page-primary), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 8px 16px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 36px; margin-bottom: 16px; }
+        .hero-left p { font-size: 15px; color: var(--text-secondary); line-height: 1.8; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; text-align: center; }
+        .hero-metric-value { font-size: 32px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+        .module { margin-bottom: 56px; padding-top: 40px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; }
+        .module-icon { width: 72px; height: 72px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+        .module-info h2 { font-size: 28px; margin-bottom: 6px; }
+        .module-info p { font-size: 14px; color: var(--text-muted); }
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; margin-bottom: 28px; }
+        .overview-content h3 { font-size: 20px; margin-bottom: 20px; color: var(--page-light); }
+        .overview-content p { font-size: 15px; color: var(--text-secondary); line-height: 1.9; margin-bottom: 18px; }
+        .overview-content strong { color: var(--text-primary); }
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; border-left: 4px solid var(--page-primary); }
+        .concept-icon { font-size: 36px; margin-bottom: 16px; }
+        .concept-term { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+        .concept-def { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .concept-example { font-size: 11px; color: var(--text-muted); background: var(--bg-card-alt); padding: 12px; border-radius: 10px; font-family: monospace; }
+        .how-it-works { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; margin-bottom: 28px; }
+        .hiw-header { padding: 20px 28px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 16px; }
+        .hiw-body { padding: 28px; }
+        .hiw-step { display: flex; gap: 24px; margin-bottom: 24px; }
+        .hiw-step-num { width: 56px; height: 56px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .hiw-step-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .hiw-step-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+        .hiw-step-detail { font-size: 12px; color: var(--text-muted); margin-top: 12px; padding: 14px; background: var(--bg-card-alt); border-radius: 10px; border-left: 3px solid var(--page-primary); font-family: monospace; }
+        /* NLU BRAIN VISUALIZATION */
+        .nlu-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; margin-bottom: 28px; }
+        .nlu-viz-header { padding: 20px 28px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .nlu-viz-legend { display: flex; gap: 16px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .nlu-viz-body { padding: 40px; background: linear-gradient(180deg, var(--bg-dark) 0%, #0d1117 100%); position: relative; min-height: 420px; }
+        .nlu-brain { display: grid; grid-template-columns: 200px 1fr 200px; gap: 40px; align-items: center; }
+        .nlu-input-zone { text-align: center; }
+        .input-bubble { background: linear-gradient(135deg, var(--blue), #1d4ed8); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); }
+        .input-bubble::after { content: ''; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); border: 10px solid transparent; border-left-color: var(--blue); }
+        .input-text { font-size: 14px; font-style: italic; color: #fff; }
+        .input-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .nlu-core { position: relative; }
+        .brain-container { background: radial-gradient(ellipse at center, rgba(59,130,246,0.1) 0%, transparent 70%); border: 2px solid var(--border-color); border-radius: 50%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative; max-width: 320px; margin: 0 auto; }
+        .brain-layer { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .brain-layer.outer { width: 100%; height: 100%; border: 2px dashed rgba(59,130,246,0.3); animation: pulse-outer 3s ease-in-out infinite; }
+        .brain-layer.mid { width: 70%; height: 70%; border: 2px solid rgba(139,92,246,0.5); background: rgba(139,92,246,0.05); }
+        .brain-layer.inner { width: 40%; height: 40%; background: linear-gradient(135deg, var(--purple), var(--pink)); box-shadow: 0 0 60px rgba(139,92,246,0.5); }
+        .brain-layer.inner::before { content: '🧠'; font-size: 48px; }
+        @keyframes pulse-outer { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.02); } }
+        .process-labels { position: absolute; width: 100%; height: 100%; }
+        .proc-label { position: absolute; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 10px; white-space: nowrap; }
+        .proc-label.tokenize { top: 5%; left: 50%; transform: translateX(-50%); border-color: var(--blue); color: var(--blue); }
+        .proc-label.embed { top: 25%; right: 0; border-color: var(--cyan); color: var(--cyan); }
+        .proc-label.encode { bottom: 25%; right: 0; border-color: var(--purple); color: var(--purple); }
+        .proc-label.classify { bottom: 5%; left: 50%; transform: translateX(-50%); border-color: var(--green); color: var(--green); }
+        .proc-label.extract { top: 25%; left: 0; border-color: var(--yellow); color: var(--yellow); }
+        .proc-label.score { bottom: 25%; left: 0; border-color: var(--pink); color: var(--pink); }
+        .nlu-output-zone { text-align: center; }
+        .output-card { background: var(--bg-card-alt); border: 2px solid var(--green); border-radius: 16px; padding: 20px; text-align: left; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2); }
+        .output-card::before { content: ''; position: absolute; left: -20px; top: 50%; transform: translateY(-50%); border: 10px solid transparent; border-right-color: var(--green); }
+        .output-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+        .output-row:last-child { border-bottom: none; }
+        .output-key { color: var(--text-muted); }
+        .output-val { color: var(--green); font-family: monospace; }
+        .output-val.intent { color: var(--blue); }
+        .output-val.entity { color: var(--yellow); }
+        .confidence-bar { width: 60px; height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 8px; }
+        .confidence-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); border-radius: 4px; }
+        .model-comparison { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; margin-bottom: 28px; }
+        .model-header { padding: 20px 28px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; }
+        .comparison-table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 16px 20px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 18px 20px; font-size: 13px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .tag { font-size: 10px; padding: 4px 10px; border-radius: 9999px; }
+        .tag.high { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .tag.medium { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .deep-dive { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        .deep-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 28px; }
+        .deep-card h3 { font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .deep-card h3 span { font-size: 24px; }
+        .deep-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .deep-list { list-style: none; }
+        .deep-list li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .deep-list li::before { content: '→ '; color: var(--page-light); }
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; text-align: center; }
+        .tool-card:hover { border-color: var(--page-primary); }
+        .tool-icon { font-size: 40px; margin-bottom: 16px; }
+        .tool-name { font-size: 15px; font-weight: 600; }
+        .tool-type { font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .tool-desc { font-size: 12px; color: var(--text-muted); }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 28px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 28px; }
+        .practice-card.do { border-left: 4px solid var(--green); }
+        .practice-card.dont { border-left: 4px solid var(--red); }
+        .practice-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 14px; color: var(--text-secondary); padding: 12px 0; border-bottom: 1px solid var(--border-color); line-height: 1.7; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 28px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; }
+        .agent-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 24px; }
+        .agent-name { font-size: 24px; font-weight: 600; }
+        .agent-role { font-size: 14px; color: var(--page-light); margin-bottom: 24px; }
+        .agent-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 28px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 14px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .agent-capabilities li::before { content: '✦ '; color: var(--page-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; }
+        .code-header { padding: 16px 24px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--page-light); }
+        .code-content { padding: 24px; background: var(--bg-dark); overflow-x: auto; max-height: 520px; }
+        .code-content pre { font-family: monospace; font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; text-decoration: none; color: inherit; }
+        .related-card:hover { border-color: var(--page-primary); }
+        .related-num { font-size: 12px; color: var(--page-light); margin-bottom: 8px; }
+        .related-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 28px 40px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { text-decoration: none; color: var(--text-secondary); padding: 16px 28px; background: var(--bg-card-alt); border-radius: 14px; }
+        .footer-brand { font-size: 14px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a> / <a href="cat06-chatbots-overview.html">Chatbots</a> / <span class="current">NLU & Intent Recognition</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-title">💬 Category 06</div>
+    <ul class="sidebar-nav">
+        <li><a href="cat06-chatbots-overview.html">🏠 Overview</a></li>
+        <li><a href="cat06-p1-nlu-intent.html" class="active">🧠 6.1 NLU & Intent</a></li>
+        <li><a href="cat06-p2-dialog-management.html">🔀 6.2 Dialog Management</a></li>
+        <li><a href="cat06-p3-response-generation.html">💬 6.3 Response Generation</a></li>
+        <li><a href="cat06-p4-context-memory.html">🧩 6.4 Context & Memory</a></li>
+        <li><a href="cat06-p5-platforms.html">🤖 6.5 Platforms</a></li>
+        <li><a href="cat06-p6-voice-assistants.html">🎙️ 6.6 Voice Assistants</a></li>
+        <li><a href="cat06-p7-multichannel.html">📱 6.7 Multi-Channel</a></li>
+        <li><a href="cat06-p8-analytics.html">📊 6.8 Analytics</a></li>
+        <li><a href="cat06-p9-testing.html">🧪 6.9 Testing & QA</a></li>
+        <li><a href="cat06-p10-enterprise.html">🏢 6.10 Enterprise</a></li>
+    </ul>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🧠 Page 6.1 • Understanding Language</div>
+                <h1>NLU & Intent Recognition</h1>
+                <p>Transform unstructured natural language into actionable structured data. Master intent classification, entity extraction, sentiment analysis, and confidence scoring to build chatbots that truly understand users.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">95%+</div><div class="hero-metric-label">Target Accuracy</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">BERT</div><div class="hero-metric-label">Transformer Models</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">F1</div><div class="hero-metric-label">Evaluation Metric</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;100ms</div><div class="hero-metric-label">Inference Target</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info"><h2>Understanding NLU</h2><p>The foundation of conversational AI</p></div>
+            </div>
+            <div class="overview-content">
+                <h3>What is Natural Language Understanding?</h3>
+                <p>Natural Language Understanding (NLU) is the critical first step in any conversational AI pipeline. It bridges the gap between human communication—ambiguous, varied, and context-dependent—and machine-processable data structures. When a user says <strong>"Book me a flight to New York next Friday,"</strong> NLU extracts the intent (book_flight), entities (destination: New York, date: next Friday), and confidence scores that tell the system how certain it is about its interpretation.</p>
+                <p>Modern NLU has evolved dramatically from rule-based pattern matching to sophisticated neural networks. Today's transformer-based models like BERT, RoBERTa, and domain-specific variants can understand semantic meaning, handle synonyms and typos, and disambiguate context—achieving human-level accuracy on well-defined domains. This evolution has made conversational AI practical for enterprise deployment.</p>
+                <p>The business impact of good NLU is significant: a <strong>5% improvement in intent recognition can translate to 20%+ reduction</strong> in escalations to human agents. Conversely, poor NLU creates frustrated users who abandon self-service channels. Every misunderstood intent is a potential lost customer or an expensive human handoff.</p>
+                <p>NLU pipelines include several key stages: <strong>tokenization</strong> (breaking text into tokens), <strong>intent classification</strong> (predicting what the user wants), <strong>entity extraction</strong> (identifying key parameters), and <strong>confidence scoring</strong> (measuring certainty). Advanced systems also incorporate sentiment analysis, coreference resolution, and multi-turn context understanding.</p>
+            </div>
+        </section>
+
+        <!-- KEY CONCEPTS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔑</div>
+                <div class="module-info"><h2>Key Concepts</h2><p>Essential NLU terminology and definitions</p></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card" style="border-left-color: var(--blue);">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-term">Intent</div>
+                    <div class="concept-def">The user's goal or desired action, mapped to specific handlers in your application. Intents are categorical—each utterance is classified into one (or sometimes multiple) intent categories.</div>
+                    <div class="concept-example">"Book a flight" → book_flight<br>"Cancel my order" → cancel_order<br>"What's the weather?" → get_weather</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--green);">
+                    <div class="concept-icon">🏷️</div>
+                    <div class="concept-term">Entity</div>
+                    <div class="concept-def">Key parameters extracted from user input—dates, names, locations, quantities, and custom types needed to fulfill the user's request. Entities fill the "slots" in task completion.</div>
+                    <div class="concept-example">"fly to NYC" → city: NYC<br>"next Friday" → date: 2024-12-20<br>"2 adults" → passenger_count: 2</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--purple);">
+                    <div class="concept-icon">📊</div>
+                    <div class="concept-term">Confidence Score</div>
+                    <div class="concept-def">Probability (0-1) indicating model certainty about its prediction. Low confidence triggers fallback behaviors like clarification or human handoff.</div>
+                    <div class="concept-example">book_flight: 0.94 ✓ High<br>check_status: 0.23 Low<br>cancel_order: 0.08 Very Low</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--yellow);">
+                    <div class="concept-icon">📝</div>
+                    <div class="concept-term">Utterance</div>
+                    <div class="concept-def">A single user message or input text. Training data consists of utterances labeled with their corresponding intents and entities.</div>
+                    <div class="concept-example">"I wanna book a flight"<br>"book flight please"<br>"can you help me fly to NYC?"</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--pink);">
+                    <div class="concept-icon">🔤</div>
+                    <div class="concept-term">Tokenization</div>
+                    <div class="concept-def">Breaking text into tokens (words, subwords, or characters) for model processing. Modern models use subword tokenization (BPE, WordPiece) to handle unknown words.</div>
+                    <div class="concept-example">"flying" → ["fly", "##ing"]<br>"NYC" → ["NY", "##C"]<br>Handles typos & new words</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--cyan);">
+                    <div class="concept-icon">🧬</div>
+                    <div class="concept-term">Embedding</div>
+                    <div class="concept-def">Dense vector representation of text that captures semantic meaning. Similar words/phrases have similar embeddings, enabling semantic understanding.</div>
+                    <div class="concept-example">"book" ≈ "reserve" ≈ "schedule"<br>768-dim vectors in BERT<br>Captures semantic similarity</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info"><h2>How It Works</h2><p>The NLU processing pipeline explained step by step</p></div>
+            </div>
+            <div class="how-it-works">
+                <div class="hiw-header">🔄 NLU Processing Pipeline</div>
+                <div class="hiw-body">
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">1</div>
+                        <div><div class="hiw-step-title">Text Preprocessing</div><div class="hiw-step-desc">Clean and normalize the raw input: lowercasing, typo correction, emoji handling, and expanding contractions.</div><div class="hiw-step-detail">Input: "I'd like 2 book a flite!!" → Cleaned: "i would like to book a flight"</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">2</div>
+                        <div><div class="hiw-step-title">Tokenization & Encoding</div><div class="hiw-step-desc">Split text into tokens and convert to embeddings. BERT-style models use subword tokenization and produce 768-dimensional vectors.</div><div class="hiw-step-detail">Tokens: ["i", "would", "like", "to", "book"] → Embeddings: [768-dim vectors]</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">3</div>
+                        <div><div class="hiw-step-title">Intent Classification</div><div class="hiw-step-desc">Neural classifier predicts intent with probability scores for each class. The [CLS] token embedding is passed through a classification head.</div><div class="hiw-step-detail">Predictions: book_flight: 0.94, check_status: 0.03, cancel: 0.02</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">4</div>
+                        <div><div class="hiw-step-title">Entity Extraction (NER)</div><div class="hiw-step-desc">Named Entity Recognition identifies and labels key parameters using BIO tagging to mark entity boundaries and types.</div><div class="hiw-step-detail">Input: "fly to New York Friday" → Entities: [city: "New York", date: "Friday"]</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">5</div>
+                        <div><div class="hiw-step-title">Confidence Evaluation</div><div class="hiw-step-desc">Assess prediction confidence. High (>0.85) proceeds, medium (0.5-0.85) confirms, low (<0.5) escalates to fallback.</div><div class="hiw-step-detail">Confidence: 0.94 > threshold (0.85) → Proceed with book_flight intent</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">6</div>
+                        <div><div class="hiw-step-title">Structured Output</div><div class="hiw-step-desc">Package results into structured format for dialog manager. Include all extracted information with confidence scores.</div><div class="hiw-step-detail">{"intent": "book_flight", "confidence": 0.94, "entities": {"city": "NYC", "date": "2024-12-20"}}</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PIPELINE DIAGRAM -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info"><h2>NLU Pipeline Architecture</h2><p>Visual flow from input to structured output</p></div>
+            </div>
+            <div class="nlu-viz">
+                <div class="nlu-viz-header">
+                    <span>🧠 Neural Understanding Architecture</span>
+                    <div class="nlu-viz-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--blue);"></div>Input</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--purple);"></div>Processing</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--green);"></div>Output</div>
+                    </div>
+                </div>
+                <div class="nlu-viz-body">
+                    <div class="nlu-brain">
+                        <div class="nlu-input-zone">
+                            <div class="input-bubble">
+                                <div class="input-text">"Book me a flight to New York next Friday"</div>
+                            </div>
+                            <div class="input-label">Raw User Input</div>
+                        </div>
+                        <div class="nlu-core">
+                            <div class="brain-container">
+                                <div class="brain-layer outer"></div>
+                                <div class="brain-layer mid"></div>
+                                <div class="brain-layer inner"></div>
+                                <div class="process-labels">
+                                    <div class="proc-label tokenize">🔤 Tokenize</div>
+                                    <div class="proc-label embed">🧬 Embed</div>
+                                    <div class="proc-label encode">⚡ Encode</div>
+                                    <div class="proc-label classify">🎯 Classify</div>
+                                    <div class="proc-label extract">🏷️ Extract</div>
+                                    <div class="proc-label score">📊 Score</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nlu-output-zone">
+                            <div class="output-card">
+                                <div class="output-row">
+                                    <span class="output-key">intent</span>
+                                    <span class="output-val intent">book_flight</span>
+                                </div>
+                                <div class="output-row">
+                                    <span class="output-key">confidence</span>
+                                    <span class="output-val">0.94 <span class="confidence-bar"><span class="confidence-fill" style="width: 94%;"></span></span></span>
+                                </div>
+                                <div class="output-row">
+                                    <span class="output-key">destination</span>
+                                    <span class="output-val entity">New York</span>
+                                </div>
+                                <div class="output-row">
+                                    <span class="output-key">date</span>
+                                    <span class="output-val entity">next Friday</span>
+                                </div>
+                            </div>
+                            <div class="input-label" style="margin-top: 16px;">Structured Output</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEEP DIVE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info"><h2>Deep Dive</h2><p>Intent Classification vs Entity Extraction</p></div>
+            </div>
+            <div class="deep-dive">
+                <div class="deep-card">
+                    <h3><span>🎯</span> Intent Classification</h3>
+                    <p>Sentence-level classification task. What does the user want to accomplish?</p>
+                    <ul class="deep-list">
+                        <li>Classification head on [CLS] token</li>
+                        <li>Softmax over intent vocabulary</li>
+                        <li>Trained with cross-entropy loss</li>
+                        <li>Augment with paraphrases</li>
+                        <li>Handle out-of-scope with fallback</li>
+                        <li>Monitor confusion matrix</li>
+                    </ul>
+                </div>
+                <div class="deep-card">
+                    <h3><span>🏷️</span> Entity Extraction (NER)</h3>
+                    <p>Token-level sequence labeling. Identify and classify spans of text.</p>
+                    <ul class="deep-list">
+                        <li>Token-level classification (B-I-O tags)</li>
+                        <li>CRF layer improves boundaries</li>
+                        <li>Pre-built: dates, numbers, emails</li>
+                        <li>Custom: products, order IDs</li>
+                        <li>Entity resolution (NYC → New York)</li>
+                        <li>Handle overlapping entities</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODEL COMPARISON -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info"><h2>Model Comparison</h2><p>Choosing the right model for your use case</p></div>
+            </div>
+            <div class="model-comparison">
+                <div class="model-header">🏆 NLU Model Options</div>
+                <table class="comparison-table">
+                    <thead><tr><th>Model</th><th>Parameters</th><th>Latency</th><th>Accuracy</th><th>Best For</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>BERT-base</strong></td><td>110M</td><td>~50ms</td><td><span class="tag high">High</span></td><td>General purpose baseline</td></tr>
+                        <tr><td><strong>DistilBERT</strong></td><td>66M</td><td>~25ms</td><td><span class="tag high">Good</span></td><td>Production w/ latency needs</td></tr>
+                        <tr><td><strong>RoBERTa</strong></td><td>125M</td><td>~55ms</td><td><span class="tag high">Excellent</span></td><td>When accuracy is paramount</td></tr>
+                        <tr><td><strong>GPT-4 (few-shot)</strong></td><td>—</td><td>~500ms</td><td><span class="tag high">Excellent</span></td><td>Zero-shot, flexible</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info"><h2>NLU Tools & Frameworks</h2><p>Libraries for building production NLU</p></div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card"><div class="tool-icon">🤗</div><div class="tool-name">Transformers</div><div class="tool-type">Hugging Face</div><div class="tool-desc">State-of-the-art models, fine-tuning</div></div>
+                <div class="tool-card"><div class="tool-icon">🔮</div><div class="tool-name">spaCy</div><div class="tool-type">Explosion AI</div><div class="tool-desc">Industrial NLP, custom NER</div></div>
+                <div class="tool-card"><div class="tool-icon">🟣</div><div class="tool-name">Rasa NLU</div><div class="tool-type">Open Source</div><div class="tool-desc">DIET classifier, forms</div></div>
+                <div class="tool-card"><div class="tool-icon">🟠</div><div class="tool-name">Dialogflow</div><div class="tool-type">Google Cloud</div><div class="tool-desc">Managed NLU, 30+ languages</div></div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info"><h2>Best Practices</h2><p>Building production-ready NLU</p></div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do This</div>
+                    <ul class="practice-list">
+                        <li>Collect 50-100+ real utterances per intent from logs or user research</li>
+                        <li>Include typos, abbreviations, slang—real users don't speak perfectly</li>
+                        <li>Use data augmentation (paraphrasing) to expand training data</li>
+                        <li>Implement confidence thresholds with appropriate fallbacks</li>
+                        <li>Monitor intent confusion matrices weekly</li>
+                        <li>Retrain regularly with production data</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Avoid This</div>
+                    <ul class="practice-list">
+                        <li>Creating too many overlapping intents</li>
+                        <li>Training only on synthetic "happy path" examples</li>
+                        <li>Ignoring the fallback intent—it's your safety net</li>
+                        <li>Deploying without measuring accuracy on held-out test set</li>
+                        <li>Hard-coding entity patterns when ML would generalize better</li>
+                        <li>Skipping A/B testing when rolling out model updates</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info"><h2>Agent This</h2><p>AI-powered NLU optimization</p></div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🧠</div>
+                    <div class="agent-name">NLUArchitectAgent</div>
+                    <div class="agent-role">NLU Systems Specialist</div>
+                    <div class="agent-desc">Expert in building production NLU systems. Designs intent taxonomies, creates entity schemas, fine-tunes transformer models.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design intent taxonomy</li>
+                        <li>Create entity schemas</li>
+                        <li>Generate training data</li>
+                        <li>Fine-tune BERT models</li>
+                        <li>Optimize inference latency</li>
+                        <li>Analyze confusion matrices</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">nlu_architect_agent.py</div>
+                    <div class="code-content"><pre>from crewai import Agent, Task, Crew
+from transformers import pipeline, AutoModelForSequenceClassification
+from transformers import AutoTokenizer
+import torch
+
+nlu_agent = Agent(
+    role="NLU Architect",
+    goal="Build high-accuracy intent classification",
+    backstory="""Expert in transformer-based NLU with
+    deep knowledge of BERT fine-tuning and NER.""",
+    tools=[IntentDesigner(), EntityBuilder()]
+)
+
+class IntentClassifier:
+    def __init__(self, model_path: str):
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_path)
+        self.model.eval()
+        self.labels = ["book_flight", "cancel", "check_status", "fallback"]
+    
+    def predict(self, text: str) -> dict:
+        inputs = self.tokenizer(text, return_tensors="pt", truncation=True)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+            probs = torch.softmax(outputs.logits, dim=-1)
+        
+        top_idx = probs.argmax().item()
+        return {
+            "intent": self.labels[top_idx],
+            "confidence": round(probs[0][top_idx].item(), 3)
+        }
+
+task = Task(
+    description="Optimize NLU for booking domain",
+    agent=nlu_agent,
+    expected_output="Trained NLU model"
+)
+
+crew = Crew(agents=[nlu_agent], tasks=[task])
+result = crew.kickoff()</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info"><h2>Related Pages</h2><p>Continue learning</p></div>
+            </div>
+            <div class="related-grid">
+                <a href="cat06-p2-dialog-management.html" class="related-card"><div class="related-num">Page 6.2</div><div class="related-title">Dialog Management</div><div class="related-desc">Use NLU output to drive conversation</div></a>
+                <a href="cat06-p4-context-memory.html" class="related-card"><div class="related-num">Page 6.4</div><div class="related-title">Context & Memory</div><div class="related-desc">Multi-turn context for better NLU</div></a>
+                <a href="cat06-p9-testing.html" class="related-card"><div class="related-num">Page 6.9</div><div class="related-title">Testing & QA</div><div class="related-desc">Evaluate NLU accuracy</div></a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat06-chatbots-overview.html" class="footer-link">← Overview</a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 6.1 of 10</div>
+        <a href="cat06-p2-dialog-management.html" class="footer-link">6.2: Dialog Management →</a>
+    </div>
+</footer>
+
+</body>
+</html>

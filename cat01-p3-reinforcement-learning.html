@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reinforcement Learning | AI/ML Foundations | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--green)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .concept-card.agent::before { background: var(--yellow); }
+        .concept-card.environment::before { background: var(--cyan); }
+        .concept-card.reward::before { background: var(--green); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+        .concept-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .concept-examples { list-style: none; }
+        .concept-examples li { font-size: 10px; padding: 5px 10px; background: var(--bg-card-alt); border-radius: 6px; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .concept-examples li::before { content: '→'; color: var(--page-light); }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .algo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .algo-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .algo-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .algo-card-icon { width: 44px; height: 44px; background: var(--page-glow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .algo-card-title { font-size: 15px; font-weight: 600; }
+        .algo-card-subtitle { font-size: 10px; color: var(--text-muted); }
+        .algo-card-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .algo-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .algo-tag { font-size: 9px; padding: 3px 8px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-tag { font-size: 8px; padding: 2px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .algo-grid { grid-template-columns: 1fr; }
+            .concept-grid, .tools-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat01-aiml-foundations-overview.html">AI/ML Foundations</a>
+        <span class="sep">/</span>
+        <span class="current">Reinforcement Learning</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🧠 Category 01</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-aiml-foundations-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#components"><span class="nav-icon">🧩</span> Components</a></li>
+            <li><a href="#loop"><span class="nav-icon">🔄</span> RL Loop</a></li>
+            <li><a href="#algorithms"><span class="nav-icon">🔢</span> Algorithms</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-p1-supervised-learning.html"><span class="nav-icon">🏷️</span> Supervised Learning</a></li>
+            <li><a href="cat01-p2-unsupervised-learning.html"><span class="nav-icon">🔍</span> Unsupervised Learning</a></li>
+            <li><a href="cat01-p3-reinforcement-learning.html" class="active"><span class="nav-icon">🎮</span> Reinforcement Learning</a></li>
+            <li><a href="cat01-p4-neural-networks.html"><span class="nav-icon">🔮</span> Neural Networks</a></li>
+            <li><a href="cat01-p5-ml-pipeline.html"><span class="nav-icon">⚙️</span> ML Pipeline</a></li>
+            <li><a href="cat01-p6-algorithm-selection.html"><span class="nav-icon">🎯</span> Algorithm Selection</a></li>
+            <li><a href="cat01-p7-ml-frameworks.html"><span class="nav-icon">🛠️</span> ML Frameworks</a></li>
+            <li><a href="cat01-p8-evaluation-metrics.html"><span class="nav-icon">📈</span> Evaluation Metrics</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🎮 Page 1.3</span>
+                <h1>Reinforcement Learning</h1>
+                <p>Train intelligent agents that learn optimal behavior through trial and error. From game-playing AI to robotics and autonomous systems, master the paradigm that powers decision-making in dynamic environments.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">AlphaGo</div><div class="hero-metric-label">Beat World Champion</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">$1B+</div><div class="hero-metric-label">Robotics RL Market</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10^170</div><div class="hero-metric-label">Go Game States Mastered</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">RLHF</div><div class="hero-metric-label">Powers ChatGPT</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Reinforcement Learning?</h2>
+                    <p>Learning through interaction and feedback</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Definition & Core Concept</h3>
+                <p>Reinforcement Learning (RL) is a machine learning paradigm where an agent learns to make decisions by interacting with an environment. Unlike supervised learning with labeled examples, the agent discovers optimal behavior through trial and error, receiving rewards or penalties for its actions.</p>
+                
+                <p>The agent's goal is to learn a policy—a mapping from states to actions—that maximizes cumulative reward over time. This involves balancing exploration (trying new actions to discover their effects) with exploitation (using known good actions to maximize reward).</p>
+                
+                <h3>Why It Matters</h3>
+                <p>RL excels in sequential decision-making problems where the optimal action depends on the current state and future consequences. It powers game-playing AI (AlphaGo, OpenAI Five), robotic control, recommendation systems, and increasingly, fine-tuning large language models through RLHF (Reinforcement Learning from Human Feedback).</p>
+                
+                <h3>Key Challenges</h3>
+                <p>RL faces unique challenges: sparse rewards make learning slow, the credit assignment problem (which action caused the reward?), sample inefficiency requiring millions of interactions, and the difficulty of designing good reward functions that capture intended behavior without unintended shortcuts.</p>
+            </div>
+        </section>
+
+        <!-- COMPONENTS -->
+        <section class="module" id="components">
+            <div class="module-header">
+                <div class="module-icon">🧩</div>
+                <div class="module-info">
+                    <h2>Core Components</h2>
+                    <p>The fundamental building blocks of reinforcement learning</p>
+                </div>
+            </div>
+            
+            <div class="concept-grid">
+                <div class="concept-card agent">
+                    <div class="concept-icon">🤖</div>
+                    <div class="concept-title">Agent</div>
+                    <div class="concept-desc">The learner and decision-maker. Observes state, selects actions, and learns from rewards to improve its policy over time.</div>
+                    <ul class="concept-examples">
+                        <li>Robot controller</li>
+                        <li>Game-playing AI</li>
+                        <li>Trading algorithm</li>
+                        <li>Recommendation engine</li>
+                    </ul>
+                </div>
+                <div class="concept-card environment">
+                    <div class="concept-icon">🌍</div>
+                    <div class="concept-title">Environment</div>
+                    <div class="concept-desc">The world the agent interacts with. Receives actions, transitions between states, and provides observations and rewards.</div>
+                    <ul class="concept-examples">
+                        <li>Game simulator</li>
+                        <li>Physical robot world</li>
+                        <li>Stock market</li>
+                        <li>Network traffic system</li>
+                    </ul>
+                </div>
+                <div class="concept-card reward">
+                    <div class="concept-icon">🏆</div>
+                    <div class="concept-title">Reward Signal</div>
+                    <div class="concept-desc">Numerical feedback indicating how good an action was. The agent's objective is to maximize cumulative reward over time.</div>
+                    <ul class="concept-examples">
+                        <li>+1 for winning, -1 for losing</li>
+                        <li>Score increase in games</li>
+                        <li>Profit from trades</li>
+                        <li>User engagement metrics</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RL LOOP VISUALIZATION -->
+        <section class="module" id="loop">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>The RL Loop</h2>
+                    <p>Agent-environment interaction cycle</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Reinforcement Learning Cycle</div>
+                    <div class="viz-badge">Interactive Diagram</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 400" style="width: 100%; height: auto;">
+                        <!-- Agent Box -->
+                        <g transform="translate(100, 120)">
+                            <rect x="0" y="0" width="200" height="160" rx="12" fill="#1a1a2e" stroke="#F59E0B" stroke-width="3"/>
+                            <rect x="0" y="0" width="200" height="40" rx="12" fill="#F59E0B20"/>
+                            <text x="100" y="28" text-anchor="middle" fill="#FBBF24" font-size="14" font-weight="700">AGENT</text>
+                            
+                            <!-- Policy -->
+                            <rect x="20" y="55" width="160" height="35" rx="6" fill="#0a0a0f" stroke="#3B82F6" stroke-width="1"/>
+                            <text x="100" y="77" text-anchor="middle" fill="#60A5FA" font-size="11">Policy π(a|s)</text>
+                            
+                            <!-- Value Function -->
+                            <rect x="20" y="100" width="160" height="35" rx="6" fill="#0a0a0f" stroke="#10B981" stroke-width="1"/>
+                            <text x="100" y="122" text-anchor="middle" fill="#34D399" font-size="11">Value V(s) or Q(s,a)</text>
+                        </g>
+                        
+                        <!-- Environment Box -->
+                        <g transform="translate(550, 120)">
+                            <rect x="0" y="0" width="200" height="160" rx="12" fill="#1a1a2e" stroke="#06B6D4" stroke-width="3"/>
+                            <rect x="0" y="0" width="200" height="40" rx="12" fill="#06B6D420"/>
+                            <text x="100" y="28" text-anchor="middle" fill="#22D3EE" font-size="14" font-weight="700">ENVIRONMENT</text>
+                            
+                            <!-- State -->
+                            <rect x="20" y="55" width="160" height="35" rx="6" fill="#0a0a0f" stroke="#8B5CF6" stroke-width="1"/>
+                            <text x="100" y="77" text-anchor="middle" fill="#A78BFA" font-size="11">State s_t</text>
+                            
+                            <!-- Dynamics -->
+                            <rect x="20" y="100" width="160" height="35" rx="6" fill="#0a0a0f" stroke="#EC4899" stroke-width="1"/>
+                            <text x="100" y="122" text-anchor="middle" fill="#F472B6" font-size="11">Dynamics P(s'|s,a)</text>
+                        </g>
+                        
+                        <!-- Action Arrow (Agent to Environment) -->
+                        <g>
+                            <path d="M 300 170 C 380 170, 400 120, 480 120 L 550 120" fill="none" stroke="#F59E0B" stroke-width="3"/>
+                            <polygon points="550,120 540,115 540,125" fill="#F59E0B"/>
+                            <rect x="370" y="95" width="80" height="28" rx="6" fill="#F59E0B"/>
+                            <text x="410" y="113" text-anchor="middle" fill="#000" font-size="11" font-weight="600">Action a_t</text>
+                        </g>
+                        
+                        <!-- Reward Arrow (Environment to Agent) -->
+                        <g>
+                            <path d="M 550 220 C 480 220, 400 260, 380 260 L 300 260" fill="none" stroke="#10B981" stroke-width="3"/>
+                            <polygon points="300,260 310,255 310,265" fill="#10B981"/>
+                            <rect x="370" y="245" width="80" height="28" rx="6" fill="#10B981"/>
+                            <text x="410" y="263" text-anchor="middle" fill="#000" font-size="11" font-weight="600">Reward r_t</text>
+                        </g>
+                        
+                        <!-- State Arrow (Environment to Agent) -->
+                        <g>
+                            <path d="M 550 250 C 450 250, 420 300, 350 300 L 300 300" fill="none" stroke="#8B5CF6" stroke-width="3"/>
+                            <polygon points="300,300 310,295 310,305" fill="#8B5CF6"/>
+                            <rect x="360" y="285" width="100" height="28" rx="6" fill="#8B5CF6"/>
+                            <text x="410" y="303" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">State s_{t+1}</text>
+                        </g>
+                        
+                        <!-- Key Equations -->
+                        <g transform="translate(50, 340)">
+                            <text x="0" y="0" fill="#6a6a7a" font-size="10">Key Equations:</text>
+                            <text x="0" y="20" fill="#60A5FA" font-size="10" font-family="monospace">Q(s,a) = r + γ·max Q(s',a')</text>
+                            <text x="0" y="40" fill="#34D399" font-size="10" font-family="monospace">V(s) = E[Σ γ^t · r_t]</text>
+                        </g>
+                        
+                        <!-- Bellman Equation Box -->
+                        <g transform="translate(300, 340)">
+                            <rect x="0" y="-15" width="300" height="55" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="150" y="5" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">Bellman Optimality Equation</text>
+                            <text x="150" y="28" text-anchor="middle" fill="#fff" font-size="11" font-family="monospace">V*(s) = max_a [R(s,a) + γ Σ P(s'|s,a)V*(s')]</text>
+                        </g>
+                        
+                        <!-- Discount Factor -->
+                        <g transform="translate(650, 340)">
+                            <text x="0" y="0" fill="#6a6a7a" font-size="10">Discount Factor γ:</text>
+                            <text x="0" y="18" fill="#a0a0b0" font-size="9">0 = short-term focus</text>
+                            <text x="0" y="33" fill="#a0a0b0" font-size="9">1 = long-term planning</text>
+                            <text x="0" y="48" fill="#FBBF24" font-size="9">Typical: 0.99</text>
+                        </g>
+                        
+                        <!-- Loop indicator -->
+                        <g transform="translate(420, 50)">
+                            <text x="0" y="0" text-anchor="middle" fill="#6a6a7a" font-size="11">Repeat until convergence or terminal state</text>
+                            <path d="M -100 15 C -100 35, 100 35, 100 15" fill="none" stroke="#6a6a7a" stroke-width="1" stroke-dasharray="4"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- ALGORITHMS -->
+        <section class="module" id="algorithms">
+            <div class="module-header">
+                <div class="module-icon">🔢</div>
+                <div class="module-info">
+                    <h2>RL Algorithm Categories</h2>
+                    <p>Major approaches to reinforcement learning</p>
+                </div>
+            </div>
+            
+            <div class="algo-grid">
+                <div class="algo-card">
+                    <div class="algo-card-header">
+                        <div class="algo-card-icon">📊</div>
+                        <div>
+                            <div class="algo-card-title">Q-Learning / DQN</div>
+                            <div class="algo-card-subtitle">Value-Based Methods</div>
+                        </div>
+                    </div>
+                    <div class="algo-card-desc">Learn the value of state-action pairs (Q-values). Select actions by choosing the highest Q-value. DQN uses neural networks to approximate Q for large state spaces.</div>
+                    <div class="algo-card-tags">
+                        <span class="algo-tag">Off-Policy</span>
+                        <span class="algo-tag">Discrete Actions</span>
+                        <span class="algo-tag">Experience Replay</span>
+                        <span class="algo-tag">Atari Games</span>
+                    </div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-card-header">
+                        <div class="algo-card-icon">🎯</div>
+                        <div>
+                            <div class="algo-card-title">Policy Gradient / PPO</div>
+                            <div class="algo-card-subtitle">Policy-Based Methods</div>
+                        </div>
+                    </div>
+                    <div class="algo-card-desc">Directly learn the policy function that maps states to actions. PPO (Proximal Policy Optimization) is the workhorse algorithm used in RLHF for LLMs.</div>
+                    <div class="algo-card-tags">
+                        <span class="algo-tag">On-Policy</span>
+                        <span class="algo-tag">Continuous Actions</span>
+                        <span class="algo-tag">RLHF</span>
+                        <span class="algo-tag">Robotics</span>
+                    </div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-card-header">
+                        <div class="algo-card-icon">🎭</div>
+                        <div>
+                            <div class="algo-card-title">Actor-Critic / A3C</div>
+                            <div class="algo-card-subtitle">Hybrid Methods</div>
+                        </div>
+                    </div>
+                    <div class="algo-card-desc">Combine value-based (critic) and policy-based (actor) approaches. The critic evaluates actions while the actor improves the policy. SAC, TD3, and A3C are popular variants.</div>
+                    <div class="algo-card-tags">
+                        <span class="algo-tag">Best of Both</span>
+                        <span class="algo-tag">Lower Variance</span>
+                        <span class="algo-tag">SAC / TD3</span>
+                        <span class="algo-tag">Parallel Training</span>
+                    </div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-card-header">
+                        <div class="algo-card-icon">🧠</div>
+                        <div>
+                            <div class="algo-card-title">Model-Based RL</div>
+                            <div class="algo-card-subtitle">World Models</div>
+                        </div>
+                    </div>
+                    <div class="algo-card-desc">Learn a model of the environment dynamics, then plan using the model. More sample-efficient but requires accurate world models. Used in MuZero and Dreamer.</div>
+                    <div class="algo-card-tags">
+                        <span class="algo-tag">Sample Efficient</span>
+                        <span class="algo-tag">Planning</span>
+                        <span class="algo-tag">MuZero</span>
+                        <span class="algo-tag">Dreamer</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Frameworks</h2>
+                    <p>Essential tools for reinforcement learning</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🏋️</div>
+                        <div>
+                            <div class="tool-name">Gymnasium</div>
+                            <div class="tool-vendor">Farama Foundation</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">The standard API for RL environments. Successor to OpenAI Gym with improved maintenance and features.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Environments</span>
+                        <span class="tool-tag">Standard API</span>
+                        <span class="tool-tag">Atari/MuJoCo</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🚀</div>
+                        <div>
+                            <div class="tool-name">Stable Baselines3</div>
+                            <div class="tool-vendor">DLR-RM</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Reliable implementations of RL algorithms. PPO, A2C, SAC, TD3, DQN with consistent API and good defaults.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">PyTorch</span>
+                        <span class="tool-tag">Production-Ready</span>
+                        <span class="tool-tag">Well-Tested</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">☁️</div>
+                        <div>
+                            <div class="tool-name">Ray RLlib</div>
+                            <div class="tool-vendor">Anyscale</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Scalable RL library for distributed training. Supports multi-agent RL and integrates with Ray ecosystem.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Distributed</span>
+                        <span class="tool-tag">Multi-Agent</span>
+                        <span class="tool-tag">Scalable</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🎮</div>
+                        <div>
+                            <div class="tool-name">Unity ML-Agents</div>
+                            <div class="tool-vendor">Unity Technologies</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Train agents in Unity game engine. Great for robotics simulation, game AI, and 3D environments.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Game Dev</span>
+                        <span class="tool-tag">3D Simulation</span>
+                        <span class="tool-tag">Visual</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🤖</div>
+                        <div>
+                            <div class="tool-name">MuJoCo</div>
+                            <div class="tool-vendor">DeepMind</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Physics engine for robotics and biomechanics. Now free and open-source. Standard for continuous control.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Physics</span>
+                        <span class="tool-tag">Robotics</span>
+                        <span class="tool-tag">Free</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🦾</div>
+                        <div>
+                            <div class="tool-name">TRL</div>
+                            <div class="tool-vendor">Hugging Face</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Transformer Reinforcement Learning. PPO for LLMs, RLHF training, reward modeling for fine-tuning.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">RLHF</span>
+                        <span class="tool-tag">LLM Training</span>
+                        <span class="tool-tag">HuggingFace</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for successful RL projects</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with simple environments before complex ones</li>
+                        <li>Normalize observations and rewards</li>
+                        <li>Use frame stacking for visual inputs</li>
+                        <li>Monitor training with TensorBoard/W&B</li>
+                        <li>Test with multiple random seeds</li>
+                        <li>Use well-tested implementations (Stable Baselines3)</li>
+                        <li>Carefully design reward functions—they define behavior</li>
+                        <li>Consider curriculum learning for hard tasks</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't expect fast convergence—RL is sample-hungry</li>
+                        <li>Avoid sparse rewards when possible</li>
+                        <li>Don't ignore reward hacking and shortcuts</li>
+                        <li>Never deploy without extensive testing</li>
+                        <li>Don't tune hyperparameters on a single seed</li>
+                        <li>Avoid complex custom environments initially</li>
+                        <li>Don't underestimate the importance of exploration</li>
+                        <li>Never assume sim-to-real transfer is easy</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for reinforcement learning</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🎮</div>
+                    <div class="agent-name">RLTrainerAgent</div>
+                    <div class="agent-role">Reinforcement Learning Specialist</div>
+                    <div class="agent-desc">Expert in designing, training, and deploying RL agents. Automates environment setup, algorithm selection, hyperparameter tuning, and reward shaping for optimal agent performance.</div>
+                    <ul class="agent-capabilities">
+                        <li>Environment design and reward engineering</li>
+                        <li>Algorithm selection (DQN vs PPO vs SAC)</li>
+                        <li>Hyperparameter optimization for RL</li>
+                        <li>Training monitoring and early stopping</li>
+                        <li>Policy evaluation and A/B testing</li>
+                        <li>Sim-to-real transfer strategies</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Training Task</div>
+                        <div class="code-filename">rl_trainer_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># rl_trainer_agent.py - RL Training Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> stable_baselines3 <span class="code-keyword">import</span> PPO, SAC
+<span class="code-keyword">import</span> gymnasium <span class="code-keyword">as</span> gym
+
+<span class="code-function">rl_trainer</span> = Agent(
+    role=<span class="code-string">"Reinforcement Learning Trainer"</span>,
+    goal=<span class="code-string">"Train optimal agents for decision-making tasks"</span>,
+    backstory=<span class="code-string">"""Expert in RL algorithms with deep 
+    knowledge of PPO, SAC, and model-based methods. 
+    Specializes in reward shaping and hyperparameter 
+    optimization for sample-efficient learning."""</span>,
+    tools=[
+        EnvironmentBuilder(),
+        RewardDesigner(),
+        AlgorithmSelector(),
+        HyperparamTuner(),
+        PolicyEvaluator(),
+    ]
+)
+
+<span class="code-function">training_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze task requirements and design environment
+    2. Engineer reward function with shaping
+    3. Select appropriate algorithm (PPO/SAC/DQN)
+    4. Tune hyperparameters with Optuna
+    5. Train with curriculum learning if needed
+    6. Evaluate policy across multiple seeds
+    7. Export trained model for deployment
+    """</span>,
+    agent=rl_trainer,
+    expected_output=<span class="code-string">"Trained agent with >90% success rate"</span>
+)
+
+<span class="code-comment"># Execute RL training pipeline</span>
+crew = Crew(agents=[rl_trainer], tasks=[training_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat01-p4-neural-networks.html" class="related-card">
+                    <div class="related-num">Page 1.4</div>
+                    <div class="related-title">Neural Networks</div>
+                    <div class="related-desc">Deep networks that power modern RL algorithms</div>
+                </a>
+                <a href="cat01-p1-supervised-learning.html" class="related-card">
+                    <div class="related-num">Page 1.1</div>
+                    <div class="related-title">Supervised Learning</div>
+                    <div class="related-desc">Foundation for behavior cloning and imitation</div>
+                </a>
+                <a href="cat01-p8-evaluation-metrics.html" class="related-card">
+                    <div class="related-num">Page 1.8</div>
+                    <div class="related-title">Evaluation Metrics</div>
+                    <div class="related-desc">Cumulative reward and policy evaluation</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat01-p2-unsupervised-learning.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">1.2: Unsupervised Learning</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 1.3 of 8</div>
+        <a href="cat01-p4-neural-networks.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">1.4: Neural Networks</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

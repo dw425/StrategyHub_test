@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Observability | Data Engineering | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            --page-primary: #8B5CF6;
+            --page-light: #A78BFA;
+            --page-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--pink)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .pillar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+        .pillar-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .pillar-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 12px 12px 0 0; }
+        .pillar-icon { font-size: 28px; margin-bottom: 10px; }
+        .pillar-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .pillar-desc { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+        
+        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .tool-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-info h3 { font-size: 14px; margin-bottom: 2px; }
+        .tool-info span { font-size: 10px; color: var(--text-muted); }
+        .tool-body { padding: 16px; }
+        .tool-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .tool-features { list-style: none; }
+        .tool-features li { font-size: 10px; padding: 3px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .tool-features li::before { content: '✓'; color: var(--green); }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .tag.green { background: rgba(16,185,129,0.2); color: var(--green); }
+        .tag.yellow { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        .tag.blue { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .tag.violet { background: rgba(139,92,246,0.2); color: var(--violet); }
+        
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .feature-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .feature-icon { width: 40px; height: 40px; background: var(--page-glow); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .feature-title { font-size: 14px; font-weight: 600; }
+        .feature-subtitle { font-size: 10px; color: var(--text-muted); }
+        .feature-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .feature-grid { grid-template-columns: 1fr; }
+            .pillar-grid { grid-template-columns: repeat(3, 1fr); }
+            .tool-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat02-data-engineering-overview.html">Data Engineering</a>
+        <span class="sep">/</span>
+        <span class="current">Data Observability</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔧 Category 02</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-data-engineering-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#pillars"><span class="nav-icon">🏛️</span> Five Pillars</a></li>
+            <li><a href="#tools"><span class="nav-icon">🔧</span> Observability Tools</a></li>
+            <li><a href="#lineage"><span class="nav-icon">🔗</span> Data Lineage</a></li>
+            <li><a href="#monitoring"><span class="nav-icon">📊</span> Monitoring</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat02-p1-data-ingestion.html"><span class="nav-icon">📥</span> Data Ingestion</a></li>
+            <li><a href="cat02-p2-data-transformation.html"><span class="nav-icon">🔄</span> Data Transformation</a></li>
+            <li><a href="cat02-p3-databricks.html"><span class="nav-icon">🧱</span> Databricks</a></li>
+            <li><a href="cat02-p4-snowflake.html"><span class="nav-icon">❄️</span> Snowflake</a></li>
+            <li><a href="cat02-p5-bigquery.html"><span class="nav-icon">🔍</span> BigQuery</a></li>
+            <li><a href="cat02-p6-apache-spark.html"><span class="nav-icon">⚡</span> Apache Spark</a></li>
+            <li><a href="cat02-p7-orchestration.html"><span class="nav-icon">🎼</span> Orchestration</a></li>
+            <li><a href="cat02-p8-data-quality.html"><span class="nav-icon">✅</span> Data Quality</a></li>
+            <li><a href="cat02-p9-observability.html" class="active"><span class="nav-icon">👁️</span> Observability</a></li>
+            <li><a href="cat02-p10-data-catalogs.html"><span class="nav-icon">📚</span> Data Catalogs</a></li>
+            <li><a href="cat02-p11-streaming.html"><span class="nav-icon">🌊</span> Streaming</a></li>
+            <li><a href="cat02-p12-reverse-etl.html"><span class="nav-icon">↩️</span> Reverse ETL</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">👁️ Page 2.9</span>
+                <h1>Data Observability</h1>
+                <p>Master continuous monitoring for data health. Learn the five pillars of data observability, implement lineage tracking, anomaly detection, and build trust through transparency in your data systems.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">5</div><div class="hero-metric-label">Pillars of Observability</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">MTTD</div><div class="hero-metric-label">Mean Time to Detect</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Lineage</div><div class="hero-metric-label">End-to-End Tracking</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">ML</div><div class="hero-metric-label">Anomaly Detection</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Data Observability?</h2>
+                    <p>Understanding your data health at all times</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>From Application to Data Observability</h3>
+                <p>Just as application observability (logs, metrics, traces) revolutionized DevOps, data observability brings the same visibility to data systems. It's the ability to understand, diagnose, and manage data health across your entire data stack—from ingestion through transformation to consumption.</p>
+                
+                <h3>Proactive vs Reactive</h3>
+                <p>Without observability, data teams discover issues when stakeholders complain: "The dashboard numbers look wrong." With observability, you detect anomalies before they impact downstream systems. The goal is to minimize Mean Time to Detect (MTTD) and Mean Time to Resolution (MTTR) for data incidents.</p>
+                
+                <h3>Trust Through Transparency</h3>
+                <p>Data observability builds trust. When stakeholders can see data lineage, freshness indicators, and quality scores, they understand what they're working with. When issues occur, root cause analysis becomes straightforward—you can trace problems back through the pipeline to their source.</p>
+            </div>
+        </section>
+
+        <!-- FIVE PILLARS -->
+        <section class="module" id="pillars">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Five Pillars of Data Observability</h2>
+                    <p>The complete picture of data health</p>
+                </div>
+            </div>
+            
+            <div class="pillar-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">⏰</div>
+                    <div class="pillar-title">Freshness</div>
+                    <div class="pillar-desc">Is my data up to date? How old is the most recent record?</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">📊</div>
+                    <div class="pillar-title">Volume</div>
+                    <div class="pillar-desc">Did the expected amount of data arrive? Any unexpected spikes or drops?</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">📋</div>
+                    <div class="pillar-title">Schema</div>
+                    <div class="pillar-desc">Has the structure changed? New columns, type changes, or removals?</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">📈</div>
+                    <div class="pillar-title">Distribution</div>
+                    <div class="pillar-desc">Are values within expected ranges? Any unusual patterns?</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🔗</div>
+                    <div class="pillar-title">Lineage</div>
+                    <div class="pillar-desc">Where did this data come from? What depends on it?</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OBSERVABILITY TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Observability Platforms</h2>
+                    <p>The leading tools in the space</p>
+                </div>
+            </div>
+            
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔮</div>
+                        <div class="tool-info">
+                            <h3>Monte Carlo</h3>
+                            <span>Data Reliability Platform</span>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <div class="tool-desc">Pioneered the data observability category. ML-powered anomaly detection with no-code setup and automatic lineage.</div>
+                        <ul class="tool-features">
+                            <li>ML-based anomaly detection</li>
+                            <li>Automatic lineage mapping</li>
+                            <li>Incident management</li>
+                            <li>Root cause analysis</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔷</div>
+                        <div class="tool-info">
+                            <h3>Bigeye</h3>
+                            <span>Data Quality Monitoring</span>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <div class="tool-desc">Automated data quality monitoring with smart thresholds. Strong focus on metrics and SLAs.</div>
+                        <ul class="tool-features">
+                            <li>Autothresholds via ML</li>
+                            <li>Data SLA tracking</li>
+                            <li>Schema change detection</li>
+                            <li>dbt integration</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">⚡</div>
+                        <div class="tool-info">
+                            <h3>Acceldata</h3>
+                            <span>Data Observability</span>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <div class="tool-desc">Enterprise-focused observability covering data, compute, and pipeline health together.</div>
+                        <ul class="tool-features">
+                            <li>Multi-layer observability</li>
+                            <li>Pipeline performance</li>
+                            <li>Cost optimization</li>
+                            <li>Enterprise scale</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">Observability Tool Comparison</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Monte Carlo</th>
+                            <th>Bigeye</th>
+                            <th>Acceldata</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Approach</strong></td>
+                            <td>ML-first, automatic</td>
+                            <td>Metrics-focused</td>
+                            <td>Multi-layer platform</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Setup</strong></td>
+                            <td><span class="tag green">No-code</span></td>
+                            <td><span class="tag green">Low-code</span></td>
+                            <td><span class="tag yellow">Configuration</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lineage</strong></td>
+                            <td><span class="tag green">Automatic</span></td>
+                            <td><span class="tag yellow">Basic</span></td>
+                            <td><span class="tag green">Comprehensive</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best For</strong></td>
+                            <td>Modern data stacks</td>
+                            <td>Data quality focus</td>
+                            <td>Enterprise/Hadoop</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- DATA LINEAGE -->
+        <section class="module" id="lineage">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Data Lineage</h2>
+                    <p>Tracing data from source to consumption</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 End-to-End Lineage Example</div>
+                    <div class="viz-badge">Impact Analysis</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 220" style="width: 100%; height: auto;">
+                        <!-- Sources -->
+                        <g transform="translate(30, 30)">
+                            <text x="60" y="0" text-anchor="middle" fill="#6a6a7a" font-size="10" font-weight="600">SOURCES</text>
+                            <rect x="0" y="15" width="120" height="40" rx="6" fill="#1a1a2e" stroke="#3B82F6"/>
+                            <text x="60" y="40" text-anchor="middle" fill="#fff" font-size="10">Salesforce CRM</text>
+                            
+                            <rect x="0" y="70" width="120" height="40" rx="6" fill="#1a1a2e" stroke="#3B82F6"/>
+                            <text x="60" y="95" text-anchor="middle" fill="#fff" font-size="10">PostgreSQL</text>
+                            
+                            <rect x="0" y="125" width="120" height="40" rx="6" fill="#1a1a2e" stroke="#3B82F6"/>
+                            <text x="60" y="150" text-anchor="middle" fill="#fff" font-size="10">Stripe API</text>
+                        </g>
+                        
+                        <!-- Raw -->
+                        <g transform="translate(220, 50)">
+                            <text x="60" y="-20" text-anchor="middle" fill="#6a6a7a" font-size="10" font-weight="600">RAW LAYER</text>
+                            <rect x="0" y="0" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4"/>
+                            <text x="60" y="22" text-anchor="middle" fill="#fff" font-size="9">raw_salesforce</text>
+                            
+                            <rect x="0" y="50" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4"/>
+                            <text x="60" y="72" text-anchor="middle" fill="#fff" font-size="9">raw_orders</text>
+                            
+                            <rect x="0" y="100" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4"/>
+                            <text x="60" y="122" text-anchor="middle" fill="#fff" font-size="9">raw_payments</text>
+                        </g>
+                        
+                        <!-- Staging -->
+                        <g transform="translate(410, 65)">
+                            <text x="60" y="-35" text-anchor="middle" fill="#6a6a7a" font-size="10" font-weight="600">STAGING</text>
+                            <rect x="0" y="0" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#F59E0B"/>
+                            <text x="60" y="22" text-anchor="middle" fill="#fff" font-size="9">stg_customers</text>
+                            
+                            <rect x="0" y="65" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#F59E0B"/>
+                            <text x="60" y="87" text-anchor="middle" fill="#fff" font-size="9">stg_orders</text>
+                        </g>
+                        
+                        <!-- Marts -->
+                        <g transform="translate(600, 50)">
+                            <text x="60" y="-20" text-anchor="middle" fill="#6a6a7a" font-size="10" font-weight="600">MARTS</text>
+                            <rect x="0" y="0" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                            <text x="60" y="22" text-anchor="middle" fill="#fff" font-size="9">dim_customers</text>
+                            
+                            <rect x="0" y="50" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                            <text x="60" y="72" text-anchor="middle" fill="#fff" font-size="9">fct_orders</text>
+                            
+                            <rect x="0" y="100" width="120" height="35" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                            <text x="60" y="122" text-anchor="middle" fill="#fff" font-size="9">revenue_monthly</text>
+                        </g>
+                        
+                        <!-- Consumers -->
+                        <g transform="translate(790, 60)">
+                            <text x="50" y="-30" text-anchor="middle" fill="#6a6a7a" font-size="10" font-weight="600">CONSUMERS</text>
+                            <rect x="0" y="0" width="100" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899"/>
+                            <text x="50" y="20" text-anchor="middle" fill="#fff" font-size="9">📊 Looker</text>
+                            
+                            <rect x="0" y="45" width="100" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899"/>
+                            <text x="50" y="65" text-anchor="middle" fill="#fff" font-size="9">🤖 ML Model</text>
+                            
+                            <rect x="0" y="90" width="100" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899"/>
+                            <text x="50" y="110" text-anchor="middle" fill="#fff" font-size="9">📧 Marketing</text>
+                        </g>
+                        
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#6a6a7a"/>
+                            </marker>
+                        </defs>
+                        <!-- Source to Raw -->
+                        <path d="M 150 65 L 220 68" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 150 120 L 220 117" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 150 175 L 220 167" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <!-- Raw to Staging -->
+                        <path d="M 340 68 L 410 82" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 340 117 L 410 130" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 340 167 L 410 147" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <!-- Staging to Marts -->
+                        <path d="M 530 82 L 600 68" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 530 82 L 600 117" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 530 147 L 600 117" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 530 147 L 600 167" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <!-- Marts to Consumers -->
+                        <path d="M 720 68 L 790 75" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 720 117 L 790 105" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                        <path d="M 720 167 L 790 135" stroke="#6a6a7a" stroke-width="1" marker-end="url(#arrowGray)"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">⬆️</div>
+                        <div>
+                            <div class="feature-title">Upstream Lineage</div>
+                            <div class="feature-subtitle">Root cause analysis</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Trace backwards from a data issue to find its source. When a metric looks wrong, follow the lineage upstream to identify which source system or transformation caused the problem.</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">⬇️</div>
+                        <div>
+                            <div class="feature-title">Downstream Lineage</div>
+                            <div class="feature-subtitle">Impact analysis</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Before making changes, understand what depends on your data. Downstream lineage shows all dashboards, models, and systems that would be affected by a schema change or data issue.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MONITORING -->
+        <section class="module" id="monitoring">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Monitoring & Alerting</h2>
+                    <p>Detecting issues before stakeholders do</p>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🤖</div>
+                        <div>
+                            <div class="feature-title">ML-Based Anomaly Detection</div>
+                            <div class="feature-subtitle">Smart thresholds</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Modern observability tools use machine learning to establish baselines and detect anomalies automatically. They learn seasonal patterns, weekly trends, and normal variance—alerting only on true anomalies.</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔔</div>
+                        <div>
+                            <div class="feature-title">Intelligent Alerting</div>
+                            <div class="feature-subtitle">Reduce noise</div>
+                        </div>
+                    </div>
+                    <div class="feature-desc">Route alerts to the right team via Slack, PagerDuty, or email. Group related incidents to avoid alert storms. Set severity levels based on business impact of affected tables.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for observability success</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with your most critical tables and expand coverage</li>
+                        <li>Set up lineage tracking early—it's harder to add later</li>
+                        <li>Define SLAs for data freshness and communicate them</li>
+                        <li>Route alerts to owners who can take action</li>
+                        <li>Create runbooks for common incident types</li>
+                        <li>Track MTTD and MTTR metrics to improve over time</li>
+                        <li>Integrate observability with your incident management process</li>
+                        <li>Use observability data to inform data contracts</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't alert on everything—focus on business-critical data</li>
+                        <li>Avoid static thresholds that don't account for patterns</li>
+                        <li>Never ignore alerts—triage or tune them</li>
+                        <li>Don't skip root cause analysis after incidents</li>
+                        <li>Avoid siloed observability—connect data and pipeline health</li>
+                        <li>Don't treat observability as set-and-forget</li>
+                        <li>Never expose sensitive lineage without access controls</li>
+                        <li>Avoid manual monitoring that doesn't scale</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for observability</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">👁️</div>
+                    <div class="agent-name">ObservabilityAgent</div>
+                    <div class="agent-role">Data Reliability Specialist</div>
+                    <div class="agent-desc">Expert in data observability platforms, anomaly detection, lineage tracking, and incident management. Specializes in building proactive monitoring systems that catch issues before they impact stakeholders.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design observability strategy</li>
+                        <li>Configure anomaly detection</li>
+                        <li>Build lineage tracking</li>
+                        <li>Set up alerting workflows</li>
+                        <li>Create incident runbooks</li>
+                        <li>Optimize MTTD/MTTR</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Monitoring Task</div>
+                        <div class="code-filename">observability_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># observability_agent.py - Data Observability Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">observability_agent</span> = Agent(
+    role=<span class="code-string">"Data Reliability Engineer"</span>,
+    goal=<span class="code-string">"Proactive monitoring of data health"</span>,
+    backstory=<span class="code-string">"""Expert in data observability platforms 
+    including Monte Carlo, Bigeye, and custom 
+    solutions. Deep knowledge of anomaly detection, 
+    lineage tracking, incident management, and 
+    building reliable data systems."""</span>,
+    tools=[
+        AnomalyDetector(),
+        LineageMapper(),
+        AlertConfigurer(),
+        IncidentManager(),
+        SLATracker(),
+    ]
+)
+
+<span class="code-function">monitoring_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Inventory critical data assets
+    2. Map end-to-end lineage
+    3. Configure freshness monitors
+    4. Set up volume anomaly detection
+    5. Create schema change alerts
+    6. Define escalation paths
+    7. Build observability dashboard
+    """</span>,
+    agent=observability_agent,
+    expected_output=<span class="code-string">"Complete observability implementation"</span>
+)
+
+<span class="code-comment"># Execute observability setup</span>
+crew = Crew(agents=[observability_agent], tasks=[monitoring_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat02-p8-data-quality.html" class="related-card">
+                    <div class="related-num">Page 2.8</div>
+                    <div class="related-title">Data Quality</div>
+                    <div class="related-desc">Testing complements monitoring</div>
+                </a>
+                <a href="cat02-p10-data-catalogs.html" class="related-card">
+                    <div class="related-num">Page 2.10</div>
+                    <div class="related-title">Data Catalogs</div>
+                    <div class="related-desc">Discovery and governance</div>
+                </a>
+                <a href="cat02-p7-orchestration.html" class="related-card">
+                    <div class="related-num">Page 2.7</div>
+                    <div class="related-title">Orchestration</div>
+                    <div class="related-desc">Pipeline monitoring</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat02-p8-data-quality.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">2.8: Data Quality</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 2.9 of 12</div>
+        <a href="cat02-p10-data-catalogs.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">2.10: Data Catalogs</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervised Learning | AI/ML Foundations | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--green), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--green); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--green); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .concept-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .concept-card.classification::before { background: var(--green); }
+        .concept-card.regression::before { background: var(--blue); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .concept-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .concept-examples { list-style: none; }
+        .concept-examples li { font-size: 10px; padding: 6px 10px; background: var(--bg-card-alt); border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .concept-examples li::before { content: '→'; color: var(--cat-light); }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .algo-matrix { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .algo-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .algo-header-title { font-size: 13px; font-weight: 600; }
+        .algo-table { width: 100%; border-collapse: collapse; }
+        .algo-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .algo-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .algo-table tr:hover td { background: var(--bg-hover); }
+        .algo-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .algo-icon { font-size: 16px; }
+        .algo-tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .algo-tag.classification { background: rgba(16,185,129,0.2); color: var(--green); }
+        .algo-tag.regression { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .algo-tag.both { background: rgba(139,92,246,0.2); color: var(--violet); }
+        .complexity-bar { height: 6px; background: var(--bg-card-alt); border-radius: 3px; overflow: hidden; width: 60px; }
+        .complexity-fill { height: 100%; border-radius: 3px; }
+        .complexity-fill.low { width: 30%; background: var(--green); }
+        .complexity-fill.medium { width: 60%; background: var(--yellow); }
+        .complexity-fill.high { width: 90%; background: var(--red); }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-tag { font-size: 8px; padding: 2px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(59,130,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .concept-grid, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .tools-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat01-aiml-foundations-overview.html">AI/ML Foundations</a>
+        <span class="sep">/</span>
+        <span class="current">Supervised Learning</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🧠 Category 01</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-aiml-foundations-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#types"><span class="nav-icon">🎯</span> Types</a></li>
+            <li><a href="#workflow"><span class="nav-icon">⚙️</span> Workflow</a></li>
+            <li><a href="#algorithms"><span class="nav-icon">🔢</span> Algorithms</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-p1-supervised-learning.html" class="active"><span class="nav-icon">🏷️</span> Supervised Learning</a></li>
+            <li><a href="cat01-p2-unsupervised-learning.html"><span class="nav-icon">🔍</span> Unsupervised Learning</a></li>
+            <li><a href="cat01-p3-reinforcement-learning.html"><span class="nav-icon">🎮</span> Reinforcement Learning</a></li>
+            <li><a href="cat01-p4-neural-networks.html"><span class="nav-icon">🔮</span> Neural Networks</a></li>
+            <li><a href="cat01-p5-ml-pipeline.html"><span class="nav-icon">⚙️</span> ML Pipeline</a></li>
+            <li><a href="cat01-p6-algorithm-selection.html"><span class="nav-icon">🎯</span> Algorithm Selection</a></li>
+            <li><a href="cat01-p7-ml-frameworks.html"><span class="nav-icon">🛠️</span> ML Frameworks</a></li>
+            <li><a href="cat01-p8-evaluation-metrics.html"><span class="nav-icon">📈</span> Evaluation Metrics</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🏷️ Page 1.1</span>
+                <h1>Supervised Learning</h1>
+                <p>The most widely used machine learning paradigm where models learn from labeled examples. Master classification and regression techniques to build predictive systems that power everything from spam filters to price forecasting.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">80%</div><div class="hero-metric-label">Of Enterprise ML Use Cases</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99%+</div><div class="hero-metric-label">Best Accuracy Achievable</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">50+</div><div class="hero-metric-label">Common Algorithms</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2</div><div class="hero-metric-label">Main Problem Types</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Supervised Learning?</h2>
+                    <p>Understanding the fundamentals of learning from labeled data</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Definition & Core Concept</h3>
+                <p>Supervised learning is a machine learning approach where models are trained using labeled datasets—input-output pairs where the correct answer is already known. The algorithm learns to map inputs (features) to outputs (targets) by analyzing these examples and minimizing prediction errors during training.</p>
+                
+                <p>The term "supervised" comes from the concept of a teacher (the labeled data) guiding the learning process. Just as a student learns from corrected homework, the model adjusts its internal parameters based on feedback about how far its predictions were from the true values.</p>
+                
+                <h3>Why It Matters</h3>
+                <p>Supervised learning powers the vast majority of production ML systems today. From credit scoring and fraud detection to medical diagnosis and recommendation engines, these algorithms excel when you have historical data with known outcomes that you want to predict for new, unseen cases.</p>
+                
+                <h3>Key Requirements</h3>
+                <p>Success with supervised learning depends on having sufficient labeled training data, well-defined features that correlate with the target variable, and a clear understanding of the prediction task. The quality and quantity of labels directly impacts model performance—garbage in, garbage out.</p>
+            </div>
+        </section>
+
+        <!-- TYPES -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Classification vs Regression</h2>
+                    <p>The two fundamental problem types in supervised learning</p>
+                </div>
+            </div>
+            
+            <div class="concept-grid">
+                <div class="concept-card classification">
+                    <div class="concept-icon">🏷️</div>
+                    <div class="concept-title">Classification</div>
+                    <div class="concept-desc">Predict discrete categories or classes. The output is a label from a finite set of possibilities. Can be binary (two classes) or multi-class (three or more).</div>
+                    <ul class="concept-examples">
+                        <li>Spam vs Not Spam (binary)</li>
+                        <li>Image recognition (multi-class)</li>
+                        <li>Customer churn prediction</li>
+                        <li>Disease diagnosis</li>
+                        <li>Sentiment analysis (positive/negative/neutral)</li>
+                    </ul>
+                </div>
+                <div class="concept-card regression">
+                    <div class="concept-icon">📈</div>
+                    <div class="concept-title">Regression</div>
+                    <div class="concept-desc">Predict continuous numerical values. The output is a real number that can take any value within a range. Used for forecasting and estimation.</div>
+                    <ul class="concept-examples">
+                        <li>House price prediction</li>
+                        <li>Sales forecasting</li>
+                        <li>Stock price estimation</li>
+                        <li>Temperature prediction</li>
+                        <li>Customer lifetime value</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- WORKFLOW DIAGRAM -->
+        <section class="module" id="workflow">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Supervised Learning Workflow</h2>
+                    <p>End-to-end process from data to predictions</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Training & Inference Pipeline</div>
+                    <div class="viz-badge">Interactive Diagram</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 280" style="width: 100%; height: auto;">
+                        <!-- Stage 1: Data Collection -->
+                        <g transform="translate(20, 30)">
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#0a0a0f" stroke="#3B82F6" stroke-width="2"/>
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#3B82F620"/>
+                            <circle cx="20" cy="20" r="12" fill="#3B82F6"/>
+                            <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">1</text>
+                            <text x="75" y="20" fill="#60A5FA" font-size="10" font-weight="600">DATA</text>
+                            <text x="70" y="50" text-anchor="middle" fill="#fff" font-size="9">Collect labeled</text>
+                            <text x="70" y="62" text-anchor="middle" fill="#fff" font-size="9">training data</text>
+                            <text x="70" y="85" text-anchor="middle" fill="#6a6a7a" font-size="8">(X, y) pairs</text>
+                        </g>
+                        
+                        <!-- Arrow 1 -->
+                        <path d="M 165 80 L 190 80" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Stage 2: Preprocessing -->
+                        <g transform="translate(195, 30)">
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#0a0a0f" stroke="#8B5CF6" stroke-width="2"/>
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#8B5CF620"/>
+                            <circle cx="20" cy="20" r="12" fill="#8B5CF6"/>
+                            <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">2</text>
+                            <text x="80" y="20" fill="#A78BFA" font-size="10" font-weight="600">PREPROCESS</text>
+                            <text x="70" y="50" text-anchor="middle" fill="#fff" font-size="9">Clean, normalize,</text>
+                            <text x="70" y="62" text-anchor="middle" fill="#fff" font-size="9">feature engineer</text>
+                            <text x="70" y="85" text-anchor="middle" fill="#6a6a7a" font-size="8">Split: train/val/test</text>
+                        </g>
+                        
+                        <!-- Arrow 2 -->
+                        <path d="M 340 80 L 365 80" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Stage 3: Training -->
+                        <g transform="translate(370, 30)">
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#0a0a0f" stroke="#10B981" stroke-width="2"/>
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#10B98120"/>
+                            <circle cx="20" cy="20" r="12" fill="#10B981"/>
+                            <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">3</text>
+                            <text x="80" y="20" fill="#34D399" font-size="10" font-weight="600">TRAIN</text>
+                            <text x="70" y="50" text-anchor="middle" fill="#fff" font-size="9">Fit model on</text>
+                            <text x="70" y="62" text-anchor="middle" fill="#fff" font-size="9">training data</text>
+                            <text x="70" y="85" text-anchor="middle" fill="#6a6a7a" font-size="8">Minimize loss</text>
+                        </g>
+                        
+                        <!-- Arrow 3 -->
+                        <path d="M 515 80 L 540 80" stroke="#10B981" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Stage 4: Evaluate -->
+                        <g transform="translate(545, 30)">
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#0a0a0f" stroke="#F59E0B" stroke-width="2"/>
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#F59E0B20"/>
+                            <circle cx="20" cy="20" r="12" fill="#F59E0B"/>
+                            <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">4</text>
+                            <text x="80" y="20" fill="#FBBF24" font-size="10" font-weight="600">EVALUATE</text>
+                            <text x="70" y="50" text-anchor="middle" fill="#fff" font-size="9">Test on holdout</text>
+                            <text x="70" y="62" text-anchor="middle" fill="#fff" font-size="9">data, tune params</text>
+                            <text x="70" y="85" text-anchor="middle" fill="#6a6a7a" font-size="8">F1, AUC, RMSE</text>
+                        </g>
+                        
+                        <!-- Arrow 4 -->
+                        <path d="M 690 80 L 715 80" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <!-- Stage 5: Deploy -->
+                        <g transform="translate(720, 30)">
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#0a0a0f" stroke="#EC4899" stroke-width="2"/>
+                            <rect x="0" y="0" width="140" height="100" rx="10" fill="#EC489920"/>
+                            <circle cx="20" cy="20" r="12" fill="#EC4899"/>
+                            <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">5</text>
+                            <text x="80" y="20" fill="#F472B6" font-size="10" font-weight="600">DEPLOY</text>
+                            <text x="70" y="50" text-anchor="middle" fill="#fff" font-size="9">Serve predictions</text>
+                            <text x="70" y="62" text-anchor="middle" fill="#fff" font-size="9">in production</text>
+                            <text x="70" y="85" text-anchor="middle" fill="#6a6a7a" font-size="8">API / Batch</text>
+                        </g>
+                        
+                        <!-- Loss Function Visualization -->
+                        <g transform="translate(20, 150)">
+                            <rect x="0" y="0" width="420" height="110" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="15" y="25" fill="#60A5FA" font-size="11" font-weight="600">Training Process: Minimize Loss Function</text>
+                            
+                            <!-- Axis -->
+                            <line x1="50" y1="90" x2="380" y2="90" stroke="#2a2a3e" stroke-width="1"/>
+                            <line x1="50" y1="40" x2="50" y2="90" stroke="#2a2a3e" stroke-width="1"/>
+                            <text x="215" y="105" text-anchor="middle" fill="#6a6a7a" font-size="8">Iterations (Epochs)</text>
+                            <text x="35" y="65" text-anchor="middle" fill="#6a6a7a" font-size="8" transform="rotate(-90, 35, 65)">Loss</text>
+                            
+                            <!-- Loss curve -->
+                            <path d="M 60 45 Q 100 50, 140 60 Q 200 70, 260 78 Q 320 82, 370 85" fill="none" stroke="#10B981" stroke-width="2"/>
+                            
+                            <!-- Annotations -->
+                            <circle cx="60" cy="45" r="4" fill="#EF4444"/>
+                            <text x="75" y="42" fill="#EF4444" font-size="8">High loss (start)</text>
+                            <circle cx="370" cy="85" r="4" fill="#10B981"/>
+                            <text x="340" y="80" fill="#10B981" font-size="8">Converged</text>
+                        </g>
+                        
+                        <!-- Equation Box -->
+                        <g transform="translate(460, 150)">
+                            <rect x="0" y="0" width="400" height="110" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="15" y="25" fill="#A78BFA" font-size="11" font-weight="600">Key Equations</text>
+                            
+                            <text x="15" y="50" fill="#6a6a7a" font-size="9">Classification Loss (Cross-Entropy):</text>
+                            <text x="15" y="65" fill="#fff" font-size="10" font-family="monospace">L = -Σ y·log(ŷ) + (1-y)·log(1-ŷ)</text>
+                            
+                            <text x="15" y="85" fill="#6a6a7a" font-size="9">Regression Loss (MSE):</text>
+                            <text x="15" y="100" fill="#fff" font-size="10" font-family="monospace">L = (1/n) Σ (y - ŷ)²</text>
+                        </g>
+                        
+                        <!-- Arrow marker definition -->
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#6a6a7a"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- ALGORITHMS -->
+        <section class="module" id="algorithms">
+            <div class="module-header">
+                <div class="module-icon">🔢</div>
+                <div class="module-info">
+                    <h2>Popular Supervised Learning Algorithms</h2>
+                    <p>Comparison of commonly used algorithms</p>
+                </div>
+            </div>
+            
+            <div class="algo-matrix">
+                <div class="algo-header">
+                    <div class="algo-header-title">Algorithm Comparison Matrix</div>
+                </div>
+                <table class="algo-table">
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Type</th>
+                            <th>Best For</th>
+                            <th>Complexity</th>
+                            <th>Interpretability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">📈</span> Linear/Logistic Regression</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>Baselines, simple relationships, interpretable models</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill low"></div></div></td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">🌳</span> Decision Tree</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>Explainable models, feature importance, non-linear</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill low"></div></div></td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">🌲</span> Random Forest</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>High accuracy, handles missing data, robust</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill medium"></div></div></td>
+                            <td>⭐⭐⭐⭐☆</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">🚀</span> XGBoost / LightGBM</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>Kaggle competitions, tabular data, best accuracy</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill medium"></div></div></td>
+                            <td>⭐⭐⭐☆☆</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">🔵</span> Support Vector Machine</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>High-dimensional data, small datasets, kernel tricks</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill medium"></div></div></td>
+                            <td>⭐⭐⭐☆☆</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">🎯</span> K-Nearest Neighbors</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>Simple baseline, no training, instance-based</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill low"></div></div></td>
+                            <td>⭐⭐⭐⭐☆</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">📊</span> Naive Bayes</div></td>
+                            <td><span class="algo-tag classification">Classification</span></td>
+                            <td>Text classification, spam filters, fast training</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill low"></div></div></td>
+                            <td>⭐⭐⭐⭐☆</td>
+                        </tr>
+                        <tr>
+                            <td><div class="algo-name"><span class="algo-icon">🧠</span> Neural Networks</div></td>
+                            <td><span class="algo-tag both">Both</span></td>
+                            <td>Complex patterns, images, text, large datasets</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill high"></div></div></td>
+                            <td>⭐☆☆☆☆</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Frameworks</h2>
+                    <p>Essential libraries for supervised learning</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔬</div>
+                        <div>
+                            <div class="tool-name">scikit-learn</div>
+                            <div class="tool-vendor">Open Source</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">The gold standard for classical ML. Consistent API, excellent documentation, great for learning and production.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Python</span>
+                        <span class="tool-tag">Classical ML</span>
+                        <span class="tool-tag">Free</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🚀</div>
+                        <div>
+                            <div class="tool-name">XGBoost</div>
+                            <div class="tool-vendor">DMLC</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Optimized gradient boosting library. Extremely fast, handles missing values, GPU support.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Gradient Boosting</span>
+                        <span class="tool-tag">GPU</span>
+                        <span class="tool-tag">Competition Winner</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">⚡</div>
+                        <div>
+                            <div class="tool-name">LightGBM</div>
+                            <div class="tool-vendor">Microsoft</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Fast gradient boosting framework. Leaf-wise tree growth, excellent for large datasets.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Fast Training</span>
+                        <span class="tool-tag">Large Data</span>
+                        <span class="tool-tag">Microsoft</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔥</div>
+                        <div>
+                            <div class="tool-name">PyTorch</div>
+                            <div class="tool-vendor">Meta AI</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Deep learning framework with dynamic graphs. Preferred for research and custom architectures.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Deep Learning</span>
+                        <span class="tool-tag">Research</span>
+                        <span class="tool-tag">Dynamic</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🧠</div>
+                        <div>
+                            <div class="tool-name">TensorFlow</div>
+                            <div class="tool-vendor">Google</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Production-ready deep learning. TensorFlow Serving, TFX pipelines, mobile deployment.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Production</span>
+                        <span class="tool-tag">Enterprise</span>
+                        <span class="tool-tag">Mobile</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🐱</div>
+                        <div>
+                            <div class="tool-name">CatBoost</div>
+                            <div class="tool-vendor">Yandex</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Handles categorical features natively. Great for datasets with many categorical variables.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Categorical</span>
+                        <span class="tool-tag">Yandex</span>
+                        <span class="tool-tag">GPU</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for successful supervised learning projects</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with a simple baseline model before complex ones</li>
+                        <li>Split data properly: train/validation/test (e.g., 70/15/15)</li>
+                        <li>Use cross-validation for robust performance estimates</li>
+                        <li>Handle class imbalance with stratification or resampling</li>
+                        <li>Perform thorough exploratory data analysis first</li>
+                        <li>Engineer features based on domain knowledge</li>
+                        <li>Track experiments and version your data</li>
+                        <li>Monitor for data drift in production</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Never train and test on the same data (data leakage)</li>
+                        <li>Don't ignore class imbalance—accuracy can be misleading</li>
+                        <li>Avoid feature engineering on the full dataset before splitting</li>
+                        <li>Don't tune hyperparameters on the test set</li>
+                        <li>Never assume more data always helps—quality matters</li>
+                        <li>Don't use complex models when simple ones suffice</li>
+                        <li>Avoid ignoring error analysis—understand failures</li>
+                        <li>Don't deploy without monitoring and alerting</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for supervised learning</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🏷️</div>
+                    <div class="agent-name">SupervisedMLAgent</div>
+                    <div class="agent-role">Classification & Regression Specialist</div>
+                    <div class="agent-desc">Expert in building, training, and deploying supervised learning models. Automates feature selection, hyperparameter tuning, model evaluation, and provides interpretability insights.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automatic algorithm selection based on data characteristics</li>
+                        <li>Feature importance analysis and selection</li>
+                        <li>Hyperparameter optimization (grid, random, Bayesian)</li>
+                        <li>Cross-validation and robust evaluation</li>
+                        <li>Model explainability with SHAP/LIME</li>
+                        <li>Production deployment pipelines</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Example Task</div>
+                        <div class="code-filename">supervised_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># supervised_agent.py - Supervised Learning Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> sklearn.model_selection <span class="code-keyword">import</span> cross_val_score
+<span class="code-keyword">import</span> xgboost <span class="code-keyword">as</span> xgb
+
+<span class="code-function">supervised_agent</span> = Agent(
+    role=<span class="code-string">"Supervised Learning Specialist"</span>,
+    goal=<span class="code-string">"Build optimal classification/regression models"</span>,
+    backstory=<span class="code-string">"""Expert in supervised learning with deep 
+    knowledge of tree-based models, neural networks, 
+    and model interpretation techniques."""</span>,
+    tools=[
+        DataProfiler(),
+        FeatureSelector(),
+        ModelTrainer(),
+        HyperparamOptimizer(),
+        ModelExplainer(),
+    ]
+)
+
+<span class="code-function">classification_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze dataset characteristics and class distribution
+    2. Perform feature engineering and selection
+    3. Train multiple algorithms (baseline to complex)
+    4. Optimize hyperparameters using Optuna
+    5. Evaluate with stratified cross-validation
+    6. Generate SHAP explanations for best model
+    7. Export production-ready pipeline
+    """</span>,
+    agent=supervised_agent,
+    expected_output=<span class="code-string">"Optimized model with F1 > 0.9"</span>
+)
+
+<span class="code-comment"># Execute the supervised learning pipeline</span>
+crew = Crew(agents=[supervised_agent], tasks=[classification_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat01-p2-unsupervised-learning.html" class="related-card">
+                    <div class="related-num">Page 1.2</div>
+                    <div class="related-title">Unsupervised Learning</div>
+                    <div class="related-desc">Clustering, dimensionality reduction, and pattern discovery</div>
+                </a>
+                <a href="cat01-p6-algorithm-selection.html" class="related-card">
+                    <div class="related-num">Page 1.6</div>
+                    <div class="related-title">Algorithm Selection</div>
+                    <div class="related-desc">Decision framework for choosing the right algorithm</div>
+                </a>
+                <a href="cat01-p8-evaluation-metrics.html" class="related-card">
+                    <div class="related-num">Page 1.8</div>
+                    <div class="related-title">Evaluation Metrics</div>
+                    <div class="related-desc">Accuracy, F1, ROC-AUC, and business metrics</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat01-aiml-foundations-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">AI/ML Foundations Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 1.1 of 8</div>
+        <a href="cat01-p2-unsupervised-learning.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">1.2: Unsupervised Learning</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

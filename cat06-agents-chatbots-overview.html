@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents & Chatbots | Category 06 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 06 - CYAN */
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        /* MAIN */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* MODULES */
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* PAGES GRID */
+        .pages-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .page-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15); }
+        .page-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 12px 12px 0 0; opacity: 0; transition: opacity 0.2s; }
+        .page-card:hover::before { opacity: 1; }
+        .page-num { width: 32px; height: 32px; background: var(--cat-glow); border: 1px solid var(--cat-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--cat-light); margin-bottom: 12px; }
+        .page-card h3 { font-size: 15px; margin-bottom: 6px; }
+        .page-card p { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .page-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .page-tag { font-size: 9px; padding: 3px 8px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+        
+        /* STATS ROW */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-icon { font-size: 24px; margin-bottom: 8px; }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* WHY SECTION */
+        .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .why-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .why-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .why-card p { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .pages-grid, .why-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="../index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <span class="current">AI Agents & Chatbots</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🤖 Category 06</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat06-agents-chatbots-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat06-p1-nlu-intent.html"><span class="nav-icon">🧠</span> 6.1 NLU & Intent</a></li>
+            <li><a href="cat06-p2-dialog-management.html"><span class="nav-icon">💬</span> 6.2 Dialog Management</a></li>
+            <li><a href="cat06-p3-response-generation.html"><span class="nav-icon">✍️</span> 6.3 Response Generation</a></li>
+            <li><a href="cat06-p4-context-memory.html"><span class="nav-icon">🧩</span> 6.4 Context & Memory</a></li>
+            <li><a href="cat06-p5-platforms.html"><span class="nav-icon">🏗️</span> 6.5 Platforms</a></li>
+            <li><a href="cat06-p6-voice-assistants.html"><span class="nav-icon">🎙️</span> 6.6 Voice Assistants</a></li>
+            <li><a href="cat06-p7-multichannel.html"><span class="nav-icon">📱</span> 6.7 Multichannel</a></li>
+            <li><a href="cat06-p8-analytics.html"><span class="nav-icon">📊</span> 6.8 Analytics</a></li>
+            <li><a href="cat06-p9-testing.html"><span class="nav-icon">🧪</span> 6.9 Testing</a></li>
+            <li><a href="cat06-p10-enterprise.html"><span class="nav-icon">🏢</span> 6.10 Enterprise</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#stats"><span class="nav-icon">📊</span> Key Stats</a></li>
+            <li><a href="#pages"><span class="nav-icon">📚</span> Deep Dives</a></li>
+            <li><a href="#why"><span class="nav-icon">❓</span> Why It Matters</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">🤖 Category 06 • Conversational AI</div>
+                <h1>AI Agents & Chatbots</h1>
+                <p>Build intelligent conversational experiences that understand, respond, and act. From NLU fundamentals to enterprise-scale deployments—master the art of human-AI interaction through chatbots, voice assistants, and autonomous agents.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">10</div>
+                    <div class="hero-metric-label">Deep-Dive Pages</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">$15B</div>
+                    <div class="hero-metric-label">Market by 2028</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">70%</div>
+                    <div class="hero-metric-label">Query Automation</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">24/7</div>
+                    <div class="hero-metric-label">Availability</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- STATS -->
+        <section class="module" id="stats">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-value">8B+</div>
+                    <div class="stat-label">Daily chatbot interactions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value">30%</div>
+                    <div class="stat-label">Support cost reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-value">&lt;1s</div>
+                    <div class="stat-label">Response time goal</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">😊</div>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">User satisfaction target</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PAGES GRID -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Deep-Dive Pages</h2>
+                    <p>10 comprehensive guides to conversational AI</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat06-p1-nlu-intent.html" class="page-card">
+                    <div class="page-num">01</div>
+                    <h3>NLU & Intent Recognition</h3>
+                    <p>Natural language understanding fundamentals—intent classification, entity extraction, and building robust NLU pipelines.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Intent Classification</span>
+                        <span class="page-tag">Entity Extraction</span>
+                        <span class="page-tag">NER</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p2-dialog-management.html" class="page-card">
+                    <div class="page-num">02</div>
+                    <h3>Dialog Management</h3>
+                    <p>Conversation flow design, state machines, slot filling, and managing multi-turn dialogues effectively.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">State Machines</span>
+                        <span class="page-tag">Slot Filling</span>
+                        <span class="page-tag">Flow Design</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p3-response-generation.html" class="page-card">
+                    <div class="page-num">03</div>
+                    <h3>Response Generation</h3>
+                    <p>Template-based vs generative responses, persona design, tone consistency, and LLM-powered generation.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Templates</span>
+                        <span class="page-tag">LLM Generation</span>
+                        <span class="page-tag">Persona</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p4-context-memory.html" class="page-card">
+                    <div class="page-num">04</div>
+                    <h3>Context & Memory</h3>
+                    <p>Short-term and long-term memory, conversation context, user profiles, and personalization strategies.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Context Window</span>
+                        <span class="page-tag">User Memory</span>
+                        <span class="page-tag">Personalization</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p5-platforms.html" class="page-card">
+                    <div class="page-num">05</div>
+                    <h3>Chatbot Platforms</h3>
+                    <p>Platform comparison—Dialogflow, Lex, Watson, Rasa, and custom solutions. Build vs buy decisions.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Dialogflow</span>
+                        <span class="page-tag">Rasa</span>
+                        <span class="page-tag">Watson</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p6-voice-assistants.html" class="page-card">
+                    <div class="page-num">06</div>
+                    <h3>Voice Assistants</h3>
+                    <p>Speech recognition, voice UX design, Alexa Skills, Google Actions, and voice-first experiences.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Speech Recognition</span>
+                        <span class="page-tag">Voice UX</span>
+                        <span class="page-tag">Alexa/Google</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p7-multichannel.html" class="page-card">
+                    <div class="page-num">07</div>
+                    <h3>Multichannel Deployment</h3>
+                    <p>Deploying across web, mobile, SMS, WhatsApp, Slack, Teams—unified experiences across channels.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">WhatsApp</span>
+                        <span class="page-tag">Slack</span>
+                        <span class="page-tag">Teams</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p8-analytics.html" class="page-card">
+                    <div class="page-num">08</div>
+                    <h3>Chatbot Analytics</h3>
+                    <p>Conversation analytics, intent accuracy, fallback rates, CSAT tracking, and continuous improvement.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Intent Accuracy</span>
+                        <span class="page-tag">Fallback Rate</span>
+                        <span class="page-tag">CSAT</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p9-testing.html" class="page-card">
+                    <div class="page-num">09</div>
+                    <h3>Testing & QA</h3>
+                    <p>Conversation testing strategies, NLU evaluation, regression testing, and quality assurance frameworks.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">NLU Testing</span>
+                        <span class="page-tag">Regression</span>
+                        <span class="page-tag">QA Frameworks</span>
+                    </div>
+                </a>
+                
+                <a href="cat06-p10-enterprise.html" class="page-card">
+                    <div class="page-num">10</div>
+                    <h3>Enterprise Chatbots</h3>
+                    <p>Scaling chatbots for enterprise—security, compliance, integration patterns, and organizational rollout.</p>
+                    <div class="page-tags">
+                        <span class="page-tag">Security</span>
+                        <span class="page-tag">Compliance</span>
+                        <span class="page-tag">Integration</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        
+        <!-- WHY IT MATTERS -->
+        <section class="module" id="why">
+            <div class="module-header">
+                <div class="module-icon">❓</div>
+                <div class="module-info">
+                    <h2>Why Conversational AI Matters</h2>
+                    <p>Business impact of intelligent chatbots and agents</p>
+                </div>
+            </div>
+            
+            <div class="why-grid">
+                <div class="why-card">
+                    <h4>💰 Cost Reduction</h4>
+                    <p>Automate 70%+ of routine queries, reducing support costs by 30% while handling unlimited concurrent conversations.</p>
+                </div>
+                <div class="why-card">
+                    <h4>⚡ Instant Response</h4>
+                    <p>24/7 availability with sub-second response times. No hold queues, no business hours—always on, always fast.</p>
+                </div>
+                <div class="why-card">
+                    <h4>📈 Scalability</h4>
+                    <p>Handle traffic spikes effortlessly. One chatbot serves 1 or 1 million users simultaneously without degradation.</p>
+                </div>
+                <div class="why-card">
+                    <h4>😊 User Experience</h4>
+                    <p>Natural, conversational interfaces that meet users where they are—web, mobile, voice, or messaging apps.</p>
+                </div>
+                <div class="why-card">
+                    <h4>🎯 Personalization</h4>
+                    <p>Context-aware interactions that remember user preferences, history, and deliver tailored experiences.</p>
+                </div>
+                <div class="why-card">
+                    <h4>📊 Insights</h4>
+                    <p>Every conversation generates data. Understand customer needs, pain points, and opportunities at scale.</p>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="../category-05/cat05-generative-ai-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">05. Generative AI</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
+        <a href="cat06-p1-nlu-intent.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">First Page</div>
+                <div class="footer-link-title">6.1 NLU & Intent</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

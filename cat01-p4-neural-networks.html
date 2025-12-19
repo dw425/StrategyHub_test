@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Network Architectures | AI/ML Foundations | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #EC4899;
+            --page-light: #F472B6;
+            --page-glow: rgba(236, 72, 153, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--violet)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .arch-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .arch-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .arch-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .arch-card.cnn::before { background: var(--blue); }
+        .arch-card.rnn::before { background: var(--green); }
+        .arch-card.transformer::before { background: var(--violet); }
+        .arch-card.gan::before { background: var(--pink); }
+        .arch-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .arch-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .arch-title { font-size: 16px; font-weight: 700; }
+        .arch-subtitle { font-size: 10px; color: var(--text-muted); }
+        .arch-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .arch-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .arch-stat { text-align: center; padding: 8px; background: var(--bg-card-alt); border-radius: 6px; }
+        .arch-stat-value { font-size: 12px; font-weight: 700; color: var(--page-light); }
+        .arch-stat-label { font-size: 8px; color: var(--text-muted); }
+        .arch-uses { list-style: none; }
+        .arch-uses li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .arch-uses li::before { content: '✓'; color: var(--green); font-size: 10px; }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); }
+        
+        .layer-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .layer-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; }
+        .layer-icon { font-size: 24px; margin-bottom: 8px; }
+        .layer-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .layer-desc { font-size: 9px; color: var(--text-muted); }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-vendor { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-tag { font-size: 8px; padding: 2px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(236,72,153,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .arch-grid { grid-template-columns: 1fr; }
+            .layer-types, .tools-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat01-aiml-foundations-overview.html">AI/ML Foundations</a>
+        <span class="sep">/</span>
+        <span class="current">Neural Network Architectures</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🧠 Category 01</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-aiml-foundations-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#architectures"><span class="nav-icon">🏗️</span> Architectures</a></li>
+            <li><a href="#layers"><span class="nav-icon">🧱</span> Layer Types</a></li>
+            <li><a href="#transformer"><span class="nav-icon">🔮</span> Transformer Deep Dive</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat01-p1-supervised-learning.html"><span class="nav-icon">🏷️</span> Supervised Learning</a></li>
+            <li><a href="cat01-p2-unsupervised-learning.html"><span class="nav-icon">🔍</span> Unsupervised Learning</a></li>
+            <li><a href="cat01-p3-reinforcement-learning.html"><span class="nav-icon">🎮</span> Reinforcement Learning</a></li>
+            <li><a href="cat01-p4-neural-networks.html" class="active"><span class="nav-icon">🔮</span> Neural Networks</a></li>
+            <li><a href="cat01-p5-ml-pipeline.html"><span class="nav-icon">⚙️</span> ML Pipeline</a></li>
+            <li><a href="cat01-p6-algorithm-selection.html"><span class="nav-icon">🎯</span> Algorithm Selection</a></li>
+            <li><a href="cat01-p7-ml-frameworks.html"><span class="nav-icon">🛠️</span> ML Frameworks</a></li>
+            <li><a href="cat01-p8-evaluation-metrics.html"><span class="nav-icon">📈</span> Evaluation Metrics</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🔮 Page 1.4</span>
+                <h1>Neural Network Architectures</h1>
+                <p>Deep dive into the building blocks of modern AI. From CNNs for computer vision to Transformers powering LLMs, understand the architectures that have revolutionized artificial intelligence.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">175B</div><div class="hero-metric-label">GPT-3 Parameters</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2017</div><div class="hero-metric-label">Transformer Revolution</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">98%+</div><div class="hero-metric-label">ImageNet Accuracy</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">4</div><div class="hero-metric-label">Major Architecture Types</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Neural Networks</h2>
+                    <p>The foundation of deep learning</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>What Are Neural Networks?</h3>
+                <p>Neural networks are computational models inspired by the human brain, consisting of interconnected layers of nodes (neurons) that process information. Each neuron applies a weighted sum of inputs followed by a non-linear activation function, enabling networks to learn complex patterns from data.</p>
+                
+                <p>Deep learning emerged when researchers discovered that stacking many layers ("deep" networks) with proper training techniques could learn hierarchical representations—from simple edges to complex objects in images, or from characters to semantic meaning in text.</p>
+                
+                <h3>Why Architecture Matters</h3>
+                <p>Different architectures excel at different tasks. CNNs exploit spatial structure in images through convolutions. RNNs model sequential dependencies through recurrence. Transformers use attention mechanisms to process all positions simultaneously, enabling massive parallelization and capturing long-range dependencies.</p>
+                
+                <h3>The Modern Landscape</h3>
+                <p>Today's AI is dominated by Transformers—the architecture behind GPT, BERT, and virtually all large language models. However, CNNs remain crucial for vision, and hybrid architectures like Vision Transformers (ViT) blur the boundaries between approaches.</p>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURES -->
+        <section class="module" id="architectures">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Major Architecture Types</h2>
+                    <p>The four foundational neural network architectures</p>
+                </div>
+            </div>
+            
+            <div class="arch-grid">
+                <div class="arch-card cnn">
+                    <div class="arch-header">
+                        <div class="arch-icon">🖼️</div>
+                        <div>
+                            <div class="arch-title">CNN - Convolutional Neural Network</div>
+                            <div class="arch-subtitle">Image & Spatial Data Processing</div>
+                        </div>
+                    </div>
+                    <div class="arch-desc">Designed for grid-like data (images, time series). Uses convolution operations to detect local patterns, pooling to reduce dimensions, and builds hierarchical features from edges to objects.</div>
+                    <div class="arch-stats">
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">ResNet</div>
+                            <div class="arch-stat-label">Top Architecture</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">98%+</div>
+                            <div class="arch-stat-label">ImageNet Acc</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">2012</div>
+                            <div class="arch-stat-label">AlexNet Year</div>
+                        </div>
+                    </div>
+                    <ul class="arch-uses">
+                        <li>Image classification & object detection</li>
+                        <li>Medical imaging analysis</li>
+                        <li>Autonomous vehicle perception</li>
+                        <li>Facial recognition systems</li>
+                    </ul>
+                </div>
+                
+                <div class="arch-card rnn">
+                    <div class="arch-header">
+                        <div class="arch-icon">📝</div>
+                        <div>
+                            <div class="arch-title">RNN / LSTM / GRU</div>
+                            <div class="arch-subtitle">Sequential Data Processing</div>
+                        </div>
+                    </div>
+                    <div class="arch-desc">Process sequential data by maintaining hidden state across time steps. LSTMs and GRUs add gating mechanisms to handle long-term dependencies and avoid vanishing gradients.</div>
+                    <div class="arch-stats">
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">LSTM</div>
+                            <div class="arch-stat-label">Most Popular</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">1997</div>
+                            <div class="arch-stat-label">LSTM Invented</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">Seq2Seq</div>
+                            <div class="arch-stat-label">Key Model</div>
+                        </div>
+                    </div>
+                    <ul class="arch-uses">
+                        <li>Time series forecasting</li>
+                        <li>Speech recognition</li>
+                        <li>Language modeling (pre-Transformer)</li>
+                        <li>Music generation</li>
+                    </ul>
+                </div>
+                
+                <div class="arch-card transformer">
+                    <div class="arch-header">
+                        <div class="arch-icon">🔮</div>
+                        <div>
+                            <div class="arch-title">Transformer</div>
+                            <div class="arch-subtitle">Attention-Based Architecture</div>
+                        </div>
+                    </div>
+                    <div class="arch-desc">Revolutionary architecture using self-attention to process all positions in parallel. Enables massive scaling and captures long-range dependencies. Powers GPT, BERT, and all modern LLMs.</div>
+                    <div class="arch-stats">
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">GPT-4</div>
+                            <div class="arch-stat-label">Leading Model</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">2017</div>
+                            <div class="arch-stat-label">Attention Paper</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">1T+</div>
+                            <div class="arch-stat-label">Params Possible</div>
+                        </div>
+                    </div>
+                    <ul class="arch-uses">
+                        <li>Large Language Models (GPT, Claude)</li>
+                        <li>Machine translation</li>
+                        <li>Vision Transformers (ViT)</li>
+                        <li>Multi-modal models (CLIP, DALL-E)</li>
+                    </ul>
+                </div>
+                
+                <div class="arch-card gan">
+                    <div class="arch-header">
+                        <div class="arch-icon">🎨</div>
+                        <div>
+                            <div class="arch-title">GAN / Diffusion</div>
+                            <div class="arch-subtitle">Generative Models</div>
+                        </div>
+                    </div>
+                    <div class="arch-desc">GANs use adversarial training (generator vs discriminator). Diffusion models learn to denoise, enabling high-quality image generation. Both revolutionized generative AI.</div>
+                    <div class="arch-stats">
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">Stable Diff</div>
+                            <div class="arch-stat-label">Leading Model</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">2014</div>
+                            <div class="arch-stat-label">GAN Invented</div>
+                        </div>
+                        <div class="arch-stat">
+                            <div class="arch-stat-value">SOTA</div>
+                            <div class="arch-stat-label">Image Quality</div>
+                        </div>
+                    </div>
+                    <ul class="arch-uses">
+                        <li>Image generation (DALL-E, Midjourney)</li>
+                        <li>Video synthesis</li>
+                        <li>Style transfer</li>
+                        <li>Data augmentation</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- LAYER TYPES -->
+        <section class="module" id="layers">
+            <div class="module-header">
+                <div class="module-icon">🧱</div>
+                <div class="module-info">
+                    <h2>Common Layer Types</h2>
+                    <p>Building blocks of neural network architectures</p>
+                </div>
+            </div>
+            
+            <div class="layer-types">
+                <div class="layer-card">
+                    <div class="layer-icon">📊</div>
+                    <div class="layer-name">Dense (Linear)</div>
+                    <div class="layer-desc">Fully connected layer. Every input connects to every output.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">🔲</div>
+                    <div class="layer-name">Convolution</div>
+                    <div class="layer-desc">Sliding filter extracts local features. Weight sharing reduces params.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">📉</div>
+                    <div class="layer-name">Pooling</div>
+                    <div class="layer-desc">Downsamples feature maps. Max or average pooling.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">⚡</div>
+                    <div class="layer-name">Activation</div>
+                    <div class="layer-desc">Non-linearity. ReLU, GELU, Sigmoid, Softmax.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">📏</div>
+                    <div class="layer-name">Normalization</div>
+                    <div class="layer-desc">Stabilizes training. BatchNorm, LayerNorm, RMSNorm.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">🎲</div>
+                    <div class="layer-name">Dropout</div>
+                    <div class="layer-desc">Regularization. Randomly zeros activations during training.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">👁️</div>
+                    <div class="layer-name">Attention</div>
+                    <div class="layer-desc">Weighted focus on relevant parts. Self and cross attention.</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-icon">📍</div>
+                    <div class="layer-name">Embedding</div>
+                    <div class="layer-desc">Maps discrete tokens to continuous vectors. Lookup table.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRANSFORMER DEEP DIVE -->
+        <section class="module" id="transformer">
+            <div class="module-header">
+                <div class="module-icon">🔮</div>
+                <div class="module-info">
+                    <h2>Transformer Architecture</h2>
+                    <p>The architecture powering modern AI</p>
+                </div>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🔮 Transformer Block Anatomy</div>
+                    <div class="viz-badge">Detailed Diagram</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 900 450" style="width: 100%; height: auto;">
+                        <!-- Input -->
+                        <g transform="translate(50, 380)">
+                            <rect x="0" y="0" width="180" height="40" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#60A5FA" font-size="12" font-weight="600">Input Embeddings</text>
+                        </g>
+                        
+                        <!-- Positional Encoding -->
+                        <g transform="translate(250, 380)">
+                            <rect x="0" y="0" width="140" height="40" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="70" y="25" text-anchor="middle" fill="#34D399" font-size="11" font-weight="600">+ Positional Enc</text>
+                        </g>
+                        
+                        <!-- Arrow up -->
+                        <path d="M 250 350 L 250 340" stroke="#6a6a7a" stroke-width="2"/>
+                        <path d="M 140 400 L 250 400 L 250 370" stroke="#6a6a7a" stroke-width="2"/>
+                        
+                        <!-- Transformer Block -->
+                        <g transform="translate(100, 50)">
+                            <rect x="0" y="0" width="350" height="280" rx="12" fill="#1a1a2e" stroke="#EC4899" stroke-width="2"/>
+                            <rect x="0" y="0" width="350" height="35" rx="12" fill="#EC489920"/>
+                            <text x="175" y="24" text-anchor="middle" fill="#F472B6" font-size="13" font-weight="700">TRANSFORMER BLOCK (×N)</text>
+                            
+                            <!-- Multi-Head Attention -->
+                            <g transform="translate(25, 50)">
+                                <rect x="0" y="0" width="300" height="70" rx="8" fill="#0a0a0f" stroke="#8B5CF6" stroke-width="2"/>
+                                <text x="150" y="20" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="600">Multi-Head Self-Attention</text>
+                                
+                                <!-- Q, K, V -->
+                                <rect x="20" y="32" width="60" height="28" rx="4" fill="#8B5CF620" stroke="#8B5CF6"/>
+                                <text x="50" y="50" text-anchor="middle" fill="#A78BFA" font-size="10">Q</text>
+                                
+                                <rect x="90" y="32" width="60" height="28" rx="4" fill="#8B5CF620" stroke="#8B5CF6"/>
+                                <text x="120" y="50" text-anchor="middle" fill="#A78BFA" font-size="10">K</text>
+                                
+                                <rect x="160" y="32" width="60" height="28" rx="4" fill="#8B5CF620" stroke="#8B5CF6"/>
+                                <text x="190" y="50" text-anchor="middle" fill="#A78BFA" font-size="10">V</text>
+                                
+                                <text x="250" y="50" fill="#6a6a7a" font-size="9">h heads</text>
+                            </g>
+                            
+                            <!-- Add & Norm 1 -->
+                            <g transform="translate(25, 130)">
+                                <rect x="0" y="0" width="300" height="30" rx="6" fill="#0a0a0f" stroke="#F59E0B" stroke-width="1"/>
+                                <text x="150" y="20" text-anchor="middle" fill="#FBBF24" font-size="10">Add & LayerNorm</text>
+                            </g>
+                            
+                            <!-- FFN -->
+                            <g transform="translate(25, 175)">
+                                <rect x="0" y="0" width="300" height="50" rx="8" fill="#0a0a0f" stroke="#06B6D4" stroke-width="2"/>
+                                <text x="150" y="20" text-anchor="middle" fill="#22D3EE" font-size="11" font-weight="600">Feed-Forward Network</text>
+                                <text x="150" y="38" text-anchor="middle" fill="#6a6a7a" font-size="9">Linear → GELU → Linear</text>
+                            </g>
+                            
+                            <!-- Add & Norm 2 -->
+                            <g transform="translate(25, 235)">
+                                <rect x="0" y="0" width="300" height="30" rx="6" fill="#0a0a0f" stroke="#F59E0B" stroke-width="1"/>
+                                <text x="150" y="20" text-anchor="middle" fill="#FBBF24" font-size="10">Add & LayerNorm</text>
+                            </g>
+                            
+                            <!-- Residual connections -->
+                            <path d="M 10 85 L 10 145 L 25 145" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3" fill="none"/>
+                            <path d="M 10 200 L 10 250 L 25 250" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3" fill="none"/>
+                        </g>
+                        
+                        <!-- Attention Formula -->
+                        <g transform="translate(500, 50)">
+                            <rect x="0" y="0" width="350" height="130" rx="10" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="175" y="25" text-anchor="middle" fill="#A78BFA" font-size="12" font-weight="600">Scaled Dot-Product Attention</text>
+                            
+                            <text x="175" y="60" text-anchor="middle" fill="#fff" font-size="14" font-family="monospace">Attention(Q,K,V) =</text>
+                            <text x="175" y="85" text-anchor="middle" fill="#fff" font-size="14" font-family="monospace">softmax(QK^T / √d_k) V</text>
+                            
+                            <text x="30" y="115" fill="#6a6a7a" font-size="9">Q = Query • K = Key • V = Value • d_k = dimension</text>
+                        </g>
+                        
+                        <!-- Model Variants -->
+                        <g transform="translate(500, 200)">
+                            <rect x="0" y="0" width="350" height="200" rx="10" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="175" y="25" text-anchor="middle" fill="#F472B6" font-size="12" font-weight="600">Transformer Variants</text>
+                            
+                            <!-- Encoder-only -->
+                            <g transform="translate(20, 45)">
+                                <rect x="0" y="0" width="95" height="60" rx="6" fill="#3B82F620" stroke="#3B82F6"/>
+                                <text x="47" y="20" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">Encoder</text>
+                                <text x="47" y="35" text-anchor="middle" fill="#6a6a7a" font-size="8">BERT, RoBERTa</text>
+                                <text x="47" y="50" text-anchor="middle" fill="#6a6a7a" font-size="8">Classification</text>
+                            </g>
+                            
+                            <!-- Decoder-only -->
+                            <g transform="translate(127, 45)">
+                                <rect x="0" y="0" width="95" height="60" rx="6" fill="#10B98120" stroke="#10B981"/>
+                                <text x="47" y="20" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Decoder</text>
+                                <text x="47" y="35" text-anchor="middle" fill="#6a6a7a" font-size="8">GPT, LLaMA</text>
+                                <text x="47" y="50" text-anchor="middle" fill="#6a6a7a" font-size="8">Generation</text>
+                            </g>
+                            
+                            <!-- Encoder-Decoder -->
+                            <g transform="translate(234, 45)">
+                                <rect x="0" y="0" width="95" height="60" rx="6" fill="#EC489920" stroke="#EC4899"/>
+                                <text x="47" y="20" text-anchor="middle" fill="#F472B6" font-size="10" font-weight="600">Enc-Dec</text>
+                                <text x="47" y="35" text-anchor="middle" fill="#6a6a7a" font-size="8">T5, BART</text>
+                                <text x="47" y="50" text-anchor="middle" fill="#6a6a7a" font-size="8">Translation</text>
+                            </g>
+                            
+                            <!-- Key innovations -->
+                            <text x="20" y="130" fill="#6a6a7a" font-size="9">Key Innovations:</text>
+                            <text x="20" y="148" fill="#a0a0b0" font-size="9">• Rotary Position Embeddings (RoPE)</text>
+                            <text x="20" y="163" fill="#a0a0b0" font-size="9">• Flash Attention (memory efficient)</text>
+                            <text x="20" y="178" fill="#a0a0b0" font-size="9">• Mixture of Experts (MoE)</text>
+                            <text x="20" y="193" fill="#a0a0b0" font-size="9">• KV Cache for inference</text>
+                        </g>
+                        
+                        <!-- Output arrow -->
+                        <path d="M 275 50 L 275 30 L 275 10" stroke="#6a6a7a" stroke-width="2" marker-end="url(#arrowUp)"/>
+                        <text x="275" y="5" text-anchor="middle" fill="#6a6a7a" font-size="10">Output</text>
+                        
+                        <defs>
+                            <marker id="arrowUp" markerWidth="10" markerHeight="10" refX="5" refY="10" orient="auto">
+                                <path d="M0,10 L5,0 L10,10" fill="none" stroke="#6a6a7a" stroke-width="1"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Frameworks</h2>
+                    <p>Essential tools for building neural networks</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔥</div>
+                        <div>
+                            <div class="tool-name">PyTorch</div>
+                            <div class="tool-vendor">Meta AI</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Dynamic computation graphs, Pythonic API. Dominant in research, growing in production. Powers most LLM development.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Research</span>
+                        <span class="tool-tag">Dynamic</span>
+                        <span class="tool-tag">LLMs</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🧠</div>
+                        <div>
+                            <div class="tool-name">TensorFlow</div>
+                            <div class="tool-vendor">Google</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Production-ready with TF Serving, TFLite for mobile, TPU support. Keras provides high-level API.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Production</span>
+                        <span class="tool-tag">Mobile</span>
+                        <span class="tool-tag">TPU</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🤗</div>
+                        <div>
+                            <div class="tool-name">Transformers</div>
+                            <div class="tool-vendor">Hugging Face</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Pre-trained models hub. Easy fine-tuning, model cards, pipelines. The go-to for NLP and increasingly vision.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Pre-trained</span>
+                        <span class="tool-tag">Fine-tuning</span>
+                        <span class="tool-tag">Hub</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">⚡</div>
+                        <div>
+                            <div class="tool-name">JAX</div>
+                            <div class="tool-vendor">Google</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">NumPy-like API with autodiff and XLA compilation. Powers Google's largest models (Gemini).</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">XLA</span>
+                        <span class="tool-tag">Functional</span>
+                        <span class="tool-tag">Google Scale</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🚀</div>
+                        <div>
+                            <div class="tool-name">Lightning</div>
+                            <div class="tool-vendor">Lightning AI</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">PyTorch wrapper for organized code. Handles distributed training, logging, checkpointing automatically.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">PyTorch</span>
+                        <span class="tool-tag">Organized</span>
+                        <span class="tool-tag">Distributed</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔧</div>
+                        <div>
+                            <div class="tool-name">ONNX</div>
+                            <div class="tool-vendor">Open Standard</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Open format for ML models. Convert between frameworks, optimize for inference, deploy anywhere.</div>
+                    <div class="tool-tags">
+                        <span class="tool-tag">Interop</span>
+                        <span class="tool-tag">Deployment</span>
+                        <span class="tool-tag">Standard</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective neural network design</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with proven architectures (ResNet, BERT, GPT)</li>
+                        <li>Use pre-trained models and fine-tune when possible</li>
+                        <li>Apply proper normalization (BatchNorm, LayerNorm)</li>
+                        <li>Use learning rate scheduling (warmup, cosine decay)</li>
+                        <li>Monitor training with TensorBoard/W&B</li>
+                        <li>Implement gradient clipping for stability</li>
+                        <li>Use mixed precision training (fp16/bf16) for speed</li>
+                        <li>Validate architecture on small data first</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't design from scratch without good reason</li>
+                        <li>Avoid training without normalization layers</li>
+                        <li>Never use a constant learning rate for Transformers</li>
+                        <li>Don't ignore vanishing/exploding gradients</li>
+                        <li>Avoid overly deep networks without residuals</li>
+                        <li>Don't skip proper weight initialization</li>
+                        <li>Never train on full data without validation splits</li>
+                        <li>Don't use Sigmoid/Tanh hidden activations (use ReLU/GELU)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for neural network architecture</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔮</div>
+                    <div class="agent-name">NeuralArchitect</div>
+                    <div class="agent-role">Deep Learning Architecture Specialist</div>
+                    <div class="agent-desc">Expert in designing, implementing, and optimizing neural network architectures. Automates architecture search, hyperparameter tuning, and provides optimization recommendations for training and inference.</div>
+                    <ul class="agent-capabilities">
+                        <li>Architecture selection (CNN vs Transformer vs hybrid)</li>
+                        <li>Layer configuration and sizing optimization</li>
+                        <li>Training hyperparameter tuning</li>
+                        <li>Memory and compute optimization</li>
+                        <li>Model compression (pruning, quantization)</li>
+                        <li>Deployment optimization (ONNX, TensorRT)</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Architecture Task</div>
+                        <div class="code-filename">neural_architect.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># neural_architect.py - Neural Architecture Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">import</span> torch.nn <span class="code-keyword">as</span> nn
+<span class="code-keyword">from</span> transformers <span class="code-keyword">import</span> AutoModel
+
+<span class="code-function">neural_architect</span> = Agent(
+    role=<span class="code-string">"Neural Network Architect"</span>,
+    goal=<span class="code-string">"Design optimal architectures for ML tasks"</span>,
+    backstory=<span class="code-string">"""Expert in CNN, Transformer, and hybrid 
+    architectures. Deep knowledge of attention mechanisms,
+    normalization, and optimization techniques. Specializes
+    in efficient model design and deployment."""</span>,
+    tools=[
+        ArchitectureAnalyzer(),
+        LayerOptimizer(),
+        MemoryProfiler(),
+        TrainingConfigurer(),
+        ModelCompressor(),
+    ]
+)
+
+<span class="code-function">design_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze task requirements and data characteristics
+    2. Select base architecture (pretrained if available)
+    3. Configure layers, attention, and normalization
+    4. Optimize for target hardware constraints
+    5. Set up training config (LR, batch size, scheduler)
+    6. Profile memory and compute requirements
+    7. Generate deployment-ready model code
+    """</span>,
+    agent=neural_architect,
+    expected_output=<span class="code-string">"Optimized architecture with training config"</span>
+)
+
+<span class="code-comment"># Execute architecture design</span>
+crew = Crew(agents=[neural_architect], tasks=[design_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat01-p7-ml-frameworks.html" class="related-card">
+                    <div class="related-num">Page 1.7</div>
+                    <div class="related-title">ML Frameworks</div>
+                    <div class="related-desc">PyTorch, TensorFlow, JAX comparison</div>
+                </a>
+                <a href="cat01-p1-supervised-learning.html" class="related-card">
+                    <div class="related-num">Page 1.1</div>
+                    <div class="related-title">Supervised Learning</div>
+                    <div class="related-desc">Training neural networks with labels</div>
+                </a>
+                <a href="cat01-p8-evaluation-metrics.html" class="related-card">
+                    <div class="related-num">Page 1.8</div>
+                    <div class="related-title">Evaluation Metrics</div>
+                    <div class="related-desc">Measuring model performance</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat01-p3-reinforcement-learning.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">1.3: Reinforcement Learning</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 1.4 of 8</div>
+        <a href="cat01-p5-ml-pipeline.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">1.5: ML Pipeline</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

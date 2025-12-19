@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Channel Deployment | Chatbots & Conversational AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #06B6D4;
+            --page-light: #22D3EE;
+            --page-glow: rgba(6, 182, 212, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: var(--bg-hover); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 32px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--page-primary), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .hero-left h1 { font-size: 32px; margin-bottom: 12px; }
+        .hero-left p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .hero-metric-value { font-size: 26px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        
+        /* MODULES */
+        .module { margin-bottom: 32px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 56px; height: 56px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: 22px; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+        
+        /* OVERVIEW */
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 18px; margin-bottom: 16px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 14px; }
+        .overview-content strong { color: var(--text-primary); }
+        
+        /* KEY CONCEPTS */
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; border-left: 4px solid var(--page-primary); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-term { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .concept-def { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .concept-example { font-size: 10px; color: var(--text-muted); background: var(--bg-card-alt); padding: 10px; border-radius: 8px; font-family: monospace; }
+        
+        /* CHANNEL HUB VISUALIZATION */
+        .hub-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .hub-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; }
+        .hub-body { padding: 40px 20px; background: linear-gradient(180deg, #151820 0%, #101318 100%); position: relative; }
+        .hub-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+        .hub-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 380px; }
+        .hub-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: linear-gradient(135deg, var(--page-primary), #0891B2); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 60px rgba(6, 182, 212, 0.5); z-index: 10; }
+        .hub-core-icon { font-size: 36px; margin-bottom: 4px; }
+        .hub-core-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .hub-core-sub { font-size: 8px; opacity: 0.8; }
+        .hub-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .hub-line { stroke: var(--page-primary); stroke-width: 2; fill: none; opacity: 0.4; transition: all 0.3s; }
+        .hub-line.active { opacity: 1; stroke-width: 3; }
+        .hub-line-glow { stroke: var(--page-primary); stroke-width: 4; fill: none; opacity: 0.15; filter: blur(2px); }
+        .hub-node { position: absolute; z-index: 5; }
+        .hub-node-card { background: var(--bg-card-alt); border: 2px solid var(--border-color); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; transition: all 0.3s; cursor: pointer; min-width: 130px; }
+        .hub-node-card:hover { border-color: var(--page-primary); transform: scale(1.05); }
+        .hub-node-card.active { border-color: var(--page-light); box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+        .hub-node-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .hub-node-icon.web { background: linear-gradient(135deg, var(--blue), #2563EB); }
+        .hub-node-icon.mobile { background: linear-gradient(135deg, var(--green), #059669); }
+        .hub-node-icon.whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
+        .hub-node-icon.messenger { background: linear-gradient(135deg, #0084FF, #0066CC); }
+        .hub-node-icon.slack { background: linear-gradient(135deg, #4A154B, #611f69); }
+        .hub-node-icon.teams { background: linear-gradient(135deg, #5558AF, #4B4FB5); }
+        .hub-node-icon.sms { background: linear-gradient(135deg, var(--yellow), #D97706); }
+        .hub-node-icon.voice { background: linear-gradient(135deg, var(--pink), #DB2777); }
+        .hub-node-info { flex: 1; }
+        .hub-node-name { font-size: 11px; font-weight: 600; }
+        .hub-node-sub { font-size: 8px; color: var(--text-muted); }
+        /* Positions - arranged in circle around smaller hub */
+        .hub-node.n1 { top: 5px; left: 50%; transform: translateX(-50%); }
+        .hub-node.n2 { top: 50px; right: 0; }
+        .hub-node.n3 { top: 155px; right: -20px; }
+        .hub-node.n4 { top: 260px; right: 0; }
+        .hub-node.n5 { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .hub-node.n6 { top: 260px; left: 0; }
+        .hub-node.n7 { top: 155px; left: -20px; }
+        .hub-node.n8 { top: 50px; left: 0; }
+        
+        /* Detail Panel */
+        .hub-detail { background: var(--bg-card-alt); border: 2px solid var(--border-color); border-radius: 14px; padding: 24px; transition: all 0.3s; min-height: 340px; }
+        .hub-detail.active { border-color: var(--page-primary); }
+        .hub-detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .hub-detail-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .hub-detail-title { font-size: 20px; font-weight: 700; }
+        .hub-detail-type { font-size: 11px; color: var(--page-light); margin-top: 2px; }
+        .hub-detail-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .hub-detail-features { list-style: none; }
+        .hub-detail-features li { font-size: 12px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+        .hub-detail-features li:last-child { border-bottom: none; }
+        .hub-detail-bullet { color: var(--page-light); font-size: 14px; flex-shrink: 0; }
+        .hub-detail-placeholder { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .hub-detail-placeholder-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .hub-detail-placeholder-text { font-size: 13px; }
+        
+        /* MESSAGE TRANSFORMATION PIPELINE */
+        .transform-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .transform-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; }
+        .transform-body { padding: 24px; background: linear-gradient(180deg, #151820 0%, #101318 100%); }
+        .transform-flow { display: flex; align-items: center; gap: 0; }
+        .transform-stage { flex: 1; position: relative; }
+        .transform-box { background: var(--bg-card-alt); border: 2px solid; border-radius: 12px; padding: 16px; margin: 0 8px; }
+        .transform-box.channel-in { border-color: var(--green); }
+        .transform-box.unified { border-color: var(--cyan); }
+        .transform-box.core { border-color: var(--purple); background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05)); }
+        .transform-box.channel-out { border-color: var(--pink); }
+        .transform-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .transform-box.channel-in .transform-label { color: var(--green); }
+        .transform-box.unified .transform-label { color: var(--cyan); }
+        .transform-box.core .transform-label { color: var(--purple); }
+        .transform-box.channel-out .transform-label { color: var(--pink); }
+        .transform-label-icon { font-size: 14px; }
+        .transform-code { font-family: monospace; font-size: 10px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; }
+        .transform-code .key { color: var(--cyan); }
+        .transform-code .string { color: var(--green); }
+        .transform-code .highlight { background: rgba(6, 182, 212, 0.2); padding: 0 2px; border-radius: 2px; }
+        .transform-arrow { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 4px; flex-shrink: 0; }
+        .transform-arrow-icon { font-size: 20px; color: var(--page-primary); }
+        .transform-arrow-label { font-size: 8px; color: var(--text-muted); text-align: center; max-width: 60px; }
+        .transform-summary { display: flex; justify-content: center; gap: 32px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .transform-stat { text-align: center; }
+        .transform-stat-value { font-size: 18px; font-weight: 700; color: var(--page-light); }
+        .transform-stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        
+        /* CHANNEL COMPARISON */
+        .channel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .channel-detail { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; }
+        .channel-detail:hover { border-color: var(--page-primary); }
+        .channel-detail-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 14px; }
+        .channel-detail-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .channel-detail-type { font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .channel-detail-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .channel-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .channel-feature { font-size: 9px; padding: 3px 8px; background: var(--bg-card-alt); border-radius: 9999px; color: var(--text-muted); }
+        
+        /* ARCHITECTURE */
+        .arch-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .arch-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .arch-flow { display: flex; align-items: stretch; gap: 16px; }
+        .arch-layer { flex: 1; background: var(--bg-card-alt); border-radius: 12px; padding: 20px; text-align: center; position: relative; }
+        .arch-layer::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--page-primary); z-index: 5; }
+        .arch-layer:last-child::after { display: none; }
+        .arch-layer-icon { font-size: 28px; margin-bottom: 10px; }
+        .arch-layer-name { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .arch-layer-items { font-size: 11px; color: var(--text-muted); line-height: 1.8; }
+        
+        /* ADAPTER PATTERN */
+        .adapter-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .adapter-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+        .adapter-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .adapter-info { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+        .adapter-code { background: var(--bg-dark); border-radius: 10px; padding: 16px; font-family: monospace; font-size: 11px; color: var(--text-secondary); overflow-x: auto; }
+        
+        /* BEST PRACTICES */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; }
+        .practice-card.do { border-left: 4px solid var(--green); }
+        .practice-card.dont { border-left: 4px solid var(--red); }
+        .practice-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 13px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); line-height: 1.6; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; }
+        .agent-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px; }
+        .agent-name { font-size: 20px; font-weight: 600; }
+        .agent-role { font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .agent-capabilities li::before { content: '✦ '; color: var(--page-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
+        .code-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--page-light); }
+        .code-content { padding: 16px; background: var(--bg-dark); overflow-x: auto; max-height: 400px; }
+        .code-content pre { font-family: monospace; font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+        
+        /* RELATED */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-decoration: none; color: inherit; }
+        .related-card:hover { border-color: var(--page-primary); }
+        .related-num { font-size: 11px; color: var(--page-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border-radius: 10px; font-size: 13px; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a> / <a href="cat06-chatbots-overview.html">Chatbots</a> / <span class="current">Multi-Channel</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-title">💬 Category 06</div>
+    <ul class="sidebar-nav">
+        <li><a href="cat06-chatbots-overview.html">🏠 Overview</a></li>
+        <li><a href="cat06-p1-nlu-intent.html">🧠 6.1 NLU & Intent</a></li>
+        <li><a href="cat06-p2-dialog-management.html">🔀 6.2 Dialog Management</a></li>
+        <li><a href="cat06-p3-response-generation.html">💬 6.3 Response Generation</a></li>
+        <li><a href="cat06-p4-context-memory.html">🧩 6.4 Context & Memory</a></li>
+        <li><a href="cat06-p5-platforms.html">🤖 6.5 Platforms</a></li>
+        <li><a href="cat06-p6-voice-assistants.html">🎙️ 6.6 Voice Assistants</a></li>
+        <li><a href="cat06-p7-multichannel.html" class="active">📱 6.7 Multi-Channel</a></li>
+        <li><a href="cat06-p8-analytics.html">📊 6.8 Analytics</a></li>
+        <li><a href="cat06-p9-testing.html">🧪 6.9 Testing & QA</a></li>
+        <li><a href="cat06-p10-enterprise.html">🏢 6.10 Enterprise</a></li>
+    </ul>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">📱 Page 6.7 • Omnichannel Experience</div>
+                <h1>Multi-Channel Deployment</h1>
+                <p>Deploy your chatbot across web, mobile, messaging platforms, and voice assistants with a unified architecture that maintains consistent experiences.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">8+</div><div class="hero-metric-label">Channel Types</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">1</div><div class="hero-metric-label">Core Bot Logic</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">API</div><div class="hero-metric-label">Adapter Pattern</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">24/7</div><div class="hero-metric-label">Availability</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info"><h2>Understanding Multi-Channel</h2><p>One bot, many touchpoints</p></div>
+            </div>
+            <div class="overview-content">
+                <h3>The Omnichannel Imperative</h3>
+                <p>Modern users expect to interact with your brand wherever they are—on your website, in WhatsApp, through Alexa, or in Slack. Building separate bots for each channel is expensive, inconsistent, and unmaintainable. The solution is a <strong>unified multi-channel architecture</strong>: one core bot with channel-specific adapters that translate messages to and from each platform's format.</p>
+                <p>The key insight is separating <strong>conversation logic from channel mechanics</strong>. Your NLU, dialog management, and business logic remain constant. Only the input/output transformation varies: WhatsApp sends webhook payloads, Slack uses Block Kit for rich messages, voice requires ASR/TTS integration. A well-designed adapter layer handles these differences cleanly.</p>
+                <p>Multi-channel also enables <strong>seamless handoffs</strong>. A customer starts on web chat during the day, continues the conversation in WhatsApp on their commute, and picks up on a smart speaker at home. With shared session storage and user memory, the bot maintains context across all touchpoints—no repetition required.</p>
+                <p>Each channel has unique <strong>constraints and capabilities</strong>. SMS limits message length. Voice can't show buttons. Messenger supports carousels. Designing for multi-channel means creating adaptive responses that gracefully degrade or enhance based on channel capabilities, while maintaining a consistent brand voice throughout.</p>
+            </div>
+        </section>
+
+        <!-- KEY CONCEPTS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔑</div>
+                <div class="module-info"><h2>Key Concepts</h2><p>Multi-channel architecture terminology</p></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card" style="border-left-color: var(--cyan);">
+                    <div class="concept-icon">🔌</div>
+                    <div class="concept-term">Channel Adapter</div>
+                    <div class="concept-def">Translation layer between channel-specific APIs and your unified bot format. Handles webhooks, auth, message parsing, and response formatting.</div>
+                    <div class="concept-example">WhatsApp → Adapter → Bot<br>Bot → Adapter → WhatsApp<br>Normalize: {text, user, channel}</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--green);">
+                    <div class="concept-icon">🔄</div>
+                    <div class="concept-term">Omnichannel</div>
+                    <div class="concept-def">Seamless experience across all channels with shared context. User can switch channels mid-conversation without losing history or progress.</div>
+                    <div class="concept-example">Web chat → WhatsApp → Voice<br>Same user, same session<br>Continuous conversation</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--purple);">
+                    <div class="concept-icon">📦</div>
+                    <div class="concept-term">Rich Messages</div>
+                    <div class="concept-def">Interactive elements beyond plain text: buttons, carousels, quick replies, images. Support varies by channel—design for graceful degradation.</div>
+                    <div class="concept-example">Messenger: Carousel cards<br>Slack: Block Kit buttons<br>SMS: Numbered options fallback</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--yellow);">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-term">Channel Routing</div>
+                    <div class="concept-def">Directing users to the right channel based on context, preferences, or capabilities. Proactive outreach via preferred channel.</div>
+                    <div class="concept-example">Support ticket → SMS alert<br>Appointment → WhatsApp<br>Complex query → Web chat</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--pink);">
+                    <div class="concept-icon">🆔</div>
+                    <div class="concept-term">User Identity</div>
+                    <div class="concept-def">Linking users across channels to a unified profile. Phone number, email, or login enables cross-channel continuity.</div>
+                    <div class="concept-example">Web: auth token<br>WhatsApp: phone number<br>→ Merge to single profile</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--blue);">
+                    <div class="concept-icon">⚡</div>
+                    <div class="concept-term">Webhook Handler</div>
+                    <div class="concept-def">HTTP endpoint receiving events from messaging platforms. Must respond quickly (<3s) or use async processing to avoid timeouts.</div>
+                    <div class="concept-example">POST /webhook/whatsapp<br>Verify signature<br>Queue message → ACK 200</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHANNEL HUB VISUALIZATION -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🎨</div>
+                <div class="module-info"><h2>Channel Hub Architecture</h2><p>Centralized bot, distributed channels</p></div>
+            </div>
+            <div class="overview-content">
+                <p>The hub-and-spoke model places your core bot at the center, with channel adapters radiating outward. Each adapter translates platform-specific formats to your unified message schema. This architecture enables adding new channels without modifying core logic—just build a new adapter.</p>
+            </div>
+            <div class="hub-viz">
+                <div class="hub-header">🔗 Multi-Channel Hub — Click a channel for details</div>
+                <div class="hub-body">
+                    <div class="hub-layout">
+                        <div class="hub-container">
+                            <!-- SVG Connection Lines -->
+                            <svg class="hub-svg" viewBox="0 0 500 380" preserveAspectRatio="xMidYMid meet">
+                                <!-- Glow lines -->
+                                <line class="hub-line-glow" x1="250" y1="190" x2="250" y2="45"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="420" y2="85"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="450" y2="190"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="420" y2="295"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="250" y2="340"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="80" y2="295"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="50" y2="190"/>
+                                <line class="hub-line-glow" x1="250" y1="190" x2="80" y2="85"/>
+                                <!-- Main lines -->
+                                <line class="hub-line" id="line-web" x1="250" y1="190" x2="250" y2="45"/>
+                                <line class="hub-line" id="line-mobile" x1="250" y1="190" x2="420" y2="85"/>
+                                <line class="hub-line" id="line-whatsapp" x1="250" y1="190" x2="450" y2="190"/>
+                                <line class="hub-line" id="line-messenger" x1="250" y1="190" x2="420" y2="295"/>
+                                <line class="hub-line" id="line-voice" x1="250" y1="190" x2="250" y2="340"/>
+                                <line class="hub-line" id="line-sms" x1="250" y1="190" x2="80" y2="295"/>
+                                <line class="hub-line" id="line-slack" x1="250" y1="190" x2="50" y2="190"/>
+                                <line class="hub-line" id="line-teams" x1="250" y1="190" x2="80" y2="85"/>
+                            </svg>
+                            
+                            <!-- Central Hub -->
+                            <div class="hub-core">
+                                <div class="hub-core-icon">🤖</div>
+                                <div class="hub-core-label">Core Bot</div>
+                                <div class="hub-core-sub">NLU • Dialog • Logic</div>
+                            </div>
+                            
+                            <!-- Channel Nodes -->
+                            <div class="hub-node n1" data-channel="web" onclick="showChannel('web')">
+                                <div class="hub-node-card" id="card-web">
+                                    <div class="hub-node-icon web">🌐</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">Web Chat</div><div class="hub-node-sub">Widget embed</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n2" data-channel="mobile" onclick="showChannel('mobile')">
+                                <div class="hub-node-card" id="card-mobile">
+                                    <div class="hub-node-icon mobile">📱</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">Mobile App</div><div class="hub-node-sub">iOS / Android</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n3" data-channel="whatsapp" onclick="showChannel('whatsapp')">
+                                <div class="hub-node-card" id="card-whatsapp">
+                                    <div class="hub-node-icon whatsapp">💬</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">WhatsApp</div><div class="hub-node-sub">2B+ users</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n4" data-channel="messenger" onclick="showChannel('messenger')">
+                                <div class="hub-node-card" id="card-messenger">
+                                    <div class="hub-node-icon messenger">💙</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">Messenger</div><div class="hub-node-sub">1.3B+ users</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n5" data-channel="voice" onclick="showChannel('voice')">
+                                <div class="hub-node-card" id="card-voice">
+                                    <div class="hub-node-icon voice">🎙️</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">Voice / IVR</div><div class="hub-node-sub">Alexa, Phone</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n6" data-channel="sms" onclick="showChannel('sms')">
+                                <div class="hub-node-card" id="card-sms">
+                                    <div class="hub-node-icon sms">📲</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">SMS / RCS</div><div class="hub-node-sub">Universal</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n7" data-channel="slack" onclick="showChannel('slack')">
+                                <div class="hub-node-card" id="card-slack">
+                                    <div class="hub-node-icon slack">💼</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">Slack</div><div class="hub-node-sub">Enterprise</div></div>
+                                </div>
+                            </div>
+                            <div class="hub-node n8" data-channel="teams" onclick="showChannel('teams')">
+                                <div class="hub-node-card" id="card-teams">
+                                    <div class="hub-node-icon teams">🟣</div>
+                                    <div class="hub-node-info"><div class="hub-node-name">MS Teams</div><div class="hub-node-sub">Enterprise</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Detail Panel -->
+                        <div class="hub-detail" id="hub-detail">
+                            <div class="hub-detail-placeholder">
+                                <div class="hub-detail-placeholder-icon">👆</div>
+                                <div class="hub-detail-placeholder-text">Click a channel to see integration details</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+            const channelData = {
+                web: {
+                    icon: '🌐',
+                    iconClass: 'background: linear-gradient(135deg, #3B82F6, #2563EB);',
+                    title: 'Web Chat',
+                    type: 'Embedded Widget',
+                    desc: 'Embed a chat widget directly on your website. Full control over UI/UX, real-time messaging, and seamless integration with your existing web properties.',
+                    features: [
+                        'Full UI customization with CSS and JavaScript hooks for brand consistency',
+                        'Real-time typing indicators, read receipts, and message status updates',
+                        'File uploads, image sharing, and rich media support out of the box'
+                    ]
+                },
+                mobile: {
+                    icon: '📱',
+                    iconClass: 'background: linear-gradient(135deg, #10B981, #059669);',
+                    title: 'Mobile App',
+                    type: 'iOS & Android SDK',
+                    desc: 'Native SDKs for iOS and Android with push notification support. Deep linking enables seamless transitions between app features and chat.',
+                    features: [
+                        'Native UI components that match platform design guidelines (iOS/Material)',
+                        'Push notifications for re-engagement even when app is backgrounded',
+                        'Offline message queueing with automatic sync when connection restored'
+                    ]
+                },
+                whatsapp: {
+                    icon: '💬',
+                    iconClass: 'background: linear-gradient(135deg, #25D366, #128C7E);',
+                    title: 'WhatsApp Business',
+                    type: 'Cloud API',
+                    desc: 'Reach 2B+ users on their preferred messaging app. Template messages for outbound, free-form replies within 24-hour customer service window.',
+                    features: [
+                        'Interactive buttons and list messages for structured responses',
+                        'Template messages for notifications (requires pre-approval)',
+                        '24-hour customer service window for free-form messaging after user initiates'
+                    ]
+                },
+                messenger: {
+                    icon: '💙',
+                    iconClass: 'background: linear-gradient(135deg, #0084FF, #0066CC);',
+                    title: 'Facebook Messenger',
+                    type: 'Platform API',
+                    desc: 'Connect with 1.3B+ Messenger users. Rich templates including carousels, receipts, and airline boarding passes for immersive experiences.',
+                    features: [
+                        'Carousel and gallery templates for product showcases',
+                        'Persistent menu and quick replies for guided navigation',
+                        'Handover protocol for seamless bot-to-human agent transitions'
+                    ]
+                },
+                slack: {
+                    icon: '💼',
+                    iconClass: 'background: linear-gradient(135deg, #4A154B, #611f69);',
+                    title: 'Slack',
+                    type: 'Workspace App',
+                    desc: 'Build internal bots for employee productivity. Block Kit provides rich, interactive layouts. Integrate with Slack workflows for automation.',
+                    features: [
+                        'Block Kit for rich layouts with buttons, selects, date pickers, and modals',
+                        'Slash commands for quick actions (/helpdesk, /expense, /standup)',
+                        'Event subscriptions for channel messages, reactions, and file uploads'
+                    ]
+                },
+                teams: {
+                    icon: '🟣',
+                    iconClass: 'background: linear-gradient(135deg, #5558AF, #4B4FB5);',
+                    title: 'Microsoft Teams',
+                    type: 'Bot Framework',
+                    desc: 'Enterprise-ready bot integration with Microsoft 365. Adaptive Cards for rich layouts, deep integration with SharePoint, and SSO support.',
+                    features: [
+                        'Adaptive Cards for rich, interactive message layouts',
+                        'Single sign-on (SSO) with Azure AD for seamless authentication',
+                        'Message extensions for invoking bot from compose box or search'
+                    ]
+                },
+                sms: {
+                    icon: '📲',
+                    iconClass: 'background: linear-gradient(135deg, #F59E0B, #D97706);',
+                    title: 'SMS / RCS',
+                    type: 'Twilio / Carrier',
+                    desc: 'Universal reach to any phone—no app required. 160 character limit requires concise design. RCS adds rich features on supported carriers.',
+                    features: [
+                        'Works on any mobile phone worldwide—100% reach, zero friction',
+                        'MMS support for images, but limited to 300KB on most carriers',
+                        'RCS upgrade path adds typing indicators, carousels on Android'
+                    ]
+                },
+                voice: {
+                    icon: '🎙️',
+                    iconClass: 'background: linear-gradient(135deg, #EC4899, #DB2777);',
+                    title: 'Voice / IVR',
+                    type: 'Alexa, Phone, Google',
+                    desc: 'Voice-first experiences for hands-free interaction. Requires ASR/TTS integration. Design for audio-only with no visual fallback.',
+                    features: [
+                        'Alexa Skills Kit and Google Actions for smart speaker deployment',
+                        'Telephony integration via Amazon Connect, Twilio, or Genesys',
+                        'SSML support for natural speech with pauses, emphasis, and prosody'
+                    ]
+                }
+            };
+            
+            function showChannel(channel) {
+                const data = channelData[channel];
+                const panel = document.getElementById('hub-detail');
+                
+                // Update panel content
+                panel.innerHTML = `
+                    <div class="hub-detail-header">
+                        <div class="hub-detail-icon" style="${data.iconClass}">${data.icon}</div>
+                        <div>
+                            <div class="hub-detail-title">${data.title}</div>
+                            <div class="hub-detail-type">${data.type}</div>
+                        </div>
+                    </div>
+                    <div class="hub-detail-desc">${data.desc}</div>
+                    <ul class="hub-detail-features">
+                        ${data.features.map(f => `<li><span class="hub-detail-bullet">✦</span> ${f}</li>`).join('')}
+                    </ul>
+                `;
+                panel.classList.add('active');
+                
+                // Update active states on cards
+                document.querySelectorAll('.hub-node-card').forEach(card => card.classList.remove('active'));
+                document.getElementById('card-' + channel).classList.add('active');
+                
+                // Update active states on lines
+                document.querySelectorAll('.hub-line').forEach(line => line.classList.remove('active'));
+                document.getElementById('line-' + channel).classList.add('active');
+            }
+            </script>
+        </section>
+
+        <!-- CHANNEL DETAILS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info"><h2>Channel Capabilities</h2><p>What each channel supports</p></div>
+            </div>
+            <div class="channel-grid">
+                <div class="channel-detail">
+                    <div class="channel-detail-icon" style="background: linear-gradient(135deg, var(--blue), #2563EB);">🌐</div>
+                    <div class="channel-detail-name">Web Chat</div>
+                    <div class="channel-detail-type">Full Control</div>
+                    <div class="channel-detail-desc">Embed widget on your site. Full customization of UI, rich media, and real-time updates.</div>
+                    <div class="channel-features">
+                        <span class="channel-feature">Rich UI</span>
+                        <span class="channel-feature">File Upload</span>
+                        <span class="channel-feature">Custom CSS</span>
+                        <span class="channel-feature">Typing Indicators</span>
+                    </div>
+                </div>
+                <div class="channel-detail">
+                    <div class="channel-detail-icon" style="background: linear-gradient(135deg, #25D366, #128C7E);">💬</div>
+                    <div class="channel-detail-name">WhatsApp</div>
+                    <div class="channel-detail-type">Business API</div>
+                    <div class="channel-detail-desc">Reach 2B+ users. Template messages for outbound, free-form for user-initiated.</div>
+                    <div class="channel-features">
+                        <span class="channel-feature">Buttons</span>
+                        <span class="channel-feature">Lists</span>
+                        <span class="channel-feature">Media</span>
+                        <span class="channel-feature">Templates</span>
+                    </div>
+                </div>
+                <div class="channel-detail">
+                    <div class="channel-detail-icon" style="background: linear-gradient(135deg, #4A154B, #611f69);">💼</div>
+                    <div class="channel-detail-name">Slack</div>
+                    <div class="channel-detail-type">Workspace App</div>
+                    <div class="channel-detail-desc">Internal bots for employees. Block Kit for rich layouts, slash commands, workflows.</div>
+                    <div class="channel-features">
+                        <span class="channel-feature">Block Kit</span>
+                        <span class="channel-feature">Modals</span>
+                        <span class="channel-feature">Slash Cmds</span>
+                        <span class="channel-feature">Threads</span>
+                    </div>
+                </div>
+                <div class="channel-detail">
+                    <div class="channel-detail-icon" style="background: linear-gradient(135deg, var(--yellow), #D97706);">📲</div>
+                    <div class="channel-detail-name">SMS</div>
+                    <div class="channel-detail-type">Universal</div>
+                    <div class="channel-detail-desc">Works on any phone. Text-only but 100% reach. Great for alerts and simple flows.</div>
+                    <div class="channel-features">
+                        <span class="channel-feature">160 chars</span>
+                        <span class="channel-feature">MMS images</span>
+                        <span class="channel-feature">No auth</span>
+                        <span class="channel-feature">Universal</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MESSAGE TRANSFORMATION PIPELINE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info"><h2>Message Transformation</h2><p>Watch data flow through the adapter pipeline</p></div>
+            </div>
+            <div class="overview-content">
+                <p>The adapter pattern normalizes channel-specific formats into a unified schema, processes through your core bot, then transforms responses back for the target channel. This horizontal flow shows a WhatsApp message as it travels through each stage.</p>
+            </div>
+            <div class="transform-viz">
+                <div class="transform-header">🔄 Inbound → Process → Outbound Pipeline</div>
+                <div class="transform-body">
+                    <div class="transform-flow">
+                        <!-- Channel Input -->
+                        <div class="transform-stage">
+                            <div class="transform-box channel-in">
+                                <div class="transform-label"><span class="transform-label-icon">💬</span> WhatsApp Webhook</div>
+                                <div class="transform-code"><span class="key">"from"</span>: <span class="string">"14155551234"</span>
+<span class="key">"text"</span>: {
+  <span class="key">"body"</span>: <span class="string highlight">"Book flight NYC"</span>
+}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="transform-arrow">
+                            <div class="transform-arrow-icon">→</div>
+                            <div class="transform-arrow-label">parse</div>
+                        </div>
+                        
+                        <!-- Unified Format -->
+                        <div class="transform-stage">
+                            <div class="transform-box unified">
+                                <div class="transform-label"><span class="transform-label-icon">📦</span> Unified Message</div>
+                                <div class="transform-code"><span class="key">"user_id"</span>: <span class="string">"14155551234"</span>
+<span class="key">"channel"</span>: <span class="string">"whatsapp"</span>
+<span class="key">"text"</span>: <span class="string highlight">"Book flight NYC"</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="transform-arrow">
+                            <div class="transform-arrow-icon">→</div>
+                            <div class="transform-arrow-label">NLU</div>
+                        </div>
+                        
+                        <!-- Core Bot -->
+                        <div class="transform-stage">
+                            <div class="transform-box core">
+                                <div class="transform-label"><span class="transform-label-icon">🤖</span> Bot Response</div>
+                                <div class="transform-code"><span class="key">"text"</span>: <span class="string highlight">"Found 3 flights"</span>
+<span class="key">"quick_replies"</span>: [
+  <span class="string">"Morning"</span>, <span class="string">"Evening"</span>
+]</div>
+                            </div>
+                        </div>
+                        
+                        <div class="transform-arrow">
+                            <div class="transform-arrow-icon">→</div>
+                            <div class="transform-arrow-label">format</div>
+                        </div>
+                        
+                        <!-- Channel Output -->
+                        <div class="transform-stage">
+                            <div class="transform-box channel-out">
+                                <div class="transform-label"><span class="transform-label-icon">📤</span> WhatsApp Interactive</div>
+                                <div class="transform-code"><span class="key">"type"</span>: <span class="string">"interactive"</span>
+<span class="key">"body"</span>: <span class="string highlight">"Found 3 flights"</span>
+<span class="key">"buttons"</span>: [<span class="string">"Morning"</span>...]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transform-summary">
+                        <div class="transform-stat">
+                            <div class="transform-stat-value">4</div>
+                            <div class="transform-stat-label">Stages</div>
+                        </div>
+                        <div class="transform-stat">
+                            <div class="transform-stat-value">~50ms</div>
+                            <div class="transform-stat-label">Adapter Overhead</div>
+                        </div>
+                        <div class="transform-stat">
+                            <div class="transform-stat-value">1</div>
+                            <div class="transform-stat-label">Unified Schema</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info"><h2>Best Practices</h2><p>Multi-channel guidelines</p></div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do This</div>
+                    <ul class="practice-list">
+                        <li>Design for the lowest common denominator, enhance for rich channels</li>
+                        <li>Use a unified message schema internally—adapt only at edges</li>
+                        <li>Share session state across channels via user identity linking</li>
+                        <li>Implement graceful degradation: carousel → list → numbered text</li>
+                        <li>Queue webhook responses and ACK immediately to avoid timeouts</li>
+                        <li>Log channel-specific errors separately for debugging</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Avoid This</div>
+                    <ul class="practice-list">
+                        <li>Building separate bots for each channel—leads to inconsistency</li>
+                        <li>Hard-coding channel logic in your dialog manager</li>
+                        <li>Ignoring character limits (SMS 160, WhatsApp 4096)</li>
+                        <li>Sending rich messages to channels that don't support them</li>
+                        <li>Forcing users to re-authenticate on each channel switch</li>
+                        <li>Neglecting channel-specific policies (WhatsApp 24h window)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info"><h2>Agent This</h2><p>AI-powered multi-channel orchestration</p></div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📱</div>
+                    <div class="agent-name">ChannelOrchestratorAgent</div>
+                    <div class="agent-role">Multi-Channel Specialist</div>
+                    <div class="agent-desc">Expert in deploying chatbots across web, mobile, messaging platforms, and voice assistants with unified architecture.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design adapter architectures</li>
+                        <li>Implement webhook handlers</li>
+                        <li>Build rich message mappers</li>
+                        <li>Configure channel integrations</li>
+                        <li>Link user identities cross-channel</li>
+                        <li>Optimize for channel constraints</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">channel_adapter.py</div>
+                    <div class="code-content"><pre>from crewai import Agent, Task, Crew
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+orchestrator_agent = Agent(
+    role="Multi-Channel Orchestrator",
+    goal="Deploy unified chatbot across all channels",
+    backstory="""Expert in omnichannel architecture with deep
+    knowledge of WhatsApp Business API, Slack Block Kit, 
+    Messenger webhooks, and voice integrations.""",
+    tools=[WebhookManager(), MessageFormatter(), ChannelRouter()]
+)
+
+@dataclass
+class UnifiedMessage:
+    """Channel-agnostic message format."""
+    user_id: str
+    channel: str
+    text: str
+    intent: str = None
+    entities: dict = None
+    attachments: list = None
+    quick_replies: list = None
+
+class ChannelAdapter(ABC):
+    """Base class for channel adapters."""
+    
+    @abstractmethod
+    def parse_inbound(self, payload: dict) -> UnifiedMessage:
+        """Convert channel payload to unified format."""
+        pass
+    
+    @abstractmethod
+    def format_outbound(self, message: UnifiedMessage) -> dict:
+        """Convert unified message to channel format."""
+        pass
+
+class WhatsAppAdapter(ChannelAdapter):
+    def parse_inbound(self, payload: dict) -> UnifiedMessage:
+        msg = payload["entry"][0]["changes"][0]["value"]["messages"][0]
+        return UnifiedMessage(
+            user_id=msg["from"],
+            channel="whatsapp",
+            text=msg.get("text", {}).get("body", ""),
+            attachments=self._parse_media(msg)
+        )
+    
+    def format_outbound(self, message: UnifiedMessage) -> dict:
+        response = {"messaging_product": "whatsapp", "to": message.user_id}
+        
+        if message.quick_replies:
+            # WhatsApp interactive buttons
+            response["type"] = "interactive"
+            response["interactive"] = {
+                "type": "button",
+                "body": {"text": message.text},
+                "action": {"buttons": [
+                    {"type": "reply", "reply": {"id": r, "title": r}}
+                    for r in message.quick_replies[:3]  # Max 3 buttons
+                ]}
+            }
+        else:
+            response["type"] = "text"
+            response["text"] = {"body": message.text}
+        
+        return response
+
+class SlackAdapter(ChannelAdapter):
+    def format_outbound(self, message: UnifiedMessage) -> dict:
+        blocks = [{"type": "section", "text": {"type": "mrkdwn", "text": message.text}}]
+        
+        if message.quick_replies:
+            blocks.append({
+                "type": "actions",
+                "elements": [
+                    {"type": "button", "text": {"type": "plain_text", "text": r}, "action_id": r}
+                    for r in message.quick_replies
+                ]
+            })
+        
+        return {"channel": message.user_id, "blocks": blocks}
+
+class MultiChannelBot:
+    def __init__(self):
+        self.adapters = {
+            "whatsapp": WhatsAppAdapter(),
+            "slack": SlackAdapter(),
+            # Add more adapters...
+        }
+    
+    def handle_message(self, channel: str, payload: dict) -> dict:
+        # Parse inbound
+        adapter = self.adapters[channel]
+        message = adapter.parse_inbound(payload)
+        
+        # Process through core bot (channel-agnostic)
+        response = self.core_bot.process(message)
+        
+        # Format outbound for channel
+        return adapter.format_outbound(response)
+
+# Task to add new channel
+task = Task(
+    description="Add Microsoft Teams adapter to multi-channel bot",
+    agent=orchestrator_agent,
+    expected_output="Teams adapter with Block Kit equivalent formatting"
+)
+
+crew = Crew(agents=[orchestrator_agent], tasks=[task])
+result = crew.kickoff()</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info"><h2>Related Pages</h2><p>Continue learning</p></div>
+            </div>
+            <div class="related-grid">
+                <a href="cat06-p5-platforms.html" class="related-card"><div class="related-num">Page 6.5</div><div class="related-title">Platforms</div><div class="related-desc">Platform channel integrations</div></a>
+                <a href="cat06-p6-voice-assistants.html" class="related-card"><div class="related-num">Page 6.6</div><div class="related-title">Voice Assistants</div><div class="related-desc">Voice as a channel</div></a>
+                <a href="cat06-p10-enterprise.html" class="related-card"><div class="related-num">Page 6.10</div><div class="related-title">Enterprise Integration</div><div class="related-desc">Backend system connections</div></a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat06-p6-voice-assistants.html" class="footer-link">← 6.6: Voice Assistants</a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 6.7 of 10</div>
+        <a href="cat06-p8-analytics.html" class="footer-link">6.8: Analytics →</a>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context & Memory | Chatbots & Conversational AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #8B5CF6;
+            --page-light: #A78BFA;
+            --page-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; }
+        .sidebar-nav a:hover { background: var(--bg-hover); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 32px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--page-primary), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .hero-left h1 { font-size: 32px; margin-bottom: 12px; }
+        .hero-left p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .hero-metric-value { font-size: 26px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        
+        /* MODULES */
+        .module { margin-bottom: 32px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 56px; height: 56px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: 22px; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+        
+        /* OVERVIEW */
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 18px; margin-bottom: 16px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 14px; }
+        .overview-content strong { color: var(--text-primary); }
+        
+        /* KEY CONCEPTS */
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; border-left: 4px solid var(--page-primary); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-term { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .concept-def { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .concept-example { font-size: 10px; color: var(--text-muted); background: var(--bg-card-alt); padding: 10px; border-radius: 8px; font-family: monospace; }
+        
+        /* HOW IT WORKS */
+        .how-it-works { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .hiw-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; }
+        .hiw-body { padding: 20px; }
+        .hiw-step { display: flex; gap: 16px; margin-bottom: 16px; }
+        .hiw-step-num { width: 44px; height: 44px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .hiw-step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .hiw-step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hiw-step-detail { font-size: 11px; color: var(--text-muted); margin-top: 8px; padding: 10px; background: var(--bg-card-alt); border-radius: 8px; border-left: 3px solid var(--page-primary); font-family: monospace; }
+        
+        /* MEMORY LAYERS VISUALIZATION */
+        .memory-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .memory-viz-header { padding: 14px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .memory-viz-body { padding: 32px; background: linear-gradient(180deg, #151820 0%, #101318 100%); }
+        .memory-layout { display: grid; grid-template-columns: 1fr 280px; gap: 32px; align-items: center; }
+        .memory-stack { position: relative; }
+        .memory-layer { position: relative; margin-bottom: 12px; border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; gap: 20px; transition: all 0.3s; }
+        .memory-layer:hover { transform: translateX(8px); }
+        .memory-layer.immediate { background: linear-gradient(135deg, #3d2035, #2d1828); border: 2px solid var(--pink); box-shadow: 0 4px 20px rgba(236, 72, 153, 0.2); }
+        .memory-layer.session { background: linear-gradient(135deg, #2d2540, #231d35); border: 2px solid var(--purple); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2); }
+        .memory-layer.persistent { background: linear-gradient(135deg, #1e2a40, #182235); border: 2px solid var(--blue); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2); }
+        .memory-layer.knowledge { background: linear-gradient(135deg, #1a3038, #15282e); border: 2px solid var(--cyan); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.2); }
+        .layer-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .layer-icon.immediate { background: rgba(236, 72, 153, 0.2); }
+        .layer-icon.session { background: rgba(139, 92, 246, 0.2); }
+        .layer-icon.persistent { background: rgba(59, 130, 246, 0.2); }
+        .layer-icon.knowledge { background: rgba(6, 182, 212, 0.2); }
+        .layer-content { flex: 1; }
+        .layer-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .layer-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+        .layer-data { font-size: 10px; font-family: monospace; color: var(--text-secondary); background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px; }
+        .layer-ttl { font-size: 10px; padding: 4px 10px; border-radius: 9999px; font-weight: 600; }
+        .layer-ttl.fast { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+        .layer-ttl.medium { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+        .layer-ttl.long { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .layer-ttl.permanent { background: rgba(6, 182, 212, 0.2); color: var(--cyan); }
+        .access-panel { background: linear-gradient(135deg, #1e222a, #181c22); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; }
+        .access-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .access-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; margin-bottom: 10px; }
+        .access-speed { width: 8px; height: 8px; border-radius: 50%; }
+        .access-speed.fast { background: var(--pink); box-shadow: 0 0 8px var(--pink); }
+        .access-speed.medium { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+        .access-speed.slow { background: var(--blue); box-shadow: 0 0 8px var(--blue); }
+        .access-speed.index { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+        .access-label { font-size: 12px; flex: 1; }
+        .access-time { font-size: 10px; font-family: monospace; color: var(--text-muted); }
+        
+        /* CONTEXT WINDOW - STACKED BAR */
+        .context-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .context-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .context-window { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .context-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+        .context-used { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .context-used span { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+        .context-note { font-size: 11px; color: var(--text-muted); }
+        .stacked-bar { display: flex; height: 48px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .bar-segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; transition: all 0.3s; position: relative; }
+        .bar-segment:hover { filter: brightness(1.2); }
+        .bar-segment.system { flex: 2; background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+        .bar-segment.history { flex: 8; background: linear-gradient(135deg, #EC4899, #DB2777); }
+        .bar-segment.rag { flex: 4; background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .bar-segment.response { flex: 2; background: linear-gradient(135deg, #10B981, #059669); }
+        .context-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--bg-card-alt); border-radius: 10px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; }
+        .legend-color.system { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+        .legend-color.history { background: linear-gradient(135deg, #EC4899, #DB2777); }
+        .legend-color.rag { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .legend-color.response { background: linear-gradient(135deg, #10B981, #059669); }
+        .legend-info { flex: 1; }
+        .legend-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+        .legend-value { font-size: 13px; font-weight: 600; }
+        
+        /* MEMORY TYPES COMPARISON */
+        .memory-compare { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
+        .memory-type-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
+        .memory-type-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .memory-type-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .memory-type-icon.short { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+        .memory-type-icon.long { background: linear-gradient(135deg, var(--blue), var(--cyan)); }
+        .memory-type-title { font-size: 16px; font-weight: 600; }
+        .memory-type-subtitle { font-size: 11px; color: var(--text-muted); }
+        .memory-type-body { padding: 20px; }
+        .memory-type-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .memory-type-list { list-style: none; }
+        .memory-type-list li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .memory-type-list li::before { content: '→'; color: var(--page-light); }
+        
+        /* TOOLS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .tool-card:hover { border-color: var(--page-primary); }
+        .tool-icon { font-size: 32px; margin-bottom: 10px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-type { font-size: 10px; color: var(--page-light); margin-bottom: 8px; }
+        .tool-desc { font-size: 11px; color: var(--text-muted); }
+        
+        /* BEST PRACTICES */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; }
+        .practice-card.do { border-left: 4px solid var(--green); }
+        .practice-card.dont { border-left: 4px solid var(--red); }
+        .practice-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 13px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); line-height: 1.6; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; }
+        .agent-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px; }
+        .agent-name { font-size: 20px; font-weight: 600; }
+        .agent-role { font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .agent-capabilities li::before { content: '✦ '; color: var(--page-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
+        .code-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--page-light); }
+        .code-content { padding: 16px; background: var(--bg-dark); overflow-x: auto; max-height: 400px; }
+        .code-content pre { font-family: monospace; font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+        
+        /* RELATED */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-decoration: none; color: inherit; }
+        .related-card:hover { border-color: var(--page-primary); }
+        .related-num { font-size: 11px; color: var(--page-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border-radius: 10px; font-size: 13px; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a> / <a href="cat06-chatbots-overview.html">Chatbots</a> / <span class="current">Context & Memory</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-title">💬 Category 06</div>
+    <ul class="sidebar-nav">
+        <li><a href="cat06-chatbots-overview.html">🏠 Overview</a></li>
+        <li><a href="cat06-p1-nlu-intent.html">🧠 6.1 NLU & Intent</a></li>
+        <li><a href="cat06-p2-dialog-management.html">🔀 6.2 Dialog Management</a></li>
+        <li><a href="cat06-p3-response-generation.html">💬 6.3 Response Generation</a></li>
+        <li><a href="cat06-p4-context-memory.html" class="active">🧩 6.4 Context & Memory</a></li>
+        <li><a href="cat06-p5-platforms.html">🤖 6.5 Platforms</a></li>
+        <li><a href="cat06-p6-voice-assistants.html">🎙️ 6.6 Voice Assistants</a></li>
+        <li><a href="cat06-p7-multichannel.html">📱 6.7 Multi-Channel</a></li>
+        <li><a href="cat06-p8-analytics.html">📊 6.8 Analytics</a></li>
+        <li><a href="cat06-p9-testing.html">🧪 6.9 Testing & QA</a></li>
+        <li><a href="cat06-p10-enterprise.html">🏢 6.10 Enterprise</a></li>
+    </ul>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🧩 Page 6.4 • Remembering Context</div>
+                <h1>Context & Memory</h1>
+                <p>Enable chatbots to remember user information, maintain conversation history, and leverage contextual data for personalized, coherent multi-turn interactions.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">128K</div><div class="hero-metric-label">Context Window</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Redis</div><div class="hero-metric-label">Session Store</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">RAG</div><div class="hero-metric-label">Long-term Memory</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">TTL</div><div class="hero-metric-label">Memory Lifecycle</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info"><h2>Understanding Context & Memory</h2><p>How chatbots remember and reason about information</p></div>
+            </div>
+            <div class="overview-content">
+                <h3>Why Memory Matters</h3>
+                <p>Context and memory transform chatbots from stateless question-answering systems into intelligent conversational partners. Without memory, every message would start from scratch—users would have to repeat their name, preferences, and the topic of discussion with every turn. <strong>Memory enables continuity</strong>, allowing the bot to reference "the flight you mentioned earlier" or "your usual order."</p>
+                <p>Modern conversational AI operates with multiple layers of memory, each serving different purposes. <strong>Immediate context</strong> holds the current conversation turn. <strong>Session memory</strong> persists throughout a single conversation (30 minutes to hours). <strong>User memory</strong> stores preferences and history across sessions (days to months). <strong>Knowledge memory</strong> provides access to domain information via RAG systems.</p>
+                <p>The challenge lies in efficiently managing these memory layers within the constraints of LLM context windows. A 128K token context window sounds large, but a customer service bot handling 50 daily conversations with 20 turns each quickly exceeds capacity. Smart memory management—summarization, selective retrieval, and tiered storage—becomes essential.</p>
+                <p>Memory also raises important considerations around <strong>privacy and data retention</strong>. Users expect personalization but also privacy controls. Best practices include clear data policies, opt-out mechanisms, automatic expiration (TTL), and GDPR-compliant deletion capabilities. The goal is memory that feels helpful, not creepy.</p>
+            </div>
+        </section>
+
+        <!-- KEY CONCEPTS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔑</div>
+                <div class="module-info"><h2>Key Concepts</h2><p>Essential memory terminology</p></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card" style="border-left-color: var(--pink);">
+                    <div class="concept-icon">💭</div>
+                    <div class="concept-term">Context Window</div>
+                    <div class="concept-def">The maximum tokens an LLM can process in a single request. Includes system prompt, conversation history, retrieved knowledge, and current query.</div>
+                    <div class="concept-example">GPT-4: 128K tokens<br>Claude: 200K tokens<br>~75K words capacity</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--purple);">
+                    <div class="concept-icon">📦</div>
+                    <div class="concept-term">Session State</div>
+                    <div class="concept-def">Temporary storage for a single conversation session. Holds slots, conversation history, and intermediate results. Typically stored in Redis or memory.</div>
+                    <div class="concept-example">session_id: "abc123"<br>slots: {origin: "SFO"}<br>turns: [{role, content}...]</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--blue);">
+                    <div class="concept-icon">🗄️</div>
+                    <div class="concept-term">Persistent Memory</div>
+                    <div class="concept-def">Long-term storage across sessions. User preferences, past interactions, learned facts. Stored in databases with user consent.</div>
+                    <div class="concept-example">user.preferences.seat = "aisle"<br>user.history.last_trip = "NYC"<br>user.tier = "platinum"</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--cyan);">
+                    <div class="concept-icon">🔍</div>
+                    <div class="concept-term">RAG Memory</div>
+                    <div class="concept-def">Retrieval-Augmented Generation: fetching relevant knowledge from vector databases based on semantic similarity to current query.</div>
+                    <div class="concept-example">Query: "baggage policy"<br>→ Retrieve: top 5 chunks<br>→ Inject into context<br>→ Generate grounded response</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--yellow);">
+                    <div class="concept-icon">📝</div>
+                    <div class="concept-term">Summarization</div>
+                    <div class="concept-def">Compressing long conversation history into shorter summaries to fit context windows. Preserves key facts while reducing token count.</div>
+                    <div class="concept-example">20 turns → 500 tokens<br>"User booked SFO→NYC<br>for Dec 20, wants aisle<br>seat, vegetarian meal"</div>
+                </div>
+                <div class="concept-card" style="border-left-color: var(--green);">
+                    <div class="concept-icon">⏱️</div>
+                    <div class="concept-term">TTL (Time-to-Live)</div>
+                    <div class="concept-def">Automatic expiration of memory entries. Session data might expire in 30 minutes, while user preferences persist for months.</div>
+                    <div class="concept-example">session_ttl: 1800s (30min)<br>cache_ttl: 86400s (1 day)<br>preference_ttl: 7776000s (90d)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info"><h2>How It Works</h2><p>The memory management pipeline</p></div>
+            </div>
+            <div class="how-it-works">
+                <div class="hiw-header">🧠 Memory Flow Per Turn</div>
+                <div class="hiw-body">
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">1</div>
+                        <div><div class="hiw-step-title">Load Session Context</div><div class="hiw-step-desc">Retrieve existing session from Redis/cache using session_id. Load conversation history, filled slots, and any pending actions.</div><div class="hiw-step-detail">session = redis.get(f"session:{session_id}") → {history: [...], slots: {...}}</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">2</div>
+                        <div><div class="hiw-step-title">Fetch User Memory</div><div class="hiw-step-desc">Query persistent storage for user preferences, past interactions, and learned facts. Merge with session context.</div><div class="hiw-step-detail">user_mem = db.get_user_memory(user_id) → {preferences: {}, history_summary: "..."}</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">3</div>
+                        <div><div class="hiw-step-title">Retrieve Knowledge (RAG)</div><div class="hiw-step-desc">Embed current query, search vector database for relevant chunks, rank by relevance and recency.</div><div class="hiw-step-detail">chunks = vector_db.search(embed(query), top_k=5) → [chunk1, chunk2, ...]</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">4</div>
+                        <div><div class="hiw-step-title">Assemble Context Window</div><div class="hiw-step-desc">Combine system prompt + user memory + RAG chunks + conversation history + current message. Trim if exceeding limit.</div><div class="hiw-step-detail">context = [system, user_context, rag_context, history[-10:], current_msg]</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">5</div>
+                        <div><div class="hiw-step-title">Process & Respond</div><div class="hiw-step-desc">Send assembled context to LLM. Extract any new facts or preferences from response for memory updates.</div><div class="hiw-step-detail">response = llm.generate(context); new_facts = extract_facts(response)</div></div>
+                    </div>
+                    <div class="hiw-step">
+                        <div class="hiw-step-num">6</div>
+                        <div><div class="hiw-step-title">Update & Persist</div><div class="hiw-step-desc">Append turn to history, update slots, save session to Redis with TTL. Optionally update persistent user memory.</div><div class="hiw-step-detail">session.history.append({user, assistant}); redis.setex(session_id, TTL, session)</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MEMORY LAYERS VISUALIZATION -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🎨</div>
+                <div class="module-info"><h2>Memory Architecture</h2><p>Layered memory system visualization</p></div>
+            </div>
+            <div class="memory-viz">
+                <div class="memory-viz-header">
+                    <span>🧠 Four-Layer Memory Stack</span>
+                </div>
+                <div class="memory-viz-body">
+                    <div class="memory-layout">
+                        <div class="memory-stack">
+                            <div class="memory-layer immediate">
+                                <div class="layer-icon immediate">⚡</div>
+                                <div class="layer-content">
+                                    <div class="layer-name">Immediate Context</div>
+                                    <div class="layer-desc">Current turn: user message + system state</div>
+                                    <div class="layer-data">"Book me a flight to NYC tomorrow"</div>
+                                </div>
+                                <div class="layer-ttl fast">~1 turn</div>
+                            </div>
+                            <div class="memory-layer session">
+                                <div class="layer-icon session">💾</div>
+                                <div class="layer-content">
+                                    <div class="layer-name">Session Memory</div>
+                                    <div class="layer-desc">Conversation history, slots, pending actions</div>
+                                    <div class="layer-data">slots: {dest: "NYC", date: "Dec 15"}</div>
+                                </div>
+                                <div class="layer-ttl medium">30 min</div>
+                            </div>
+                            <div class="memory-layer persistent">
+                                <div class="layer-icon persistent">🗄️</div>
+                                <div class="layer-content">
+                                    <div class="layer-name">User Memory</div>
+                                    <div class="layer-desc">Preferences, history, learned facts</div>
+                                    <div class="layer-data">pref: {seat: "aisle", meal: "veg"}</div>
+                                </div>
+                                <div class="layer-ttl long">90 days</div>
+                            </div>
+                            <div class="memory-layer knowledge">
+                                <div class="layer-icon knowledge">📚</div>
+                                <div class="layer-content">
+                                    <div class="layer-name">Knowledge Base</div>
+                                    <div class="layer-desc">RAG: policies, FAQs, product info</div>
+                                    <div class="layer-data">baggage_policy.chunk[3]: "50lb limit..."</div>
+                                </div>
+                                <div class="layer-ttl permanent">Indexed</div>
+                            </div>
+                        </div>
+                        <div class="access-panel">
+                            <div class="access-title">⚡ Access Speed</div>
+                            <div class="access-item">
+                                <div class="access-speed fast"></div>
+                                <div class="access-label">Immediate Context</div>
+                                <div class="access-time">0ms</div>
+                            </div>
+                            <div class="access-item">
+                                <div class="access-speed medium"></div>
+                                <div class="access-label">Session (Redis)</div>
+                                <div class="access-time">~1ms</div>
+                            </div>
+                            <div class="access-item">
+                                <div class="access-speed slow"></div>
+                                <div class="access-label">User Memory (DB)</div>
+                                <div class="access-time">~10ms</div>
+                            </div>
+                            <div class="access-item">
+                                <div class="access-speed index"></div>
+                                <div class="access-label">Knowledge (Vector)</div>
+                                <div class="access-time">~50ms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTEXT WINDOW MANAGEMENT -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info"><h2>Context Window Management</h2><p>Fitting everything into limited space</p></div>
+            </div>
+            <div class="overview-content">
+                <h3>The Context Window Challenge</h3>
+                <p>Every LLM has a finite context window—the maximum tokens it can process in a single request. While modern models like GPT-4 (128K) and Claude (200K) offer generous limits, efficient allocation is critical for production chatbots. You must fit your system prompt, conversation history, retrieved knowledge, user context, and leave room for the response—all within this budget. <strong>Poor allocation leads to truncated history, missing context, or failed requests.</strong></p>
+            </div>
+            <div class="context-section">
+                <div class="context-title">📏 Token Budget Allocation</div>
+                <div class="context-window">
+                    <div class="context-header">
+                        <div class="context-used">16K tokens <span>/ 128K budget</span></div>
+                        <div class="context-note">Typical allocation per request</div>
+                    </div>
+                    <div class="stacked-bar">
+                        <div class="bar-segment system">2K</div>
+                        <div class="bar-segment history">8K</div>
+                        <div class="bar-segment rag">4K</div>
+                        <div class="bar-segment response">2K</div>
+                    </div>
+                    <div class="context-legend">
+                        <div class="legend-item">
+                            <div class="legend-color system"></div>
+                            <div class="legend-info">
+                                <div class="legend-label">System Prompt</div>
+                                <div class="legend-value">2K tokens</div>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color history"></div>
+                            <div class="legend-info">
+                                <div class="legend-label">Conversation History</div>
+                                <div class="legend-value">8K tokens</div>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color rag"></div>
+                            <div class="legend-info">
+                                <div class="legend-label">RAG + User Context</div>
+                                <div class="legend-value">4K tokens</div>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color response"></div>
+                            <div class="legend-info">
+                                <div class="legend-label">Response Budget</div>
+                                <div class="legend-value">2K tokens</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content" style="margin-top: 20px;">
+                <h3>Allocation Strategy Explained</h3>
+                <p><strong>System Prompt (2K):</strong> Your persona, instructions, and behavioral guidelines. Keep this lean—every token here competes with conversation context. Use concise instructions and avoid redundancy. Some teams maintain a "core" prompt (~500 tokens) and conditionally add sections based on detected intent.</p>
+                <p><strong>Conversation History (8K):</strong> The largest allocation typically goes to recent turns. A sliding window of the last 10-15 exchanges usually suffices. For longer conversations, implement <strong>progressive summarization</strong>: summarize older turns into a compact paragraph, keeping recent turns verbatim. This preserves context while controlling token growth.</p>
+                <p><strong>RAG + User Context (4K):</strong> Retrieved knowledge chunks and user personalization data. Limit RAG to 3-5 highly relevant chunks rather than flooding context with marginally related content. User context (preferences, history summary) should be pre-computed and cached, not assembled on every request. Quality over quantity—irrelevant context degrades response quality.</p>
+            </div>
+        </section>
+
+        <!-- MEMORY TYPES COMPARISON -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info"><h2>Short-term vs Long-term Memory</h2><p>Different storage strategies for different needs</p></div>
+            </div>
+            <div class="memory-compare">
+                <div class="memory-type-card">
+                    <div class="memory-type-header">
+                        <div class="memory-type-icon short">⚡</div>
+                        <div>
+                            <div class="memory-type-title">Short-term Memory</div>
+                            <div class="memory-type-subtitle">Session-scoped, fast access</div>
+                        </div>
+                    </div>
+                    <div class="memory-type-body">
+                        <div class="memory-type-desc">Holds information needed for the current conversation. Stored in Redis or in-memory cache. Expires automatically after session timeout.</div>
+                        <ul class="memory-type-list">
+                            <li>Conversation turn history</li>
+                            <li>Filled slots (entities extracted)</li>
+                            <li>Current dialog state/stage</li>
+                            <li>Temporary user clarifications</li>
+                            <li>Pending confirmations</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="memory-type-card">
+                    <div class="memory-type-header">
+                        <div class="memory-type-icon long">🗄️</div>
+                        <div>
+                            <div class="memory-type-title">Long-term Memory</div>
+                            <div class="memory-type-subtitle">Persistent, user-consented</div>
+                        </div>
+                    </div>
+                    <div class="memory-type-body">
+                        <div class="memory-type-desc">Persists across sessions and devices. Stored in databases (PostgreSQL, MongoDB). Requires user consent and provides deletion controls.</div>
+                        <ul class="memory-type-list">
+                            <li>User preferences (seat, meal, etc.)</li>
+                            <li>Past booking history summary</li>
+                            <li>Learned facts ("lives in SF")</li>
+                            <li>Communication style preferences</li>
+                            <li>Loyalty tier / account status</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info"><h2>Memory Tools & Technologies</h2><p>Infrastructure for conversational memory</p></div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card"><div class="tool-icon">🔴</div><div class="tool-name">Redis</div><div class="tool-type">Session Store</div><div class="tool-desc">In-memory key-value store with TTL support</div></div>
+                <div class="tool-card"><div class="tool-icon">🌲</div><div class="tool-name">Pinecone</div><div class="tool-type">Vector DB</div><div class="tool-desc">Managed vector database for RAG retrieval</div></div>
+                <div class="tool-card"><div class="tool-icon">🐘</div><div class="tool-name">PostgreSQL</div><div class="tool-type">Persistent Store</div><div class="tool-desc">Relational DB for user profiles & history</div></div>
+                <div class="tool-card"><div class="tool-icon">🦜</div><div class="tool-name">LangChain</div><div class="tool-type">Framework</div><div class="tool-desc">Memory abstractions & conversation buffers</div></div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info"><h2>Best Practices</h2><p>Memory management guidelines</p></div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do This</div>
+                    <ul class="practice-list">
+                        <li>Summarize long conversations to fit context windows efficiently</li>
+                        <li>Use tiered storage: Redis for session, DB for persistent, vector for knowledge</li>
+                        <li>Set appropriate TTLs—session data should expire, not accumulate forever</li>
+                        <li>Provide users with memory controls: view, edit, delete their data</li>
+                        <li>Load user context early in the prompt for better personalization</li>
+                        <li>Cache frequently accessed knowledge chunks to reduce latency</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Avoid This</div>
+                    <ul class="practice-list">
+                        <li>Storing sensitive data (passwords, full credit cards) in memory</li>
+                        <li>Keeping unlimited conversation history—it bloats context and costs</li>
+                        <li>Ignoring memory consent requirements (GDPR, CCPA compliance)</li>
+                        <li>Over-personalizing in creepy ways ("I see you were sad last Tuesday")</li>
+                        <li>Relying solely on LLM memory—it hallucinates, use structured storage</li>
+                        <li>Forgetting to handle session expiration gracefully for users</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info"><h2>Agent This</h2><p>AI-powered memory management</p></div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🧩</div>
+                    <div class="agent-name">MemoryArchitectAgent</div>
+                    <div class="agent-role">Context & Memory Specialist</div>
+                    <div class="agent-desc">Expert in designing memory systems for conversational AI. Optimizes context window usage, implements RAG pipelines, and ensures privacy compliance.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design memory architectures</li>
+                        <li>Implement session management</li>
+                        <li>Build RAG retrieval pipelines</li>
+                        <li>Optimize context windows</li>
+                        <li>Ensure GDPR compliance</li>
+                        <li>Create summarization strategies</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">memory_manager.py</div>
+                    <div class="code-content"><pre>from crewai import Agent, Task, Crew
+import redis
+from langchain.memory import ConversationSummaryBufferMemory
+
+memory_agent = Agent(
+    role="Memory Architecture Specialist",
+    goal="Design efficient context and memory systems",
+    backstory="""Expert in conversational memory with deep
+    knowledge of Redis, vector databases, and LLM context
+    optimization. Has built memory systems handling millions
+    of daily conversations.""",
+    tools=[RedisManager(), VectorDBClient(), Summarizer()]
+)
+
+class ConversationMemory:
+    def __init__(self, session_id: str, user_id: str):
+        self.redis = redis.Redis()
+        self.session_id = session_id
+        self.user_id = user_id
+        self.session_ttl = 1800  # 30 minutes
+        
+    def load_context(self) -> dict:
+        """Load all memory layers for current turn."""
+        # Layer 1: Session memory (fast)
+        session = self.redis.get(f"session:{self.session_id}")
+        session = json.loads(session) if session else {"history": [], "slots": {}}
+        
+        # Layer 2: User memory (persistent)
+        user_mem = db.query(
+            "SELECT preferences, history_summary FROM users WHERE id = %s",
+            [self.user_id]
+        )
+        
+        # Layer 3: RAG knowledge (if query provided)
+        # Handled separately in retrieve_knowledge()
+        
+        return {
+            "session": session,
+            "user": user_mem,
+            "history": session.get("history", [])[-10:]  # Last 10 turns
+        }
+    
+    def retrieve_knowledge(self, query: str, top_k: int = 5) -> list:
+        """RAG: Fetch relevant knowledge chunks."""
+        embedding = embed_model.encode(query)
+        chunks = vector_db.search(embedding, top_k=top_k)
+        return [c.text for c in chunks]
+    
+    def update_session(self, user_msg: str, bot_msg: str, new_slots: dict):
+        """Append turn and update session in Redis."""
+        session = self.load_context()["session"]
+        session["history"].append({"user": user_msg, "assistant": bot_msg})
+        session["slots"].update(new_slots)
+        
+        # Summarize if history too long
+        if len(session["history"]) > 20:
+            session["summary"] = summarize(session["history"][:-10])
+            session["history"] = session["history"][-10:]
+        
+        self.redis.setex(
+            f"session:{self.session_id}",
+            self.session_ttl,
+            json.dumps(session)
+        )
+    
+    def save_user_preference(self, key: str, value: str):
+        """Persist user preference to long-term storage."""
+        db.execute(
+            "UPDATE users SET preferences = jsonb_set(preferences, %s, %s) WHERE id = %s",
+            [f'{{{key}}}', f'"{value}"', self.user_id]
+        )
+
+# Create memory optimization task
+task = Task(
+    description="Optimize memory usage for high-volume travel chatbot",
+    agent=memory_agent,
+    expected_output="Memory architecture with Redis session, PostgreSQL user store, Pinecone RAG"
+)
+
+crew = Crew(agents=[memory_agent], tasks=[task])
+result = crew.kickoff()</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info"><h2>Related Pages</h2><p>Continue learning</p></div>
+            </div>
+            <div class="related-grid">
+                <a href="cat06-p2-dialog-management.html" class="related-card"><div class="related-num">Page 6.2</div><div class="related-title">Dialog Management</div><div class="related-desc">State tracking that uses memory</div></a>
+                <a href="cat06-p3-response-generation.html" class="related-card"><div class="related-num">Page 6.3</div><div class="related-title">Response Generation</div><div class="related-desc">Context-aware response crafting</div></a>
+                <a href="cat06-p10-enterprise.html" class="related-card"><div class="related-num">Page 6.10</div><div class="related-title">Enterprise Integration</div><div class="related-desc">CRM and knowledge base connections</div></a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat06-p3-response-generation.html" class="footer-link">← 6.3: Response Generation</a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 6.4 of 10</div>
+        <a href="cat06-p5-platforms.html" class="footer-link">6.5: Platforms →</a>
+    </div>
+</footer>
+
+</body>
+</html>

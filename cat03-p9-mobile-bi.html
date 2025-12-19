@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile BI | Analytics & BI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            --page-primary: #8B5CF6;
+            --page-light: #A78BFA;
+            --page-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .approach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .approach-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .approach-icon { font-size: 28px; margin-bottom: 12px; }
+        .approach-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .approach-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .approach-pros { list-style: none; }
+        .approach-pros li { font-size: 10px; padding: 3px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .approach-pros li::before { content: '+'; color: var(--green); font-weight: bold; }
+        
+        .design-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .design-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .design-icon { font-size: 24px; margin-bottom: 8px; }
+        .design-title { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .design-desc { font-size: 9px; color: var(--text-muted); }
+        
+        .platform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .platform-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        .platform-logo { width: 40px; height: 40px; background: var(--bg-card-alt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .platform-info h3 { font-size: 14px; margin-bottom: 2px; }
+        .platform-info span { font-size: 10px; color: var(--text-muted); }
+        .platform-body { padding: 16px; }
+        .platform-features { list-style: none; }
+        .platform-features li { font-size: 10px; padding: 4px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .platform-features li::before { content: '✓'; color: var(--green); }
+        
+        .offline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .offline-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .offline-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .offline-icon { font-size: 24px; }
+        .offline-title { font-size: 14px; font-weight: 600; }
+        .offline-list { list-style: none; }
+        .offline-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .offline-list li:last-child { border-bottom: none; }
+        .offline-list li::before { content: '📱'; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .platform-grid, .offline-grid, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .design-grid { grid-template-columns: repeat(2, 1fr); }
+            .approach-grid, .related-pages { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat03-analytics-bi-overview.html">Analytics & BI</a>
+        <span class="sep">/</span>
+        <span class="current">Mobile BI</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 03</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat03-analytics-bi-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#approaches"><span class="nav-icon">📱</span> Approaches</a></li>
+            <li><a href="#design"><span class="nav-icon">🎨</span> Mobile Design</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🔧</span> Platforms</a></li>
+            <li><a href="#offline"><span class="nav-icon">📴</span> Offline & Sync</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat03-p1-bi-platforms.html"><span class="nav-icon">📊</span> BI Platforms</a></li>
+            <li><a href="cat03-p2-self-service.html"><span class="nav-icon">🙋</span> Self-Service</a></li>
+            <li><a href="cat03-p3-semantic-layer.html"><span class="nav-icon">🧊</span> Semantic Layer</a></li>
+            <li><a href="cat03-p4-visualization.html"><span class="nav-icon">📈</span> Visualization</a></li>
+            <li><a href="cat03-p5-dashboard-design.html"><span class="nav-icon">🎨</span> Dashboard Design</a></li>
+            <li><a href="cat03-p6-embedded.html"><span class="nav-icon">🔌</span> Embedded Analytics</a></li>
+            <li><a href="cat03-p7-realtime.html"><span class="nav-icon">⚡</span> Real-Time</a></li>
+            <li><a href="cat03-p8-advanced.html"><span class="nav-icon">🔮</span> Advanced Analytics</a></li>
+            <li><a href="cat03-p9-mobile-bi.html" class="active"><span class="nav-icon">📱</span> Mobile BI</a></li>
+            <li><a href="cat03-p10-bi-governance.html"><span class="nav-icon">🏛️</span> BI Governance</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">📱 Page 3.9</span>
+                <h1>Mobile BI</h1>
+                <p>Bring analytics to where decisions happen. Design mobile-first dashboards, enable offline access, and deliver insights to executives and field teams on any device.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">70%+</div><div class="hero-metric-label">Execs Use Mobile</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Touch</div><div class="hero-metric-label">Optimized Interactions</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Offline</div><div class="hero-metric-label">Access Anywhere</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">Push</div><div class="hero-metric-label">Alert Notifications</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Analytics On the Go</h2>
+                    <p>Mobile-first BI strategy</p>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Why Mobile Matters</h3>
+                <p>Executives make decisions in meetings, on planes, and between appointments—not sitting at desks. Field sales need customer data during client visits. Operations managers need KPIs from the factory floor. Mobile BI meets decision-makers where they are, not where IT wants them to be.</p>
+                
+                <h3>Mobile-First vs Mobile-Friendly</h3>
+                <p>Most BI platforms offer mobile apps that render desktop dashboards on smaller screens—this is mobile-friendly. True mobile-first design means purpose-built experiences: larger touch targets, simplified navigation, glanceable KPIs, and workflows optimized for on-the-go consumption. The difference is usability.</p>
+                
+                <h3>Beyond Consumption</h3>
+                <p>Mobile BI isn't just viewing dashboards. Push notifications alert users to threshold breaches. Annotation and sharing enable collaboration. Voice queries via Siri or Google Assistant provide hands-free access. The goal is actionable insights, not passive viewing.</p>
+            </div>
+        </section>
+
+        <!-- APPROACHES -->
+        <section class="module" id="approaches">
+            <div class="module-header">
+                <div class="module-icon">📱</div>
+                <div class="module-info">
+                    <h2>Mobile Approaches</h2>
+                    <p>Delivery options</p>
+                </div>
+            </div>
+            
+            <div class="approach-grid">
+                <div class="approach-card">
+                    <div class="approach-icon">📲</div>
+                    <div class="approach-title">Native Mobile Apps</div>
+                    <div class="approach-desc">Vendor apps (Power BI, Tableau) built for iOS/Android. Best performance, offline support, push notifications.</div>
+                    <ul class="approach-pros">
+                        <li>Native performance</li>
+                        <li>Offline capability</li>
+                        <li>Push notifications</li>
+                        <li>Device integration</li>
+                    </ul>
+                </div>
+                
+                <div class="approach-card">
+                    <div class="approach-icon">🌐</div>
+                    <div class="approach-title">Responsive Web</div>
+                    <div class="approach-desc">Desktop dashboards that adapt to mobile browsers. No app install, but limited offline and notifications.</div>
+                    <ul class="approach-pros">
+                        <li>No app required</li>
+                        <li>Single codebase</li>
+                        <li>Instant updates</li>
+                        <li>Cross-platform</li>
+                    </ul>
+                </div>
+                
+                <div class="approach-card">
+                    <div class="approach-icon">🔧</div>
+                    <div class="approach-title">Custom Mobile Apps</div>
+                    <div class="approach-desc">Bespoke apps with embedded analytics. Full control over UX, branding, and workflow integration.</div>
+                    <ul class="approach-pros">
+                        <li>Full customization</li>
+                        <li>Brand integration</li>
+                        <li>Custom workflows</li>
+                        <li>Deep embedding</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MOBILE DESIGN -->
+        <section class="module" id="design">
+            <div class="module-header">
+                <div class="module-icon">🎨</div>
+                <div class="module-info">
+                    <h2>Mobile Design Principles</h2>
+                    <p>Designing for small screens</p>
+                </div>
+            </div>
+            
+            <div class="design-grid">
+                <div class="design-card">
+                    <div class="design-icon">👆</div>
+                    <div class="design-title">Touch Targets</div>
+                    <div class="design-desc">44px minimum tap areas</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">👁️</div>
+                    <div class="design-title">Glanceable</div>
+                    <div class="design-desc">Key info in 3 seconds</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">📏</div>
+                    <div class="design-title">Vertical Scroll</div>
+                    <div class="design-desc">Single column layouts</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">📊</div>
+                    <div class="design-title">Simplified Charts</div>
+                    <div class="design-desc">Fewer data points</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">🔤</div>
+                    <div class="design-title">Readable Text</div>
+                    <div class="design-desc">16px+ font sizes</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">🎯</div>
+                    <div class="design-title">Focus on KPIs</div>
+                    <div class="design-desc">Top 3-5 metrics</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">🔄</div>
+                    <div class="design-title">Pull to Refresh</div>
+                    <div class="design-desc">Familiar patterns</div>
+                </div>
+                <div class="design-card">
+                    <div class="design-icon">🌙</div>
+                    <div class="design-title">Dark Mode</div>
+                    <div class="design-desc">System preference support</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLATFORMS -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Mobile BI Platforms</h2>
+                    <p>Vendor mobile capabilities</p>
+                </div>
+            </div>
+            
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">💼</div>
+                        <div class="platform-info">
+                            <h3>Power BI Mobile</h3>
+                            <span>iOS, Android, Windows</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <ul class="platform-features">
+                            <li>Offline access to favorites</li>
+                            <li>Push notifications on alerts</li>
+                            <li>Annotate and share reports</li>
+                            <li>Windows Surface Hub support</li>
+                            <li>QR code scanning</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">📊</div>
+                        <div class="platform-info">
+                            <h3>Tableau Mobile</h3>
+                            <span>iOS, Android</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <ul class="platform-features">
+                            <li>Offline snapshots</li>
+                            <li>Touch-optimized interactions</li>
+                            <li>Favorites and recents</li>
+                            <li>Data-driven alerts</li>
+                            <li>SSO integration</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">🔍</div>
+                        <div class="platform-info">
+                            <h3>Looker Mobile</h3>
+                            <span>iOS, Android</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <ul class="platform-features">
+                            <li>Look and dashboard access</li>
+                            <li>Scheduled delivery</li>
+                            <li>Filter and explore</li>
+                            <li>Share via email/Slack</li>
+                            <li>Offline viewing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">💡</div>
+                        <div class="platform-info">
+                            <h3>ThoughtSpot</h3>
+                            <span>Search-driven mobile</span>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <ul class="platform-features">
+                            <li>Natural language search</li>
+                            <li>AI-powered insights</li>
+                            <li>Pinboards on mobile</li>
+                            <li>SpotIQ anomaly alerts</li>
+                            <li>Voice search support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OFFLINE & SYNC -->
+        <section class="module" id="offline">
+            <div class="module-header">
+                <div class="module-icon">📴</div>
+                <div class="module-info">
+                    <h2>Offline & Sync</h2>
+                    <p>Analytics without connectivity</p>
+                </div>
+            </div>
+            
+            <div class="offline-grid">
+                <div class="offline-card">
+                    <div class="offline-header">
+                        <div class="offline-icon">💾</div>
+                        <div class="offline-title">Offline Strategies</div>
+                    </div>
+                    <ul class="offline-list">
+                        <li>Pre-cache favorite dashboards</li>
+                        <li>Store last-viewed state</li>
+                        <li>Download scheduled reports</li>
+                        <li>Sync on WiFi only option</li>
+                    </ul>
+                </div>
+                
+                <div class="offline-card">
+                    <div class="offline-header">
+                        <div class="offline-icon">🔄</div>
+                        <div class="offline-title">Sync Considerations</div>
+                    </div>
+                    <ul class="offline-list">
+                        <li>Data freshness indicators</li>
+                        <li>Background refresh scheduling</li>
+                        <li>Bandwidth management</li>
+                        <li>Conflict resolution</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for mobile BI success</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Design mobile-specific layouts (not just shrunk desktop)</li>
+                        <li>Prioritize KPIs at the top</li>
+                        <li>Use large, touch-friendly controls</li>
+                        <li>Enable offline access for key reports</li>
+                        <li>Implement push notifications for alerts</li>
+                        <li>Test on actual devices, not emulators</li>
+                        <li>Support both portrait and landscape</li>
+                        <li>Consider data costs for field users</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Don't cram desktop dashboards onto mobile</li>
+                        <li>Avoid tiny text and controls</li>
+                        <li>Never require pinch-zoom to read</li>
+                        <li>Don't ignore loading performance</li>
+                        <li>Avoid horizontal scrolling</li>
+                        <li>Don't forget security (lost device scenarios)</li>
+                        <li>Never assume always-on connectivity</li>
+                        <li>Don't skip user testing with target audience</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered mobile BI design</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📱</div>
+                    <div class="agent-name">MobileBIAgent</div>
+                    <div class="agent-role">Mobile Analytics Specialist</div>
+                    <div class="agent-desc">Expert in mobile BI design, responsive layouts, and offline-first architecture. Specializes in creating touch-optimized analytics experiences.</div>
+                    <ul class="agent-capabilities">
+                        <li>Design mobile layouts</li>
+                        <li>Optimize touch interactions</li>
+                        <li>Configure offline sync</li>
+                        <li>Set up push alerts</li>
+                        <li>Test responsiveness</li>
+                        <li>Audit mobile UX</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Mobile Task</div>
+                        <div class="code-filename">mobile_bi_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># mobile_bi_agent.py - Mobile BI Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">mobile_agent</span> = Agent(
+    role=<span class="code-string">"Mobile BI Designer"</span>,
+    goal=<span class="code-string">"Create effective mobile analytics experiences"</span>,
+    backstory=<span class="code-string">"""Expert in mobile-first design for BI 
+    including touch optimization, responsive layouts, 
+    offline architecture, and push notification 
+    configuration for iOS and Android."""</span>,
+    tools=[
+        MobileLayoutDesigner(),
+        TouchOptimizer(),
+        OfflineConfigurator(),
+        AlertSetup(),
+        ResponsiveTester(),
+        UXAuditor(),
+    ]
+)
+
+<span class="code-function">mobile_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Identify mobile user personas
+    2. Define priority metrics for mobile
+    3. Design mobile-first layout
+    4. Optimize for touch interactions
+    5. Configure offline sync strategy
+    6. Set up push notifications
+    7. Test on target devices
+    8. Gather user feedback
+    """</span>,
+    agent=mobile_agent,
+    expected_output=<span class="code-string">"Mobile BI implementation"</span>
+)
+
+<span class="code-comment"># Execute mobile BI design</span>
+crew = Crew(agents=[mobile_agent], tasks=[mobile_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat03-p5-dashboard-design.html" class="related-card">
+                    <div class="related-num">Page 3.5</div>
+                    <div class="related-title">Dashboard Design</div>
+                    <div class="related-desc">Design principles</div>
+                </a>
+                <a href="cat03-p6-embedded.html" class="related-card">
+                    <div class="related-num">Page 3.6</div>
+                    <div class="related-title">Embedded Analytics</div>
+                    <div class="related-desc">Mobile app embedding</div>
+                </a>
+                <a href="cat03-p7-realtime.html" class="related-card">
+                    <div class="related-num">Page 3.7</div>
+                    <div class="related-title">Real-Time Analytics</div>
+                    <div class="related-desc">Live mobile updates</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat03-p8-advanced.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">3.8: Advanced Analytics</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 3.9 of 10</div>
+        <a href="cat03-p10-bi-governance.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">3.10: BI Governance</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning | Generative AI | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EC4899;
+            --cat-light: #F472B6;
+            --cat-glow: rgba(236, 72, 153, 0.15);
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--page-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* DECISION TREE */
+        .decision-tree { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .decision-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .decision-title { font-size: 13px; font-weight: 600; }
+        .decision-canvas { padding: 24px; background: var(--bg-dark); }
+        .decision-flow { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .decision-node { background: var(--bg-card-alt); border: 2px solid var(--border-color); border-radius: 12px; padding: 16px 24px; text-align: center; max-width: 300px; }
+        .decision-node.question { border-color: var(--page-primary); background: var(--page-glow); }
+        .decision-node.answer { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+        .decision-node-text { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .decision-node-desc { font-size: 10px; color: var(--text-muted); }
+        .decision-branches { display: flex; gap: 40px; }
+        .decision-branch { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .decision-arrow { font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; }
+        .decision-label { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: var(--bg-card-alt); margin-bottom: 4px; }
+        .decision-label.yes { color: var(--green); }
+        .decision-label.no { color: var(--red); }
+        
+        /* LORA DIAGRAM */
+        .lora-diagram { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .lora-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .lora-title { font-size: 13px; font-weight: 600; }
+        .lora-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .lora-canvas { padding: 24px; background: var(--bg-dark); display: flex; justify-content: center; align-items: center; gap: 40px; }
+        .lora-side { text-align: center; }
+        .lora-side-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .lora-matrix { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .lora-matrix-block { border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: white; }
+        .lora-matrix-block.full { width: 120px; height: 80px; background: var(--blue); }
+        .lora-matrix-block.frozen { width: 120px; height: 80px; background: var(--text-muted); opacity: 0.5; }
+        .lora-matrix-block.a { width: 120px; height: 20px; background: var(--green); }
+        .lora-matrix-block.b { width: 20px; height: 80px; background: var(--pink); }
+        .lora-plus { font-size: 24px; color: var(--text-muted); }
+        .lora-row { display: flex; align-items: center; gap: 8px; }
+        .lora-label { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+        .lora-savings { background: var(--bg-card-alt); border-radius: 8px; padding: 12px 16px; margin-top: 16px; }
+        .lora-savings-text { font-size: 11px; color: var(--text-secondary); text-align: center; }
+        .lora-savings-highlight { color: var(--green); font-weight: 600; }
+        
+        /* METHOD COMPARISON */
+        .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .method-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .method-header { padding: 16px; border-bottom: 1px solid var(--border-color); }
+        .method-header.full { background: linear-gradient(135deg, rgba(59,130,246,0.2), transparent); border-left: 3px solid var(--blue); }
+        .method-header.lora { background: linear-gradient(135deg, rgba(16,185,129,0.2), transparent); border-left: 3px solid var(--green); }
+        .method-header.qlora { background: linear-gradient(135deg, rgba(236,72,153,0.2), transparent); border-left: 3px solid var(--pink); }
+        .method-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .method-subtitle { font-size: 10px; color: var(--text-muted); }
+        .method-body { padding: 16px; }
+        .method-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .method-stat { background: var(--bg-card-alt); border-radius: 6px; padding: 10px; text-align: center; }
+        .method-stat-value { font-size: 14px; font-weight: 600; color: var(--page-light); }
+        .method-stat-label { font-size: 8px; color: var(--text-muted); margin-top: 2px; }
+        .method-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .method-pros { list-style: none; }
+        .method-pros li { font-size: 10px; color: var(--text-secondary); padding: 3px 0; }
+        .method-pros li::before { content: '✓ '; color: var(--green); }
+        
+        /* DATASET FORMAT */
+        .dataset-example { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .dataset-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .dataset-title { font-size: 13px; font-weight: 600; }
+        .dataset-format { font-size: 10px; padding: 3px 10px; border-radius: 9999px; background: var(--page-glow); color: var(--page-light); }
+        .dataset-body { padding: 16px; background: var(--bg-dark); }
+        .dataset-row { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .dataset-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .dataset-label { font-size: 10px; font-weight: 600; color: var(--page-light); margin-bottom: 4px; text-transform: uppercase; }
+        .dataset-content { font-family: monospace; font-size: 11px; color: var(--text-secondary); line-height: 1.5; background: var(--bg-card-alt); padding: 10px; border-radius: 6px; }
+        
+        /* TRAINING PROGRESS */
+        .training-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .training-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .training-chart { display: flex; align-items: flex-end; gap: 4px; height: 120px; margin-bottom: 16px; padding: 0 20px; }
+        .training-bar { flex: 1; background: linear-gradient(to top, var(--page-primary), var(--page-light)); border-radius: 4px 4px 0 0; transition: height 0.3s; }
+        .training-labels { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); padding: 0 20px; }
+        .training-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+        .training-metric { background: var(--bg-card-alt); border-radius: 8px; padding: 12px; text-align: center; }
+        .training-metric-value { font-size: 16px; font-weight: 700; color: var(--page-light); }
+        .training-metric-label { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* COMPARISON TABLE */
+        .comparison-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .comparison-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .comparison-title { font-size: 13px; font-weight: 600; }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--page-primary), var(--page-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--page-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 10px 16px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--page-light); border-bottom-color: var(--page-light); }
+        .code-filename { margin-left: auto; padding: 10px 16px; font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; background: var(--bg-dark); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-function { color: var(--page-light); }
+        .code-comment { color: var(--text-muted); }
+        
+        /* RELATED PAGES */
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 4px; }
+        .related-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat05-generative-ai-overview.html">Generative AI</a>
+        <span class="sep">/</span>
+        <span class="current">Fine-Tuning</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🎨 Category 05</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat05-generative-ai-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat05-p1-llm-fundamentals.html"><span class="nav-icon">🧠</span> 5.1 LLM Fundamentals</a></li>
+            <li><a href="cat05-p2-prompt-engineering.html"><span class="nav-icon">✍️</span> 5.2 Prompt Engineering</a></li>
+            <li><a href="cat05-p3-rag-systems.html"><span class="nav-icon">🔍</span> 5.3 RAG Systems</a></li>
+            <li><a href="cat05-p4-fine-tuning.html" class="active"><span class="nav-icon">🎯</span> 5.4 Fine-Tuning</a></li>
+            <li><a href="cat05-p5-embeddings.html"><span class="nav-icon">📊</span> 5.5 Embeddings</a></li>
+            <li><a href="cat05-p6-model-evaluation.html"><span class="nav-icon">📈</span> 5.6 Evaluation</a></li>
+            <li><a href="cat05-p7-multimodal.html"><span class="nav-icon">🖼️</span> 5.7 Multimodal</a></li>
+            <li><a href="cat05-p8-responsible-ai.html"><span class="nav-icon">⚖️</span> 5.8 Responsible AI</a></li>
+            <li><a href="cat05-p9-deployment.html"><span class="nav-icon">🚀</span> 5.9 Deployment</a></li>
+            <li><a href="cat05-p10-cost-optimization.html"><span class="nav-icon">💰</span> 5.10 Cost</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🎯 Page 5.4</div>
+                <h1>Fine-Tuning LLMs</h1>
+                <p>Customize language models for your specific domain and tasks. Master LoRA, QLoRA, and full fine-tuning techniques to create specialized AI models.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">LoRA</div>
+                    <div class="hero-metric-label">0.1% Parameters</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">4-bit</div>
+                    <div class="hero-metric-label">QLoRA Quantization</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">1K+</div>
+                    <div class="hero-metric-label">Training Examples</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Hours</div>
+                    <div class="hero-metric-label">Training Time</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>When to Fine-Tune?</h2>
+                    <p>Understanding when fine-tuning is the right choice</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Fine-Tuning vs. Alternatives</h3>
+                <p>Fine-tuning adapts a pre-trained model to your specific domain or task by continuing training on your data. Unlike prompting or RAG, fine-tuning modifies the model weights themselves, allowing it to learn new patterns, terminology, and behaviors that can't be achieved through context alone.</p>
+                <p><strong>Fine-tune when:</strong> You need consistent style/format, domain-specific knowledge baked into the model, lower latency (no retrieval step), proprietary terminology or jargon, or tasks that prompting fails to achieve. Fine-tuning is particularly valuable for structured output generation, code completion in proprietary frameworks, and specialized classification tasks.</p>
+                <p><strong>Don't fine-tune when:</strong> You just need access to current information (use RAG), have less than 1,000 high-quality examples, need to frequently update knowledge, or when good prompting achieves acceptable results. Fine-tuning is expensive and creates maintenance burden—make sure it's worth it.</p>
+            </div>
+        </section>
+
+        <!-- DECISION TREE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🌳</div>
+                <div class="module-info">
+                    <h2>Decision Framework</h2>
+                    <p>Choosing the right approach for your use case</p>
+                </div>
+            </div>
+            <div class="decision-tree">
+                <div class="decision-header">
+                    <div class="decision-title">🤔 Prompt vs RAG vs Fine-Tune Decision Tree</div>
+                </div>
+                <div class="decision-canvas">
+                    <div class="decision-flow">
+                        <div class="decision-node question">
+                            <div class="decision-node-text">Does good prompting solve your problem?</div>
+                            <div class="decision-node-desc">Test with few-shot examples first</div>
+                        </div>
+                        <div class="decision-branches">
+                            <div class="decision-branch">
+                                <div class="decision-arrow">
+                                    <span class="decision-label yes">Yes</span>
+                                    ↓
+                                </div>
+                                <div class="decision-node answer">
+                                    <div class="decision-node-text">✅ Use Prompt Engineering</div>
+                                    <div class="decision-node-desc">Cheapest, fastest to iterate</div>
+                                </div>
+                            </div>
+                            <div class="decision-branch">
+                                <div class="decision-arrow">
+                                    <span class="decision-label no">No</span>
+                                    ↓
+                                </div>
+                                <div class="decision-node question">
+                                    <div class="decision-node-text">Do you need real-time or updatable knowledge?</div>
+                                    <div class="decision-node-desc">Information that changes frequently</div>
+                                </div>
+                                <div class="decision-branches" style="margin-top: 12px;">
+                                    <div class="decision-branch">
+                                        <div class="decision-arrow">
+                                            <span class="decision-label yes">Yes</span>
+                                            ↓
+                                        </div>
+                                        <div class="decision-node answer">
+                                            <div class="decision-node-text">✅ Use RAG</div>
+                                            <div class="decision-node-desc">Dynamic knowledge access</div>
+                                        </div>
+                                    </div>
+                                    <div class="decision-branch">
+                                        <div class="decision-arrow">
+                                            <span class="decision-label no">No</span>
+                                            ↓
+                                        </div>
+                                        <div class="decision-node answer">
+                                            <div class="decision-node-text">✅ Fine-Tune</div>
+                                            <div class="decision-node-desc">Bake knowledge into model</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LORA DIAGRAM -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>LoRA: Low-Rank Adaptation</h2>
+                    <p>Train a fraction of parameters with full performance</p>
+                </div>
+            </div>
+            <div class="lora-diagram">
+                <div class="lora-header">
+                    <div class="lora-title">🧮 LoRA Architecture Visualization</div>
+                    <div class="lora-badge">Parameter Efficient</div>
+                </div>
+                <div class="lora-canvas">
+                    <div class="lora-side">
+                        <div class="lora-side-title">Full Fine-Tuning</div>
+                        <div class="lora-matrix">
+                            <div class="lora-matrix-block full">W<br/>d × d<br/>All trainable</div>
+                            <div class="lora-label">Update entire weight matrix</div>
+                        </div>
+                    </div>
+                    <div class="lora-plus">→</div>
+                    <div class="lora-side">
+                        <div class="lora-side-title">LoRA Fine-Tuning</div>
+                        <div class="lora-matrix">
+                            <div class="lora-row">
+                                <div class="lora-matrix-block frozen">W<br/>Frozen</div>
+                                <div class="lora-plus">+</div>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <div class="lora-matrix-block b">B</div>
+                                    <div style="font-size: 10px; color: var(--text-muted);">×</div>
+                                    <div class="lora-matrix-block a">A</div>
+                                </div>
+                            </div>
+                            <div class="lora-label">Freeze W, train small A & B matrices</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 0 24px 24px;">
+                    <div class="lora-savings">
+                        <div class="lora-savings-text">
+                            <strong>How it works:</strong> Instead of updating the full d×d weight matrix W, LoRA freezes W and trains two small matrices: A (d×r) and B (r×d) where r << d (typically r=8 to 64). The update becomes W + BA, achieving <span class="lora-savings-highlight">99.9% parameter reduction</span> with comparable performance.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- METHOD COMPARISON -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Fine-Tuning Methods</h2>
+                    <p>Compare approaches for your constraints</p>
+                </div>
+            </div>
+            <div class="method-grid">
+                <div class="method-card">
+                    <div class="method-header full">
+                        <div class="method-title">Full Fine-Tuning</div>
+                        <div class="method-subtitle">All parameters trainable</div>
+                    </div>
+                    <div class="method-body">
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">100%</div>
+                                <div class="method-stat-label">Params Trained</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">8× A100</div>
+                                <div class="method-stat-label">GPU Required</div>
+                            </div>
+                        </div>
+                        <div class="method-desc">Train all model parameters. Maximum flexibility but requires significant compute and risks catastrophic forgetting.</div>
+                        <ul class="method-pros">
+                            <li>Best possible performance ceiling</li>
+                            <li>Full model adaptation</li>
+                            <li>No architectural constraints</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-card">
+                    <div class="method-header lora">
+                        <div class="method-title">LoRA</div>
+                        <div class="method-subtitle">Low-Rank Adaptation</div>
+                    </div>
+                    <div class="method-body">
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">0.1%</div>
+                                <div class="method-stat-label">Params Trained</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">1× A100</div>
+                                <div class="method-stat-label">GPU Required</div>
+                            </div>
+                        </div>
+                        <div class="method-desc">Train small adapter matrices while freezing base model. Excellent performance with dramatically reduced compute needs.</div>
+                        <ul class="method-pros">
+                            <li>Near full fine-tune performance</li>
+                            <li>Swap adapters at runtime</li>
+                            <li>No catastrophic forgetting</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-card">
+                    <div class="method-header qlora">
+                        <div class="method-title">QLoRA</div>
+                        <div class="method-subtitle">Quantized LoRA</div>
+                    </div>
+                    <div class="method-body">
+                        <div class="method-stats">
+                            <div class="method-stat">
+                                <div class="method-stat-value">4-bit</div>
+                                <div class="method-stat-label">Quantization</div>
+                            </div>
+                            <div class="method-stat">
+                                <div class="method-stat-value">1× RTX</div>
+                                <div class="method-stat-label">Consumer GPU</div>
+                            </div>
+                        </div>
+                        <div class="method-desc">LoRA on 4-bit quantized models. Fine-tune 65B models on a single 48GB GPU with minimal quality loss.</div>
+                        <ul class="method-pros">
+                            <li>Fine-tune huge models cheaply</li>
+                            <li>Consumer hardware viable</li>
+                            <li>~95% of full LoRA quality</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATASET FORMAT -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Training Data Format</h2>
+                    <p>Structure your fine-tuning dataset correctly</p>
+                </div>
+            </div>
+            <div class="dataset-example">
+                <div class="dataset-header">
+                    <div class="dataset-title">Instruction-Following Format (ChatML)</div>
+                    <div class="dataset-format">JSONL</div>
+                </div>
+                <div class="dataset-body">
+                    <div class="dataset-row">
+                        <div class="dataset-label">System</div>
+                        <div class="dataset-content">You are a helpful customer support agent for TechCorp. Always be polite, accurate, and concise. If you don't know something, say so.</div>
+                    </div>
+                    <div class="dataset-row">
+                        <div class="dataset-label">User</div>
+                        <div class="dataset-content">How do I reset my password?</div>
+                    </div>
+                    <div class="dataset-row">
+                        <div class="dataset-label">Assistant</div>
+                        <div class="dataset-content">To reset your TechCorp password: 1) Go to techcorp.com/reset, 2) Enter your email address, 3) Click the link in the email we send you, 4) Choose a new password. The link expires in 24 hours. Need help with anything else?</div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Dataset Best Practices</h3>
+                <p><strong>Quality over quantity:</strong> 1,000 high-quality, diverse examples often outperform 10,000 mediocre ones. Each example should demonstrate the exact behavior you want the model to learn. Invest in data curation and cleaning.</p>
+                <p><strong>Diversity matters:</strong> Include varied examples covering edge cases, different phrasings, and potential failure modes. Models learn patterns—if all examples are similar, the model won't generalize well to novel inputs.</p>
+                <p><strong>Format consistency:</strong> Use consistent formatting across all examples. The model learns the format as much as the content. ChatML, Alpaca, and ShareGPT are popular formats with good tooling support.</p>
+            </div>
+        </section>
+
+        <!-- TRAINING VISUALIZATION -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Training Process</h2>
+                    <p>Understanding the fine-tuning training loop</p>
+                </div>
+            </div>
+            <div class="training-viz">
+                <div class="training-title">📉 Training Loss Over Time (Typical LoRA Run)</div>
+                <div class="training-chart">
+                    <div class="training-bar" style="height: 100%;"></div>
+                    <div class="training-bar" style="height: 85%;"></div>
+                    <div class="training-bar" style="height: 70%;"></div>
+                    <div class="training-bar" style="height: 58%;"></div>
+                    <div class="training-bar" style="height: 48%;"></div>
+                    <div class="training-bar" style="height: 42%;"></div>
+                    <div class="training-bar" style="height: 38%;"></div>
+                    <div class="training-bar" style="height: 35%;"></div>
+                    <div class="training-bar" style="height: 33%;"></div>
+                    <div class="training-bar" style="height: 32%;"></div>
+                    <div class="training-bar" style="height: 31%;"></div>
+                    <div class="training-bar" style="height: 30%;"></div>
+                </div>
+                <div class="training-labels">
+                    <span>Epoch 1</span>
+                    <span>Epoch 2</span>
+                    <span>Epoch 3</span>
+                </div>
+                <div class="training-metrics">
+                    <div class="training-metric">
+                        <div class="training-metric-value">3</div>
+                        <div class="training-metric-label">Epochs</div>
+                    </div>
+                    <div class="training-metric">
+                        <div class="training-metric-value">2e-4</div>
+                        <div class="training-metric-label">Learning Rate</div>
+                    </div>
+                    <div class="training-metric">
+                        <div class="training-metric-value">4</div>
+                        <div class="training-metric-label">Batch Size</div>
+                    </div>
+                    <div class="training-metric">
+                        <div class="training-metric-value">0.31</div>
+                        <div class="training-metric-label">Final Loss</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON TABLE -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Platform Comparison</h2>
+                    <p>Where to run your fine-tuning jobs</p>
+                </div>
+            </div>
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-title">📋 Fine-Tuning Platforms</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Managed</th>
+                            <th>Cost</th>
+                            <th>Models</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OpenAI Fine-tuning</strong></td>
+                            <td>Fully managed</td>
+                            <td>$$$</td>
+                            <td>GPT-3.5, GPT-4</td>
+                            <td>Simplest setup, production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Together AI</strong></td>
+                            <td>Managed</td>
+                            <td>$$</td>
+                            <td>Llama, Mistral, etc.</td>
+                            <td>Open models, good pricing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hugging Face AutoTrain</strong></td>
+                            <td>Semi-managed</td>
+                            <td>$$</td>
+                            <td>Any HF model</td>
+                            <td>Flexibility + convenience</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Axolotl (Self-host)</strong></td>
+                            <td>DIY</td>
+                            <td>$</td>
+                            <td>Any model</td>
+                            <td>Full control, cost optimization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unsloth</strong></td>
+                            <td>DIY</td>
+                            <td>$</td>
+                            <td>Llama, Mistral</td>
+                            <td>2x faster training</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered fine-tuning assistant</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🎯</div>
+                    <div class="agent-name">FineTuningAgent</div>
+                    <div class="agent-role">Model Customization Expert</div>
+                    <div class="agent-desc">Expert in fine-tuning strategies, dataset preparation, and training optimization. Helps you decide when to fine-tune, prepare high-quality datasets, select hyperparameters, and deploy custom models.</div>
+                    <ul class="agent-capabilities">
+                        <li>Evaluate fine-tuning necessity</li>
+                        <li>Design dataset collection strategy</li>
+                        <li>Select optimal method (LoRA/QLoRA/Full)</li>
+                        <li>Configure hyperparameters</li>
+                        <li>Monitor training and prevent overfitting</li>
+                        <li>Evaluate and deploy fine-tuned models</li>
+                        <li>Debug training issues</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Training Task</div>
+                        <div class="code-filename">finetuning_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># finetuning_agent.py - Fine-Tuning Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-function">ft_agent</span> = Agent(
+    role=<span class="code-string">"Fine-Tuning Specialist"</span>,
+    goal=<span class="code-string">"Create optimized custom LLMs"</span>,
+    backstory=<span class="code-string">"""Expert in LLM fine-tuning with deep 
+    knowledge of LoRA, QLoRA, and full fine-tuning.
+    Has trained hundreds of custom models across 
+    domains. Specializes in data quality, efficient
+    training, and evaluation. Knows when to fine-tune
+    vs. use prompting or RAG."""</span>,
+    tools=[
+        DatasetAnalyzer(),
+        HyperparameterSelector(),
+        TrainingMonitor(),
+        ModelEvaluator(),
+        DeploymentHelper(),
+    ]
+)
+
+<span class="code-function">ft_task</span> = Task(
+    description=<span class="code-string">"""
+    1. Analyze use case and determine if fine-tuning needed
+    2. Design dataset collection and curation strategy
+    3. Select base model and fine-tuning method
+    4. Configure optimal hyperparameters
+    5. Set up training pipeline with monitoring
+    6. Evaluate model quality on held-out data
+    7. Package for deployment
+    """</span>,
+    agent=ft_agent,
+    expected_output=<span class="code-string">"Deployed fine-tuned model"</span>
+)
+
+<span class="code-comment"># Execute fine-tuning</span>
+crew = Crew(agents=[ft_agent], tasks=[ft_task])
+result = crew.kickoff()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat05-p2-prompt-engineering.html" class="related-card">
+                    <div class="related-num">Page 5.2</div>
+                    <div class="related-title">Prompt Engineering</div>
+                    <div class="related-desc">Try prompting before fine-tuning</div>
+                </a>
+                <a href="cat05-p3-rag-systems.html" class="related-card">
+                    <div class="related-num">Page 5.3</div>
+                    <div class="related-title">RAG Systems</div>
+                    <div class="related-desc">Alternative for knowledge injection</div>
+                </a>
+                <a href="cat05-p6-model-evaluation.html" class="related-card">
+                    <div class="related-num">Page 5.6</div>
+                    <div class="related-title">Model Evaluation</div>
+                    <div class="related-desc">Evaluate your fine-tuned models</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat05-p3-rag-systems.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">5.3: RAG Systems</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 5.4 of 10</div>
+        <a href="cat05-p5-embeddings.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">5.5: Embeddings & Vectors</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>
