@@ -1,6 +1,6 @@
 # Strategy Hub Master Category List
 
-**28 Categories | ~178 Pages | Blueprint Technologies**
+**28 Categories | ~178 Pages | Strategy Hub**
 
 ---
 
@@ -91,4 +91,4 @@
 
 ---
 
-*Strategy Hub Master Plan v3.0 | Blueprint Technologies | December 2025*
+*Strategy Hub Master Plan v3.0 | Strategy Hub | December 2025*
