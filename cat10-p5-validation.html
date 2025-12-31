@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation & Testing | Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --page-primary: #06B6D4;
+            --page-light: #22D3EE;
+            --page-glow: rgba(6, 182, 212, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: rgba(20, 184, 166, 0.15); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+
+        /* Test Pyramid */
+        .test-pyramid { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 40px; margin-bottom: 24px; }
+        .pyramid-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 32px; }
+        .pyramid-visual { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .pyramid-level { display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 13px; }
+        .pyramid-level.e2e { width: 150px; height: 60px; background: linear-gradient(135deg, #EF4444, #DC2626); clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        .pyramid-level.integration { width: 250px; height: 70px; background: linear-gradient(135deg, #F59E0B, #D97706); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); }
+        .pyramid-level.unit { width: 380px; height: 80px; background: linear-gradient(135deg, #10B981, #059669); border-radius: 0 0 8px 8px; }
+        .pyramid-labels { display: flex; justify-content: space-around; width: 100%; max-width: 400px; margin-top: 24px; font-size: 11px; color: var(--text-muted); }
+
+        /* CI/CD Pipeline */
+        .cicd-pipeline { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .pipeline-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 32px; }
+        .pipeline-stages { display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .pipeline-stages::before { content: ''; position: absolute; top: 40px; left: 60px; right: 60px; height: 4px; background: linear-gradient(90deg, var(--blue), var(--cyan), var(--green), var(--yellow), var(--purple)); }
+        .pipeline-stage { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .stage-icon { width: 80px; height: 80px; background: var(--bg-card); border: 3px solid var(--stage-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px; transition: all 0.3s; }
+        .pipeline-stage:hover .stage-icon { transform: scale(1.1); box-shadow: 0 0 30px color-mix(in srgb, var(--stage-color) 50%, transparent); }
+        .stage-label { font-size: 12px; font-weight: 600; color: var(--stage-color); }
+        .stage-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Coverage Heatmap */
+        .coverage-heatmap { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .heatmap-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .heatmap-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); gap: 4px; }
+        .heatmap-header { font-size: 10px; color: var(--text-muted); text-align: center; padding: 8px; }
+        .heatmap-row-label { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; }
+        .heatmap-cell { height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: white; }
+        .coverage-high { background: var(--green); }
+        .coverage-med { background: var(--yellow); }
+        .coverage-low { background: var(--orange); }
+        .coverage-critical { background: var(--red); }
+
+        /* Test Types Grid */
+        .test-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .test-type-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; border-top: 3px solid var(--type-color); }
+        .test-type-icon { font-size: 32px; margin-bottom: 12px; }
+        .test-type-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .test-type-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .test-type-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+        .test-tool-tag { font-size: 10px; padding: 4px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+
+        /* Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 14px; font-weight: 600; }
+        .tool-category { font-size: 10px; color: var(--text-muted); }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Anti-Patterns */
+        .anti-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .anti-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-left: 3px solid var(--red); }
+        .anti-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--red); }
+        .anti-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .anti-fix { font-size: 11px; padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--green); border-radius: 6px; }
+        .anti-fix strong { color: var(--green); }
+
+        /* Best Practices */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3 { color: var(--green); font-size: 16px; margin-bottom: 20px; }
+        .practices-dont h3 { color: var(--red); font-size: 16px; margin-bottom: 20px; }
+        .practice-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); }
+        .practices-do .practice-icon { color: var(--green); }
+        .practices-dont .practice-icon { color: var(--red); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .test-types, .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .anti-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html" class="active"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#pyramid"><span class="nav-icon">🔺</span> Test Pyramid</a></li>
+            <li><a href="#cicd"><span class="nav-icon">🔄</span> CI/CD Pipeline</a></li>
+            <li><a href="#coverage"><span class="nav-icon">📊</span> Coverage</a></li>
+            <li><a href="#types"><span class="nav-icon">🧪</span> Test Types</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">⚠️</span> Anti-Patterns</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">✅ Page 10.5</span>
+                <h1>Validation & Testing</h1>
+                <p>Build confidence in your code with comprehensive testing strategies. From unit tests to end-to-end validation, master the testing pyramid, CI/CD pipelines, and quality gates that catch bugs before users do.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">80%+</div><div class="hero-metric-label">Coverage Target</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;10min</div><div class="hero-metric-label">CI Pipeline</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">0</div><div class="hero-metric-label">Prod Bugs Goal</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100%</div><div class="hero-metric-label">Critical Path</div></div>
+            </div>
+        </section>
+
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding Testing</h2>
+                    <p>Why testing is essential for sustainable development</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>What is Software Testing?</h3>
+                    <p>Software testing is the systematic process of verifying that code behaves as expected. It catches bugs early, enables safe refactoring, and documents expected behavior through executable specifications.</p>
+                    <p>Good tests are fast, reliable, and focused. They test behavior, not implementation details.</p>
+                </div>
+                <div>
+                    <h3>Why Testing Matters</h3>
+                    <p><strong>Confidence:</strong> Ship without fear. Tests catch regressions before users do.</p>
+                    <p><strong>Refactoring:</strong> Change code safely. Tests verify behavior is preserved.</p>
+                    <p><strong>Documentation:</strong> Tests show how code should be used.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="pyramid">
+            <div class="module-header">
+                <div class="module-icon">🔺</div>
+                <div class="module-info">
+                    <h2>The Testing Pyramid</h2>
+                    <p>Balanced test distribution for efficient quality assurance</p>
+                </div>
+            </div>
+            <div class="test-pyramid">
+                <div class="pyramid-title">Test Distribution by Type</div>
+                <div class="pyramid-visual">
+                    <div class="pyramid-level e2e">E2E ~10%</div>
+                    <div class="pyramid-level integration">Integration ~20%</div>
+                    <div class="pyramid-level unit">Unit Tests ~70%</div>
+                </div>
+                <div class="pyramid-labels">
+                    <span>Slow & Expensive</span>
+                    <span>Fast & Cheap</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="cicd">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>CI/CD Pipeline</h2>
+                    <p>Automated testing and deployment workflow</p>
+                </div>
+            </div>
+            <div class="cicd-pipeline">
+                <div class="pipeline-title">Continuous Integration / Continuous Deployment</div>
+                <div class="pipeline-stages">
+                    <div class="pipeline-stage">
+                        <div class="stage-icon" style="--stage-color: #3B82F6;">📝</div>
+                        <div class="stage-label" style="--stage-color: #3B82F6;">Commit</div>
+                        <div class="stage-time">Trigger</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-icon" style="--stage-color: #06B6D4;">🔍</div>
+                        <div class="stage-label" style="--stage-color: #06B6D4;">Lint</div>
+                        <div class="stage-time">30s</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-icon" style="--stage-color: #10B981;">🧪</div>
+                        <div class="stage-label" style="--stage-color: #10B981;">Unit Test</div>
+                        <div class="stage-time">2min</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-icon" style="--stage-color: #F59E0B;">🔗</div>
+                        <div class="stage-label" style="--stage-color: #F59E0B;">Integration</div>
+                        <div class="stage-time">5min</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-icon" style="--stage-color: #8B5CF6;">📦</div>
+                        <div class="stage-label" style="--stage-color: #8B5CF6;">Build</div>
+                        <div class="stage-time">2min</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-icon" style="--stage-color: #EC4899;">🚀</div>
+                        <div class="stage-label" style="--stage-color: #EC4899;">Deploy</div>
+                        <div class="stage-time">3min</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="coverage">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Coverage Analysis</h2>
+                    <p>Visualize test coverage across your codebase</p>
+                </div>
+            </div>
+            <div class="coverage-heatmap">
+                <div class="heatmap-title">Module Coverage Heatmap</div>
+                <div class="heatmap-grid">
+                    <div class="heatmap-header"></div>
+                    <div class="heatmap-header">Statements</div>
+                    <div class="heatmap-header">Branches</div>
+                    <div class="heatmap-header">Functions</div>
+                    <div class="heatmap-header">Lines</div>
+                    <div class="heatmap-header">Risk</div>
+                    <div class="heatmap-row-label">auth/</div>
+                    <div class="heatmap-cell coverage-high">92%</div>
+                    <div class="heatmap-cell coverage-high">88%</div>
+                    <div class="heatmap-cell coverage-high">95%</div>
+                    <div class="heatmap-cell coverage-high">91%</div>
+                    <div class="heatmap-cell coverage-high">Low</div>
+                    <div class="heatmap-row-label">api/</div>
+                    <div class="heatmap-cell coverage-high">85%</div>
+                    <div class="heatmap-cell coverage-med">72%</div>
+                    <div class="heatmap-cell coverage-high">88%</div>
+                    <div class="heatmap-cell coverage-high">84%</div>
+                    <div class="heatmap-cell coverage-high">Low</div>
+                    <div class="heatmap-row-label">payments/</div>
+                    <div class="heatmap-cell coverage-med">78%</div>
+                    <div class="heatmap-cell coverage-low">65%</div>
+                    <div class="heatmap-cell coverage-med">75%</div>
+                    <div class="heatmap-cell coverage-med">77%</div>
+                    <div class="heatmap-cell coverage-critical">High</div>
+                    <div class="heatmap-row-label">utils/</div>
+                    <div class="heatmap-cell coverage-high">95%</div>
+                    <div class="heatmap-cell coverage-high">90%</div>
+                    <div class="heatmap-cell coverage-high">98%</div>
+                    <div class="heatmap-cell coverage-high">94%</div>
+                    <div class="heatmap-cell coverage-high">Low</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">🧪</div>
+                <div class="module-info">
+                    <h2>Test Types</h2>
+                    <p>Different tests for different purposes</p>
+                </div>
+            </div>
+            <div class="test-types">
+                <div class="test-type-card" style="--type-color: #10B981;">
+                    <div class="test-type-icon">⚡</div>
+                    <div class="test-type-name">Unit Tests</div>
+                    <p class="test-type-desc">Test individual functions in isolation. Mock dependencies. Fast execution.</p>
+                    <div class="test-type-tools">
+                        <span class="test-tool-tag">Jest</span>
+                        <span class="test-tool-tag">Vitest</span>
+                        <span class="test-tool-tag">PyTest</span>
+                    </div>
+                </div>
+                <div class="test-type-card" style="--type-color: #F59E0B;">
+                    <div class="test-type-icon">🔗</div>
+                    <div class="test-type-name">Integration Tests</div>
+                    <p class="test-type-desc">Test component interactions. Real databases, real APIs.</p>
+                    <div class="test-type-tools">
+                        <span class="test-tool-tag">Supertest</span>
+                        <span class="test-tool-tag">TestContainers</span>
+                    </div>
+                </div>
+                <div class="test-type-card" style="--type-color: #EF4444;">
+                    <div class="test-type-icon">🌐</div>
+                    <div class="test-type-name">E2E Tests</div>
+                    <p class="test-type-desc">Test complete user flows through the UI. Browser automation.</p>
+                    <div class="test-type-tools">
+                        <span class="test-tool-tag">Playwright</span>
+                        <span class="test-tool-tag">Cypress</span>
+                    </div>
+                </div>
+                <div class="test-type-card" style="--type-color: #8B5CF6;">
+                    <div class="test-type-icon">📄</div>
+                    <div class="test-type-name">Contract Tests</div>
+                    <p class="test-type-desc">Verify API contracts between services. Consumer-driven.</p>
+                    <div class="test-type-tools">
+                        <span class="test-tool-tag">Pact</span>
+                        <span class="test-tool-tag">Spring Contract</span>
+                    </div>
+                </div>
+                <div class="test-type-card" style="--type-color: #EC4899;">
+                    <div class="test-type-icon">🏋️</div>
+                    <div class="test-type-name">Load Tests</div>
+                    <p class="test-type-desc">Test performance under load. Find breaking points.</p>
+                    <div class="test-type-tools">
+                        <span class="test-tool-tag">k6</span>
+                        <span class="test-tool-tag">Locust</span>
+                    </div>
+                </div>
+                <div class="test-type-card" style="--type-color: #06B6D4;">
+                    <div class="test-type-icon">🔐</div>
+                    <div class="test-type-name">Security Tests</div>
+                    <p class="test-type-desc">Scan for vulnerabilities. SAST, DAST, dependency scanning.</p>
+                    <div class="test-type-tools">
+                        <span class="test-tool-tag">OWASP ZAP</span>
+                        <span class="test-tool-tag">Snyk</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Testing Tools</h2>
+                    <p>Essential tools for comprehensive testing</p>
+                </div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🃏</div>
+                        <div><div class="tool-name">Jest</div><div class="tool-category">JavaScript</div></div>
+                    </div>
+                    <div class="tool-desc">Delightful JavaScript testing with zero config.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🎭</div>
+                        <div><div class="tool-name">Playwright</div><div class="tool-category">E2E</div></div>
+                    </div>
+                    <div class="tool-desc">Cross-browser E2E testing with auto-wait.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🌲</div>
+                        <div><div class="tool-name">Cypress</div><div class="tool-category">E2E</div></div>
+                    </div>
+                    <div class="tool-desc">Fast, reliable browser testing with time travel.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">⚡</div>
+                        <div><div class="tool-name">Vitest</div><div class="tool-category">Vite</div></div>
+                    </div>
+                    <div class="tool-desc">Blazing fast unit testing for Vite projects.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🐍</div>
+                        <div><div class="tool-name">PyTest</div><div class="tool-category">Python</div></div>
+                    </div>
+                    <div class="tool-desc">Simple, powerful Python testing framework.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📊</div>
+                        <div><div class="tool-name">k6</div><div class="tool-category">Load Testing</div></div>
+                    </div>
+                    <div class="tool-desc">Modern load testing with JavaScript scripting.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔐</div>
+                        <div><div class="tool-name">OWASP ZAP</div><div class="tool-category">Security</div></div>
+                    </div>
+                    <div class="tool-desc">Free security scanner for web applications.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📈</div>
+                        <div><div class="tool-name">Codecov</div><div class="tool-category">Coverage</div></div>
+                    </div>
+                    <div class="tool-desc">Coverage reports, PR comments, quality gates.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Testing Anti-Patterns</h2>
+                    <p>Common mistakes that undermine test effectiveness</p>
+                </div>
+            </div>
+            <div class="anti-grid">
+                <div class="anti-card">
+                    <h4>Testing Implementation</h4>
+                    <p>Tests that verify internal details rather than behavior. Break on refactoring.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Test inputs and outputs. Don't assert on internal state.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Flaky Tests</h4>
+                    <p>Tests that sometimes pass, sometimes fail. Timing issues, shared state.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Isolate tests. Use deterministic data. Mock externals.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Ice Cream Cone</h4>
+                    <p>Inverted pyramid—lots of E2E, few unit tests. Slow and expensive.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Rebalance to proper pyramid. Convert E2E to unit tests.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Coverage Theater</h4>
+                    <p>High coverage numbers with weak assertions. Tests execute but don't verify.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Measure mutation score. Review assertions, not percentages.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Testing Best Practices</h2>
+                    <p>Proven patterns for effective testing</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Test behavior, not implementation</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Keep tests fast—under 10 minutes total</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Make tests deterministic and isolated</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Use descriptive test names</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Follow the testing pyramid</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Run tests on every commit</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Fix flaky tests immediately</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Mock everything—integration matters</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Write tests after code is done</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Chase 100% coverage blindly</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Share state between tests</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Write one giant test per feature</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Ignore failing tests</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Test private methods directly</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered testing assistance</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>TestArchitect</h3>
+                    <p>An AI agent that analyzes code to generate comprehensive test suites, identifies coverage gaps, and suggests testing strategies.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🧪</span> Generate unit tests from function signatures</div>
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Identify coverage gaps and risky code</div>
+                        <div class="agent-capability"><span class="capability-icon">🎲</span> Generate edge case test data</div>
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Analyze test effectiveness metrics</div>
+                        <div class="agent-capability"><span class="capability-icon">⚠️</span> Detect flaky test patterns</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">test_architect_agent.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+test_architect = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Test Architect"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Maximize test coverage and quality"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in testing strategies
+    and quality metrics. Generates effective tests."""</span>,
+    <span class="code-string">tools=</span>[code_analyzer, test_generator,
+           coverage_analyzer]
+)
+
+testing_task = Task(
+    <span class="code-string">description=</span><span class="code-string">"""Analyze codebase and:
+    - Generate missing unit tests
+    - Identify high-risk untested code
+    - Recommend testing improvements"""</span>,
+    <span class="code-string">agent=</span>test_architect
+)
+
+crew = Crew(agents=[test_architect], tasks=[testing_task])
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring Product Building</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat10-p2-best-practices.html" class="related-card">
+                    <div class="related-icon">✨</div>
+                    <div class="related-title">Best Practices</div>
+                    <div class="related-desc">Code quality standards that complement testing</div>
+                </a>
+                <a href="cat10-p4-ai-assisted-dev.html" class="related-card">
+                    <div class="related-icon">🤖</div>
+                    <div class="related-title">AI-Assisted Development</div>
+                    <div class="related-desc">AI-generated tests and quality checks</div>
+                </a>
+                <a href="cat10-p7-product-metrics.html" class="related-card">
+                    <div class="related-icon">📊</div>
+                    <div class="related-title">Product Metrics</div>
+                    <div class="related-desc">Measuring test effectiveness and quality</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat10-p4-ai-assisted-dev.html" class="footer-link">
+            <span>←</span>
+            <div><div class="footer-link-label">Previous Page</div><div class="footer-link-title">10.4: AI-Assisted Dev</div></div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 10.5</div>
+        <a href="cat10-p6-methodologies.html" class="footer-link">
+            <div><div class="footer-link-label">Next Page</div><div class="footer-link-title">10.6: Methodologies</div></div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

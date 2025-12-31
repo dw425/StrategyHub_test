@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Lifecycle | Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #14B8A6;
+            --page-light: #2DD4BF;
+            --page-glow: rgba(20, 184, 166, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        /* Hero Compact */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Module */
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Overview Content */
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Characteristics Grid */
+        .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .char-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .char-icon { font-size: 28px; margin-bottom: 12px; }
+        .char-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .char-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* Phase Timeline Visual */
+        .timeline-section { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .timeline-header { text-align: center; margin-bottom: 32px; }
+        .timeline-header h4 { font-size: 18px; font-weight: 600; color: var(--page-light); margin-bottom: 8px; }
+        .timeline-header p { font-size: 13px; color: var(--text-muted); }
+        .timeline-track { position: relative; padding-top: 20px; padding-bottom: 20px; }
+        .timeline-line { position: absolute; top: 56px; left: 5%; right: 5%; height: 4px; background: linear-gradient(90deg, var(--cat-primary), var(--cyan), var(--purple), var(--pink), var(--yellow), var(--green), var(--blue)); border-radius: 2px; }
+        .timeline-nodes { display: flex; justify-content: space-between; position: relative; z-index: 1; padding: 0 20px; }
+        .timeline-node { display: flex; flex-direction: column; align-items: center; }
+        .node-circle { width: 72px; height: 72px; border-radius: 50%; background: var(--bg-card); border: 4px solid var(--node-color); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; box-shadow: 0 0 30px color-mix(in srgb, var(--node-color) 40%, transparent); transition: all 0.3s; cursor: pointer; }
+        .timeline-node:hover .node-circle { transform: scale(1.15); box-shadow: 0 0 50px color-mix(in srgb, var(--node-color) 60%, transparent); }
+        .node-label { font-size: 13px; font-weight: 600; color: var(--node-color); margin-bottom: 4px; }
+        .node-time { font-size: 11px; color: var(--text-muted); }
+
+        /* Waterfall vs Agile Comparison */
+        .approach-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .approach-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .approach-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 16px; text-align: center; }
+        .approach-card.waterfall h4 { color: var(--yellow); }
+        .approach-card.agile h4 { color: var(--green); }
+        .approach-visual { margin-bottom: 16px; }
+        .waterfall-steps { display: flex; flex-direction: column; gap: 8px; }
+        .waterfall-step { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--yellow); border-radius: 6px; padding: 10px; font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .waterfall-step::before { content: '↓'; color: var(--yellow); }
+        .waterfall-step:first-child::before { content: '→'; }
+        .agile-visual { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .agile-sprint { width: 100px; height: 100px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 2px solid var(--green); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 8px; }
+        .agile-sprint strong { color: var(--green); font-size: 13px; margin-bottom: 4px; }
+        .agile-sprint span { font-size: 9px; color: var(--text-muted); line-height: 1.3; }
+        .agile-arrow { font-size: 20px; color: var(--green); }
+        .approach-traits { margin-top: 16px; }
+        .approach-traits h5 { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .approach-traits ul { list-style: none; font-size: 12px; color: var(--text-secondary); }
+        .approach-traits li { padding: 4px 0; padding-left: 16px; position: relative; }
+        .approach-traits li::before { content: '•'; position: absolute; left: 0; color: var(--text-muted); }
+
+        /* Phase Deep Dive Cards */
+        .phase-deep { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .phase-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; border-top: 4px solid var(--phase-color); }
+        .phase-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .phase-card-icon { font-size: 28px; }
+        .phase-card-title { font-size: 16px; font-weight: 600; }
+        .phase-card-duration { font-size: 11px; color: var(--text-muted); }
+        .phase-card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .phase-section { margin-bottom: 16px; }
+        .phase-section h5 { font-size: 11px; color: var(--phase-color); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .phase-section ul { list-style: none; }
+        .phase-section li { font-size: 12px; color: var(--text-secondary); padding: 4px 0; padding-left: 16px; position: relative; }
+        .phase-section li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-size: 10px; }
+
+        /* Stakeholder RACI */
+        .raci-section { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .raci-header { padding: 16px 24px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .raci-header h4 { font-size: 15px; font-weight: 600; color: var(--page-light); }
+        .raci-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .raci-table th { padding: 12px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
+        .raci-table td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .raci-table td:first-child { text-align: left; font-weight: 500; color: var(--text-primary); }
+        .raci-r { color: var(--green); font-weight: bold; }
+        .raci-a { color: var(--blue); font-weight: bold; }
+        .raci-c { color: var(--yellow); }
+        .raci-i { color: var(--text-muted); }
+
+        /* Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .tool-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 14px; font-weight: 600; }
+        .tool-category { font-size: 10px; color: var(--text-muted); }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .tool-features { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tool-feature { font-size: 9px; padding: 3px 8px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 4px; color: var(--page-light); }
+
+        /* Comparison Table */
+        .comparison-table { overflow-x: auto; margin-bottom: 24px; }
+        .comparison-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .check { color: var(--green); }
+        .partial { color: var(--yellow); }
+        .cross { color: var(--red); }
+
+        /* Anti-Patterns */
+        .anti-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .anti-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-left: 3px solid var(--red); }
+        .anti-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--red); }
+        .anti-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .anti-fix { font-size: 11px; padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--green); border-radius: 6px; }
+        .anti-fix strong { color: var(--green); }
+
+        /* Best Practices */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3, .practices-dont h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .practices-do h3 { color: var(--green); }
+        .practices-dont h3 { color: var(--red); }
+        .practice-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); }
+        .practice-item .practice-icon { flex-shrink: 0; }
+        .practices-do .practice-icon { color: var(--green); }
+        .practices-dont .practice-icon { color: var(--red); }
+
+        /* Case Studies */
+        .case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .case-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; border-top: 3px solid var(--case-color); }
+        .case-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .case-card .case-company { font-size: 11px; color: var(--case-color); margin-bottom: 12px; }
+        .case-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .case-result { font-size: 11px; padding: 10px; background: var(--bg-card); border-radius: 6px; }
+        .case-result strong { color: var(--green); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        /* Footer */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .approach-compare, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .char-grid, .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .phase-deep, .anti-grid { grid-template-columns: 1fr; }
+            .case-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html" class="active"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#timeline"><span class="nav-icon">🗺️</span> 7-Phase Timeline</a></li>
+            <li><a href="#approaches"><span class="nav-icon">⚖️</span> Waterfall vs Agile</a></li>
+            <li><a href="#phases"><span class="nav-icon">📝</span> Phase Deep Dive</a></li>
+            <li><a href="#stakeholders"><span class="nav-icon">👥</span> Stakeholder RACI</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools & Platforms</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">⚠️</span> Anti-Patterns</a></li>
+            <li><a href="#bestpractices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#cases"><span class="nav-icon">📚</span> Case Studies</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔄 Page 10.1</span>
+                <h1>Product Lifecycle</h1>
+                <p>Master the complete product development journey from initial discovery through launch and continuous iteration. A structured approach that balances speed with quality, enabling teams to ship value incrementally while maintaining technical excellence and user focus throughout the entire product lifecycle.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">7</div><div class="hero-metric-label">Core Phases</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">18-32</div><div class="hero-metric-label">Weeks Typical</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Success Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">3x</div><div class="hero-metric-label">Faster Iteration</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding the Product Lifecycle</h2>
+                    <p>From concept to continuous improvement—building products that last</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>What is the Product Lifecycle?</h3>
+                    <p>The product lifecycle is a structured framework that guides teams from initial concept through market launch and ongoing iteration. It provides clear phases with defined deliverables, quality gates, and success criteria—enabling better planning, resource allocation, and risk management.</p>
+                    <p>The key insight: successful products aren't built in isolation—they're developed through continuous cycles of building, measuring, and learning. Each phase serves a specific purpose and builds systematically on the previous one.</p>
+                    <p>Unlike traditional waterfall approaches, modern lifecycle management embraces uncertainty and change. It acknowledges that requirements evolve, markets shift, and user needs are discovered—not predicted.</p>
+                </div>
+                <div>
+                    <h3>Why Lifecycle Management Matters</h3>
+                    <p><strong>Reduced Risk:</strong> Validate assumptions early before investing significant resources. Kill projects that won't succeed before they drain budgets. The earlier you fail, the cheaper the lesson.</p>
+                    <p><strong>Faster Time-to-Market:</strong> Structured phases eliminate decision paralysis. Teams know what to do and when to move forward. Clear handoffs prevent bottlenecks.</p>
+                    <p><strong>Better Outcomes:</strong> Products built with continuous user input outperform those built on assumptions. Each phase incorporates feedback loops that course-correct early.</p>
+                    <p><strong>Team Alignment:</strong> Everyone understands where they are in the journey, what success looks like, and what comes next. No more "are we done yet?" conversations.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Key Lifecycle Characteristics</h3>
+                    <div class="char-grid">
+                        <div class="char-card">
+                            <div class="char-icon">🔄</div>
+                            <div class="char-name">Iterative Progress</div>
+                            <div class="char-desc">Each phase loops back with learnings. Build-measure-learn cycles at every stage.</div>
+                        </div>
+                        <div class="char-card">
+                            <div class="char-icon">🚦</div>
+                            <div class="char-name">Quality Gates</div>
+                            <div class="char-desc">Clear criteria before phase transitions. No advancement without validation.</div>
+                        </div>
+                        <div class="char-card">
+                            <div class="char-icon">👥</div>
+                            <div class="char-name">User-Centered</div>
+                            <div class="char-desc">Every phase involves user input. Discovery to iteration keeps users first.</div>
+                        </div>
+                        <div class="char-card">
+                            <div class="char-icon">📊</div>
+                            <div class="char-name">Data-Driven</div>
+                            <div class="char-desc">Decisions backed by metrics. Qualitative and quantitative evidence required.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Visualization -->
+        <section class="module" id="timeline">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>The 7-Phase Product Journey</h2>
+                    <p>A visual map from discovery to continuous iteration</p>
+                </div>
+            </div>
+            
+            <div class="timeline-section">
+                <div class="timeline-header">
+                    <h4>Product Development Timeline</h4>
+                    <p>Typical duration: 18-32 weeks from Discovery to Launch, then ongoing iteration</p>
+                </div>
+                <div class="timeline-track">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-nodes">
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #14B8A6;">🔍</div>
+                            <div class="node-label" style="--node-color: #14B8A6;">Discovery</div>
+                            <div class="node-time">2-4 weeks</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #06B6D4;">🎨</div>
+                            <div class="node-label" style="--node-color: #06B6D4;">Design</div>
+                            <div class="node-time">3-6 weeks</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #8B5CF6;">⚡</div>
+                            <div class="node-label" style="--node-color: #8B5CF6;">Build</div>
+                            <div class="node-time">6-12 weeks</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #EC4899;">🧪</div>
+                            <div class="node-label" style="--node-color: #EC4899;">Test</div>
+                            <div class="node-time">2-4 weeks</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #F59E0B;">📋</div>
+                            <div class="node-label" style="--node-color: #F59E0B;">Prepare</div>
+                            <div class="node-time">2-3 weeks</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #10B981;">🚀</div>
+                            <div class="node-label" style="--node-color: #10B981;">Launch</div>
+                            <div class="node-time">1-2 weeks</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-circle" style="--node-color: #3B82F6;">📊</div>
+                            <div class="node-label" style="--node-color: #3B82F6;">Iterate</div>
+                            <div class="node-time">Ongoing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waterfall vs Agile -->
+        <section class="module" id="approaches">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Waterfall vs. Agile Lifecycle</h2>
+                    <p>Understanding the fundamental approaches to product development</p>
+                </div>
+            </div>
+            <div class="approach-compare">
+                <div class="approach-card waterfall">
+                    <h4>📊 Waterfall Lifecycle</h4>
+                    <div class="approach-visual">
+                        <div class="waterfall-steps">
+                            <div class="waterfall-step">Requirements (Complete)</div>
+                            <div class="waterfall-step">Design (Complete)</div>
+                            <div class="waterfall-step">Implementation</div>
+                            <div class="waterfall-step">Testing</div>
+                            <div class="waterfall-step">Deployment</div>
+                            <div class="waterfall-step">Maintenance</div>
+                        </div>
+                    </div>
+                    <div class="approach-traits">
+                        <h5>Characteristics</h5>
+                        <ul>
+                            <li>Sequential phases, no overlap</li>
+                            <li>Complete documentation upfront</li>
+                            <li>Big bang release at the end</li>
+                            <li>Change is expensive and disruptive</li>
+                            <li>Long feedback cycles</li>
+                            <li>Risk discovered late in process</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="approach-card agile">
+                    <h4>🔄 Agile Lifecycle</h4>
+                    <div class="approach-visual">
+                        <div class="agile-visual">
+                            <div class="agile-sprint"><strong>Sprint 1</strong><span>Plan→Build→Test</span></div>
+                            <span class="agile-arrow">→</span>
+                            <div class="agile-sprint"><strong>Sprint 2</strong><span>Plan→Build→Test</span></div>
+                            <span class="agile-arrow">→</span>
+                            <div class="agile-sprint"><strong>Sprint N</strong><span>Plan→Build→Test</span></div>
+                        </div>
+                    </div>
+                    <div class="approach-traits">
+                        <h5>Characteristics</h5>
+                        <ul>
+                            <li>Iterative cycles with overlap</li>
+                            <li>Just-enough documentation</li>
+                            <li>Incremental releases frequently</li>
+                            <li>Change is expected and welcomed</li>
+                            <li>Continuous feedback loops</li>
+                            <li>Risk discovered early and often</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase Deep Dive -->
+        <section class="module" id="phases">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Phase Deep Dive</h2>
+                    <p>Detailed activities, deliverables, and success criteria for each phase</p>
+                </div>
+            </div>
+            
+            <div class="phase-deep">
+                <div class="phase-card" style="--phase-color: #14B8A6;">
+                    <div class="phase-card-header">
+                        <span class="phase-card-icon">🔍</span>
+                        <div>
+                            <div class="phase-card-title">Phase 1: Discovery</div>
+                            <div class="phase-card-duration">2-4 weeks • Validation Focus</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Validate assumptions, understand users deeply, and define the problem space. This phase determines whether the product should be built at all. Kill bad ideas here, not in production.</p>
+                    <div class="phase-section">
+                        <h5>Key Activities</h5>
+                        <ul>
+                            <li>Conduct 15-20 user interviews</li>
+                            <li>Complete competitive landscape analysis</li>
+                            <li>Define problem statements and hypotheses</li>
+                            <li>Create user personas with jobs-to-be-done</li>
+                            <li>Map customer journey and pain points</li>
+                        </ul>
+                    </div>
+                    <div class="phase-section">
+                        <h5>Deliverables</h5>
+                        <ul>
+                            <li>User research synthesis document</li>
+                            <li>Validated problem statement</li>
+                            <li>Business case with ROI projections</li>
+                            <li>Go/no-go recommendation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="phase-card" style="--phase-color: #06B6D4;">
+                    <div class="phase-card-header">
+                        <span class="phase-card-icon">🎨</span>
+                        <div>
+                            <div class="phase-card-title">Phase 2: Design</div>
+                            <div class="phase-card-duration">3-6 weeks • Solution Focus</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Transform insights into tangible solutions. Create prototypes that can be validated with real users before committing significant development resources.</p>
+                    <div class="phase-section">
+                        <h5>Key Activities</h5>
+                        <ul>
+                            <li>Information architecture mapping</li>
+                            <li>Low-fidelity wireframe iterations</li>
+                            <li>High-fidelity visual design</li>
+                            <li>Interactive prototype creation</li>
+                            <li>Usability testing (5+ sessions)</li>
+                        </ul>
+                    </div>
+                    <div class="phase-section">
+                        <h5>Deliverables</h5>
+                        <ul>
+                            <li>Design specifications document</li>
+                            <li>Clickable prototype for testing</li>
+                            <li>Design system components</li>
+                            <li>Technical feasibility assessment</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="phase-card" style="--phase-color: #8B5CF6;">
+                    <div class="phase-card-header">
+                        <span class="phase-card-icon">⚡</span>
+                        <div>
+                            <div class="phase-card-title">Phase 3: Build</div>
+                            <div class="phase-card-duration">6-12 weeks • Development Focus</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Develop the product in iterative sprints. Ship working software frequently, incorporate feedback continuously, and maintain high code quality throughout.</p>
+                    <div class="phase-section">
+                        <h5>Key Activities</h5>
+                        <ul>
+                            <li>Architecture design and tech stack selection</li>
+                            <li>Sprint-based development (2-week cycles)</li>
+                            <li>Daily standups and sprint ceremonies</li>
+                            <li>Code reviews and pair programming</li>
+                            <li>Continuous integration/deployment setup</li>
+                        </ul>
+                    </div>
+                    <div class="phase-section">
+                        <h5>Deliverables</h5>
+                        <ul>
+                            <li>Working software increments</li>
+                            <li>API documentation</li>
+                            <li>Technical architecture docs</li>
+                            <li>Feature flags for controlled rollout</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="phase-card" style="--phase-color: #EC4899;">
+                    <div class="phase-card-header">
+                        <span class="phase-card-icon">🧪</span>
+                        <div>
+                            <div class="phase-card-title">Phase 4: Test</div>
+                            <div class="phase-card-duration">2-4 weeks • Quality Focus</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Validate quality across all dimensions. Catch bugs before users do, ensure performance under load, and verify accessibility and security compliance.</p>
+                    <div class="phase-section">
+                        <h5>Key Activities</h5>
+                        <ul>
+                            <li>Unit and integration test completion</li>
+                            <li>End-to-end test automation</li>
+                            <li>Performance and load testing</li>
+                            <li>Security vulnerability scanning</li>
+                            <li>User acceptance testing coordination</li>
+                        </ul>
+                    </div>
+                    <div class="phase-section">
+                        <h5>Deliverables</h5>
+                        <ul>
+                            <li>Test coverage report (80%+ target)</li>
+                            <li>Performance benchmark results</li>
+                            <li>Security audit findings</li>
+                            <li>UAT sign-off documentation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="phase-card" style="--phase-color: #F59E0B;">
+                    <div class="phase-card-header">
+                        <span class="phase-card-icon">📋</span>
+                        <div>
+                            <div class="phase-card-title">Phase 5: Prepare</div>
+                            <div class="phase-card-duration">2-3 weeks • Readiness Focus</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Ready the entire organization for launch. Ensure support teams are trained, marketing is prepared, and operational runbooks are complete.</p>
+                    <div class="phase-section">
+                        <h5>Key Activities</h5>
+                        <ul>
+                            <li>Create marketing launch materials</li>
+                            <li>Write user documentation and help content</li>
+                            <li>Train customer support teams</li>
+                            <li>Set up monitoring and alerting</li>
+                            <li>Document rollback procedures</li>
+                        </ul>
+                    </div>
+                    <div class="phase-section">
+                        <h5>Deliverables</h5>
+                        <ul>
+                            <li>Launch communication plan</li>
+                            <li>Support runbooks and FAQs</li>
+                            <li>Operational playbooks</li>
+                            <li>Launch checklist completed</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="phase-card" style="--phase-color: #10B981;">
+                    <div class="phase-card-header">
+                        <span class="phase-card-icon">🚀</span>
+                        <div>
+                            <div class="phase-card-title">Phase 6: Launch</div>
+                            <div class="phase-card-duration">1-2 weeks • Release Focus</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Execute a controlled rollout to minimize risk. Start small, monitor closely, expand with confidence, and respond quickly to any issues that arise.</p>
+                    <div class="phase-section">
+                        <h5>Key Activities</h5>
+                        <ul>
+                            <li>Soft launch to 5% of users</li>
+                            <li>Monitor real-time dashboards</li>
+                            <li>Triage and fix critical issues</li>
+                            <li>Expand progressively (25%, 50%, 100%)</li>
+                            <li>Conduct post-launch retrospective</li>
+                        </ul>
+                    </div>
+                    <div class="phase-section">
+                        <h5>Deliverables</h5>
+                        <ul>
+                            <li>Rollout status reports</li>
+                            <li>Incident response logs</li>
+                            <li>User feedback compilation</li>
+                            <li>Launch retrospective notes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stakeholder RACI -->
+        <section class="module" id="stakeholders">
+            <div class="module-header">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h2>Stakeholder Roles & Responsibilities</h2>
+                    <p>RACI matrix for lifecycle phase ownership</p>
+                </div>
+            </div>
+            
+            <div class="raci-section">
+                <div class="raci-header">
+                    <h4>Responsibility Assignment Matrix</h4>
+                </div>
+                <table class="raci-table">
+                    <thead>
+                        <tr>
+                            <th>Phase</th>
+                            <th>Product Manager</th>
+                            <th>Designer</th>
+                            <th>Engineering</th>
+                            <th>QA</th>
+                            <th>Marketing</th>
+                            <th>Support</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Discovery</strong></td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-i">I</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Design</strong></td>
+                            <td class="raci-a">A</td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-i">I</td>
+                            <td class="raci-i">I</td>
+                            <td class="raci-i">I</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Build</strong></td>
+                            <td class="raci-a">A</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-i">I</td>
+                            <td class="raci-i">I</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Test</strong></td>
+                            <td class="raci-a">A</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-i">I</td>
+                            <td class="raci-i">I</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Prepare</strong></td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-r">R</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Launch</strong></td>
+                            <td class="raci-a">A</td>
+                            <td class="raci-i">I</td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-r">R</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Iterate</strong></td>
+                            <td class="raci-r">R</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                            <td class="raci-c">C</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+                <span class="raci-r">R</span> = Responsible (does the work) • 
+                <span class="raci-a">A</span> = Accountable (owns the outcome) • 
+                <span class="raci-c">C</span> = Consulted (provides input) • 
+                <span class="raci-i">I</span> = Informed (kept updated)
+            </p>
+        </section>
+
+        <!-- Tools & Platforms -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Essential tools for managing the product lifecycle</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">📋</div>
+                        <div>
+                            <div class="tool-name">Jira</div>
+                            <div class="tool-category">Project Management</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">Industry-standard agile project management. Sprints, backlogs, roadmaps, and deep integrations.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Scrum/Kanban</span>
+                        <span class="tool-feature">Roadmaps</span>
+                        <span class="tool-feature">Reporting</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">⚡</div>
+                        <div>
+                            <div class="tool-name">Linear</div>
+                            <div class="tool-category">Project Management</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">Fast, modern issue tracking built for speed. Keyboard-first design with beautiful UX.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Cycles</span>
+                        <span class="tool-feature">Projects</span>
+                        <span class="tool-feature">Git Sync</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">📝</div>
+                        <div>
+                            <div class="tool-name">Notion</div>
+                            <div class="tool-category">Documentation</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">All-in-one workspace for docs, wikis, and databases. Flexible for any workflow.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Wikis</span>
+                        <span class="tool-feature">Databases</span>
+                        <span class="tool-feature">Templates</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">🎨</div>
+                        <div>
+                            <div class="tool-name">Figma</div>
+                            <div class="tool-category">Design</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">Collaborative design platform for UI/UX. Real-time multiplayer with dev handoff.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Prototypes</span>
+                        <span class="tool-feature">Components</span>
+                        <span class="tool-feature">Dev Mode</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">📊</div>
+                        <div>
+                            <div class="tool-name">Amplitude</div>
+                            <div class="tool-category">Analytics</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">Product analytics for user behavior. Funnels, cohorts, and experimentation platform.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Funnels</span>
+                        <span class="tool-feature">Cohorts</span>
+                        <span class="tool-feature">A/B Tests</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">🔬</div>
+                        <div>
+                            <div class="tool-name">Mixpanel</div>
+                            <div class="tool-category">Analytics</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">Event-based product analytics. Track user journeys and measure impact.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Events</span>
+                        <span class="tool-feature">Retention</span>
+                        <span class="tool-feature">Reports</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">🎯</div>
+                        <div>
+                            <div class="tool-name">LaunchDarkly</div>
+                            <div class="tool-category">Feature Flags</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">Feature management platform for controlled rollouts and experimentation.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Flags</span>
+                        <span class="tool-feature">Targeting</span>
+                        <span class="tool-feature">Experiments</span>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo">🔔</div>
+                        <div>
+                            <div class="tool-name">PagerDuty</div>
+                            <div class="tool-category">Incident Response</div>
+                        </div>
+                    </div>
+                    <p class="tool-desc">On-call management and incident response. Keep teams informed during outages.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature">Alerting</span>
+                        <span class="tool-feature">Escalation</span>
+                        <span class="tool-feature">Postmortems</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Jira</th>
+                            <th>Linear</th>
+                            <th>Asana</th>
+                            <th>Monday.com</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Best For</strong></td>
+                            <td>Enterprise Agile</td>
+                            <td>Fast-moving Teams</td>
+                            <td>Cross-functional</td>
+                            <td>Non-technical</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Learning Curve</strong></td>
+                            <td>Steep</td>
+                            <td>Gentle</td>
+                            <td>Moderate</td>
+                            <td>Easy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Customization</strong></td>
+                            <td><span class="check">✓</span> Extensive</td>
+                            <td><span class="partial">~</span> Limited</td>
+                            <td><span class="check">✓</span> Good</td>
+                            <td><span class="check">✓</span> Extensive</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Git Integration</strong></td>
+                            <td><span class="check">✓</span> Native</td>
+                            <td><span class="check">✓</span> Native</td>
+                            <td><span class="partial">~</span> Via Apps</td>
+                            <td><span class="partial">~</span> Via Apps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pricing</strong></td>
+                            <td>$$$</td>
+                            <td>$$</td>
+                            <td>$$</td>
+                            <td>$$</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Anti-Patterns -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Common Anti-Patterns</h2>
+                    <p>Mistakes that derail product development—and how to avoid them</p>
+                </div>
+            </div>
+            
+            <div class="anti-grid">
+                <div class="anti-card">
+                    <h4>Skipping Discovery</h4>
+                    <p>Jumping straight to building without validating the problem. Teams waste months building features nobody wants or solving non-problems.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Require at least 10 user interviews and validated problem statements before committing to development. No exceptions.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Big Bang Launches</h4>
+                    <p>Launching to 100% of users on day one with no ability to catch issues early, iterate based on feedback, or roll back gracefully.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Always use progressive rollouts with monitoring gates: 5% → 25% → 50% → 100%. Use feature flags.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Feature Factory Mode</h4>
+                    <p>Measuring success by features shipped rather than outcomes achieved. Teams build constantly but never measure whether anything matters.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Define success metrics before building. Require outcome measurement for every release. Celebrate impact, not output.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Death by Committee</h4>
+                    <p>Requiring consensus from too many stakeholders. Endless meetings, slow decisions, watered-down products that please nobody.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Assign clear decision-making authority via RACI matrix. One accountable person per decision. Disagree and commit.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Scope Creep</h4>
+                    <p>Continuously adding features without removing anything. Projects never ship because the finish line keeps moving farther away.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Lock scope at sprint boundaries. Every addition requires a subtraction. Ship MVPs and iterate based on data.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Documentation Debt</h4>
+                    <p>Shipping without docs, runbooks, or training. Support teams are blindsided, users struggle, and tribal knowledge creates bus factors.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Include documentation in Definition of Done. No launch without support training and operational runbooks.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module" id="bestpractices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Proven patterns from high-performing product teams</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Start with user research—validate problems before building solutions</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Ship early MVPs to learn fast, even if they're embarrassing</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Use feature flags for progressive rollouts and easy rollbacks</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Define success metrics before building—measure relentlessly</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Run retrospectives after every phase for continuous improvement</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Kill projects early if data shows they won't succeed</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Document decisions and rationale for future reference</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Involve users throughout—not just at the beginning and end</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Build cross-functional teams that own outcomes end-to-end</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Build features in isolation without user feedback loops</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Spend months on a "perfect" v1—perfectionism kills products</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Launch to 100% on day one—you'll miss critical learnings</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Measure success by features shipped rather than outcomes</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Skip documentation—future you will hate present you</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Ignore technical debt until it becomes crippling</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Let stakeholders add scope without trade-off discussions</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Assume what users want—always validate with evidence</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Throw features over the wall without support enablement</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Case Studies -->
+        <section class="module" id="cases">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Real-World Case Studies</h2>
+                    <p>How leading companies approach product lifecycle management</p>
+                </div>
+            </div>
+            
+            <div class="case-grid">
+                <div class="case-card" style="--case-color: #3B82F6;">
+                    <h4>Continuous Discovery at Spotify</h4>
+                    <div class="case-company">Spotify • Music Streaming</div>
+                    <p>Spotify runs continuous discovery with "Think It, Build It, Ship It, Tweak It" cycles. Every squad has embedded UX researchers running weekly user interviews.</p>
+                    <div class="case-result"><strong>Result:</strong> 2-week cycles from hypothesis to validated learning. Features like Discover Weekly came from this process.</div>
+                </div>
+                <div class="case-card" style="--case-color: #10B981;">
+                    <h4>Amazon's Working Backwards</h4>
+                    <div class="case-company">Amazon • E-commerce</div>
+                    <p>Amazon starts every project with a 6-page press release describing the finished product. Forces clarity on customer value before any code is written.</p>
+                    <div class="case-result"><strong>Result:</strong> Killed countless bad ideas before investment. AWS, Kindle, and Prime all started this way.</div>
+                </div>
+                <div class="case-card" style="--case-color: #8B5CF6;">
+                    <h4>Facebook's Move Fast</h4>
+                    <div class="case-company">Meta • Social Media</div>
+                    <p>Meta deploys code twice daily with extensive feature flagging. Dark launches let them test with 0.1% of users before any public announcement.</p>
+                    <div class="case-result"><strong>Result:</strong> Ship thousands of experiments per year. Iterate to product-market fit faster than competitors.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Section -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered product lifecycle assistance</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>ProductLifecycleManager</h3>
+                    <p>An AI agent that monitors phase progress, validates deliverables, ensures quality gates are met before transitions, and generates status reports for stakeholders.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Track phase deliverables and completion status</div>
+                        <div class="agent-capability"><span class="capability-icon">🚦</span> Validate quality gates before phase transitions</div>
+                        <div class="agent-capability"><span class="capability-icon">⚠️</span> Identify risks and blockers proactively</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Generate phase transition reports automatically</div>
+                        <div class="agent-capability"><span class="capability-icon">🔔</span> Alert stakeholders on milestone completion</div>
+                        <div class="agent-capability"><span class="capability-icon">📈</span> Forecast delivery dates based on velocity</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">lifecycle_agent.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+lifecycle_manager = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Product Lifecycle Manager"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Guide products through phases with quality gates"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in product development lifecycle.
+    Ensures deliverables complete and quality standards met.
+    Identifies risks early and recommends mitigations."""</span>,
+    <span class="code-string">tools=</span>[phase_tracker, deliverable_validator,
+           risk_assessor, stakeholder_notifier]
+)
+
+transition_task = Task(
+    <span class="code-string">description=</span><span class="code-string">"""Evaluate phase transition readiness:
+    - Audit required deliverables vs checklist
+    - Verify quality gates satisfied
+    - Review stakeholder sign-offs
+    - Assess team capacity for next phase
+    - Generate go/no-go recommendation"""</span>,
+    <span class="code-string">agent=</span>lifecycle_manager,
+    <span class="code-string">expected_output=</span><span class="code-string">"Phase transition report"</span>
+)
+
+crew = Crew(agents=[lifecycle_manager], tasks=[transition_task])
+result = crew.kickoff()
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring Product Building</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat10-p2-best-practices.html" class="related-card">
+                    <div class="related-icon">✨</div>
+                    <div class="related-title">Best Practices</div>
+                    <div class="related-desc">Code quality, documentation, and technical debt management</div>
+                </a>
+                <a href="cat10-p6-methodologies.html" class="related-card">
+                    <div class="related-icon">📋</div>
+                    <div class="related-title">Methodologies</div>
+                    <div class="related-desc">Agile, Scrum, Kanban, and SAFe frameworks in depth</div>
+                </a>
+                <a href="cat10-p7-product-metrics.html" class="related-card">
+                    <div class="related-icon">📊</div>
+                    <div class="related-title">Product Metrics</div>
+                    <div class="related-desc">KPIs, OKRs, and DORA metrics for measuring success</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat10-product-building-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Category Overview</div>
+                <div class="footer-link-title">10: Product Building</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 10.1</div>
+        <a href="cat10-p2-best-practices.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">10.2: Best Practices</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+
+        /* Hero */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); border-radius: 16px 16px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Quick Stats */
+        .quick-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .quick-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.2s; }
+        .quick-stat:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .quick-stat-icon { font-size: 24px; margin-bottom: 8px; }
+        .quick-stat-value { font-size: 28px; font-weight: 700; color: var(--cat-light); }
+        .quick-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Module */
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Pillars Grid */
+        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .pillar-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; border-top: 3px solid var(--pillar-color); transition: all 0.3s; }
+        .pillar-card:hover { transform: translateY(-4px); border-color: var(--pillar-color); }
+        .pillar-icon { font-size: 32px; margin-bottom: 12px; }
+        .pillar-title { font-size: 15px; font-weight: 600; color: var(--pillar-color); margin-bottom: 8px; }
+        .pillar-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .pillar-link { font-size: 11px; color: var(--cat-light); text-decoration: none; }
+        .pillar-link:hover { text-decoration: underline; }
+
+        /* Learning Path */
+        .learning-path { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .path-title { font-size: 15px; font-weight: 600; color: var(--cat-light); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .path-steps { display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .path-steps::before { content: ''; position: absolute; top: 24px; left: 40px; right: 40px; height: 3px; background: linear-gradient(90deg, var(--cat-primary), var(--cyan), var(--purple), var(--pink), var(--yellow), var(--green), var(--blue)); border-radius: 2px; }
+        .path-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; text-decoration: none; color: inherit; }
+        .path-step-icon { width: 48px; height: 48px; background: var(--bg-card); border: 3px solid var(--step-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; transition: all 0.3s; }
+        .path-step:hover .path-step-icon { transform: scale(1.15); box-shadow: 0 0 20px color-mix(in srgb, var(--step-color) 50%, transparent); }
+        .path-step-label { font-size: 10px; font-weight: 600; color: var(--step-color); text-align: center; max-width: 70px; }
+
+        /* Pages Grid */
+        .pages-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .page-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.3s; display: flex; gap: 16px; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .page-num { width: 44px; height: 44px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .page-content h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .page-content p { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .page-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .page-tag { font-size: 9px; padding: 2px 6px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+
+        /* Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-icon { font-size: 24px; margin-bottom: 8px; }
+        .tool-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .tool-type { font-size: 9px; color: var(--text-muted); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 10px 16px; font-size: 11px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 16px; font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        .footer-nav { display: flex; gap: 24px; }
+        .footer-nav a { color: var(--text-muted); text-decoration: none; font-size: 12px; transition: color 0.2s; }
+        .footer-nav a:hover { color: var(--cat-light); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .agent-grid { grid-template-columns: 1fr; }
+            .quick-stats { grid-template-columns: repeat(2, 1fr); }
+            .pillars-grid { grid-template-columns: 1fr; }
+            .pages-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(3, 1fr); }
+            .path-steps { flex-wrap: wrap; gap: 16px; justify-content: center; }
+            .path-steps::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="#pillars"><span class="nav-icon">🏛️</span> Core Pillars</a></li>
+            <li><a href="#path"><span class="nav-icon">🗺️</span> Learning Path</a></li>
+            <li><a href="#pages"><span class="nav-icon">📚</span> All Pages</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🏗️ Category 10</span>
+                <h1>Product Building</h1>
+                <p>Master the complete product development lifecycle from discovery to scale. Learn methodologies, engineering best practices, AI-assisted development, and metrics that drive successful products from idea to market leadership.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">70%</div><div class="hero-metric-label">Products Fail to Market</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2-4x</div><div class="hero-metric-label">Agile vs Waterfall Speed</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">40%</div><div class="hero-metric-label">Code from AI Assistants</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">7</div><div class="hero-metric-label">Deep-Dive Pages</div></div>
+            </div>
+        </section>
+
+        <!-- QUICK STATS -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">🔄</div>
+                <div class="quick-stat-value">7</div>
+                <div class="quick-stat-label">Lifecycle Phases</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-icon">📋</div>
+                <div class="quick-stat-value">7</div>
+                <div class="quick-stat-label">Methodologies Covered</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-icon">📊</div>
+                <div class="quick-stat-value">40+</div>
+                <div class="quick-stat-label">Product Metrics</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-icon">🛠️</div>
+                <div class="quick-stat-value">30+</div>
+                <div class="quick-stat-label">Tools & Platforms</div>
+            </div>
+        </div>
+
+        <!-- CORE PILLARS -->
+        <section class="module" id="pillars">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Core Pillars of Product Building</h2>
+                    <p>The three fundamental dimensions of successful product development</p>
+                </div>
+            </div>
+            
+            <div class="pillars-grid">
+                <div class="pillar-card" style="--pillar-color: #14B8A6;">
+                    <div class="pillar-icon">🎯</div>
+                    <div class="pillar-title">Process & Methodology</div>
+                    <p class="pillar-desc">How you organize work matters. From Scrum sprints to Shape Up cycles, choose frameworks that match your team's context and product maturity.</p>
+                    <a href="cat10-p6-methodologies.html" class="pillar-link">Explore Methodologies →</a>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #8B5CF6;">
+                    <div class="pillar-icon">⚡</div>
+                    <div class="pillar-title">Engineering Excellence</div>
+                    <p class="pillar-desc">Quality code scales. Master SOLID principles, testing strategies, and best practices that enable teams to move fast without breaking things.</p>
+                    <a href="cat10-p2-best-practices.html" class="pillar-link">Explore Best Practices →</a>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #3B82F6;">
+                    <div class="pillar-icon">📊</div>
+                    <div class="pillar-title">Data-Driven Decisions</div>
+                    <p class="pillar-desc">Measure what matters. From North Star metrics to DORA engineering indicators, use data to guide product direction and validate assumptions.</p>
+                    <a href="cat10-p7-product-metrics.html" class="pillar-link">Explore Metrics →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEARNING PATH -->
+        <section class="module" id="path">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Suggested Learning Path</h2>
+                    <p>A recommended journey through product building concepts</p>
+                </div>
+            </div>
+            
+            <div class="learning-path">
+                <div class="path-title">📍 Start Here → Master Product Building</div>
+                <div class="path-steps">
+                    <a href="cat10-p1-product-lifecycle.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #14B8A6;">🔄</div>
+                        <div class="path-step-label" style="--step-color: #14B8A6;">Lifecycle</div>
+                    </a>
+                    <a href="cat10-p6-methodologies.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #F59E0B;">📋</div>
+                        <div class="path-step-label" style="--step-color: #F59E0B;">Methods</div>
+                    </a>
+                    <a href="cat10-p2-best-practices.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #8B5CF6;">✨</div>
+                        <div class="path-step-label" style="--step-color: #8B5CF6;">Practices</div>
+                    </a>
+                    <a href="cat10-p5-validation.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #06B6D4;">✅</div>
+                        <div class="path-step-label" style="--step-color: #06B6D4;">Testing</div>
+                    </a>
+                    <a href="cat10-p4-ai-assisted-dev.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #EC4899;">🤖</div>
+                        <div class="path-step-label" style="--step-color: #EC4899;">AI Dev</div>
+                    </a>
+                    <a href="cat10-p3-scaling-strategies.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #10B981;">📈</div>
+                        <div class="path-step-label" style="--step-color: #10B981;">Scaling</div>
+                    </a>
+                    <a href="cat10-p7-product-metrics.html" class="path-step">
+                        <div class="path-step-icon" style="--step-color: #3B82F6;">📊</div>
+                        <div class="path-step-label" style="--step-color: #3B82F6;">Metrics</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEEP-DIVE PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Deep-Dive Pages</h2>
+                    <p>Comprehensive guides for each product building topic</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat10-p1-product-lifecycle.html" class="page-card">
+                    <div class="page-num">10.1</div>
+                    <div class="page-content">
+                        <h3>Product Lifecycle</h3>
+                        <p>The complete journey from discovery to launch and iteration. Understand each phase, stakeholder responsibilities, and key deliverables.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">Discovery</span>
+                            <span class="page-tag">Design</span>
+                            <span class="page-tag">Build</span>
+                            <span class="page-tag">Launch</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="cat10-p2-best-practices.html" class="page-card">
+                    <div class="page-num">10.2</div>
+                    <div class="page-content">
+                        <h3>Best Practices</h3>
+                        <p>Code quality patterns, SOLID principles, code smells, tech debt management, and engineering excellence standards.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">SOLID</span>
+                            <span class="page-tag">Code Review</span>
+                            <span class="page-tag">Tech Debt</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="cat10-p3-scaling-strategies.html" class="page-card">
+                    <div class="page-num">10.3</div>
+                    <div class="page-content">
+                        <h3>Scaling Strategies</h3>
+                        <p>Horizontal vs vertical scaling, database sharding, caching strategies, load balancing, and infrastructure evolution.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">Horizontal</span>
+                            <span class="page-tag">Sharding</span>
+                            <span class="page-tag">Caching</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="cat10-p4-ai-assisted-dev.html" class="page-card">
+                    <div class="page-num">10.4</div>
+                    <div class="page-content">
+                        <h3>AI-Assisted Development</h3>
+                        <p>Leverage AI coding assistants, prompt engineering patterns, tool ecosystem, and best practices for AI-augmented development.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">Copilot</span>
+                            <span class="page-tag">Claude</span>
+                            <span class="page-tag">Prompts</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="cat10-p5-validation.html" class="page-card">
+                    <div class="page-num">10.5</div>
+                    <div class="page-content">
+                        <h3>Validation & Testing</h3>
+                        <p>Testing pyramid, TDD practices, integration testing, performance testing, and quality assurance strategies.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">Unit Tests</span>
+                            <span class="page-tag">Integration</span>
+                            <span class="page-tag">E2E</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="cat10-p6-methodologies.html" class="page-card">
+                    <div class="page-num">10.6</div>
+                    <div class="page-content">
+                        <h3>Methodologies</h3>
+                        <p>Scrum, Kanban, XP, Lean, Shape Up, and SAFe. Choose the right framework for your team's context.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">Scrum</span>
+                            <span class="page-tag">Kanban</span>
+                            <span class="page-tag">SAFe</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="cat10-p7-product-metrics.html" class="page-card">
+                    <div class="page-num">10.7</div>
+                    <div class="page-content">
+                        <h3>Product Metrics</h3>
+                        <p>North Star metrics, AARRR funnel, DORA metrics, engagement, financial metrics, and experimentation.</p>
+                        <div class="page-tags">
+                            <span class="page-tag">North Star</span>
+                            <span class="page-tag">DORA</span>
+                            <span class="page-tag">A/B Tests</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Key tools across the product building landscape</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">📋</div>
+                    <div class="tool-name">Jira</div>
+                    <div class="tool-type">Project Management</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">Linear</div>
+                    <div class="tool-type">Issue Tracking</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🎨</div>
+                    <div class="tool-name">Figma</div>
+                    <div class="tool-type">Design</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔄</div>
+                    <div class="tool-name">GitHub</div>
+                    <div class="tool-type">Version Control</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🚀</div>
+                    <div class="tool-name">Vercel</div>
+                    <div class="tool-type">Deployment</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📈</div>
+                    <div class="tool-name">Amplitude</div>
+                    <div class="tool-type">Analytics</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🤖</div>
+                    <div class="tool-name">Copilot</div>
+                    <div class="tool-type">AI Coding</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🧪</div>
+                    <div class="tool-name">Jest</div>
+                    <div class="tool-type">Testing</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📦</div>
+                    <div class="tool-name">Docker</div>
+                    <div class="tool-type">Containers</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">☁️</div>
+                    <div class="tool-name">AWS</div>
+                    <div class="tool-type">Cloud</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔍</div>
+                    <div class="tool-name">Datadog</div>
+                    <div class="tool-type">Monitoring</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">💬</div>
+                    <div class="tool-name">Slack</div>
+                    <div class="tool-type">Communication</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI agents for product building automation</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>ProductBuilder Agent</h3>
+                    <p>An AI agent that assists across the entire product lifecycle—from discovery research to metrics analysis, helping teams make better decisions faster.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Analyze user research and extract insights</div>
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Generate PRDs and technical specs</div>
+                        <div class="agent-capability"><span class="capability-icon">✨</span> Review code for best practices</div>
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Monitor metrics and alert on anomalies</div>
+                        <div class="agent-capability"><span class="capability-icon">🧪</span> Analyze A/B test results</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">product_builder_agent.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+
+product_builder = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Product Builder"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Ship better products faster"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in product
+    development, agile methodologies,
+    engineering practices, and metrics."""</span>,
+    <span class="code-string">tools=</span>[research_analyzer,
+           spec_generator, code_reviewer,
+           metrics_monitor, ab_analyzer]
+)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 10: Product Building</div>
+        <div class="footer-nav">
+            <a href="cat10-p1-product-lifecycle.html">Start Learning →</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
