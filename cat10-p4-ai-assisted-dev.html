@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Assisted Development | Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #EC4899;
+            --page-light: #F472B6;
+            --page-glow: rgba(236, 72, 153, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* AI Workflow Pipeline - UNIQUE VISUAL */
+        .ai-pipeline { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .pipeline-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 32px; }
+        .pipeline-flow { display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .pipeline-flow::before { content: ''; position: absolute; top: 50%; left: 80px; right: 80px; height: 3px; background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue), var(--cyan), var(--green)); transform: translateY(-50%); }
+        .pipeline-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .pipeline-box { width: 100px; height: 100px; background: var(--bg-card); border: 3px solid var(--step-color); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 12px; transition: all 0.3s; }
+        .pipeline-step:hover .pipeline-box { transform: scale(1.1); box-shadow: 0 0 30px color-mix(in srgb, var(--step-color) 40%, transparent); }
+        .pipeline-emoji { font-size: 32px; margin-bottom: 4px; }
+        .pipeline-label { font-size: 11px; font-weight: 600; color: var(--step-color); }
+        .pipeline-desc { font-size: 10px; color: var(--text-muted); text-align: center; max-width: 100px; }
+
+        /* Prompt Engineering Patterns - UNIQUE VISUAL */
+        .prompt-patterns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .prompt-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .prompt-card-header { background: var(--bg-card-alt); padding: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); }
+        .prompt-card-icon { font-size: 24px; }
+        .prompt-card-title { font-size: 14px; font-weight: 600; }
+        .prompt-card-body { padding: 16px; }
+        .prompt-example { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .prompt-tip { font-size: 11px; color: var(--page-light); display: flex; align-items: flex-start; gap: 8px; }
+        .prompt-tip::before { content: '💡'; }
+
+        /* AI Tool Ecosystem - UNIQUE VISUAL */
+        .tool-ecosystem { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .ecosystem-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .ecosystem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .ecosystem-category { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .ecosystem-cat-header { text-align: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .ecosystem-cat-icon { font-size: 28px; margin-bottom: 8px; }
+        .ecosystem-cat-name { font-size: 14px; font-weight: 600; color: var(--cat-color); }
+        .ecosystem-tools { display: flex; flex-direction: column; gap: 8px; }
+        .eco-tool { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg-dark); border-radius: 8px; font-size: 12px; }
+        .eco-tool-icon { font-size: 16px; }
+
+        /* Use Case Cards */
+        .usecase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .usecase-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; border-top: 3px solid var(--usecase-color); transition: all 0.3s; }
+        .usecase-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .usecase-icon { font-size: 36px; margin-bottom: 12px; }
+        .usecase-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .usecase-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .usecase-savings { font-size: 11px; padding: 6px 12px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 6px; color: var(--page-light); display: inline-block; }
+
+        /* Quality vs Speed Chart - UNIQUE VISUAL */
+        .quality-chart { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .chart-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .quadrant-container { display: flex; align-items: stretch; gap: 12px; max-width: 600px; margin: 0 auto; }
+        .q-ylabel { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-muted); padding: 8px; }
+        .q-main { flex: 1; }
+        .q-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .q-xlabel { text-align: center; font-size: 11px; color: var(--text-muted); padding-top: 8px; }
+        .q-cell { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100px; }
+        .q-cell-icon { font-size: 24px; margin-bottom: 8px; }
+        .q-cell-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .q-cell-desc { font-size: 11px; color: var(--text-muted); }
+
+        /* Comparison Table */
+        .comparison-table { overflow-x: auto; margin-bottom: 24px; }
+        .comparison-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .check { color: var(--green); font-weight: 600; }
+        .partial { color: var(--yellow); }
+        .cross { color: var(--red); }
+
+        /* Anti-Patterns */
+        .anti-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .anti-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-left: 3px solid var(--red); }
+        .anti-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--red); }
+        .anti-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .anti-fix { font-size: 11px; padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--green); border-radius: 6px; }
+        .anti-fix strong { color: var(--green); }
+
+        /* Best Practices */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3, .practices-dont h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .practices-do h3 { color: var(--green); }
+        .practices-dont h3 { color: var(--red); }
+        .practice-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); }
+        .practice-item .practice-icon { flex-shrink: 0; }
+        .practices-do .practice-icon { color: var(--green); }
+        .practices-dont .practice-icon { color: var(--red); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .prompt-patterns, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .ecosystem-grid, .usecase-grid { grid-template-columns: repeat(2, 1fr); }
+            .anti-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html" class="active"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#workflow"><span class="nav-icon">🔄</span> AI Workflow</a></li>
+            <li><a href="#prompts"><span class="nav-icon">💬</span> Prompt Engineering</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tool Ecosystem</a></li>
+            <li><a href="#usecases"><span class="nav-icon">💡</span> Use Cases</a></li>
+            <li><a href="#quality"><span class="nav-icon">⚖️</span> Quality Trade-offs</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">⚠️</span> Anti-Patterns</a></li>
+            <li><a href="#bestpractices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🤖 Page 10.4</span>
+                <h1>AI-Assisted Development</h1>
+                <p>Leverage AI to accelerate development without sacrificing quality. From code generation to documentation, learn how to integrate AI tools into your workflow while maintaining code ownership, security, and architectural integrity.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">55%</div><div class="hero-metric-label">Faster Coding</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">40%</div><div class="hero-metric-label">Less Boilerplate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">92%</div><div class="hero-metric-label">Dev Adoption</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2x</div><div class="hero-metric-label">PR Throughput</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding AI-Assisted Development</h2>
+                    <p>Augmenting human intelligence, not replacing it</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>What is AI-Assisted Development?</h3>
+                    <p>AI-assisted development uses machine learning models to help developers write, review, test, and document code. These tools understand context, suggest completions, explain code, and automate repetitive tasks.</p>
+                    <p>The key insight: AI is a powerful collaborator, not an autonomous agent. It excels at pattern matching and boilerplate but requires human judgment for architecture, security, and business logic.</p>
+                    <p>Think of AI as a very fast junior developer—helpful for drafting, but always needs review.</p>
+                </div>
+                <div>
+                    <h3>Why AI-Assisted Development Matters</h3>
+                    <p><strong>Velocity:</strong> Spend time on hard problems, not boilerplate. AI handles the tedious stuff so you can focus on what matters.</p>
+                    <p><strong>Learning:</strong> Get explanations, see alternatives, discover patterns. AI is like having a knowledgeable pair programmer available 24/7.</p>
+                    <p><strong>Consistency:</strong> AI can help enforce coding standards across the team. Same patterns, same style, everywhere.</p>
+                    <p><strong>Accessibility:</strong> Lower barrier to entry for new languages and frameworks. AI helps bridge knowledge gaps.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Workflow Pipeline -->
+        <section class="module" id="workflow">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>AI-Assisted Development Workflow</h2>
+                    <p>Integrating AI throughout the development lifecycle</p>
+                </div>
+            </div>
+            
+            <div class="ai-pipeline">
+                <div class="pipeline-title">From Idea to Deployment with AI</div>
+                <div class="pipeline-flow">
+                    <div class="pipeline-step">
+                        <div class="pipeline-box" style="--step-color: #EC4899;">
+                            <span class="pipeline-emoji">💭</span>
+                            <span class="pipeline-label">Ideate</span>
+                        </div>
+                        <div class="pipeline-desc">Brainstorm with AI chat</div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-box" style="--step-color: #8B5CF6;">
+                            <span class="pipeline-emoji">📝</span>
+                            <span class="pipeline-label">Spec</span>
+                        </div>
+                        <div class="pipeline-desc">Generate requirements</div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-box" style="--step-color: #3B82F6;">
+                            <span class="pipeline-emoji">⌨️</span>
+                            <span class="pipeline-label">Code</span>
+                        </div>
+                        <div class="pipeline-desc">AI autocomplete</div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-box" style="--step-color: #06B6D4;">
+                            <span class="pipeline-emoji">👁️</span>
+                            <span class="pipeline-label">Review</span>
+                        </div>
+                        <div class="pipeline-desc">AI-assisted review</div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-box" style="--step-color: #10B981;">
+                            <span class="pipeline-emoji">🧪</span>
+                            <span class="pipeline-label">Test</span>
+                        </div>
+                        <div class="pipeline-desc">Generate test cases</div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-box" style="--step-color: #F59E0B;">
+                            <span class="pipeline-emoji">📚</span>
+                            <span class="pipeline-label">Document</span>
+                        </div>
+                        <div class="pipeline-desc">Auto-generate docs</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prompt Engineering -->
+        <section class="module" id="prompts">
+            <div class="module-header">
+                <div class="module-icon">💬</div>
+                <div class="module-info">
+                    <h2>Prompt Engineering Patterns</h2>
+                    <p>Get better results with effective prompting</p>
+                </div>
+            </div>
+            
+            <div class="prompt-patterns">
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <span class="prompt-card-icon">🎯</span>
+                        <span class="prompt-card-title">Specific Context</span>
+                    </div>
+                    <div class="prompt-card-body">
+                        <div class="prompt-example">
+"Write a Python function that validates email addresses using regex. It should return True for valid emails, False otherwise. Handle edge cases like missing @ symbol and invalid domains."
+                        </div>
+                        <div class="prompt-tip">Always include language, purpose, expected behavior, and edge cases.</div>
+                    </div>
+                </div>
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <span class="prompt-card-icon">📋</span>
+                        <span class="prompt-card-title">Step-by-Step</span>
+                    </div>
+                    <div class="prompt-card-body">
+                        <div class="prompt-example">
+"Create a user authentication flow:
+1. Accept username and password
+2. Hash password with bcrypt
+3. Check against database
+4. Return JWT token on success
+5. Handle invalid credentials gracefully"
+                        </div>
+                        <div class="prompt-tip">Break complex tasks into numbered steps for better accuracy.</div>
+                    </div>
+                </div>
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <span class="prompt-card-icon">🔄</span>
+                        <span class="prompt-card-title">Iterative Refinement</span>
+                    </div>
+                    <div class="prompt-card-body">
+                        <div class="prompt-example">
+"This function works but is O(n²). Refactor to O(n log n) while maintaining the same interface. Explain the optimization."
+                        </div>
+                        <div class="prompt-tip">Start with working code, then ask for specific improvements.</div>
+                    </div>
+                </div>
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <span class="prompt-card-icon">🎭</span>
+                        <span class="prompt-card-title">Role Assignment</span>
+                    </div>
+                    <div class="prompt-card-body">
+                        <div class="prompt-example">
+"Act as a senior security engineer. Review this authentication code for vulnerabilities. Focus on SQL injection, XSS, and session management issues."
+                        </div>
+                        <div class="prompt-tip">Assigning expertise roles improves domain-specific output quality.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tool Ecosystem -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>AI Development Tool Ecosystem</h2>
+                    <p>The landscape of AI-powered development tools</p>
+                </div>
+            </div>
+            
+            <div class="tool-ecosystem">
+                <div class="ecosystem-title">AI Tools by Category</div>
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-category">
+                        <div class="ecosystem-cat-header" style="--cat-color: #EC4899;">
+                            <div class="ecosystem-cat-icon">⌨️</div>
+                            <div class="ecosystem-cat-name" style="color: #EC4899;">Code Generation</div>
+                        </div>
+                        <div class="ecosystem-tools">
+                            <div class="eco-tool"><span class="eco-tool-icon">🐙</span> GitHub Copilot</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">🔮</span> Cursor</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">⚡</span> Codeium</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">🎯</span> Tabnine</div>
+                        </div>
+                    </div>
+                    <div class="ecosystem-category">
+                        <div class="ecosystem-cat-header" style="--cat-color: #8B5CF6;">
+                            <div class="ecosystem-cat-icon">💬</div>
+                            <div class="ecosystem-cat-name" style="color: #8B5CF6;">Chat Assistants</div>
+                        </div>
+                        <div class="ecosystem-tools">
+                            <div class="eco-tool"><span class="eco-tool-icon">🤖</span> Claude</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">🟢</span> ChatGPT</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">🔷</span> Gemini</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">🦙</span> Llama</div>
+                        </div>
+                    </div>
+                    <div class="ecosystem-category">
+                        <div class="ecosystem-cat-header" style="--cat-color: #10B981;">
+                            <div class="ecosystem-cat-icon">🔍</div>
+                            <div class="ecosystem-cat-name" style="color: #10B981;">Code Review</div>
+                        </div>
+                        <div class="ecosystem-tools">
+                            <div class="eco-tool"><span class="eco-tool-icon">🤖</span> CodeRabbit</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">👁️</span> Codacy AI</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">🔐</span> Snyk AI</div>
+                            <div class="eco-tool"><span class="eco-tool-icon">📊</span> SonarQube AI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Best For</th>
+                            <th>IDE Support</th>
+                            <th>Pricing</th>
+                            <th>Privacy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GitHub Copilot</strong></td>
+                            <td>Inline completion</td>
+                            <td><span class="check">✓</span> All major IDEs</td>
+                            <td>$10-19/mo</td>
+                            <td>Enterprise options</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cursor</strong></td>
+                            <td>Full IDE experience</td>
+                            <td>Standalone IDE</td>
+                            <td>$20/mo</td>
+                            <td>Good</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Claude</strong></td>
+                            <td>Complex reasoning</td>
+                            <td>Web/API</td>
+                            <td>$20/mo</td>
+                            <td><span class="check">✓</span> Excellent</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Codeium</strong></td>
+                            <td>Free option</td>
+                            <td><span class="check">✓</span> All major IDEs</td>
+                            <td>Free tier</td>
+                            <td>Good</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section class="module" id="usecases">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>High-Value Use Cases</h2>
+                    <p>Where AI delivers the most impact</p>
+                </div>
+            </div>
+            
+            <div class="usecase-grid">
+                <div class="usecase-card" style="--usecase-color: #EC4899;">
+                    <div class="usecase-icon">📝</div>
+                    <div class="usecase-title">Boilerplate Generation</div>
+                    <p class="usecase-desc">CRUD endpoints, data models, API clients. AI excels at repetitive patterns you've written 100 times.</p>
+                    <div class="usecase-savings">Saves 2-3 hrs/week</div>
+                </div>
+                <div class="usecase-card" style="--usecase-color: #8B5CF6;">
+                    <div class="usecase-icon">🧪</div>
+                    <div class="usecase-title">Test Generation</div>
+                    <p class="usecase-desc">Unit tests, edge cases, mocks. Given a function, AI generates comprehensive test suites.</p>
+                    <div class="usecase-savings">80% coverage boost</div>
+                </div>
+                <div class="usecase-card" style="--usecase-color: #3B82F6;">
+                    <div class="usecase-icon">📚</div>
+                    <div class="usecase-title">Documentation</div>
+                    <p class="usecase-desc">JSDoc, README files, API docs. AI drafts, humans refine. Always better than nothing.</p>
+                    <div class="usecase-savings">5x faster docs</div>
+                </div>
+                <div class="usecase-card" style="--usecase-color: #10B981;">
+                    <div class="usecase-icon">🔄</div>
+                    <div class="usecase-title">Code Refactoring</div>
+                    <p class="usecase-desc">Modernize legacy code, apply design patterns, improve performance. AI suggests, you decide.</p>
+                    <div class="usecase-savings">40% faster refactors</div>
+                </div>
+                <div class="usecase-card" style="--usecase-color: #F59E0B;">
+                    <div class="usecase-icon">🐛</div>
+                    <div class="usecase-title">Bug Investigation</div>
+                    <p class="usecase-desc">Explain error messages, suggest fixes, trace through code. AI as debugging partner.</p>
+                    <div class="usecase-savings">30% faster fixes</div>
+                </div>
+                <div class="usecase-card" style="--usecase-color: #06B6D4;">
+                    <div class="usecase-icon">🌐</div>
+                    <div class="usecase-title">Language Translation</div>
+                    <p class="usecase-desc">Port code between languages. Python to TypeScript, Java to Kotlin. Structure preserved.</p>
+                    <div class="usecase-savings">Days → Hours</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quality Trade-offs -->
+        <section class="module" id="quality">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Quality vs. Speed Trade-offs</h2>
+                    <p>When to trust AI output and when to be skeptical</p>
+                </div>
+            </div>
+            
+            <div class="quality-chart">
+                <div class="chart-title">AI Output Trust Matrix</div>
+                <div class="quadrant-container">
+                    <div class="q-ylabel">Complexity →</div>
+                    <div class="q-main">
+                        <div class="q-row">
+                            <div class="q-cell" style="border-color: var(--green);">
+                                <div class="q-cell-icon">✅</div>
+                                <div class="q-cell-label" style="color: var(--green);">Trust Highly</div>
+                                <div class="q-cell-desc">Simple + Common patterns</div>
+                            </div>
+                            <div class="q-cell" style="border-color: var(--yellow);">
+                                <div class="q-cell-icon">⚠️</div>
+                                <div class="q-cell-label" style="color: var(--yellow);">Verify</div>
+                                <div class="q-cell-desc">Complex + Common patterns</div>
+                            </div>
+                        </div>
+                        <div class="q-row">
+                            <div class="q-cell" style="border-color: var(--yellow);">
+                                <div class="q-cell-icon">⚠️</div>
+                                <div class="q-cell-label" style="color: var(--yellow);">Verify</div>
+                                <div class="q-cell-desc">Simple + Unique domain</div>
+                            </div>
+                            <div class="q-cell" style="border-color: var(--red);">
+                                <div class="q-cell-icon">❌</div>
+                                <div class="q-cell-label" style="color: var(--red);">Draft Only</div>
+                                <div class="q-cell-desc">Complex + Unique domain</div>
+                            </div>
+                        </div>
+                        <div class="q-xlabel">← Familiarity (AI Training Data) →</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>When AI Excels</h3>
+                    <p><strong>Common Patterns:</strong> REST APIs, CRUD operations, data transformations. Things AI has seen millions of times.</p>
+                    <p><strong>Well-Defined Tasks:</strong> Clear input/output specs. "Convert this JSON to CSV" not "make it better."</p>
+                    <p><strong>Language Translation:</strong> Moving between similar languages preserves structure and intent well.</p>
+                </div>
+                <div>
+                    <h3>When to Be Skeptical</h3>
+                    <p><strong>Security Code:</strong> Auth, crypto, permissions. AI can introduce subtle vulnerabilities. Always expert review.</p>
+                    <p><strong>Domain-Specific Logic:</strong> Business rules unique to your company. AI doesn't know your domain.</p>
+                    <p><strong>Performance-Critical:</strong> AI optimizes for correctness, not necessarily performance. Profile and verify.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Anti-Patterns -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>AI Development Anti-Patterns</h2>
+                    <p>Common mistakes when using AI tools</p>
+                </div>
+            </div>
+            
+            <div class="anti-grid">
+                <div class="anti-card">
+                    <h4>Blind Copy-Paste</h4>
+                    <p>Accepting AI output without understanding or reviewing. Creates technical debt and security vulnerabilities.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Read every line. Understand before committing. If you can't explain it, don't ship it.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Over-Reliance</h4>
+                    <p>Using AI for everything, including tasks where it's weak. Wastes time fixing bad output.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Know AI's strengths and weaknesses. Use it where it excels, skip where it doesn't.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Sensitive Data in Prompts</h4>
+                    <p>Pasting API keys, passwords, or PII into AI tools. Data may be logged or used for training.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Sanitize prompts before sending. Use placeholder values. Check data policies.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Skipping Tests</h4>
+                    <p>Assuming AI-generated code works. It often has subtle bugs that only appear in edge cases.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Test AI code more thoroughly, not less. Include edge cases AI might miss.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module" id="bestpractices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>AI Development Best Practices</h2>
+                    <p>Maximizing value while minimizing risk</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Review all AI-generated code before committing</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Use AI for first drafts, iterate with human judgment</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Write detailed prompts with context and constraints</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Test AI output more thoroughly than human code</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Use AI for learning and exploring unfamiliar domains</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Maintain coding skills—AI is a tool, not a replacement</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Track AI-assisted code for quality patterns</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Copy-paste without understanding</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Include secrets or PII in prompts</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Trust AI for security-critical code without expert review</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Assume AI understands your unique business logic</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Skip code review because "AI wrote it"</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Use AI as excuse to avoid learning fundamentals</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Blame AI for bugs—you accepted the code</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Section -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>Multi-agent AI development assistance</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>DeveloperAssistantCrew</h3>
+                    <p>A multi-agent system that combines specialized AI agents for different development tasks: code generation, review, testing, and documentation working together.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">⌨️</span> Generate code from specifications</div>
+                        <div class="agent-capability"><span class="capability-icon">👁️</span> Review for quality and security</div>
+                        <div class="agent-capability"><span class="capability-icon">🧪</span> Generate comprehensive test suites</div>
+                        <div class="agent-capability"><span class="capability-icon">📚</span> Auto-generate documentation</div>
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> Suggest refactoring improvements</div>
+                        <div class="agent-capability"><span class="capability-icon">🐛</span> Debug and explain errors</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">dev_assistant_crew.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+coder = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Senior Developer"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Write clean, efficient code"</span>,
+    <span class="code-string">tools=</span>[code_generator, linter]
+)
+
+reviewer = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Code Reviewer"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Ensure quality and security"</span>,
+    <span class="code-string">tools=</span>[security_scanner, style_checker]
+)
+
+tester = Agent(
+    <span class="code-string">role=</span><span class="code-string">"QA Engineer"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Comprehensive test coverage"</span>,
+    <span class="code-string">tools=</span>[test_generator, coverage_analyzer]
+)
+
+dev_crew = Crew(
+    agents=[coder, reviewer, tester],
+    tasks=[code_task, review_task, test_task],
+    process=<span class="code-string">"sequential"</span>
+)
+result = dev_crew.kickoff()
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring Product Building</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat10-p2-best-practices.html" class="related-card">
+                    <div class="related-icon">✨</div>
+                    <div class="related-title">Best Practices</div>
+                    <div class="related-desc">Code quality standards for human and AI code</div>
+                </a>
+                <a href="cat10-p5-validation.html" class="related-card">
+                    <div class="related-icon">✅</div>
+                    <div class="related-title">Validation & Testing</div>
+                    <div class="related-desc">Testing strategies including AI-generated tests</div>
+                </a>
+                <a href="cat10-p7-product-metrics.html" class="related-card">
+                    <div class="related-icon">📊</div>
+                    <div class="related-title">Product Metrics</div>
+                    <div class="related-desc">Measuring AI impact on development velocity</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat10-p3-scaling-strategies.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">10.3: Scaling Strategies</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 10.4</div>
+        <a href="cat10-p5-validation.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">10.5: Validation & Testing</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

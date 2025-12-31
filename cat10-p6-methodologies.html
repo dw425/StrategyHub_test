@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodologies | Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: rgba(20, 184, 166, 0.15); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .content-full { grid-column: 1 / -1; }
+
+        /* Methodology Header Cards */
+        .method-header { display: flex; gap: 16px; margin-bottom: 24px; padding: 20px; background: var(--bg-dark); border-radius: 12px; border-left: 4px solid var(--method-color); }
+        .method-header-icon { font-size: 48px; }
+        .method-header-content h3 { font-size: 18px; font-weight: 600; color: var(--method-color); margin-bottom: 8px; }
+        .method-header-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .method-tags { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .method-tag { font-size: 10px; padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+
+        /* Sprint/Cycle Timeline */
+        .cycle-visual { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .cycle-title { font-size: 15px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 20px; }
+        .cycle-phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .cycle-phase { background: var(--bg-card); border: 2px solid var(--phase-color); border-radius: 10px; padding: 16px; text-align: center; transition: transform 0.2s; }
+        .cycle-phase:hover { transform: translateY(-4px); }
+        .phase-icon { font-size: 24px; margin-bottom: 8px; }
+        .phase-name { font-size: 12px; font-weight: 600; color: var(--phase-color); margin-bottom: 4px; }
+        .phase-time { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+        .phase-desc { font-size: 10px; color: var(--text-muted); }
+        .cycle-bar { height: 6px; background: linear-gradient(90deg, var(--purple), var(--blue), var(--cyan), var(--green), var(--yellow)); border-radius: 3px; }
+
+        /* Role Cards */
+        .roles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .role-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; border-top: 3px solid var(--role-color); }
+        .role-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .role-icon { font-size: 28px; }
+        .role-name { font-size: 14px; font-weight: 600; color: var(--role-color); }
+        .role-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .role-responsibilities { list-style: none; }
+        .role-responsibilities li { font-size: 11px; color: var(--text-muted); padding: 4px 0; padding-left: 16px; position: relative; }
+        .role-responsibilities li::before { content: '→'; position: absolute; left: 0; color: var(--role-color); }
+
+        /* Artifact/Practice Cards */
+        .artifacts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .artifact-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; }
+        .artifact-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .artifact-icon { font-size: 20px; }
+        .artifact-name { font-size: 13px; font-weight: 600; color: var(--artifact-color); }
+        .artifact-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Kanban Board */
+        .kanban-board { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; overflow-x: auto; }
+        .board-title { font-size: 15px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 20px; }
+        .board-columns { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 10px; }
+        .board-column { background: var(--bg-card); border-radius: 8px; padding: 10px; min-height: 200px; }
+        .column-header { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; margin-bottom: 10px; background: color-mix(in srgb, var(--col-color) 15%, transparent); }
+        .column-name { font-size: 11px; font-weight: 600; color: var(--col-color); }
+        .column-wip { font-size: 9px; color: var(--bg-dark); background: var(--col-color); padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .board-card { background: var(--bg-dark); border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 10px; border-left: 3px solid var(--card-color); }
+        .card-title { font-weight: 600; margin-bottom: 4px; font-size: 11px; }
+        .card-meta { display: flex; justify-content: space-between; color: var(--text-muted); }
+
+        /* XP Practices Grid */
+        .practices-visual { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .practice-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; border-bottom: 3px solid var(--practice-color); transition: all 0.2s; }
+        .practice-card:hover { transform: translateY(-4px); border-color: var(--practice-color); }
+        .practice-icon { font-size: 24px; margin-bottom: 8px; }
+        .practice-name { font-size: 11px; font-weight: 600; color: var(--practice-color); margin-bottom: 6px; }
+        .practice-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Values Pills */
+        .values-row { display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .value-pill { background: var(--bg-dark); border: 2px solid var(--value-color); border-radius: 50px; padding: 10px 20px; }
+        .value-pill span { font-size: 12px; font-weight: 600; color: var(--value-color); }
+
+        /* Lean Principles */
+        .lean-principles { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 24px; }
+        .lean-principle { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 10px; text-align: center; }
+        .principle-num { width: 28px; height: 28px; background: var(--principle-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--bg-dark); margin: 0 auto 10px; }
+        .principle-name { font-size: 10px; font-weight: 600; color: var(--principle-color); line-height: 1.4; }
+
+        /* Waste Types */
+        .waste-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+        .waste-card { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red); border-radius: 8px; padding: 12px; text-align: center; }
+        .waste-icon { font-size: 18px; margin-bottom: 6px; }
+        .waste-name { font-size: 10px; font-weight: 600; color: var(--red); margin-bottom: 4px; }
+        .waste-example { font-size: 9px; color: var(--text-muted); }
+
+        /* Shape Up Betting Table */
+        .betting-table { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .betting-title { font-size: 15px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 20px; }
+        .bets-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .bet-card { background: var(--bg-card); border: 2px solid var(--bet-color); border-radius: 10px; padding: 16px; }
+        .bet-status { font-size: 10px; font-weight: 600; color: var(--bet-color); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .bet-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .bet-appetite { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .bet-team { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+        /* SAFe Hierarchy */
+        .safe-hierarchy { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .hierarchy-title { font-size: 15px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .hierarchy-levels { display: flex; flex-direction: column; gap: 12px; }
+        .hierarchy-level { display: flex; align-items: center; gap: 20px; }
+        .level-label { width: 80px; text-align: right; font-size: 11px; font-weight: 600; color: var(--level-color); }
+        .level-boxes { flex: 1; display: flex; gap: 10px; }
+        .level-box { background: var(--bg-card); border: 2px solid var(--level-color); border-radius: 8px; padding: 12px; flex: 1; }
+        .level-box-title { font-size: 11px; font-weight: 600; color: var(--level-color); margin-bottom: 2px; }
+        .level-box-desc { font-size: 9px; color: var(--text-muted); }
+        .level-arrow { width: 80px; text-align: center; font-size: 20px; color: var(--border-color); }
+
+        /* Comparison Table */
+        .comparison-table { overflow-x: auto; margin-bottom: 24px; }
+        .comparison-table table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .comparison-table th { background: var(--bg-dark); padding: 12px 10px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); white-space: nowrap; }
+        .comparison-table td { padding: 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .check { color: var(--green); font-weight: 600; }
+        .partial { color: var(--yellow); }
+        .cross { color: var(--red); }
+
+        /* Decision Matrix */
+        .decision-matrix { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .matrix-title { font-size: 15px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 20px; }
+        .matrix-rows { display: flex; flex-direction: column; gap: 10px; }
+        .matrix-row { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--bg-card); border-radius: 8px; }
+        .matrix-condition { font-size: 12px; color: var(--text-primary); flex: 1; }
+        .matrix-answer { font-size: 11px; padding: 6px 14px; border-radius: 6px; font-weight: 600; }
+        .matrix-answer.scrum { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+        .matrix-answer.kanban { background: rgba(6, 182, 212, 0.2); color: var(--cyan); }
+        .matrix-answer.xp { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .matrix-answer.lean { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+        .matrix-answer.shapeup { background: rgba(249, 115, 22, 0.2); color: var(--orange); }
+        .matrix-answer.safe { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .matrix-answer.scrumban { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+
+        /* Anti-Patterns */
+        .anti-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px; }
+        .anti-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; border-left: 3px solid var(--red); }
+        .anti-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--red); }
+        .anti-card p { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+        .anti-fix { font-size: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--green); border-radius: 6px; }
+        .anti-fix strong { color: var(--green); }
+
+        /* Best Practices */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 12px; padding: 20px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3 { color: var(--green); font-size: 14px; margin-bottom: 16px; }
+        .practices-dont h3 { color: var(--red); font-size: 14px; margin-bottom: 16px; }
+        .practice-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--text-secondary); }
+        .practice-item .icon { flex-shrink: 0; }
+        .practices-do .icon { color: var(--green); }
+        .practices-dont .icon { color: var(--red); }
+
+        /* Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .tool-icon { font-size: 24px; margin-bottom: 8px; }
+        .tool-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .tool-type { font-size: 9px; color: var(--text-muted); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 10px 16px; font-size: 11px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 16px; font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .roles-grid, .artifacts-grid, .bets-grid, .safe-events { grid-template-columns: 1fr; }
+            .cycle-phases, .practices-visual, .waste-grid { grid-template-columns: repeat(2, 1fr); }
+            .lean-principles { grid-template-columns: repeat(4, 1fr); }
+            .board-columns { grid-template-columns: repeat(3, 1fr); }
+            .tools-grid { grid-template-columns: repeat(3, 1fr); }
+            .related-grid, .anti-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html" class="active"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#scrum"><span class="nav-icon">🏃</span> Scrum</a></li>
+            <li><a href="#kanban"><span class="nav-icon">📊</span> Kanban</a></li>
+            <li><a href="#xp"><span class="nav-icon">⚡</span> XP</a></li>
+            <li><a href="#lean"><span class="nav-icon">🎯</span> Lean</a></li>
+            <li><a href="#shapeup"><span class="nav-icon">🔷</span> Shape Up</a></li>
+            <li><a href="#safe"><span class="nav-icon">🚂</span> SAFe</a></li>
+            <li><a href="#choosing"><span class="nav-icon">🧭</span> Choosing</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📋 Page 10.6</span>
+                <h1>Development Methodologies</h1>
+                <p>Master the frameworks that organize product development. From Scrum sprints to Kanban flow to Shape Up's appetite-based betting, understand when and how to apply each methodology for maximum team effectiveness and delivery velocity.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">7</div><div class="hero-metric-label">Methodologies</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2 wks</div><div class="hero-metric-label">Typical Sprint</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5-9</div><div class="hero-metric-label">Team Size</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">∞</div><div class="hero-metric-label">Continuous Flow</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding Methodologies</h2>
+                    <p>Frameworks for organizing development work and delivering value</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>What are Development Methodologies?</h3>
+                    <p>Development methodologies are structured approaches to organizing work, coordinating teams, and delivering value. They provide ceremonies, roles, and artifacts that create predictability and alignment across organizations.</p>
+                    <p>The key insight: <strong>no methodology is universally best</strong>. Choose based on team size, product maturity, organizational culture, and the nature of work. Most successful teams blend elements from multiple frameworks to create their own operating system.</p>
+                </div>
+                <div>
+                    <h3>Why Methodologies Matter</h3>
+                    <p><strong>Predictability:</strong> Regular cadences create rhythm. Teams know what to expect and when to deliver. Stakeholders can plan around reliable schedules.</p>
+                    <p><strong>Visibility:</strong> Progress is transparent. Everyone sees what's happening without interrupting work. Bottlenecks surface early.</p>
+                    <p><strong>Continuous Improvement:</strong> Built-in reflection points through retrospectives, inspect-and-adapt cycles, and kaizen events drive teams to get better over time.</p>
+                    <p><strong>Alignment:</strong> Shared language and practices mean everyone understands the process and their role. Reduces coordination overhead.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCRUM -->
+        <section class="module" id="scrum">
+            <div class="module-header">
+                <div class="module-icon">🏃</div>
+                <div class="module-info">
+                    <h2>Scrum Framework</h2>
+                    <p>Iterative development with time-boxed sprints and defined roles</p>
+                </div>
+            </div>
+
+            <div class="method-header" style="--method-color: #8B5CF6;">
+                <div class="method-header-icon">🏃</div>
+                <div class="method-header-content">
+                    <h3>Scrum at a Glance</h3>
+                    <p>Scrum is the most widely adopted agile framework. Teams work in fixed-length sprints (typically 2 weeks), delivering potentially shippable increments at the end of each cycle. Core philosophy: inspect and adapt—every sprint provides feedback that shapes the next one. Empirical process control through transparency, inspection, and adaptation.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">2-Week Sprints</span>
+                        <span class="method-tag">3 Roles</span>
+                        <span class="method-tag">5 Events</span>
+                        <span class="method-tag">3 Artifacts</span>
+                        <span class="method-tag">5-9 People</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cycle-visual">
+                <div class="cycle-title">Sprint Events (2-Week Cycle)</div>
+                <div class="cycle-phases">
+                    <div class="cycle-phase" style="--phase-color: #8B5CF6;">
+                        <div class="phase-icon">📋</div>
+                        <div class="phase-name">Sprint Planning</div>
+                        <div class="phase-time">2-4 hours</div>
+                        <div class="phase-desc">What can we deliver? How will we do it?</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #3B82F6;">
+                        <div class="phase-icon">🧍</div>
+                        <div class="phase-name">Daily Standup</div>
+                        <div class="phase-time">15 min/day</div>
+                        <div class="phase-desc">Sync, blockers, coordination</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #06B6D4;">
+                        <div class="phase-icon">🔄</div>
+                        <div class="phase-name">Refinement</div>
+                        <div class="phase-time">~10% of sprint</div>
+                        <div class="phase-desc">Prepare future work, estimate</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #10B981;">
+                        <div class="phase-icon">👁️</div>
+                        <div class="phase-name">Sprint Review</div>
+                        <div class="phase-time">1-2 hours</div>
+                        <div class="phase-desc">Demo work, gather feedback</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #F59E0B;">
+                        <div class="phase-icon">🔍</div>
+                        <div class="phase-name">Retrospective</div>
+                        <div class="phase-time">1-2 hours</div>
+                        <div class="phase-desc">What to improve? Action items</div>
+                    </div>
+                </div>
+                <div class="cycle-bar"></div>
+            </div>
+
+            <div class="roles-grid">
+                <div class="role-card" style="--role-color: #8B5CF6;">
+                    <div class="role-header">
+                        <div class="role-icon">👤</div>
+                        <div class="role-name">Product Owner</div>
+                    </div>
+                    <p class="role-desc">Owns the product vision and maximizes value delivered. Single voice for stakeholders. Makes prioritization decisions.</p>
+                    <ul class="role-responsibilities">
+                        <li>Manages and orders product backlog</li>
+                        <li>Defines acceptance criteria</li>
+                        <li>Accepts or rejects completed work</li>
+                        <li>Communicates with stakeholders</li>
+                        <li>Makes trade-off decisions</li>
+                    </ul>
+                </div>
+                <div class="role-card" style="--role-color: #10B981;">
+                    <div class="role-header">
+                        <div class="role-icon">🎯</div>
+                        <div class="role-name">Scrum Master</div>
+                    </div>
+                    <p class="role-desc">Facilitates the process and removes impediments. Servant leader who coaches team on Scrum practices.</p>
+                    <ul class="role-responsibilities">
+                        <li>Facilitates all Scrum events</li>
+                        <li>Removes blockers quickly</li>
+                        <li>Shields team from distractions</li>
+                        <li>Coaches on Scrum practices</li>
+                        <li>Drives continuous improvement</li>
+                    </ul>
+                </div>
+                <div class="role-card" style="--role-color: #3B82F6;">
+                    <div class="role-header">
+                        <div class="role-icon">👥</div>
+                        <div class="role-name">Development Team</div>
+                    </div>
+                    <p class="role-desc">Cross-functional, self-organizing team that delivers the increment. All skills needed to create value.</p>
+                    <ul class="role-responsibilities">
+                        <li>Self-organizes to achieve sprint goal</li>
+                        <li>Commits to what they can deliver</li>
+                        <li>Estimates work collaboratively</li>
+                        <li>Owns quality and Definition of Done</li>
+                        <li>Delivers working software each sprint</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="artifacts-grid">
+                <div class="artifact-card" style="--artifact-color: #8B5CF6;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">📚</div>
+                        <div class="artifact-name">Product Backlog</div>
+                    </div>
+                    <p class="artifact-desc">Single ordered list of everything needed in the product. Owned by PO. Continuously refined. Items ordered by value, risk, dependencies.</p>
+                </div>
+                <div class="artifact-card" style="--artifact-color: #3B82F6;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">📝</div>
+                        <div class="artifact-name">Sprint Backlog</div>
+                    </div>
+                    <p class="artifact-desc">Items selected for sprint plus plan to deliver. Owned by Dev Team. Updated daily. Visible to all. Forecast of what increment will be.</p>
+                </div>
+                <div class="artifact-card" style="--artifact-color: #10B981;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">📦</div>
+                        <div class="artifact-name">Increment</div>
+                    </div>
+                    <p class="artifact-desc">Sum of completed items plus all prior increments. Must meet Definition of Done. Potentially releasable. Inspected at Sprint Review.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KANBAN -->
+        <section class="module" id="kanban">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Kanban System</h2>
+                    <p>Continuous flow with work-in-progress limits and pull-based scheduling</p>
+                </div>
+            </div>
+
+            <div class="method-header" style="--method-color: #06B6D4;">
+                <div class="method-header-icon">📊</div>
+                <div class="method-header-content">
+                    <h3>Kanban at a Glance</h3>
+                    <p>Kanban is a visual system for managing work as it flows through a process. Unlike Scrum, there are no fixed iterations—work flows continuously. The key constraint: WIP limits. By limiting work-in-progress, teams improve flow, reduce context switching, and surface bottlenecks immediately. Evolved from Toyota's manufacturing system.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">Continuous Flow</span>
+                        <span class="method-tag">WIP Limits</span>
+                        <span class="method-tag">Pull System</span>
+                        <span class="method-tag">Visual Board</span>
+                        <span class="method-tag">Any Team Size</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kanban-board">
+                <div class="board-title">Kanban Board with WIP Limits</div>
+                <div class="board-columns">
+                    <div class="board-column">
+                        <div class="column-header" style="--col-color: #8B5CF6;">
+                            <span class="column-name">Backlog</span>
+                            <span class="column-wip">∞</span>
+                        </div>
+                        <div class="board-card" style="--card-color: #8B5CF6;"><div class="card-title">User dashboard redesign</div><div class="card-meta"><span>5 pts</span><span>🟡 Med</span></div></div>
+                        <div class="board-card" style="--card-color: #3B82F6;"><div class="card-title">API rate limiting</div><div class="card-meta"><span>8 pts</span><span>🔵 High</span></div></div>
+                        <div class="board-card" style="--card-color: #6B7280;"><div class="card-title">Bug: login timeout</div><div class="card-meta"><span>2 pts</span><span>🟢 Low</span></div></div>
+                    </div>
+                    <div class="board-column">
+                        <div class="column-header" style="--col-color: #3B82F6;">
+                            <span class="column-name">Ready</span>
+                            <span class="column-wip">5</span>
+                        </div>
+                        <div class="board-card" style="--card-color: #EC4899;"><div class="card-title">Search autocomplete</div><div class="card-meta"><span>5 pts</span><span>🔵 High</span></div></div>
+                        <div class="board-card" style="--card-color: #06B6D4;"><div class="card-title">Email templates</div><div class="card-meta"><span>3 pts</span><span>🟡 Med</span></div></div>
+                    </div>
+                    <div class="board-column">
+                        <div class="column-header" style="--col-color: #F59E0B;">
+                            <span class="column-name">In Progress</span>
+                            <span class="column-wip">4</span>
+                        </div>
+                        <div class="board-card" style="--card-color: #10B981;"><div class="card-title">OAuth integration</div><div class="card-meta"><span>8 pts</span><span>🔵 High</span></div></div>
+                        <div class="board-card" style="--card-color: #F59E0B;"><div class="card-title">Unit test coverage</div><div class="card-meta"><span>3 pts</span><span>🟡 Med</span></div></div>
+                    </div>
+                    <div class="board-column">
+                        <div class="column-header" style="--col-color: #EC4899;">
+                            <span class="column-name">Review</span>
+                            <span class="column-wip">3</span>
+                        </div>
+                        <div class="board-card" style="--card-color: #8B5CF6;"><div class="card-title">Payment flow v2</div><div class="card-meta"><span>5 pts</span><span>🔵 High</span></div></div>
+                    </div>
+                    <div class="board-column">
+                        <div class="column-header" style="--col-color: #10B981;">
+                            <span class="column-name">Done</span>
+                            <span class="column-wip">∞</span>
+                        </div>
+                        <div class="board-card" style="--card-color: #6B7280;"><div class="card-title">DB schema migration</div><div class="card-meta"><span>3 pts</span><span>✓</span></div></div>
+                        <div class="board-card" style="--card-color: #6B7280;"><div class="card-title">CI pipeline fix</div><div class="card-meta"><span>2 pts</span><span>✓</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="artifacts-grid">
+                <div class="artifact-card" style="--artifact-color: #06B6D4;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">👁️</div>
+                        <div class="artifact-name">Visualize Work</div>
+                    </div>
+                    <p class="artifact-desc">Make all work visible on the board. Hidden work is unmanaged work. See the entire system at a glance. Bottlenecks become obvious.</p>
+                </div>
+                <div class="artifact-card" style="--artifact-color: #F59E0B;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">🚦</div>
+                        <div class="artifact-name">Limit WIP</div>
+                    </div>
+                    <p class="artifact-desc">Restrict work-in-progress per column. Stop starting, start finishing. Forces focus and surfaces blockers. Less multitasking = higher quality.</p>
+                </div>
+                <div class="artifact-card" style="--artifact-color: #10B981;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">🌊</div>
+                        <div class="artifact-name">Manage Flow</div>
+                    </div>
+                    <p class="artifact-desc">Optimize for throughput, not utilization. Measure cycle time and lead time. Smooth flow beats busy work. Identify and eliminate waste.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- XP -->
+        <section class="module" id="xp">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Extreme Programming (XP)</h2>
+                    <p>Engineering practices for software excellence and sustainable pace</p>
+                </div>
+            </div>
+
+            <div class="method-header" style="--method-color: #10B981;">
+                <div class="method-header-icon">⚡</div>
+                <div class="method-header-content">
+                    <h3>XP at a Glance</h3>
+                    <p>XP is an agile methodology focused on technical excellence. While Scrum focuses on process, XP focuses on <em>how to write great code</em>. XP practices work synergistically—pair programming enables collective ownership, TDD enables continuous refactoring, CI enables frequent releases. Created by Kent Beck, Ward Cunningham, and Ron Jeffries.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">1-2 Week Iterations</span>
+                        <span class="method-tag">12 Practices</span>
+                        <span class="method-tag">5 Values</span>
+                        <span class="method-tag">2-12 Developers</span>
+                        <span class="method-tag">Customer On-Site</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="values-row">
+                <div class="value-pill" style="--value-color: #10B981;"><span>💬 Communication</span></div>
+                <div class="value-pill" style="--value-color: #3B82F6;"><span>🎯 Simplicity</span></div>
+                <div class="value-pill" style="--value-color: #8B5CF6;"><span>🔄 Feedback</span></div>
+                <div class="value-pill" style="--value-color: #F59E0B;"><span>💪 Courage</span></div>
+                <div class="value-pill" style="--value-color: #EC4899;"><span>🤝 Respect</span></div>
+            </div>
+
+            <div class="practices-visual">
+                <div class="practice-card" style="--practice-color: #10B981;">
+                    <div class="practice-icon">👥</div>
+                    <div class="practice-name">Pair Programming</div>
+                    <p class="practice-desc">Two developers, one computer. Real-time code review. Knowledge sharing.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #3B82F6;">
+                    <div class="practice-icon">🧪</div>
+                    <div class="practice-name">Test-Driven Dev</div>
+                    <p class="practice-desc">Write test first. Red-green-refactor. Design emerges from tests.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #8B5CF6;">
+                    <div class="practice-icon">🔄</div>
+                    <div class="practice-name">Continuous Integration</div>
+                    <p class="practice-desc">Integrate multiple times daily. Automated builds. Fast feedback.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #F59E0B;">
+                    <div class="practice-icon">🛠️</div>
+                    <div class="practice-name">Refactoring</div>
+                    <p class="practice-desc">Continuously improve code. Remove duplication. Keep design clean.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #EC4899;">
+                    <div class="practice-icon">📐</div>
+                    <div class="practice-name">Simple Design</div>
+                    <p class="practice-desc">YAGNI. No speculative features. Simplest thing that works.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #06B6D4;">
+                    <div class="practice-icon">👨‍👩‍👧‍👦</div>
+                    <div class="practice-name">Collective Ownership</div>
+                    <p class="practice-desc">Everyone owns all code. Anyone can change anything. No silos.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #EF4444;">
+                    <div class="practice-icon">📏</div>
+                    <div class="practice-name">Coding Standards</div>
+                    <p class="practice-desc">Consistent style. Code looks like one person wrote it all.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #14B8A6;">
+                    <div class="practice-icon">⏰</div>
+                    <div class="practice-name">Sustainable Pace</div>
+                    <p class="practice-desc">40-hour weeks. No death marches. Fresh devs write better code.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #F97316;">
+                    <div class="practice-icon">🏠</div>
+                    <div class="practice-name">On-Site Customer</div>
+                    <p class="practice-desc">Real user available for questions. Fast answers. No spec delays.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #A855F7;">
+                    <div class="practice-icon">📖</div>
+                    <div class="practice-name">Planning Game</div>
+                    <p class="practice-desc">Business picks scope. Dev picks estimates. Negotiate each iteration.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #84CC16;">
+                    <div class="practice-icon">📦</div>
+                    <div class="practice-name">Small Releases</div>
+                    <p class="practice-desc">Ship frequently. Get real feedback. Reduce risk per release.</p>
+                </div>
+                <div class="practice-card" style="--practice-color: #0EA5E9;">
+                    <div class="practice-icon">🎨</div>
+                    <div class="practice-name">System Metaphor</div>
+                    <p class="practice-desc">Shared vocabulary. Mental model everyone understands.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEAN -->
+        <section class="module" id="lean">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Lean Software Development</h2>
+                    <p>Eliminate waste and maximize customer value through flow optimization</p>
+                </div>
+            </div>
+
+            <div class="method-header" style="--method-color: #EC4899;">
+                <div class="method-header-icon">🎯</div>
+                <div class="method-header-content">
+                    <h3>Lean at a Glance</h3>
+                    <p>Lean software development adapts lean manufacturing principles (from Toyota Production System) to software. Focus on eliminating waste, optimizing the whole system, and delivering value fast. Lean thinking underlies both Kanban and much of agile philosophy. It's more a mindset than a specific methodology—principles that guide decisions.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">7 Principles</span>
+                        <span class="method-tag">8 Wastes</span>
+                        <span class="method-tag">Value Stream Focus</span>
+                        <span class="method-tag">Pull System</span>
+                        <span class="method-tag">Any Team Size</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lean-principles">
+                <div class="lean-principle" style="--principle-color: #8B5CF6;">
+                    <div class="principle-num">1</div>
+                    <div class="principle-name">Eliminate Waste</div>
+                </div>
+                <div class="lean-principle" style="--principle-color: #3B82F6;">
+                    <div class="principle-num">2</div>
+                    <div class="principle-name">Build Quality In</div>
+                </div>
+                <div class="lean-principle" style="--principle-color: #06B6D4;">
+                    <div class="principle-num">3</div>
+                    <div class="principle-name">Create Knowledge</div>
+                </div>
+                <div class="lean-principle" style="--principle-color: #10B981;">
+                    <div class="principle-num">4</div>
+                    <div class="principle-name">Defer Commitment</div>
+                </div>
+                <div class="lean-principle" style="--principle-color: #F59E0B;">
+                    <div class="principle-num">5</div>
+                    <div class="principle-name">Deliver Fast</div>
+                </div>
+                <div class="lean-principle" style="--principle-color: #EC4899;">
+                    <div class="principle-num">6</div>
+                    <div class="principle-name">Respect People</div>
+                </div>
+                <div class="lean-principle" style="--principle-color: #EF4444;">
+                    <div class="principle-num">7</div>
+                    <div class="principle-name">Optimize Whole</div>
+                </div>
+            </div>
+
+            <div class="waste-grid">
+                <div class="waste-card">
+                    <div class="waste-icon">📦</div>
+                    <div class="waste-name">Partially Done Work</div>
+                    <p class="waste-example">Unmerged branches, undeployed features</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">🔮</div>
+                    <div class="waste-name">Extra Features</div>
+                    <p class="waste-example">Building "just in case" functionality</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">🔄</div>
+                    <div class="waste-name">Relearning</div>
+                    <p class="waste-example">Lost knowledge, poor documentation</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">🤝</div>
+                    <div class="waste-name">Handoffs</div>
+                    <p class="waste-example">Passing work between teams/people</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">⏳</div>
+                    <div class="waste-name">Delays</div>
+                    <p class="waste-example">Waiting for approvals, reviews</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">🔀</div>
+                    <div class="waste-name">Task Switching</div>
+                    <p class="waste-example">Context changes between projects</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">🐛</div>
+                    <div class="waste-name">Defects</div>
+                    <p class="waste-example">Bugs requiring rework later</p>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-icon">📋</div>
+                    <div class="waste-name">Extra Processes</div>
+                    <p class="waste-example">Unnecessary meetings, paperwork</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SHAPE UP -->
+        <section class="module" id="shapeup">
+            <div class="module-header">
+                <div class="module-icon">🔷</div>
+                <div class="module-info">
+                    <h2>Shape Up</h2>
+                    <p>Basecamp's methodology: 6-week cycles with fixed time, variable scope</p>
+                </div>
+            </div>
+
+            <div class="method-header" style="--method-color: #F97316;">
+                <div class="method-header-icon">🔷</div>
+                <div class="method-header-content">
+                    <h3>Shape Up at a Glance</h3>
+                    <p>Shape Up is Basecamp's alternative to agile. Instead of backlogs and sprints, work is "shaped" into pitches with a fixed appetite (time budget). Teams get 6 weeks to ship—no extensions. Between cycles, a 2-week cooldown for bugs, exploration, and recovery. No daily standups, no story points, no velocity tracking.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">6-Week Cycles</span>
+                        <span class="method-tag">2-Week Cooldown</span>
+                        <span class="method-tag">Appetite-Based</span>
+                        <span class="method-tag">Betting Table</span>
+                        <span class="method-tag">Small Teams</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cycle-visual">
+                <div class="cycle-title">Shape Up Cycle (6 Weeks + 2 Week Cooldown)</div>
+                <div class="cycle-phases">
+                    <div class="cycle-phase" style="--phase-color: #F97316;">
+                        <div class="phase-icon">✍️</div>
+                        <div class="phase-name">Shaping</div>
+                        <div class="phase-time">Pre-cycle</div>
+                        <div class="phase-desc">Senior people define rough solution</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #8B5CF6;">
+                        <div class="phase-icon">🎰</div>
+                        <div class="phase-name">Betting Table</div>
+                        <div class="phase-time">Cycle start</div>
+                        <div class="phase-desc">Leadership picks what to build</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #3B82F6;">
+                        <div class="phase-icon">🏗️</div>
+                        <div class="phase-name">Building</div>
+                        <div class="phase-time">6 weeks</div>
+                        <div class="phase-desc">Small team ships complete feature</div>
+                    </div>
+                    <div class="cycle-phase" style="--phase-color: #10B981;">
+                        <div class="phase-icon">❄️</div>
+                        <div class="phase-name">Cooldown</div>
+                        <div class="phase-time">2 weeks</div>
+                        <div class="phase-desc">Bugs, exploration, recovery</div>
+                    </div>
+                </div>
+                <div class="cycle-bar"></div>
+            </div>
+
+            <div class="betting-table">
+                <div class="betting-title">Betting Table: What Gets Built This Cycle</div>
+                <div class="bets-grid">
+                    <div class="bet-card" style="--bet-color: #10B981;">
+                        <div class="bet-status">✓ Bet</div>
+                        <div class="bet-title">Notification Center</div>
+                        <div class="bet-appetite">6-week appetite • Big Batch</div>
+                        <div class="bet-team">👥 Team: Alice + Bob + Carlos</div>
+                    </div>
+                    <div class="bet-card" style="--bet-color: #10B981;">
+                        <div class="bet-status">✓ Bet</div>
+                        <div class="bet-title">Quick Add Tasks</div>
+                        <div class="bet-appetite">2-week appetite • Small Batch</div>
+                        <div class="bet-team">👥 Team: Dana + Erik</div>
+                    </div>
+                    <div class="bet-card" style="--bet-color: #6B7280;">
+                        <div class="bet-status">Not Bet</div>
+                        <div class="bet-title">Calendar Redesign</div>
+                        <div class="bet-appetite">Needs more shaping</div>
+                        <div class="bet-team">📝 Back to shaping</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Key Concepts</h3>
+                    <p><strong>Appetite:</strong> How much time we're willing to spend, not how long it will take. "6-week appetite" means if it can't ship in 6 weeks, scope gets cut.</p>
+                    <p><strong>Pitches:</strong> Shaped work with problem, solution boundaries, and rabbit holes identified. Not specs—teams have autonomy on details.</p>
+                    <p><strong>Hill Charts:</strong> Visual progress showing where work is (figuring things out vs. execution).</p>
+                </div>
+                <div>
+                    <h3>When to Use Shape Up</h3>
+                    <p><strong>Product companies:</strong> Building your own product with autonomy over roadmap.</p>
+                    <p><strong>Senior teams:</strong> Experienced developers who can work without daily check-ins.</p>
+                    <p><strong>Anti-bureaucracy:</strong> Teams tired of Scrum ceremonies and want more autonomy.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SAFe -->
+        <section class="module" id="safe">
+            <div class="module-header">
+                <div class="module-icon">🚂</div>
+                <div class="module-info">
+                    <h2>SAFe (Scaled Agile Framework)</h2>
+                    <p>Enterprise-scale agile for large organizations with multiple teams</p>
+                </div>
+            </div>
+
+            <div class="method-header" style="--method-color: #F59E0B;">
+                <div class="method-header-icon">🚂</div>
+                <div class="method-header-content">
+                    <h3>SAFe at a Glance</h3>
+                    <p>SAFe scales agile across large enterprises by organizing teams into Agile Release Trains (ARTs) that work in 10-week Program Increments (PIs). Adds structure for portfolio management, architecture governance, and cross-team coordination. Complex but comprehensive—addresses enterprise concerns that smaller frameworks ignore.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">10-Week PI</span>
+                        <span class="method-tag">50-125 per ART</span>
+                        <span class="method-tag">PI Planning</span>
+                        <span class="method-tag">Release Train</span>
+                        <span class="method-tag">Portfolio Level</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="safe-hierarchy">
+                <div class="hierarchy-title">SAFe Levels: Portfolio → Program → Team</div>
+                <div class="hierarchy-levels">
+                    <div class="hierarchy-level" style="--level-color: #8B5CF6;">
+                        <div class="level-label">Portfolio</div>
+                        <div class="level-boxes">
+                            <div class="level-box"><div class="level-box-title">Epic: Customer Portal</div><div class="level-box-desc">Strategic, multi-quarter</div></div>
+                            <div class="level-box"><div class="level-box-title">Epic: Mobile Platform</div><div class="level-box-desc">Cross-cutting initiative</div></div>
+                        </div>
+                    </div>
+                    <div class="hierarchy-level"><div class="level-arrow">↓</div></div>
+                    <div class="hierarchy-level" style="--level-color: #3B82F6;">
+                        <div class="level-label">Program</div>
+                        <div class="level-boxes">
+                            <div class="level-box"><div class="level-box-title">Feature: Auth</div><div class="level-box-desc">Fits in one PI</div></div>
+                            <div class="level-box"><div class="level-box-title">Feature: Dashboard</div><div class="level-box-desc">Multi-team work</div></div>
+                            <div class="level-box"><div class="level-box-title">Feature: Reports</div><div class="level-box-desc">Business value</div></div>
+                        </div>
+                    </div>
+                    <div class="hierarchy-level"><div class="level-arrow">↓</div></div>
+                    <div class="hierarchy-level" style="--level-color: #10B981;">
+                        <div class="level-label">Team</div>
+                        <div class="level-boxes">
+                            <div class="level-box"><div class="level-box-title">Team Alpha</div><div class="level-box-desc">Frontend</div></div>
+                            <div class="level-box"><div class="level-box-title">Team Beta</div><div class="level-box-desc">Backend</div></div>
+                            <div class="level-box"><div class="level-box-title">Team Gamma</div><div class="level-box-desc">Platform</div></div>
+                            <div class="level-box"><div class="level-box-title">Team Delta</div><div class="level-box-desc">Mobile</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="artifacts-grid">
+                <div class="artifact-card" style="--artifact-color: #8B5CF6;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">📅</div>
+                        <div class="artifact-name">PI Planning</div>
+                    </div>
+                    <p class="artifact-desc">2-day event every 10 weeks. All teams plan together. Create alignment, identify dependencies, commit to PI objectives. The heartbeat of the ART.</p>
+                </div>
+                <div class="artifact-card" style="--artifact-color: #3B82F6;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">🎭</div>
+                        <div class="artifact-name">System Demo</div>
+                    </div>
+                    <p class="artifact-desc">Every 2 weeks, integrated demo of all team work. Full system validation. Stakeholder feedback. Progress visibility across the train.</p>
+                </div>
+                <div class="artifact-card" style="--artifact-color: #10B981;">
+                    <div class="artifact-header">
+                        <div class="artifact-icon">🔍</div>
+                        <div class="artifact-name">Inspect & Adapt</div>
+                    </div>
+                    <p class="artifact-desc">End of PI reflection. Quantitative review of metrics. Problem-solving workshop. Identify improvement experiments. Kaizen events.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Choosing -->
+        <section class="module" id="choosing">
+            <div class="module-header">
+                <div class="module-icon">🧭</div>
+                <div class="module-info">
+                    <h2>Choosing a Methodology</h2>
+                    <p>Match the framework to your team's context and constraints</p>
+                </div>
+            </div>
+
+            <div class="decision-matrix">
+                <div class="matrix-title">Decision Guide: Which Methodology Fits?</div>
+                <div class="matrix-rows">
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Team is 50+ developers working on related products?</span>
+                        <span class="matrix-answer safe">→ SAFe</span>
+                    </div>
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Work arrives unpredictably (support, ops, incidents)?</span>
+                        <span class="matrix-answer kanban">→ Kanban</span>
+                    </div>
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Building new product with evolving requirements?</span>
+                        <span class="matrix-answer scrum">→ Scrum</span>
+                    </div>
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Quality is paramount, bugs are extremely costly?</span>
+                        <span class="matrix-answer xp">→ XP practices</span>
+                    </div>
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Need to optimize existing process, reduce waste?</span>
+                        <span class="matrix-answer lean">→ Lean thinking</span>
+                    </div>
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Tired of Scrum ceremonies? Want more autonomy?</span>
+                        <span class="matrix-answer shapeup">→ Shape Up</span>
+                    </div>
+                    <div class="matrix-row">
+                        <span class="matrix-condition">Need sprint structure but also continuous flow?</span>
+                        <span class="matrix-answer scrumban">→ Scrumban (hybrid)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Scrum</th>
+                            <th>Kanban</th>
+                            <th>XP</th>
+                            <th>Lean</th>
+                            <th>Shape Up</th>
+                            <th>SAFe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Team Size</strong></td>
+                            <td>5-9</td>
+                            <td>Any</td>
+                            <td>2-12</td>
+                            <td>Any</td>
+                            <td>2-3</td>
+                            <td>50-125</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cycle Length</strong></td>
+                            <td>2 weeks</td>
+                            <td>Continuous</td>
+                            <td>1-2 weeks</td>
+                            <td>Continuous</td>
+                            <td>6 weeks</td>
+                            <td>10 weeks</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Focus</strong></td>
+                            <td>Process</td>
+                            <td>Flow</td>
+                            <td>Engineering</td>
+                            <td>Value</td>
+                            <td>Shaping</td>
+                            <td>Coordination</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ceremonies</strong></td>
+                            <td><span class="partial">~</span> Many</td>
+                            <td><span class="check">✓</span> Few</td>
+                            <td><span class="partial">~</span> Some</td>
+                            <td><span class="check">✓</span> Few</td>
+                            <td><span class="check">✓</span> Few</td>
+                            <td><span class="cross">✗</span> Many</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complexity</strong></td>
+                            <td>Medium</td>
+                            <td>Low</td>
+                            <td>Medium</td>
+                            <td>Low</td>
+                            <td>Low</td>
+                            <td>High</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best For</strong></td>
+                            <td>Product dev</td>
+                            <td>Support</td>
+                            <td>Quality</td>
+                            <td>Optimization</td>
+                            <td>Product co.</td>
+                            <td>Enterprise</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Anti-Patterns -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Anti-Patterns to Avoid</h2>
+                    <p>Common mistakes that undermine methodology effectiveness</p>
+                </div>
+            </div>
+            
+            <div class="anti-grid">
+                <div class="anti-card">
+                    <h4>Zombie Scrum</h4>
+                    <p>Going through motions without the mindset. All ceremonies, no value. Teams feel burned out and disengaged.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Focus on outcomes, not rituals. Ask "what value did we deliver?" not "did we do standup?"</div>
+                </div>
+                <div class="anti-card">
+                    <h4>WIP Explosion</h4>
+                    <p>Everything "in progress" but nothing done. Context switching chaos. No flow, just thrashing.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Enforce WIP limits ruthlessly. Finish things before starting new ones.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Cargo Cult Agile</h4>
+                    <p>Implementing practices without understanding principles. Standups become status reports. Retros produce no action.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Understand the "why" behind each practice. Skip what doesn't serve you.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Velocity as Target</h4>
+                    <p>Using velocity as performance metric. Teams inflate estimates. Gaming numbers. Meaningless data.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Velocity for planning only. Never compare teams. Focus on outcomes delivered.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Scrumfall</h4>
+                    <p>Waterfall disguised as Scrum. Big upfront planning, "agile" sprints, no real iteration. Requirements locked.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Embrace uncertainty. Welcome changing requirements. Deliver frequently.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>SAFe Bloat</h4>
+                    <p>Implementing full SAFe for a 20-person team. Drowning in process. More coordination than coding.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Scale methodology to team size. Start simple, add complexity only when needed.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Making methodologies work for your team</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="icon">✓</span> Adapt framework to your context—no methodology works out of the box</div>
+                    <div class="practice-item"><span class="icon">✓</span> Run meaningful retrospectives and actually implement improvements</div>
+                    <div class="practice-item"><span class="icon">✓</span> Protect team from interruptions during focused work time</div>
+                    <div class="practice-item"><span class="icon">✓</span> Keep ceremonies strictly time-boxed to maintain energy</div>
+                    <div class="practice-item"><span class="icon">✓</span> Combine methodologies—Scrum process + XP engineering</div>
+                    <div class="practice-item"><span class="icon">✓</span> Empower teams to self-organize and make decisions</div>
+                    <div class="practice-item"><span class="icon">✓</span> Start simple and add complexity only when pain demands it</div>
+                    <div class="practice-item"><span class="icon">✓</span> Measure outcomes delivered, not process compliance</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="icon">✗</span> Follow rules blindly without understanding the principles</div>
+                    <div class="practice-item"><span class="icon">✗</span> Skip retros when busy—that's when you need them most</div>
+                    <div class="practice-item"><span class="icon">✗</span> Let standups become status reports to management</div>
+                    <div class="practice-item"><span class="icon">✗</span> Change scope mid-sprint constantly—protect commitments</div>
+                    <div class="practice-item"><span class="icon">✗</span> Use velocity for individual performance reviews—ever</div>
+                    <div class="practice-item"><span class="icon">✗</span> Implement SAFe when you have 15 developers—it's overkill</div>
+                    <div class="practice-item"><span class="icon">✗</span> Micromanage team's daily work—trust the process</div>
+                    <div class="practice-item"><span class="icon">✗</span> Ignore engineering practices—process without quality fails</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools</h2>
+                    <p>Popular tools for implementing methodologies</p>
+                </div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">📋</div>
+                    <div class="tool-name">Jira</div>
+                    <div class="tool-type">Scrum/Kanban</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">Linear</div>
+                    <div class="tool-type">Modern PM</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔵</div>
+                    <div class="tool-name">Asana</div>
+                    <div class="tool-type">Work Management</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📝</div>
+                    <div class="tool-name">Trello</div>
+                    <div class="tool-type">Kanban</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🟢</div>
+                    <div class="tool-name">Monday</div>
+                    <div class="tool-type">Work OS</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔷</div>
+                    <div class="tool-name">Basecamp</div>
+                    <div class="tool-type">Shape Up</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Section -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered methodology coaching and optimization</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>AgileCoach</h3>
+                    <p>An AI agent that analyzes team dynamics, sprint metrics, and process health to recommend methodology adaptations and facilitate continuous improvement.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Analyze sprint velocity and burndown trends</div>
+                        <div class="agent-capability"><span class="capability-icon">🎯</span> Recommend process improvements based on data</div>
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> Facilitate retrospective discussions</div>
+                        <div class="agent-capability"><span class="capability-icon">⚠️</span> Identify anti-patterns early</div>
+                        <div class="agent-capability"><span class="capability-icon">🧠</span> Suggest methodology mix for context</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">agile_coach_agent.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+
+agile_coach = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Agile Coach"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Optimize team processes"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in Scrum,
+    Kanban, XP, Lean, Shape Up, SAFe.
+    Helps teams find the right mix."""</span>,
+    <span class="code-string">tools=</span>[metrics_analyzer,
+           retro_facilitator,
+           health_monitor]
+)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring Product Building</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat10-p1-product-lifecycle.html" class="related-card">
+                    <div class="related-icon">🔄</div>
+                    <div class="related-title">Product Lifecycle</div>
+                    <div class="related-desc">How methodologies fit development phases</div>
+                </a>
+                <a href="cat10-p7-product-metrics.html" class="related-card">
+                    <div class="related-icon">📊</div>
+                    <div class="related-title">Product Metrics</div>
+                    <div class="related-desc">Measuring methodology effectiveness</div>
+                </a>
+                <a href="cat10-p2-best-practices.html" class="related-card">
+                    <div class="related-icon">✨</div>
+                    <div class="related-title">Best Practices</div>
+                    <div class="related-desc">Engineering practices that support agile</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat10-p5-validation.html" class="footer-link">
+            <span>←</span>
+            <div><div class="footer-link-label">Previous</div><div class="footer-link-title">10.5: Validation & Testing</div></div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 10.6</div>
+        <a href="cat10-p7-product-metrics.html" class="footer-link">
+            <div><div class="footer-link-label">Next</div><div class="footer-link-title">10.7: Product Metrics</div></div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

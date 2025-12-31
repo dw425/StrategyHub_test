@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Practices | Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --cat-dark: #0D9488;
+            --cat-glow: rgba(20, 184, 166, 0.15);
+            --page-primary: #8B5CF6;
+            --page-light: #A78BFA;
+            --page-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Code Quality Pyramid - UNIQUE VISUAL */
+        .quality-pyramid { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px; }
+        .pyramid-title { font-size: 16px; font-weight: 600; color: var(--page-light); margin-bottom: 32px; }
+        .pyramid-layers { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .pyramid-layer { display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 13px; transition: all 0.3s; cursor: pointer; position: relative; }
+        .pyramid-layer:hover { transform: scale(1.05); z-index: 10; }
+        .pyramid-layer.l1 { width: 120px; height: 50px; background: linear-gradient(135deg, #10B981, #059669); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+        .pyramid-layer.l2 { width: 200px; height: 50px; background: linear-gradient(135deg, #3B82F6, #2563EB); clip-path: polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%); }
+        .pyramid-layer.l3 { width: 280px; height: 50px; background: linear-gradient(135deg, #8B5CF6, #7C3AED); clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%); }
+        .pyramid-layer.l4 { width: 360px; height: 50px; background: linear-gradient(135deg, #F59E0B, #D97706); clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%); }
+        .pyramid-layer.l5 { width: 440px; height: 60px; background: linear-gradient(135deg, #EF4444, #DC2626); border-radius: 0 0 8px 8px; }
+        .pyramid-labels { display: flex; justify-content: space-between; width: 100%; max-width: 500px; margin-top: 24px; font-size: 11px; color: var(--text-muted); }
+
+        /* Tech Debt Quadrant - UNIQUE VISUAL */
+        .debt-quadrant { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .quadrant-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .quadrant-container { display: flex; align-items: stretch; gap: 12px; }
+        .quadrant-ylabel { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-muted); padding: 8px; }
+        .quadrant-main { flex: 1; }
+        .quadrant-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .quadrant-xlabel { text-align: center; font-size: 11px; color: var(--text-muted); padding-top: 8px; }
+        .quadrant-cell { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 8px; padding: 16px; min-height: 100px; }
+        .quadrant-cell h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .quadrant-cell p { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        .quadrant-cell.q1 { border-color: var(--green); }
+        .quadrant-cell.q1 h4 { color: var(--green); }
+        .quadrant-cell.q2 { border-color: var(--yellow); }
+        .quadrant-cell.q2 h4 { color: var(--yellow); }
+        .quadrant-cell.q3 { border-color: var(--red); }
+        .quadrant-cell.q3 h4 { color: var(--red); }
+        .quadrant-cell.q4 { border-color: var(--orange); }
+        .quadrant-cell.q4 h4 { color: var(--orange); }
+
+        /* PR Review Flow - UNIQUE VISUAL */
+        .pr-flow { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .pr-flow-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 32px; }
+        .pr-flow-track { display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .pr-flow-track::before { content: ''; position: absolute; top: 50%; left: 60px; right: 60px; height: 3px; background: linear-gradient(90deg, var(--purple), var(--blue), var(--cyan), var(--green)); transform: translateY(-50%); }
+        .pr-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .pr-step-icon { width: 56px; height: 56px; background: var(--bg-card); border: 3px solid var(--step-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; }
+        .pr-step-label { font-size: 12px; font-weight: 600; color: var(--step-color); }
+        .pr-step-time { font-size: 10px; color: var(--text-muted); }
+
+        /* Code Smell Cards */
+        .smell-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .smell-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-left: 4px solid var(--smell-color); }
+        .smell-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--smell-color); }
+        .smell-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .smell-example { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-card); padding: 10px; border-radius: 6px; color: var(--text-muted); overflow-x: auto; }
+
+        /* Principles Grid */
+        .principles-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+        .principle-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; transition: all 0.3s; }
+        .principle-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .principle-letter { font-size: 32px; font-weight: 700; color: var(--page-light); margin-bottom: 8px; }
+        .principle-name { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+        .principle-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Documentation Tiers - UNIQUE VISUAL */
+        .doc-tiers { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .doc-tiers-title { font-size: 16px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .doc-tiers-visual { display: flex; justify-content: center; gap: 24px; }
+        .doc-tier { display: flex; flex-direction: column; align-items: center; }
+        .doc-tier-bar { width: 80px; background: linear-gradient(to top, var(--tier-color), transparent); border-radius: 8px 8px 0 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; font-size: 24px; }
+        .doc-tier-bar.t1 { height: 200px; }
+        .doc-tier-bar.t2 { height: 160px; }
+        .doc-tier-bar.t3 { height: 120px; }
+        .doc-tier-bar.t4 { height: 80px; }
+        .doc-tier-label { margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--tier-color); }
+        .doc-tier-items { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 4px; }
+
+        /* Linting Rules Table */
+        .lint-table { overflow-x: auto; margin-bottom: 24px; }
+        .lint-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .lint-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .lint-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .lint-table tr:hover td { background: var(--bg-hover); }
+        .severity-error { color: var(--red); font-weight: 600; }
+        .severity-warn { color: var(--yellow); font-weight: 600; }
+        .severity-info { color: var(--blue); }
+
+        /* Testing Practices */
+        .testing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .testing-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .testing-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .testing-card h4 span { font-size: 20px; }
+        .testing-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .testing-code { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-card); padding: 16px; border-radius: 8px; overflow-x: auto; }
+        .testing-code .comment { color: #6A737D; }
+        .testing-code .keyword { color: #FF7B72; }
+        .testing-code .string { color: #A5D6FF; }
+        .testing-code .function { color: #D2A8FF; }
+
+        /* Best Practices DO/DON'T */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3, .practices-dont h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .practices-do h3 { color: var(--green); }
+        .practices-dont h3 { color: var(--red); }
+        .practice-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); }
+        .practice-item .practice-icon { flex-shrink: 0; }
+        .practices-do .practice-icon { color: var(--green); }
+        .practices-dont .practice-icon { color: var(--red); }
+
+        /* Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 14px; font-weight: 600; }
+        .tool-category { font-size: 10px; color: var(--text-muted); }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .principles-grid { grid-template-columns: repeat(3, 1fr); }
+            .smell-grid, .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .testing-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html" class="active"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#pyramid"><span class="nav-icon">🔺</span> Quality Pyramid</a></li>
+            <li><a href="#solid"><span class="nav-icon">🏛️</span> SOLID Principles</a></li>
+            <li><a href="#smells"><span class="nav-icon">👃</span> Code Smells</a></li>
+            <li><a href="#debt"><span class="nav-icon">💳</span> Tech Debt</a></li>
+            <li><a href="#reviews"><span class="nav-icon">👁️</span> Code Reviews</a></li>
+            <li><a href="#docs"><span class="nav-icon">📝</span> Documentation</a></li>
+            <li><a href="#testing"><span class="nav-icon">🧪</span> Testing Practices</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">✨ Page 10.2</span>
+                <h1>Best Practices</h1>
+                <p>Master the engineering practices that separate exceptional codebases from technical debt disasters. From SOLID principles to code review workflows, learn the patterns that enable teams to ship fast while maintaining long-term velocity and code health.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">80%+</div><div class="hero-metric-label">Test Coverage Target</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;4hrs</div><div class="hero-metric-label">PR Review SLA</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">0</div><div class="hero-metric-label">Critical Lint Errors</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">20%</div><div class="hero-metric-label">Tech Debt Budget</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding Code Quality</h2>
+                    <p>The foundation of sustainable software development</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>What Makes Code "Good"?</h3>
+                    <p>Good code isn't just code that works—it's code that can be understood, modified, and extended by others (including future you). It balances readability with performance, flexibility with simplicity.</p>
+                    <p>The best codebases share common traits: consistent style, clear naming, small focused functions, comprehensive tests, and documentation that explains "why" not just "what."</p>
+                    <p>Code quality isn't about perfection—it's about sustainable velocity. Clean code lets teams move fast without breaking things.</p>
+                </div>
+                <div>
+                    <h3>Why Best Practices Matter</h3>
+                    <p><strong>Reduced Bugs:</strong> Consistent patterns and testing catch issues before production. Prevention beats firefighting every time.</p>
+                    <p><strong>Faster Onboarding:</strong> New team members productive in days instead of weeks when code is readable and documented.</p>
+                    <p><strong>Sustainable Velocity:</strong> Technical debt compounds. Best practices prevent the slowdown that kills projects.</p>
+                    <p><strong>Team Happiness:</strong> Engineers want to work in clean codebases. Retention improves when the code isn't painful.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Quality Pyramid -->
+        <section class="module" id="pyramid">
+            <div class="module-header">
+                <div class="module-icon">🔺</div>
+                <div class="module-info">
+                    <h2>The Code Quality Pyramid</h2>
+                    <p>Layers of quality from foundation to peak</p>
+                </div>
+            </div>
+            
+            <div class="quality-pyramid">
+                <div class="pyramid-title">Building Quality from the Ground Up</div>
+                <div class="pyramid-layers">
+                    <div class="pyramid-layer l1">Monitoring</div>
+                    <div class="pyramid-layer l2">Integration Tests</div>
+                    <div class="pyramid-layer l3">Unit Tests</div>
+                    <div class="pyramid-layer l4">Code Review</div>
+                    <div class="pyramid-layer l5">Linting & Formatting</div>
+                </div>
+                <div class="pyramid-labels">
+                    <span>Automated • Fast • Cheap</span>
+                    <span>Manual • Slow • Expensive</span>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Foundation: Automated Checks</h3>
+                    <p>The base of the pyramid runs automatically on every commit. Linting catches style issues, formatters enforce consistency, and type checkers prevent entire classes of bugs.</p>
+                    <p>These checks are fast (seconds), cheap (automated), and catch 80% of issues before human review.</p>
+                </div>
+                <div>
+                    <h3>Peak: Production Monitoring</h3>
+                    <p>The top of the pyramid catches what tests miss. Real user behavior, edge cases in production, and performance under load reveal issues that synthetic tests can't predict.</p>
+                    <p>Monitoring is expensive but essential—the final safety net before users experience issues.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOLID Principles -->
+        <section class="module" id="solid">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>SOLID Principles</h2>
+                    <p>The five pillars of object-oriented design</p>
+                </div>
+            </div>
+            
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <div class="principle-letter">S</div>
+                    <div class="principle-name">Single Responsibility</div>
+                    <div class="principle-desc">A class should have only one reason to change. One job, done well.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-letter">O</div>
+                    <div class="principle-name">Open/Closed</div>
+                    <div class="principle-desc">Open for extension, closed for modification. Add features without changing existing code.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-letter">L</div>
+                    <div class="principle-name">Liskov Substitution</div>
+                    <div class="principle-desc">Subtypes must be substitutable for their base types without breaking behavior.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-letter">I</div>
+                    <div class="principle-name">Interface Segregation</div>
+                    <div class="principle-desc">Many specific interfaces are better than one general-purpose interface.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-letter">D</div>
+                    <div class="principle-name">Dependency Inversion</div>
+                    <div class="principle-desc">Depend on abstractions, not concretions. High-level modules shouldn't depend on low-level modules.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Smells -->
+        <section class="module" id="smells">
+            <div class="module-header">
+                <div class="module-icon">👃</div>
+                <div class="module-info">
+                    <h2>Common Code Smells</h2>
+                    <p>Warning signs that code needs refactoring</p>
+                </div>
+            </div>
+            
+            <div class="smell-grid">
+                <div class="smell-card" style="--smell-color: #EF4444;">
+                    <h4>🔴 God Class</h4>
+                    <p>One class that knows too much or does too much. Thousands of lines, dozens of methods, impossible to test.</p>
+                    <div class="smell-example">class ApplicationManager { // 3000+ lines... }</div>
+                </div>
+                <div class="smell-card" style="--smell-color: #F59E0B;">
+                    <h4>🟠 Long Method</h4>
+                    <p>Functions that scroll for pages. Too many responsibilities, too many branches, impossible to name accurately.</p>
+                    <div class="smell-example">function processOrder() { // 200+ lines... }</div>
+                </div>
+                <div class="smell-card" style="--smell-color: #EF4444;">
+                    <h4>🔴 Duplicate Code</h4>
+                    <p>Copy-paste programming. Same logic in multiple places, bugs fixed in one spot but not others.</p>
+                    <div class="smell-example">// Same validation in 5 different files</div>
+                </div>
+                <div class="smell-card" style="--smell-color: #F59E0B;">
+                    <h4>🟠 Feature Envy</h4>
+                    <p>A method that uses more features of another class than its own. Data and behavior should live together.</p>
+                    <div class="smell-example">order.customer.address.city.toUpper()</div>
+                </div>
+                <div class="smell-card" style="--smell-color: #3B82F6;">
+                    <h4>🔵 Magic Numbers</h4>
+                    <p>Unexplained numeric literals scattered through code. What does 86400 mean? Why 7? Who knows.</p>
+                    <div class="smell-example">if (days > 7) { retry(86400); }</div>
+                </div>
+                <div class="smell-card" style="--smell-color: #3B82F6;">
+                    <h4>🔵 Dead Code</h4>
+                    <p>Unreachable code, unused variables, commented-out blocks. Clutters the codebase, confuses readers.</p>
+                    <div class="smell-example">// TODO: remove this old implementation</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Debt Quadrant -->
+        <section class="module" id="debt">
+            <div class="module-header">
+                <div class="module-icon">💳</div>
+                <div class="module-info">
+                    <h2>Technical Debt Management</h2>
+                    <p>Strategic approach to managing code quality trade-offs</p>
+                </div>
+            </div>
+            
+            <div class="debt-quadrant">
+                <div class="quadrant-title">Technical Debt Quadrant</div>
+                <div class="quadrant-container">
+                    <div class="quadrant-ylabel">Deliberate ← Intent → Inadvertent</div>
+                    <div class="quadrant-main">
+                        <div class="quadrant-row">
+                            <div class="quadrant-cell q1">
+                                <h4>✅ Prudent & Deliberate</h4>
+                                <p>"We must ship now and deal with consequences." Conscious trade-off with a payback plan. Time-boxed, tracked, scheduled for resolution.</p>
+                            </div>
+                            <div class="quadrant-cell q2">
+                                <h4>⚠️ Prudent & Inadvertent</h4>
+                                <p>"Now we know how we should have done it." Learning debt—discovered better approach after building. Natural part of growth.</p>
+                            </div>
+                        </div>
+                        <div class="quadrant-row">
+                            <div class="quadrant-cell q3">
+                                <h4>🔴 Reckless & Deliberate</h4>
+                                <p>"We don't have time for design." Dangerous shortcuts without payback plan. Compounds quickly, slows everything down.</p>
+                            </div>
+                            <div class="quadrant-cell q4">
+                                <h4>🟠 Reckless & Inadvertent</h4>
+                                <p>"What's layering?" Incompetence debt—didn't know better. Requires training and code review to prevent.</p>
+                            </div>
+                        </div>
+                        <div class="quadrant-xlabel">Reckless ← Prudence → Prudent</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Managing Tech Debt</h3>
+                    <p><strong>Track It:</strong> Maintain a tech debt register. Every shortcut gets logged with impact assessment and payback estimate.</p>
+                    <p><strong>Budget It:</strong> Allocate 15-20% of sprint capacity for debt paydown. Consistent investment prevents crisis mode.</p>
+                    <p><strong>Prioritize It:</strong> Focus on debt that blocks features or causes incidents. Not all debt is equal.</p>
+                </div>
+                <div>
+                    <h3>Debt Payback Strategies</h3>
+                    <p><strong>Boy Scout Rule:</strong> Leave code cleaner than you found it. Small improvements on every touch compound over time.</p>
+                    <p><strong>Refactoring Sprints:</strong> Dedicated sprints for major cleanup. Works for large-scale architectural debt.</p>
+                    <p><strong>Strangler Pattern:</strong> Build new system alongside old, gradually migrate traffic. For legacy system replacement.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Reviews -->
+        <section class="module" id="reviews">
+            <div class="module-header">
+                <div class="module-icon">👁️</div>
+                <div class="module-info">
+                    <h2>Code Review Excellence</h2>
+                    <p>Collaborative quality assurance that levels up the whole team</p>
+                </div>
+            </div>
+            
+            <div class="pr-flow">
+                <div class="pr-flow-title">Pull Request Lifecycle</div>
+                <div class="pr-flow-track">
+                    <div class="pr-step">
+                        <div class="pr-step-icon" style="--step-color: #8B5CF6;">📝</div>
+                        <div class="pr-step-label" style="--step-color: #8B5CF6;">Create PR</div>
+                        <div class="pr-step-time">Author</div>
+                    </div>
+                    <div class="pr-step">
+                        <div class="pr-step-icon" style="--step-color: #3B82F6;">🤖</div>
+                        <div class="pr-step-label" style="--step-color: #3B82F6;">CI Checks</div>
+                        <div class="pr-step-time">Automated</div>
+                    </div>
+                    <div class="pr-step">
+                        <div class="pr-step-icon" style="--step-color: #06B6D4;">👀</div>
+                        <div class="pr-step-label" style="--step-color: #06B6D4;">Review</div>
+                        <div class="pr-step-time">&lt;4 hours</div>
+                    </div>
+                    <div class="pr-step">
+                        <div class="pr-step-icon" style="--step-color: #10B981;">💬</div>
+                        <div class="pr-step-label" style="--step-color: #10B981;">Discuss</div>
+                        <div class="pr-step-time">As needed</div>
+                    </div>
+                    <div class="pr-step">
+                        <div class="pr-step-icon" style="--step-color: #10B981;">✅</div>
+                        <div class="pr-step-label" style="--step-color: #10B981;">Approve</div>
+                        <div class="pr-step-time">1+ reviewer</div>
+                    </div>
+                    <div class="pr-step">
+                        <div class="pr-step-icon" style="--step-color: #F59E0B;">🚀</div>
+                        <div class="pr-step-label" style="--step-color: #F59E0B;">Merge</div>
+                        <div class="pr-step-time">Author</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What to Look For</h3>
+                    <p><strong>Correctness:</strong> Does it do what it claims? Are edge cases handled? Will it break under load?</p>
+                    <p><strong>Design:</strong> Is it well-structured? Does it follow patterns? Is complexity justified?</p>
+                    <p><strong>Readability:</strong> Can you understand it in one read? Are names clear? Is intent obvious?</p>
+                    <p><strong>Tests:</strong> Is critical functionality covered? Are tests meaningful or just coverage theater?</p>
+                </div>
+                <div>
+                    <h3>Review Etiquette</h3>
+                    <p><strong>Be Kind:</strong> Critique code, not people. "This could be clearer" not "You wrote confusing code."</p>
+                    <p><strong>Be Specific:</strong> Point to exact issues with suggested fixes. Vague feedback wastes time.</p>
+                    <p><strong>Be Timely:</strong> Review within 4 hours during work days. Blocked PRs kill momentum.</p>
+                    <p><strong>Be Humble:</strong> Ask questions before assuming. Maybe you're missing context.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation -->
+        <section class="module" id="docs">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Documentation Excellence</h2>
+                    <p>The right docs at the right level of detail</p>
+                </div>
+            </div>
+            
+            <div class="doc-tiers">
+                <div class="doc-tiers-title">Documentation Priority Tiers</div>
+                <div class="doc-tiers-visual">
+                    <div class="doc-tier">
+                        <div class="doc-tier-bar t1" style="--tier-color: #EF4444;">📖</div>
+                        <div class="doc-tier-label" style="--tier-color: #EF4444;">README</div>
+                        <div class="doc-tier-items">Setup, Quick Start</div>
+                    </div>
+                    <div class="doc-tier">
+                        <div class="doc-tier-bar t2" style="--tier-color: #F59E0B;">📋</div>
+                        <div class="doc-tier-label" style="--tier-color: #F59E0B;">API Docs</div>
+                        <div class="doc-tier-items">Endpoints, Types</div>
+                    </div>
+                    <div class="doc-tier">
+                        <div class="doc-tier-bar t3" style="--tier-color: #3B82F6;">🏗️</div>
+                        <div class="doc-tier-label" style="--tier-color: #3B82F6;">Architecture</div>
+                        <div class="doc-tier-items">ADRs, Diagrams</div>
+                    </div>
+                    <div class="doc-tier">
+                        <div class="doc-tier-bar t4" style="--tier-color: #10B981;">📚</div>
+                        <div class="doc-tier-label" style="--tier-color: #10B981;">Tutorials</div>
+                        <div class="doc-tier-items">Guides, Examples</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What to Document</h3>
+                    <p><strong>Why, not What:</strong> Code shows what it does. Docs should explain why decisions were made.</p>
+                    <p><strong>Getting Started:</strong> From zero to running in under 15 minutes. Automate what you can.</p>
+                    <p><strong>Architecture Decisions:</strong> Record significant choices in ADRs. Future you will thank present you.</p>
+                </div>
+                <div>
+                    <h3>Documentation Best Practices</h3>
+                    <p><strong>Keep It Current:</strong> Outdated docs are worse than no docs. Review on every release.</p>
+                    <p><strong>Put It Where People Look:</strong> README in the repo, not a wiki nobody checks.</p>
+                    <p><strong>Include Examples:</strong> Working code examples beat prose explanations every time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testing Practices -->
+        <section class="module" id="testing">
+            <div class="module-header">
+                <div class="module-icon">🧪</div>
+                <div class="module-info">
+                    <h2>Testing Best Practices</h2>
+                    <p>Write tests that catch bugs and enable refactoring</p>
+                </div>
+            </div>
+            
+            <div class="testing-grid">
+                <div class="testing-card">
+                    <h4><span>✅</span> Good Test</h4>
+                    <p>Tests behavior, not implementation. Descriptive name. Isolated. Fast. Catches real bugs.</p>
+                    <div class="testing-code">
+<span class="comment">// Good: tests behavior</span>
+<span class="keyword">test</span>(<span class="string">'user can checkout with valid cart'</span>, () => {
+  <span class="keyword">const</span> cart = createCartWith(validItems);
+  <span class="keyword">const</span> result = checkout(cart, validPayment);
+  expect(result.status).toBe(<span class="string">'success'</span>);
+  expect(result.orderId).toBeDefined();
+});
+                    </div>
+                </div>
+                <div class="testing-card">
+                    <h4><span>❌</span> Bad Test</h4>
+                    <p>Tests implementation details. Brittle. Slow. Passes even when code is broken. Coverage theater.</p>
+                    <div class="testing-code">
+<span class="comment">// Bad: tests implementation</span>
+<span class="keyword">test</span>(<span class="string">'checkout'</span>, () => {
+  <span class="keyword">const</span> spy = jest.spyOn(db, <span class="string">'query'</span>);
+  checkout();
+  expect(spy).toHaveBeenCalledWith(
+    <span class="string">'INSERT INTO orders...'</span>  <span class="comment">// Brittle!</span>
+  );
+});
+                    </div>
+                </div>
+            </div>
+
+            <div class="lint-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Type</th>
+                            <th>Speed</th>
+                            <th>Coverage</th>
+                            <th>Confidence</th>
+                            <th>When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Unit Tests</strong></td>
+                            <td class="severity-info">⚡ Fast</td>
+                            <td>Functions, Classes</td>
+                            <td>Low isolation</td>
+                            <td>Business logic, utilities</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Integration Tests</strong></td>
+                            <td class="severity-warn">🐢 Medium</td>
+                            <td>Module interactions</td>
+                            <td>Medium</td>
+                            <td>API endpoints, DB queries</td>
+                        </tr>
+                        <tr>
+                            <td><strong>E2E Tests</strong></td>
+                            <td class="severity-error">🐌 Slow</td>
+                            <td>Full user flows</td>
+                            <td>High</td>
+                            <td>Critical paths only</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contract Tests</strong></td>
+                            <td class="severity-info">⚡ Fast</td>
+                            <td>API boundaries</td>
+                            <td>High for APIs</td>
+                            <td>Microservices</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tools -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Quality Tools</h2>
+                    <p>Essential tooling for maintaining code quality</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔍</div>
+                        <div>
+                            <div class="tool-name">ESLint</div>
+                            <div class="tool-category">JavaScript Linting</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Pluggable linter for JavaScript/TypeScript. Catches bugs, enforces style, integrates everywhere.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🎨</div>
+                        <div>
+                            <div class="tool-name">Prettier</div>
+                            <div class="tool-category">Code Formatting</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Opinionated formatter. End style debates forever. Consistent code across the team.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔐</div>
+                        <div>
+                            <div class="tool-name">SonarQube</div>
+                            <div class="tool-category">Code Quality</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Continuous inspection platform. Security vulnerabilities, code smells, coverage tracking.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📊</div>
+                        <div>
+                            <div class="tool-name">Codecov</div>
+                            <div class="tool-category">Coverage Tracking</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Test coverage reporting. PR comments, trend tracking, coverage gates.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🐙</div>
+                        <div>
+                            <div class="tool-name">GitHub Actions</div>
+                            <div class="tool-category">CI/CD</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Native GitHub CI. Workflows as code, marketplace actions, seamless PR integration.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔄</div>
+                        <div>
+                            <div class="tool-name">Husky</div>
+                            <div class="tool-category">Git Hooks</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Modern Git hooks. Run linters, tests, formatters before commit or push.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📦</div>
+                        <div>
+                            <div class="tool-name">Dependabot</div>
+                            <div class="tool-category">Dependency Updates</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Automated dependency updates. Security patches, version bumps, changelog summaries.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🛡️</div>
+                        <div>
+                            <div class="tool-name">Snyk</div>
+                            <div class="tool-category">Security Scanning</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Find and fix vulnerabilities. Dependencies, containers, IaC scanning.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices DO/DON'T -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices Summary</h2>
+                    <p>Quick reference for code quality standards</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Write self-documenting code with clear names</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Keep functions small and focused (under 20 lines)</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Test behavior, not implementation details</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Review PRs within 4 hours during work days</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Track and budget for technical debt</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Automate everything that can be automated</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Document decisions, not just code</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Refactor continuously in small increments</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Use feature flags for safe deployments</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Write clever code that only you understand</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Let functions grow to hundreds of lines</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Mock everything—integration matters</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Let PRs sit for days without review</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Ignore tech debt until crisis mode</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Rely on manual processes that can be automated</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Write documentation once and forget it</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Save refactoring for "someday"</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Deploy directly to production without gates</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Section -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered code quality assistance</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>CodeQualityReviewer</h3>
+                    <p>An AI agent that reviews code for quality issues, suggests refactorings, identifies code smells, and ensures adherence to team standards before human review.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">👃</span> Detect code smells and anti-patterns</div>
+                        <div class="agent-capability"><span class="capability-icon">🔧</span> Suggest refactoring opportunities</div>
+                        <div class="agent-capability"><span class="capability-icon">📏</span> Check adherence to style guides</div>
+                        <div class="agent-capability"><span class="capability-icon">🧪</span> Identify missing test coverage</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Generate documentation suggestions</div>
+                        <div class="agent-capability"><span class="capability-icon">🔐</span> Flag potential security issues</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">code_reviewer_agent.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+code_reviewer = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Senior Code Reviewer"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Ensure code quality and best practices"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in clean code principles,
+    SOLID design, and refactoring patterns. Reviews
+    code for quality, security, and maintainability."""</span>,
+    <span class="code-string">tools=</span>[ast_analyzer, complexity_checker,
+           security_scanner, style_enforcer]
+)
+
+review_task = Task(
+    <span class="code-string">description=</span><span class="code-string">"""Review this pull request:
+    - Check for code smells and anti-patterns
+    - Verify test coverage for new code
+    - Ensure documentation is adequate
+    - Flag security vulnerabilities
+    - Suggest refactoring improvements"""</span>,
+    <span class="code-string">agent=</span>code_reviewer,
+    <span class="code-string">expected_output=</span><span class="code-string">"Code review with actionable feedback"</span>
+)
+
+crew = Crew(agents=[code_reviewer], tasks=[review_task])
+result = crew.kickoff()
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring Product Building</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat10-p1-product-lifecycle.html" class="related-card">
+                    <div class="related-icon">🔄</div>
+                    <div class="related-title">Product Lifecycle</div>
+                    <div class="related-desc">The complete journey from discovery to iteration</div>
+                </a>
+                <a href="cat10-p5-validation.html" class="related-card">
+                    <div class="related-icon">✅</div>
+                    <div class="related-title">Validation & Testing</div>
+                    <div class="related-desc">Comprehensive testing strategies and automation</div>
+                </a>
+                <a href="cat10-p4-ai-assisted-dev.html" class="related-card">
+                    <div class="related-icon">🤖</div>
+                    <div class="related-title">AI-Assisted Development</div>
+                    <div class="related-desc">Leveraging AI for faster, better code</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat10-p1-product-lifecycle.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">10.1: Product Lifecycle</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 10.2</div>
+        <a href="cat10-p3-scaling-strategies.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">10.3: Scaling Strategies</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

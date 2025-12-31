@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Metrics | Product Building | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #14B8A6;
+            --cat-light: #2DD4BF;
+            --page-primary: #3B82F6;
+            --page-light: #60A5FA;
+            --page-glow: rgba(59, 130, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: rgba(20, 184, 166, 0.15); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+
+        /* North Star - COMPACT */
+        .north-star-section { display: grid; grid-template-columns: 280px 1fr; gap: 24px; margin-bottom: 24px; }
+        .north-star-card { background: linear-gradient(135deg, var(--bg-card-alt), var(--bg-card)); border: 2px solid var(--page-primary); border-radius: 12px; padding: 24px; text-align: center; }
+        .ns-icon { font-size: 32px; margin-bottom: 8px; }
+        .ns-label { font-size: 10px; color: var(--page-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+        .ns-value { font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .ns-name { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+        .ns-change { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(16, 185, 129, 0.2); border-radius: 6px; color: var(--green); font-size: 12px; font-weight: 600; }
+        .north-star-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .ns-info-block h4 { font-size: 13px; font-weight: 600; color: var(--page-light); margin-bottom: 10px; }
+        .ns-info-block p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+        .ns-examples { list-style: none; }
+        .ns-examples li { font-size: 11px; color: var(--text-muted); padding: 4px 0; display: flex; gap: 8px; }
+        .ns-examples strong { color: var(--text-secondary); }
+
+        /* AARRR Pirate Funnel */
+        .pirate-funnel { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .funnel-title { font-size: 15px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .funnel-stages { display: flex; flex-direction: column; gap: 8px; }
+        .funnel-stage { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-card); border-radius: 8px; border-left: 4px solid var(--stage-color); }
+        .stage-letter { width: 40px; height: 40px; background: var(--stage-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--bg-dark); }
+        .stage-info { flex: 1; }
+        .stage-name { font-size: 14px; font-weight: 600; color: var(--stage-color); margin-bottom: 2px; }
+        .stage-question { font-size: 11px; color: var(--text-muted); }
+        .stage-metrics { display: flex; gap: 16px; }
+        .stage-metric { text-align: center; }
+        .stage-metric-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .stage-metric-label { font-size: 9px; color: var(--text-muted); }
+        .stage-examples { font-size: 10px; color: var(--text-muted); max-width: 200px; }
+
+        /* DORA Metrics */
+        .dora-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .dora-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; border-top: 3px solid var(--dora-color); }
+        .dora-icon { font-size: 24px; margin-bottom: 8px; }
+        .dora-name { font-size: 12px; font-weight: 600; color: var(--dora-color); margin-bottom: 4px; }
+        .dora-value { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .dora-target { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+        .dora-status { font-size: 9px; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+        .dora-status.elite { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .dora-status.high { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .dora-status.medium { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .dora-status.low { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+
+        /* Engagement Metrics */
+        .engagement-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .engagement-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .engagement-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .engagement-name { font-size: 12px; color: var(--text-muted); }
+        .engagement-trend { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+        .trend-up { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .trend-down { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .engagement-value { font-size: 28px; font-weight: 700; color: var(--metric-color); margin-bottom: 8px; }
+        .engagement-chart { height: 32px; display: flex; align-items: flex-end; gap: 3px; }
+        .chart-bar { flex: 1; background: var(--metric-color); border-radius: 2px 2px 0 0; opacity: 0.5; }
+        .chart-bar:last-child { opacity: 1; }
+        .engagement-desc { font-size: 10px; color: var(--text-muted); margin-top: 8px; }
+
+        /* Financial Metrics */
+        .financial-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .financial-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-align: center; }
+        .fin-icon { font-size: 20px; margin-bottom: 8px; }
+        .fin-name { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .fin-value { font-size: 22px; font-weight: 700; color: var(--fin-color); margin-bottom: 4px; }
+        .fin-change { font-size: 10px; color: var(--green); }
+        .fin-formula { font-size: 9px; color: var(--text-muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
+
+        /* Satisfaction Metrics - NPS/CSAT/CES */
+        .satisfaction-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .sat-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .sat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .sat-icon { font-size: 24px; }
+        .sat-name { font-size: 14px; font-weight: 600; }
+        .sat-score { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+        .sat-value { font-size: 36px; font-weight: 700; color: var(--sat-color); }
+        .sat-scale { font-size: 12px; color: var(--text-muted); }
+        .sat-breakdown { display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        .sat-segment { height: 100%; }
+        .sat-labels { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); }
+        .sat-desc { font-size: 11px; color: var(--text-secondary); margin-top: 12px; line-height: 1.5; }
+
+        /* Feature Adoption */
+        .feature-adoption { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .adoption-title { font-size: 15px; font-weight: 600; color: var(--page-light); margin-bottom: 20px; }
+        .adoption-list { display: flex; flex-direction: column; gap: 12px; }
+        .adoption-item { display: flex; align-items: center; gap: 16px; padding: 12px; background: var(--bg-card); border-radius: 8px; }
+        .adoption-feature { font-size: 13px; font-weight: 500; width: 140px; }
+        .adoption-bar-container { flex: 1; height: 24px; background: var(--bg-dark); border-radius: 6px; overflow: hidden; position: relative; }
+        .adoption-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+        .adoption-percent { font-size: 11px; font-weight: 600; color: var(--bg-dark); }
+        .adoption-users { font-size: 11px; color: var(--text-muted); width: 80px; text-align: right; }
+        .adoption-trend { font-size: 10px; width: 50px; text-align: right; }
+
+        /* A/B Testing */
+        .ab-tests { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .ab-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .ab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .ab-name { font-size: 13px; font-weight: 600; }
+        .ab-status { font-size: 10px; padding: 3px 8px; border-radius: 4px; }
+        .ab-status.running { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .ab-status.winner { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .ab-variants { display: flex; gap: 12px; margin-bottom: 12px; }
+        .ab-variant { flex: 1; padding: 12px; background: var(--bg-card); border-radius: 8px; text-align: center; }
+        .ab-variant.control { border: 1px solid var(--border-color); }
+        .ab-variant.treatment { border: 1px solid var(--green); }
+        .variant-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+        .variant-value { font-size: 18px; font-weight: 700; }
+        .ab-confidence { font-size: 11px; color: var(--text-muted); }
+        .ab-lift { font-size: 12px; font-weight: 600; color: var(--green); }
+
+        /* Health Dashboard */
+        .health-dashboard { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .health-title { font-size: 15px; font-weight: 600; color: var(--page-light); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .health-score { font-size: 24px; font-weight: 700; color: var(--green); }
+        .health-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .health-item { background: var(--bg-card); border-radius: 8px; padding: 16px; text-align: center; }
+        .health-indicator { width: 12px; height: 12px; border-radius: 50%; margin: 0 auto 8px; }
+        .health-indicator.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .health-indicator.yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+        .health-indicator.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+        .health-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .health-value { font-size: 14px; font-weight: 600; }
+
+        /* Metric Categories */
+        .metric-categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric-category { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-top: 3px solid var(--cat-color); }
+        .metric-cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .metric-cat-icon { font-size: 20px; }
+        .metric-cat-name { font-size: 14px; font-weight: 600; }
+        .metric-list { display: flex; flex-direction: column; gap: 8px; }
+        .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--bg-card); border-radius: 6px; }
+        .metric-row-name { font-size: 11px; color: var(--text-secondary); }
+        .metric-row-value { font-size: 12px; font-weight: 600; }
+
+        /* Tools */
+        .tools-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .tool-icon { font-size: 24px; margin-bottom: 8px; }
+        .tool-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+        .tool-type { font-size: 9px; color: var(--text-muted); }
+
+        /* Best Practices */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 10px; padding: 20px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3 { color: var(--green); font-size: 14px; margin-bottom: 14px; }
+        .practices-dont h3 { color: var(--red); font-size: 14px; margin-bottom: 14px; }
+        .practice-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--text-secondary); }
+        .practice-item .icon { flex-shrink: 0; }
+        .practices-do .icon { color: var(--green); }
+        .practices-dont .icon { color: var(--red); }
+
+        /* Agent */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 10px 16px; font-size: 11px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 16px; font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .best-practices, .agent-grid, .north-star-section { grid-template-columns: 1fr; }
+            .dora-grid, .financial-grid { grid-template-columns: repeat(2, 1fr); }
+            .engagement-grid, .satisfaction-grid { grid-template-columns: 1fr; }
+            .health-grid { grid-template-columns: repeat(3, 1fr); }
+            .tools-grid { grid-template-columns: repeat(3, 1fr); }
+            .related-grid, .ab-tests, .metric-categories { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Product Building</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat10-product-building-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat10-p1-product-lifecycle.html"><span class="nav-icon">🔄</span> 10.1 Product Lifecycle</a></li>
+            <li><a href="cat10-p2-best-practices.html"><span class="nav-icon">✨</span> 10.2 Best Practices</a></li>
+            <li><a href="cat10-p3-scaling-strategies.html"><span class="nav-icon">📈</span> 10.3 Scaling Strategies</a></li>
+            <li><a href="cat10-p4-ai-assisted-dev.html"><span class="nav-icon">🤖</span> 10.4 AI-Assisted Dev</a></li>
+            <li><a href="cat10-p5-validation.html"><span class="nav-icon">✅</span> 10.5 Validation & Testing</a></li>
+            <li><a href="cat10-p6-methodologies.html"><span class="nav-icon">📋</span> 10.6 Methodologies</a></li>
+            <li><a href="cat10-p7-product-metrics.html" class="active"><span class="nav-icon">📊</span> 10.7 Product Metrics</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#northstar"><span class="nav-icon">⭐</span> North Star</a></li>
+            <li><a href="#pirate"><span class="nav-icon">🏴‍☠️</span> AARRR Funnel</a></li>
+            <li><a href="#engagement"><span class="nav-icon">📈</span> Engagement</a></li>
+            <li><a href="#financial"><span class="nav-icon">💰</span> Financial</a></li>
+            <li><a href="#satisfaction"><span class="nav-icon">😊</span> Satisfaction</a></li>
+            <li><a href="#dora"><span class="nav-icon">🚀</span> DORA</a></li>
+            <li><a href="#features"><span class="nav-icon">✨</span> Feature Adoption</a></li>
+            <li><a href="#experiments"><span class="nav-icon">🧪</span> A/B Testing</a></li>
+            <li><a href="#health"><span class="nav-icon">💚</span> Health Score</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📊 Page 10.7</span>
+                <h1>Product Metrics</h1>
+                <p>Master the metrics that matter. From North Star alignment to DORA engineering metrics, learn to measure what drives product success and make data-informed decisions at every level.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">9</div><div class="hero-metric-label">Metric Categories</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">40+</div><div class="hero-metric-label">Key Metrics</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5</div><div class="hero-metric-label">AARRR Stages</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">4</div><div class="hero-metric-label">DORA Metrics</div></div>
+            </div>
+        </section>
+
+        <!-- North Star Metric -->
+        <section class="module" id="northstar">
+            <div class="module-header">
+                <div class="module-icon">⭐</div>
+                <div class="module-info">
+                    <h2>North Star Metric</h2>
+                    <p>The single metric that captures your product's core value</p>
+                </div>
+            </div>
+
+            <div class="north-star-section">
+                <div class="north-star-card">
+                    <div class="ns-icon">⭐</div>
+                    <div class="ns-label">North Star Metric</div>
+                    <div class="ns-value">2.4M</div>
+                    <div class="ns-name">Weekly Active Users</div>
+                    <div class="ns-change">↑ 12% vs last month</div>
+                </div>
+                <div class="north-star-info">
+                    <div class="ns-info-block">
+                        <h4>What Makes a Good North Star?</h4>
+                        <p><strong>Value-Focused:</strong> Reflects the core value users get from your product. Not revenue—that's an output.</p>
+                        <p><strong>Actionable:</strong> Teams can influence it through their work. Not external factors you can't control.</p>
+                        <p><strong>Leading:</strong> Predicts future success. Early warning when things go wrong.</p>
+                    </div>
+                    <div class="ns-info-block">
+                        <h4>Examples by Company Type</h4>
+                        <ul class="ns-examples">
+                            <li><strong>Spotify:</strong> Time spent listening (engagement)</li>
+                            <li><strong>Airbnb:</strong> Nights booked (transactions)</li>
+                            <li><strong>Slack:</strong> Messages sent (adoption)</li>
+                            <li><strong>Facebook:</strong> Daily active users (habitual usage)</li>
+                            <li><strong>Shopify:</strong> GMV processed (merchant success)</li>
+                            <li><strong>Zoom:</strong> Meeting minutes (core value delivered)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AARRR Pirate Metrics -->
+        <section class="module" id="pirate">
+            <div class="module-header">
+                <div class="module-icon">🏴‍☠️</div>
+                <div class="module-info">
+                    <h2>AARRR Pirate Metrics</h2>
+                    <p>The growth funnel framework for understanding user lifecycle</p>
+                </div>
+            </div>
+
+            <div class="pirate-funnel">
+                <div class="funnel-title">Growth Funnel Stages</div>
+                <div class="funnel-stages">
+                    <div class="funnel-stage" style="--stage-color: #8B5CF6;">
+                        <div class="stage-letter">A</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Acquisition</div>
+                            <div class="stage-question">How do users find you?</div>
+                        </div>
+                        <div class="stage-metrics">
+                            <div class="stage-metric"><div class="stage-metric-value">45K</div><div class="stage-metric-label">Visitors/mo</div></div>
+                            <div class="stage-metric"><div class="stage-metric-value">$2.40</div><div class="stage-metric-label">CAC</div></div>
+                        </div>
+                        <div class="stage-examples">Traffic, signups, app installs, cost per acquisition</div>
+                    </div>
+                    <div class="funnel-stage" style="--stage-color: #3B82F6;">
+                        <div class="stage-letter">A</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Activation</div>
+                            <div class="stage-question">Do users have a great first experience?</div>
+                        </div>
+                        <div class="stage-metrics">
+                            <div class="stage-metric"><div class="stage-metric-value">32%</div><div class="stage-metric-label">Activation</div></div>
+                            <div class="stage-metric"><div class="stage-metric-value">2.3 days</div><div class="stage-metric-label">Time to Value</div></div>
+                        </div>
+                        <div class="stage-examples">Onboarding completion, "aha moment" reached, setup finished</div>
+                    </div>
+                    <div class="funnel-stage" style="--stage-color: #06B6D4;">
+                        <div class="stage-letter">R</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Retention</div>
+                            <div class="stage-question">Do users come back?</div>
+                        </div>
+                        <div class="stage-metrics">
+                            <div class="stage-metric"><div class="stage-metric-value">68%</div><div class="stage-metric-label">D7 Retention</div></div>
+                            <div class="stage-metric"><div class="stage-metric-value">45%</div><div class="stage-metric-label">D30 Retention</div></div>
+                        </div>
+                        <div class="stage-examples">DAU/MAU, cohort retention curves, churn rate</div>
+                    </div>
+                    <div class="funnel-stage" style="--stage-color: #10B981;">
+                        <div class="stage-letter">R</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Revenue</div>
+                            <div class="stage-question">How do you make money?</div>
+                        </div>
+                        <div class="stage-metrics">
+                            <div class="stage-metric"><div class="stage-metric-value">$89</div><div class="stage-metric-label">ARPU</div></div>
+                            <div class="stage-metric"><div class="stage-metric-value">4.2%</div><div class="stage-metric-label">Conversion</div></div>
+                        </div>
+                        <div class="stage-examples">MRR, LTV, ARPU, conversion rate, expansion revenue</div>
+                    </div>
+                    <div class="funnel-stage" style="--stage-color: #F59E0B;">
+                        <div class="stage-letter">R</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Referral</div>
+                            <div class="stage-question">Do users tell others?</div>
+                        </div>
+                        <div class="stage-metrics">
+                            <div class="stage-metric"><div class="stage-metric-value">1.4</div><div class="stage-metric-label">Viral Coef.</div></div>
+                            <div class="stage-metric"><div class="stage-metric-value">23%</div><div class="stage-metric-label">Referral Rate</div></div>
+                        </div>
+                        <div class="stage-examples">NPS, viral coefficient, referral signups, share rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Engagement Metrics -->
+        <section class="module" id="engagement">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Engagement Metrics</h2>
+                    <p>Measure how deeply users interact with your product</p>
+                </div>
+            </div>
+
+            <div class="engagement-grid">
+                <div class="engagement-card" style="--metric-color: #8B5CF6;">
+                    <div class="engagement-header">
+                        <span class="engagement-name">DAU / MAU Ratio</span>
+                        <span class="engagement-trend trend-up">↑ 3.2%</span>
+                    </div>
+                    <div class="engagement-value">42%</div>
+                    <div class="engagement-chart">
+                        <div class="chart-bar" style="height: 65%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 68%;"></div>
+                        <div class="chart-bar" style="height: 75%;"></div>
+                        <div class="chart-bar" style="height: 72%;"></div>
+                        <div class="chart-bar" style="height: 80%;"></div>
+                        <div class="chart-bar" style="height: 85%;"></div>
+                    </div>
+                    <div class="engagement-desc">"Stickiness" - how often monthly users come daily. 50%+ is excellent for consumer apps.</div>
+                </div>
+                <div class="engagement-card" style="--metric-color: #3B82F6;">
+                    <div class="engagement-header">
+                        <span class="engagement-name">Session Duration</span>
+                        <span class="engagement-trend trend-up">↑ 12%</span>
+                    </div>
+                    <div class="engagement-value">8.4 min</div>
+                    <div class="engagement-chart">
+                        <div class="chart-bar" style="height: 50%;"></div>
+                        <div class="chart-bar" style="height: 55%;"></div>
+                        <div class="chart-bar" style="height: 60%;"></div>
+                        <div class="chart-bar" style="height: 58%;"></div>
+                        <div class="chart-bar" style="height: 65%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 78%;"></div>
+                    </div>
+                    <div class="engagement-desc">Average time users spend per session. Context matters—longer isn't always better.</div>
+                </div>
+                <div class="engagement-card" style="--metric-color: #10B981;">
+                    <div class="engagement-header">
+                        <span class="engagement-name">Sessions per User</span>
+                        <span class="engagement-trend trend-up">↑ 8%</span>
+                    </div>
+                    <div class="engagement-value">4.2/wk</div>
+                    <div class="engagement-chart">
+                        <div class="chart-bar" style="height: 60%;"></div>
+                        <div class="chart-bar" style="height: 62%;"></div>
+                        <div class="chart-bar" style="height: 68%;"></div>
+                        <div class="chart-bar" style="height: 72%;"></div>
+                        <div class="chart-bar" style="height: 75%;"></div>
+                        <div class="chart-bar" style="height: 80%;"></div>
+                        <div class="chart-bar" style="height: 88%;"></div>
+                    </div>
+                    <div class="engagement-desc">Frequency of use. Strong habits = 5+ sessions/week for daily-use products.</div>
+                </div>
+                <div class="engagement-card" style="--metric-color: #F59E0B;">
+                    <div class="engagement-header">
+                        <span class="engagement-name">Feature Breadth</span>
+                        <span class="engagement-trend trend-down">↓ 2%</span>
+                    </div>
+                    <div class="engagement-value">3.8</div>
+                    <div class="engagement-chart">
+                        <div class="chart-bar" style="height: 75%;"></div>
+                        <div class="chart-bar" style="height: 72%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 68%;"></div>
+                        <div class="chart-bar" style="height: 65%;"></div>
+                        <div class="chart-bar" style="height: 64%;"></div>
+                        <div class="chart-bar" style="height: 62%;"></div>
+                    </div>
+                    <div class="engagement-desc">Average features used per session. Low breadth may indicate discovery issues.</div>
+                </div>
+                <div class="engagement-card" style="--metric-color: #EC4899;">
+                    <div class="engagement-header">
+                        <span class="engagement-name">D1 → D7 Retention</span>
+                        <span class="engagement-trend trend-up">↑ 5%</span>
+                    </div>
+                    <div class="engagement-value">68%</div>
+                    <div class="engagement-chart">
+                        <div class="chart-bar" style="height: 100%;"></div>
+                        <div class="chart-bar" style="height: 85%;"></div>
+                        <div class="chart-bar" style="height: 78%;"></div>
+                        <div class="chart-bar" style="height: 74%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 68%;"></div>
+                        <div class="chart-bar" style="height: 68%;"></div>
+                    </div>
+                    <div class="engagement-desc">Users retained from Day 1 to Day 7. Critical early retention indicator.</div>
+                </div>
+                <div class="engagement-card" style="--metric-color: #06B6D4;">
+                    <div class="engagement-header">
+                        <span class="engagement-name">Actions per Session</span>
+                        <span class="engagement-trend trend-up">↑ 15%</span>
+                    </div>
+                    <div class="engagement-value">12.4</div>
+                    <div class="engagement-chart">
+                        <div class="chart-bar" style="height: 55%;"></div>
+                        <div class="chart-bar" style="height: 60%;"></div>
+                        <div class="chart-bar" style="height: 65%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 78%;"></div>
+                        <div class="chart-bar" style="height: 85%;"></div>
+                        <div class="chart-bar" style="height: 92%;"></div>
+                    </div>
+                    <div class="engagement-desc">Core actions taken per session. Higher = more engaged, productive users.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Metrics -->
+        <section class="module" id="financial">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>Financial & Business Metrics</h2>
+                    <p>Unit economics and revenue health indicators</p>
+                </div>
+            </div>
+
+            <div class="financial-grid">
+                <div class="financial-card" style="--fin-color: #10B981;">
+                    <div class="fin-icon">💎</div>
+                    <div class="fin-name">Lifetime Value (LTV)</div>
+                    <div class="fin-value">$340</div>
+                    <div class="fin-change">↑ 8% YoY</div>
+                    <div class="fin-formula">ARPU × Avg Lifespan</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #3B82F6;">
+                    <div class="fin-icon">🎯</div>
+                    <div class="fin-name">Customer Acquisition Cost</div>
+                    <div class="fin-value">$85</div>
+                    <div class="fin-change">↓ 12% YoY</div>
+                    <div class="fin-formula">Marketing $ / New Customers</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #8B5CF6;">
+                    <div class="fin-icon">📊</div>
+                    <div class="fin-name">LTV:CAC Ratio</div>
+                    <div class="fin-value">4.0x</div>
+                    <div class="fin-change">Target: 3x+</div>
+                    <div class="fin-formula">LTV / CAC</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #F59E0B;">
+                    <div class="fin-icon">⏱️</div>
+                    <div class="fin-name">CAC Payback</div>
+                    <div class="fin-value">8 mo</div>
+                    <div class="fin-change">Target: &lt;12 mo</div>
+                    <div class="fin-formula">CAC / (ARPU × Margin)</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #EC4899;">
+                    <div class="fin-icon">📈</div>
+                    <div class="fin-name">Monthly Recurring Revenue</div>
+                    <div class="fin-value">$2.4M</div>
+                    <div class="fin-change">↑ 15% MoM</div>
+                    <div class="fin-formula">∑ Monthly Subscriptions</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #06B6D4;">
+                    <div class="fin-icon">🔄</div>
+                    <div class="fin-name">Net Revenue Retention</div>
+                    <div class="fin-value">118%</div>
+                    <div class="fin-change">Target: 100%+</div>
+                    <div class="fin-formula">(Start + Expansion - Churn) / Start</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #EF4444;">
+                    <div class="fin-icon">📉</div>
+                    <div class="fin-name">Churn Rate</div>
+                    <div class="fin-value">2.1%</div>
+                    <div class="fin-change">↓ 0.3% MoM</div>
+                    <div class="fin-formula">Lost Customers / Total</div>
+                </div>
+                <div class="financial-card" style="--fin-color: #14B8A6;">
+                    <div class="fin-icon">👤</div>
+                    <div class="fin-name">ARPU</div>
+                    <div class="fin-value">$89</div>
+                    <div class="fin-change">↑ 5% QoQ</div>
+                    <div class="fin-formula">Revenue / Active Users</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Satisfaction Metrics -->
+        <section class="module" id="satisfaction">
+            <div class="module-header">
+                <div class="module-icon">😊</div>
+                <div class="module-info">
+                    <h2>User Satisfaction Metrics</h2>
+                    <p>Measure customer happiness and loyalty</p>
+                </div>
+            </div>
+
+            <div class="satisfaction-grid">
+                <div class="sat-card" style="--sat-color: #10B981;">
+                    <div class="sat-header">
+                        <div class="sat-icon">📣</div>
+                        <div class="sat-name">Net Promoter Score (NPS)</div>
+                    </div>
+                    <div class="sat-score">
+                        <div class="sat-value">+47</div>
+                        <div class="sat-scale">/ 100</div>
+                    </div>
+                    <div class="sat-breakdown">
+                        <div class="sat-segment" style="width: 58%; background: var(--green);"></div>
+                        <div class="sat-segment" style="width: 31%; background: var(--yellow);"></div>
+                        <div class="sat-segment" style="width: 11%; background: var(--red);"></div>
+                    </div>
+                    <div class="sat-labels">
+                        <span>Detractors 11%</span>
+                        <span>Passives 31%</span>
+                        <span>Promoters 58%</span>
+                    </div>
+                    <p class="sat-desc">"How likely are you to recommend us?" Scale 0-10. Promoters (9-10) minus Detractors (0-6). Above 50 is excellent.</p>
+                </div>
+                <div class="sat-card" style="--sat-color: #3B82F6;">
+                    <div class="sat-header">
+                        <div class="sat-icon">⭐</div>
+                        <div class="sat-name">Customer Satisfaction (CSAT)</div>
+                    </div>
+                    <div class="sat-score">
+                        <div class="sat-value">4.3</div>
+                        <div class="sat-scale">/ 5.0</div>
+                    </div>
+                    <div class="sat-breakdown">
+                        <div class="sat-segment" style="width: 45%; background: var(--green);"></div>
+                        <div class="sat-segment" style="width: 35%; background: #22C55E;"></div>
+                        <div class="sat-segment" style="width: 12%; background: var(--yellow);"></div>
+                        <div class="sat-segment" style="width: 8%; background: var(--red);"></div>
+                    </div>
+                    <div class="sat-labels">
+                        <span>1-2: 8%</span>
+                        <span>3: 12%</span>
+                        <span>4: 35%</span>
+                        <span>5: 45%</span>
+                    </div>
+                    <p class="sat-desc">"How satisfied are you with [X]?" Measures immediate satisfaction after specific interactions or features.</p>
+                </div>
+                <div class="sat-card" style="--sat-color: #8B5CF6;">
+                    <div class="sat-header">
+                        <div class="sat-icon">💪</div>
+                        <div class="sat-name">Customer Effort Score (CES)</div>
+                    </div>
+                    <div class="sat-score">
+                        <div class="sat-value">5.8</div>
+                        <div class="sat-scale">/ 7.0</div>
+                    </div>
+                    <div class="sat-breakdown">
+                        <div class="sat-segment" style="width: 52%; background: var(--green);"></div>
+                        <div class="sat-segment" style="width: 28%; background: #22C55E;"></div>
+                        <div class="sat-segment" style="width: 15%; background: var(--yellow);"></div>
+                        <div class="sat-segment" style="width: 5%; background: var(--red);"></div>
+                    </div>
+                    <div class="sat-labels">
+                        <span>High Effort</span>
+                        <span></span>
+                        <span></span>
+                        <span>Low Effort</span>
+                    </div>
+                    <p class="sat-desc">"How easy was it to [complete task]?" Higher scores mean lower friction. Best predictor of support-driven churn.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DORA Metrics -->
+        <section class="module" id="dora">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>DORA Metrics</h2>
+                    <p>Engineering excellence indicators from DevOps Research</p>
+                </div>
+            </div>
+
+            <div class="dora-grid">
+                <div class="dora-card" style="--dora-color: #10B981;">
+                    <div class="dora-icon">🚀</div>
+                    <div class="dora-name">Deployment Frequency</div>
+                    <div class="dora-value">4.2/day</div>
+                    <div class="dora-target">Elite: Multiple/day</div>
+                    <span class="dora-status elite">Elite</span>
+                </div>
+                <div class="dora-card" style="--dora-color: #3B82F6;">
+                    <div class="dora-icon">⏱️</div>
+                    <div class="dora-name">Lead Time for Changes</div>
+                    <div class="dora-value">2.4 hrs</div>
+                    <div class="dora-target">Elite: &lt;1 hour</div>
+                    <span class="dora-status high">High</span>
+                </div>
+                <div class="dora-card" style="--dora-color: #F59E0B;">
+                    <div class="dora-icon">🔧</div>
+                    <div class="dora-name">Mean Time to Recovery</div>
+                    <div class="dora-value">45 min</div>
+                    <div class="dora-target">Elite: &lt;1 hour</div>
+                    <span class="dora-status elite">Elite</span>
+                </div>
+                <div class="dora-card" style="--dora-color: #8B5CF6;">
+                    <div class="dora-icon">📉</div>
+                    <div class="dora-name">Change Failure Rate</div>
+                    <div class="dora-value">8%</div>
+                    <div class="dora-target">Elite: 0-15%</div>
+                    <span class="dora-status elite">Elite</span>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Why DORA Matters</h3>
+                    <p>Research shows elite performers ship 208x more frequently than low performers while maintaining higher quality. Speed and stability aren't tradeoffs—they reinforce each other.</p>
+                </div>
+                <div>
+                    <h3>Performance Levels</h3>
+                    <p><strong>Elite:</strong> Multiple deploys/day, &lt;1hr lead time, &lt;1hr recovery, &lt;15% failure rate.</p>
+                    <p><strong>Low:</strong> Monthly deploys, 1-6mo lead time, 1wk-1mo recovery, 46-60% failure rate.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Adoption -->
+        <section class="module" id="features">
+            <div class="module-header">
+                <div class="module-icon">✨</div>
+                <div class="module-info">
+                    <h2>Feature Adoption</h2>
+                    <p>Track how users discover and adopt product features</p>
+                </div>
+            </div>
+
+            <div class="feature-adoption">
+                <div class="adoption-title">Feature Adoption Rates</div>
+                <div class="adoption-list">
+                    <div class="adoption-item">
+                        <div class="adoption-feature">🔍 Search</div>
+                        <div class="adoption-bar-container">
+                            <div class="adoption-bar" style="width: 89%; background: var(--green);">
+                                <span class="adoption-percent">89%</span>
+                            </div>
+                        </div>
+                        <div class="adoption-users">2.1M users</div>
+                        <div class="adoption-trend" style="color: var(--green);">↑ 3%</div>
+                    </div>
+                    <div class="adoption-item">
+                        <div class="adoption-feature">📊 Dashboard</div>
+                        <div class="adoption-bar-container">
+                            <div class="adoption-bar" style="width: 76%; background: var(--green);">
+                                <span class="adoption-percent">76%</span>
+                            </div>
+                        </div>
+                        <div class="adoption-users">1.8M users</div>
+                        <div class="adoption-trend" style="color: var(--green);">↑ 5%</div>
+                    </div>
+                    <div class="adoption-item">
+                        <div class="adoption-feature">🔔 Notifications</div>
+                        <div class="adoption-bar-container">
+                            <div class="adoption-bar" style="width: 62%; background: var(--blue);">
+                                <span class="adoption-percent">62%</span>
+                            </div>
+                        </div>
+                        <div class="adoption-users">1.5M users</div>
+                        <div class="adoption-trend" style="color: var(--green);">↑ 8%</div>
+                    </div>
+                    <div class="adoption-item">
+                        <div class="adoption-feature">📤 Export</div>
+                        <div class="adoption-bar-container">
+                            <div class="adoption-bar" style="width: 45%; background: var(--yellow);">
+                                <span class="adoption-percent">45%</span>
+                            </div>
+                        </div>
+                        <div class="adoption-users">1.1M users</div>
+                        <div class="adoption-trend" style="color: var(--red);">↓ 2%</div>
+                    </div>
+                    <div class="adoption-item">
+                        <div class="adoption-feature">🤖 AI Assistant</div>
+                        <div class="adoption-bar-container">
+                            <div class="adoption-bar" style="width: 28%; background: var(--orange);">
+                                <span class="adoption-percent">28%</span>
+                            </div>
+                        </div>
+                        <div class="adoption-users">670K users</div>
+                        <div class="adoption-trend" style="color: var(--green);">↑ 15%</div>
+                    </div>
+                    <div class="adoption-item">
+                        <div class="adoption-feature">🔗 Integrations</div>
+                        <div class="adoption-bar-container">
+                            <div class="adoption-bar" style="width: 18%; background: var(--red);">
+                                <span class="adoption-percent">18%</span>
+                            </div>
+                        </div>
+                        <div class="adoption-users">430K users</div>
+                        <div class="adoption-trend" style="color: var(--yellow);">→ 0%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- A/B Testing -->
+        <section class="module" id="experiments">
+            <div class="module-header">
+                <div class="module-icon">🧪</div>
+                <div class="module-info">
+                    <h2>A/B Testing & Experimentation</h2>
+                    <p>Data-driven decision making through controlled experiments</p>
+                </div>
+            </div>
+
+            <div class="ab-tests">
+                <div class="ab-card">
+                    <div class="ab-header">
+                        <div class="ab-name">Checkout Flow Redesign</div>
+                        <span class="ab-status winner">Winner Found</span>
+                    </div>
+                    <div class="ab-variants">
+                        <div class="ab-variant control">
+                            <div class="variant-label">Control (A)</div>
+                            <div class="variant-value">3.2%</div>
+                        </div>
+                        <div class="ab-variant treatment">
+                            <div class="variant-label">Treatment (B)</div>
+                            <div class="variant-value" style="color: var(--green);">4.1%</div>
+                        </div>
+                    </div>
+                    <div class="ab-confidence">95% confidence • 14 days • 50K users</div>
+                    <div class="ab-lift">+28% conversion lift 🎉</div>
+                </div>
+                <div class="ab-card">
+                    <div class="ab-header">
+                        <div class="ab-name">Onboarding Tooltip Sequence</div>
+                        <span class="ab-status running">Running</span>
+                    </div>
+                    <div class="ab-variants">
+                        <div class="ab-variant control">
+                            <div class="variant-label">Control (A)</div>
+                            <div class="variant-value">32%</div>
+                        </div>
+                        <div class="ab-variant treatment">
+                            <div class="variant-label">Treatment (B)</div>
+                            <div class="variant-value">34%</div>
+                        </div>
+                    </div>
+                    <div class="ab-confidence">78% confidence • 7 days • 12K users</div>
+                    <div class="ab-lift" style="color: var(--text-muted);">Need more data</div>
+                </div>
+                <div class="ab-card">
+                    <div class="ab-header">
+                        <div class="ab-name">Pricing Page Layout</div>
+                        <span class="ab-status winner">Winner Found</span>
+                    </div>
+                    <div class="ab-variants">
+                        <div class="ab-variant control">
+                            <div class="variant-label">Control (A)</div>
+                            <div class="variant-value">12.4%</div>
+                        </div>
+                        <div class="ab-variant treatment">
+                            <div class="variant-label">Treatment (B)</div>
+                            <div class="variant-value" style="color: var(--green);">14.8%</div>
+                        </div>
+                    </div>
+                    <div class="ab-confidence">99% confidence • 21 days • 85K users</div>
+                    <div class="ab-lift">+19% upgrade rate 🎉</div>
+                </div>
+                <div class="ab-card">
+                    <div class="ab-header">
+                        <div class="ab-name">Search Algorithm v3</div>
+                        <span class="ab-status running">Running</span>
+                    </div>
+                    <div class="ab-variants">
+                        <div class="ab-variant control">
+                            <div class="variant-label">Control (A)</div>
+                            <div class="variant-value">68%</div>
+                        </div>
+                        <div class="ab-variant treatment">
+                            <div class="variant-label">Treatment (B)</div>
+                            <div class="variant-value">71%</div>
+                        </div>
+                    </div>
+                    <div class="ab-confidence">89% confidence • 5 days • 200K queries</div>
+                    <div class="ab-lift" style="color: var(--yellow);">Trending positive</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Health Dashboard -->
+        <section class="module" id="health">
+            <div class="module-header">
+                <div class="module-icon">💚</div>
+                <div class="module-info">
+                    <h2>Product Health Score</h2>
+                    <p>Holistic view of product performance across dimensions</p>
+                </div>
+            </div>
+
+            <div class="health-dashboard">
+                <div class="health-title">Overall Health <span class="health-score">87/100</span></div>
+                <div class="health-grid">
+                    <div class="health-item">
+                        <div class="health-indicator green"></div>
+                        <div class="health-label">Growth</div>
+                        <div class="health-value">92</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-indicator green"></div>
+                        <div class="health-label">Engagement</div>
+                        <div class="health-value">88</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-indicator yellow"></div>
+                        <div class="health-label">Retention</div>
+                        <div class="health-value">76</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-indicator green"></div>
+                        <div class="health-label">Revenue</div>
+                        <div class="health-value">91</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-indicator green"></div>
+                        <div class="health-label">Quality</div>
+                        <div class="health-value">89</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-categories">
+                <div class="metric-category" style="--cat-color: #10B981;">
+                    <div class="metric-cat-header">
+                        <div class="metric-cat-icon">📈</div>
+                        <div class="metric-cat-name">Growth Indicators</div>
+                    </div>
+                    <div class="metric-list">
+                        <div class="metric-row"><span class="metric-row-name">New User Growth</span><span class="metric-row-value" style="color: var(--green);">+18%</span></div>
+                        <div class="metric-row"><span class="metric-row-name">Organic Traffic</span><span class="metric-row-value" style="color: var(--green);">+12%</span></div>
+                        <div class="metric-row"><span class="metric-row-name">Viral Coefficient</span><span class="metric-row-value">1.4</span></div>
+                    </div>
+                </div>
+                <div class="metric-category" style="--cat-color: #3B82F6;">
+                    <div class="metric-cat-header">
+                        <div class="metric-cat-icon">🎯</div>
+                        <div class="metric-cat-name">Quality Indicators</div>
+                    </div>
+                    <div class="metric-list">
+                        <div class="metric-row"><span class="metric-row-name">Bug Reports</span><span class="metric-row-value" style="color: var(--green);">↓ 23%</span></div>
+                        <div class="metric-row"><span class="metric-row-name">Support Tickets</span><span class="metric-row-value" style="color: var(--yellow);">↑ 5%</span></div>
+                        <div class="metric-row"><span class="metric-row-name">P99 Latency</span><span class="metric-row-value">142ms</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Analytics Tools</h2>
+                    <p>Popular tools for product analytics</p>
+                </div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">Amplitude</div>
+                    <div class="tool-type">Product Analytics</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🔥</div>
+                    <div class="tool-name">Mixpanel</div>
+                    <div class="tool-type">Event Analytics</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📈</div>
+                    <div class="tool-name">Heap</div>
+                    <div class="tool-type">Auto-capture</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🎯</div>
+                    <div class="tool-name">PostHog</div>
+                    <div class="tool-type">Open Source</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📉</div>
+                    <div class="tool-name">Looker</div>
+                    <div class="tool-type">BI Platform</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Metrics Best Practices</h2>
+                    <p>Guidelines for effective product measurement</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="icon">✓</span> Pick one North Star metric that reflects core value</div>
+                    <div class="practice-item"><span class="icon">✓</span> Measure outcomes, not just outputs</div>
+                    <div class="practice-item"><span class="icon">✓</span> Use cohort analysis for retention metrics</div>
+                    <div class="practice-item"><span class="icon">✓</span> A/B test before making major changes</div>
+                    <div class="practice-item"><span class="icon">✓</span> Segment metrics by user type and behavior</div>
+                    <div class="practice-item"><span class="icon">✓</span> Review metrics weekly with the team</div>
+                    <div class="practice-item"><span class="icon">✓</span> Set leading indicators, not just lagging</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="icon">✗</span> Track too many metrics—focus on 5-7 key ones</div>
+                    <div class="practice-item"><span class="icon">✗</span> Use vanity metrics that don't drive decisions</div>
+                    <div class="practice-item"><span class="icon">✗</span> Ignore statistical significance in experiments</div>
+                    <div class="practice-item"><span class="icon">✗</span> Optimize one metric at the expense of others</div>
+                    <div class="practice-item"><span class="icon">✗</span> Compare metrics without context or segments</div>
+                    <div class="practice-item"><span class="icon">✗</span> Set metrics and forget them—review regularly</div>
+                    <div class="practice-item"><span class="icon">✗</span> Let metrics become targets (Goodhart's Law)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Section -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered metrics analysis and insights</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>MetricsAnalyst</h3>
+                    <p>An AI agent that monitors product metrics, detects anomalies, identifies trends, and generates actionable insights for product teams.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Monitor key metrics and detect anomalies</div>
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Root cause analysis for metric changes</div>
+                        <div class="agent-capability"><span class="capability-icon">📈</span> Trend forecasting and predictions</div>
+                        <div class="agent-capability"><span class="capability-icon">🎯</span> Experiment analysis and recommendations</div>
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Generate weekly metrics reports</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">metrics_analyst_agent.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+
+metrics_analyst = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Metrics Analyst"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Surface actionable insights"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in product
+    analytics, statistical analysis,
+    and growth metrics."""</span>,
+    <span class="code-string">tools=</span>[anomaly_detector,
+           trend_analyzer, forecaster]
+)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring Product Building</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat10-p5-validation.html" class="related-card">
+                    <div class="related-icon">✅</div>
+                    <div class="related-title">Validation & Testing</div>
+                    <div class="related-desc">Testing strategies that feed into metrics</div>
+                </a>
+                <a href="cat10-p6-methodologies.html" class="related-card">
+                    <div class="related-icon">📋</div>
+                    <div class="related-title">Methodologies</div>
+                    <div class="related-desc">Track methodology effectiveness</div>
+                </a>
+                <a href="cat10-p1-product-lifecycle.html" class="related-card">
+                    <div class="related-icon">🔄</div>
+                    <div class="related-title">Product Lifecycle</div>
+                    <div class="related-desc">Metrics at each lifecycle stage</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat10-p6-methodologies.html" class="footer-link">
+            <span>←</span>
+            <div><div class="footer-link-label">Previous</div><div class="footer-link-title">10.6: Methodologies</div></div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 10.7</div>
+        <a href="cat10-product-building-overview.html" class="footer-link">
+            <div><div class="footer-link-label">Back to</div><div class="footer-link-title">Category Overview</div></div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>
