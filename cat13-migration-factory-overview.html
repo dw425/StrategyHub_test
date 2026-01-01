@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration Factory | Category 13 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 13 - MIGRATION VIOLET */
+            --brand-orange: #FF9900;
+            --cat-primary: #7C3AED;
+            --cat-light: #A78BFA;
+            --cat-dark: #6D28D9;
+            --cat-glow: rgba(124, 58, 237, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONVEYOR BELT ANIMATION
+        ═══════════════════════════════════════════════════════════════ */
+        .conveyor-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .conveyor-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .conveyor-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .conveyor-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: rgba(16, 185, 129, 0.2); color: var(--success-green); animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        
+        .conveyor-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; min-height: 280px; }
+        
+        /* Belt track */
+        .belt-track { position: absolute; left: 40px; right: 40px; top: 50%; height: 40px; transform: translateY(-50%); }
+        .belt-surface { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #1a1a2e 0px, #1a1a2e 20px, #252538 20px, #252538 40px); border-radius: 4px; animation: belt-move 2s linear infinite; }
+        @keyframes belt-move { 0% { background-position: 0 0; } 100% { background-position: 40px 0; } }
+        .belt-edge { position: absolute; left: 0; right: 0; height: 4px; background: #3a3a4e; }
+        .belt-edge.top { top: 0; }
+        .belt-edge.bottom { bottom: 0; }
+        
+        /* Stations above belt */
+        .stations-row { display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 60px; }
+        .station { display: flex; flex-direction: column; align-items: center; width: 100px; }
+        .station-head { width: 60px; height: 60px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; position: relative; z-index: 10; }
+        .station-head::after { content: ''; position: absolute; bottom: -20px; left: 50%; width: 2px; height: 20px; background: var(--border-color); }
+        .station-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: var(--space-sm); color: var(--text-muted); }
+        .station.source .station-head { border-color: var(--danger-red); background: rgba(239, 68, 68, 0.1); }
+        .station.assess .station-head { border-color: var(--orange); background: rgba(249, 115, 22, 0.1); }
+        .station.convert .station-head { border-color: var(--warning-yellow); background: rgba(245, 158, 11, 0.1); }
+        .station.validate .station-head { border-color: var(--cyan); background: rgba(6, 182, 212, 0.1); }
+        .station.target .station-head { border-color: var(--success-green); background: rgba(16, 185, 129, 0.1); }
+        
+        /* Moving items on belt */
+        .belt-items { position: absolute; left: 60px; right: 60px; top: 50%; transform: translateY(-50%); height: 30px; overflow: hidden; }
+        .belt-item { position: absolute; width: 24px; height: 24px; background: var(--cat-primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; animation: item-move 8s linear infinite; box-shadow: 0 0 10px rgba(124, 58, 237, 0.5); }
+        .belt-item:nth-child(1) { animation-delay: 0s; }
+        .belt-item:nth-child(2) { animation-delay: -2s; }
+        .belt-item:nth-child(3) { animation-delay: -4s; }
+        .belt-item:nth-child(4) { animation-delay: -6s; }
+        @keyframes item-move { 0% { left: 0; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { left: calc(100% - 24px); opacity: 0; } }
+        
+        /* Stats below */
+        .conveyor-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border-color); border-top: 1px solid var(--border-color); }
+        .conveyor-stat { background: var(--bg-card); padding: var(--space-md); text-align: center; }
+        .conveyor-stat-value { font-size: var(--font-lg); font-weight: 700; }
+        .conveyor-stat-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .conveyor-stat:nth-child(1) .conveyor-stat-value { color: var(--danger-red); }
+        .conveyor-stat:nth-child(2) .conveyor-stat-value { color: var(--orange); }
+        .conveyor-stat:nth-child(3) .conveyor-stat-value { color: var(--warning-yellow); }
+        .conveyor-stat:nth-child(4) .conveyor-stat-value { color: var(--cyan); }
+        .conveyor-stat:nth-child(5) .conveyor-stat-value { color: var(--success-green); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COMPATIBILITY MATRIX HEATMAP
+        ═══════════════════════════════════════════════════════════════ */
+        .matrix-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .matrix-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .matrix-title { font-size: var(--font-sm); font-weight: 600; }
+        .matrix-body { padding: var(--space-lg); overflow-x: auto; }
+        .matrix-table { width: 100%; border-collapse: collapse; }
+        .matrix-table th, .matrix-table td { padding: var(--space-sm) var(--space-md); text-align: center; font-size: var(--font-sm); }
+        .matrix-table th { color: var(--text-muted); font-weight: 500; }
+        .matrix-table th:first-child { text-align: left; }
+        .matrix-table td:first-child { text-align: left; font-weight: 600; color: var(--text-primary); }
+        .matrix-cell { width: 60px; height: 36px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: var(--font-xs); }
+        .matrix-cell.high { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .matrix-cell.medium { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .matrix-cell.low { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .matrix-cell.na { background: var(--bg-card-alt); color: var(--text-muted); }
+        .matrix-legend { display: flex; gap: var(--space-lg); padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--border-color); justify-content: center; }
+        .matrix-legend-item { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--text-muted); }
+        .matrix-legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+        .matrix-legend-dot.high { background: rgba(16, 185, 129, 0.4); }
+        .matrix-legend-dot.medium { background: rgba(245, 158, 11, 0.4); }
+        .matrix-legend-dot.low { background: rgba(239, 68, 68, 0.4); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           WAVE TIMELINE GANTT
+        ═══════════════════════════════════════════════════════════════ */
+        .timeline-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .timeline-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .timeline-title { font-size: var(--font-sm); font-weight: 600; }
+        .timeline-legend { display: flex; gap: var(--space-md); }
+        .timeline-legend-item { display: flex; align-items: center; gap: 6px; font-size: var(--font-xs); color: var(--text-muted); }
+        .timeline-legend-bar { width: 20px; height: 8px; border-radius: 2px; }
+        .timeline-legend-bar.complete { background: var(--success-green); }
+        .timeline-legend-bar.active { background: var(--cat-primary); }
+        .timeline-legend-bar.planned { background: var(--text-muted); }
+        
+        .timeline-body { padding: var(--space-lg); }
+        .timeline-months { display: flex; margin-left: 120px; margin-bottom: var(--space-sm); }
+        .timeline-month { flex: 1; font-size: var(--font-xs); color: var(--text-muted); text-align: center; }
+        .timeline-row { display: flex; align-items: center; margin-bottom: var(--space-sm); }
+        .timeline-label { width: 120px; font-size: var(--font-sm); font-weight: 500; flex-shrink: 0; }
+        .timeline-track { flex: 1; height: 28px; background: var(--bg-card-alt); border-radius: var(--radius-sm); position: relative; }
+        .timeline-bar { position: absolute; top: 4px; height: 20px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; }
+        .timeline-bar.complete { background: linear-gradient(90deg, var(--success-green), #059669); }
+        .timeline-bar.active { background: linear-gradient(90deg, var(--cat-primary), var(--cat-light)); animation: bar-pulse 2s infinite; }
+        .timeline-bar.planned { background: var(--text-muted); opacity: 0.5; }
+        @keyframes bar-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); } 50% { box-shadow: 0 0 0 4px rgba(124, 58, 237, 0); } }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CIRCULAR PROGRESS RINGS
+        ═══════════════════════════════════════════════════════════════ */
+        .rings-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .rings-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .rings-title { font-size: var(--font-sm); font-weight: 600; }
+        .rings-body { padding: var(--space-xl); }
+        .rings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-xl); }
+        .ring-item { display: flex; flex-direction: column; align-items: center; }
+        .ring-svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: var(--bg-card-alt); stroke-width: 8; }
+        .ring-progress { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+        .ring-progress.green { stroke: var(--success-green); }
+        .ring-progress.yellow { stroke: var(--warning-yellow); }
+        .ring-progress.blue { stroke: var(--blue); }
+        .ring-progress.purple { stroke: var(--cat-primary); }
+        .ring-center { position: relative; margin-top: -90px; text-align: center; height: 60px; display: flex; flex-direction: column; justify-content: center; }
+        .ring-value { font-size: var(--font-xl); font-weight: 700; }
+        .ring-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-xl); }
+        .ring-sublabel { font-size: 10px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FUNNEL VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .funnel-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .funnel-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .funnel-title { font-size: var(--font-sm); font-weight: 600; }
+        .funnel-body { padding: var(--space-xl); display: flex; justify-content: center; }
+        .funnel-chart { width: 100%; max-width: 600px; }
+        .funnel-stage { display: flex; align-items: center; margin-bottom: 4px; }
+        .funnel-bar-container { flex: 1; display: flex; justify-content: center; }
+        .funnel-bar { height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: var(--font-sm); transition: all 0.3s; position: relative; }
+        .funnel-bar:hover { filter: brightness(1.2); transform: scaleX(1.02); }
+        .funnel-bar.s1 { width: 100%; background: linear-gradient(90deg, #EF4444, #F87171); }
+        .funnel-bar.s2 { width: 85%; background: linear-gradient(90deg, #F97316, #FB923C); }
+        .funnel-bar.s3 { width: 70%; background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+        .funnel-bar.s4 { width: 55%; background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+        .funnel-bar.s5 { width: 45%; background: linear-gradient(90deg, #10B981, #34D399); }
+        .funnel-label { width: 100px; font-size: var(--font-sm); color: var(--text-secondary); text-align: right; padding-right: var(--space-md); }
+        .funnel-value { width: 80px; font-size: var(--font-sm); color: var(--text-muted); padding-left: var(--space-md); }
+        .funnel-value span { color: var(--text-primary); font-weight: 600; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOL CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COMPARISON CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .compare-grid { display: grid; grid-template-columns: 1fr 80px 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); align-items: stretch; }
+        .compare-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); position: relative; }
+        .compare-card.legacy { border-color: var(--danger-red); }
+        .compare-card.legacy::before { content: 'LEGACY'; position: absolute; top: -10px; left: var(--space-lg); background: var(--danger-red); color: white; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: var(--radius-full); }
+        .compare-card.modern { border-color: var(--success-green); }
+        .compare-card.modern::before { content: 'MODERN'; position: absolute; top: -10px; left: var(--space-lg); background: var(--success-green); color: white; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: var(--radius-full); }
+        .compare-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-sm); }
+        .compare-list { list-style: none; }
+        .compare-list li { padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .compare-list li:last-child { border-bottom: none; }
+        .compare-icon { font-size: 16px; }
+        .compare-arrow { display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--cat-light); }
+        .compare-arrow span { animation: arrow-pulse 1.5s infinite; }
+        @keyframes arrow-pulse { 0%, 100% { transform: translateX(0); opacity: 1; } 50% { transform: translateX(10px); opacity: 0.5; } }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT + CODE
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-section-header { margin-bottom: var(--space-lg); }
+        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(124,58,237,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* DIVIDER */
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        /* PAGES GRID */
+        .pages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .page-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; color: inherit; transition: all 0.3s; position: relative; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2); }
+        .page-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .page-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .page-desc { font-size: var(--font-sm); color: var(--text-muted); line-height: 1.6; }
+        .page-arrow { position: absolute; top: var(--space-lg); right: var(--space-lg); color: var(--cat-light); opacity: 0; transition: all 0.2s; }
+        .page-card:hover .page-arrow { opacity: 1; transform: translateX(4px); }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+            .pages-grid { grid-template-columns: repeat(2, 1fr); }
+            .rings-grid { grid-template-columns: repeat(2, 1fr); }
+            .compare-grid { grid-template-columns: 1fr; }
+            .compare-arrow { transform: rotate(90deg); }
+            .conveyor-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .pages-grid, .tools-grid { grid-template-columns: 1fr; }
+            .rings-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="#">Categories</a>
+        <span class="sep">/</span>
+        <span class="current">Migration Factory</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔄 Category 13</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat13-migration-factory-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat13-p1-assessment.html"><span class="nav-icon">📋</span> 13.1 Assessment</a></li>
+            <li><a href="cat13-p2-conversion.html"><span class="nav-icon">🔀</span> 13.2 Conversion</a></li>
+            <li><a href="cat13-p3-validation.html"><span class="nav-icon">✅</span> 13.3 Validation</a></li>
+            <li><a href="cat13-p4-cutover.html"><span class="nav-icon">🚀</span> 13.4 Cutover</a></li>
+            <li><a href="cat13-p5-wave-planning.html"><span class="nav-icon">📊</span> 13.5 Wave Planning</a></li>
+            <li><a href="cat13-p6-tooling.html"><span class="nav-icon">🛠️</span> 13.6 Tooling</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔄 Category 13</span>
+                <h1>Migration Factory</h1>
+                <p>Industrialize large-scale data platform migrations with repeatable processes, automated tooling, and wave-based execution for enterprise transformations.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">60%</div><div class="hero-metric-label">Faster Than Manual</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10K+</div><div class="hero-metric-label">Objects Per Wave</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.9%</div><div class="hero-metric-label">Data Accuracy</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">40%</div><div class="hero-metric-label">Cost Reduction</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: FACTORY OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">🏭</div>
+                <div class="module-info">
+                    <h2>Migration Assembly Line</h2>
+                    <p>Industrialized approach to enterprise-scale migrations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>A <strong>Migration Factory</strong> applies manufacturing principles—standardization, automation, repeatability, and continuous improvement—to transform thousands of database objects, ETL jobs, and applications at scale. Instead of treating each migration as a unique project, the factory model enables predictable throughput and quality across migration waves.</p>
+            </div>
+
+            <!-- Animated Conveyor Belt -->
+            <div class="conveyor-container">
+                <div class="conveyor-header">
+                    <div class="conveyor-title">🏭 Factory Assembly Line</div>
+                    <div class="conveyor-badge">● Live</div>
+                </div>
+                <div class="conveyor-canvas">
+                    <div class="stations-row">
+                        <div class="station source">
+                            <div class="station-head">🗄️</div>
+                            <div class="station-label">Source</div>
+                        </div>
+                        <div class="station assess">
+                            <div class="station-head">📋</div>
+                            <div class="station-label">Assess</div>
+                        </div>
+                        <div class="station convert">
+                            <div class="station-head">🔀</div>
+                            <div class="station-label">Convert</div>
+                        </div>
+                        <div class="station validate">
+                            <div class="station-head">✅</div>
+                            <div class="station-label">Validate</div>
+                        </div>
+                        <div class="station target">
+                            <div class="station-head">🎯</div>
+                            <div class="station-label">Target</div>
+                        </div>
+                    </div>
+                    <div class="belt-track">
+                        <div class="belt-edge top"></div>
+                        <div class="belt-surface"></div>
+                        <div class="belt-edge bottom"></div>
+                        <div class="belt-items">
+                            <div class="belt-item">📦</div>
+                            <div class="belt-item">📦</div>
+                            <div class="belt-item">📦</div>
+                            <div class="belt-item">📦</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="conveyor-stats">
+                    <div class="conveyor-stat">
+                        <div class="conveyor-stat-value">12,847</div>
+                        <div class="conveyor-stat-label">Total Objects</div>
+                    </div>
+                    <div class="conveyor-stat">
+                        <div class="conveyor-stat-value">2,847</div>
+                        <div class="conveyor-stat-label">In Assessment</div>
+                    </div>
+                    <div class="conveyor-stat">
+                        <div class="conveyor-stat-value">1,923</div>
+                        <div class="conveyor-stat-label">Converting</div>
+                    </div>
+                    <div class="conveyor-stat">
+                        <div class="conveyor-stat-value">1,456</div>
+                        <div class="conveyor-stat-label">Validating</div>
+                    </div>
+                    <div class="conveyor-stat">
+                        <div class="conveyor-stat-value">6,621</div>
+                        <div class="conveyor-stat-label">Complete</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 2: BEFORE/AFTER COMPARISON -->
+        <section class="module" id="transform">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>The Transformation</h2>
+                    <p>From legacy constraints to modern capabilities</p>
+                </div>
+            </div>
+            
+            <div class="compare-grid">
+                <div class="compare-card legacy">
+                    <div class="compare-title">🗄️ Legacy Systems</div>
+                    <ul class="compare-list">
+                        <li><span class="compare-icon">❌</span> On-premises hardware lock-in</li>
+                        <li><span class="compare-icon">❌</span> Expensive proprietary licenses</li>
+                        <li><span class="compare-icon">❌</span> Manual scaling operations</li>
+                        <li><span class="compare-icon">❌</span> Limited analytics capabilities</li>
+                        <li><span class="compare-icon">❌</span> Siloed data across systems</li>
+                        <li><span class="compare-icon">❌</span> Complex maintenance windows</li>
+                    </ul>
+                </div>
+                <div class="compare-arrow">
+                    <span>→</span>
+                </div>
+                <div class="compare-card modern">
+                    <div class="compare-title">☁️ Modern Platform</div>
+                    <ul class="compare-list">
+                        <li><span class="compare-icon">✅</span> Cloud-native elasticity</li>
+                        <li><span class="compare-icon">✅</span> Pay-per-use pricing model</li>
+                        <li><span class="compare-icon">✅</span> Auto-scaling on demand</li>
+                        <li><span class="compare-icon">✅</span> AI/ML native integration</li>
+                        <li><span class="compare-icon">✅</span> Unified data lakehouse</li>
+                        <li><span class="compare-icon">✅</span> Zero-downtime updates</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 3: COMPATIBILITY MATRIX -->
+        <section class="module" id="compatibility">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Migration Compatibility Matrix</h2>
+                    <p>Source to target platform conversion complexity</p>
+                </div>
+            </div>
+            
+            <div class="matrix-container">
+                <div class="matrix-header">
+                    <div class="matrix-title">Auto-Conversion Success Rate by Platform Pair</div>
+                </div>
+                <div class="matrix-body">
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Source →</th>
+                                <th>Databricks</th>
+                                <th>Snowflake</th>
+                                <th>Fabric</th>
+                                <th>BigQuery</th>
+                                <th>Redshift</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Oracle</td>
+                                <td><span class="matrix-cell medium">78%</span></td>
+                                <td><span class="matrix-cell high">85%</span></td>
+                                <td><span class="matrix-cell medium">72%</span></td>
+                                <td><span class="matrix-cell medium">75%</span></td>
+                                <td><span class="matrix-cell high">82%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Teradata</td>
+                                <td><span class="matrix-cell high">88%</span></td>
+                                <td><span class="matrix-cell high">92%</span></td>
+                                <td><span class="matrix-cell medium">70%</span></td>
+                                <td><span class="matrix-cell high">85%</span></td>
+                                <td><span class="matrix-cell high">90%</span></td>
+                            </tr>
+                            <tr>
+                                <td>SQL Server</td>
+                                <td><span class="matrix-cell high">82%</span></td>
+                                <td><span class="matrix-cell high">88%</span></td>
+                                <td><span class="matrix-cell high">95%</span></td>
+                                <td><span class="matrix-cell medium">78%</span></td>
+                                <td><span class="matrix-cell high">85%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Netezza</td>
+                                <td><span class="matrix-cell high">90%</span></td>
+                                <td><span class="matrix-cell high">94%</span></td>
+                                <td><span class="matrix-cell medium">68%</span></td>
+                                <td><span class="matrix-cell high">88%</span></td>
+                                <td><span class="matrix-cell high">92%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Hadoop/Hive</td>
+                                <td><span class="matrix-cell high">96%</span></td>
+                                <td><span class="matrix-cell high">85%</span></td>
+                                <td><span class="matrix-cell medium">75%</span></td>
+                                <td><span class="matrix-cell high">90%</span></td>
+                                <td><span class="matrix-cell medium">78%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Redshift</td>
+                                <td><span class="matrix-cell high">88%</span></td>
+                                <td><span class="matrix-cell high">91%</span></td>
+                                <td><span class="matrix-cell medium">72%</span></td>
+                                <td><span class="matrix-cell high">86%</span></td>
+                                <td><span class="matrix-cell na">N/A</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="matrix-legend">
+                    <div class="matrix-legend-item"><span class="matrix-legend-dot high"></span> High (>80%)</div>
+                    <div class="matrix-legend-item"><span class="matrix-legend-dot medium"></span> Medium (60-80%)</div>
+                    <div class="matrix-legend-item"><span class="matrix-legend-dot low"></span> Low (<60%)</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 4: WAVE TIMELINE -->
+        <section class="module" id="waves">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Wave Timeline</h2>
+                    <p>Parallel execution of migration waves</p>
+                </div>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <div class="timeline-title">Migration Wave Schedule</div>
+                    <div class="timeline-legend">
+                        <div class="timeline-legend-item"><span class="timeline-legend-bar complete"></span> Complete</div>
+                        <div class="timeline-legend-item"><span class="timeline-legend-bar active"></span> Active</div>
+                        <div class="timeline-legend-item"><span class="timeline-legend-bar planned"></span> Planned</div>
+                    </div>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-months">
+                        <div class="timeline-month">Jan</div>
+                        <div class="timeline-month">Feb</div>
+                        <div class="timeline-month">Mar</div>
+                        <div class="timeline-month">Apr</div>
+                        <div class="timeline-month">May</div>
+                        <div class="timeline-month">Jun</div>
+                    </div>
+                    <div class="timeline-row">
+                        <div class="timeline-label">Wave 1 - Core</div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar complete" style="left: 0%; width: 33%;">✓ Done</div>
+                        </div>
+                    </div>
+                    <div class="timeline-row">
+                        <div class="timeline-label">Wave 2 - Finance</div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar complete" style="left: 16%; width: 33%;">✓ Done</div>
+                        </div>
+                    </div>
+                    <div class="timeline-row">
+                        <div class="timeline-label">Wave 3 - Analytics</div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar active" style="left: 33%; width: 33%;">In Progress</div>
+                        </div>
+                    </div>
+                    <div class="timeline-row">
+                        <div class="timeline-label">Wave 4 - Marketing</div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar planned" style="left: 50%; width: 33%;">Planned</div>
+                        </div>
+                    </div>
+                    <div class="timeline-row">
+                        <div class="timeline-label">Wave 5 - Archive</div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar planned" style="left: 66%; width: 33%;">Planned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 5: KPI RINGS -->
+        <section class="module" id="kpis">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Factory Performance</h2>
+                    <p>Key metrics driving migration success</p>
+                </div>
+            </div>
+            
+            <div class="rings-container">
+                <div class="rings-header">
+                    <div class="rings-title">Real-Time Factory KPIs</div>
+                </div>
+                <div class="rings-body">
+                    <div class="rings-grid">
+                        <div class="ring-item">
+                            <svg class="ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                                <circle class="ring-progress green" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="49"/>
+                            </svg>
+                            <div class="ring-center">
+                                <div class="ring-value" style="color: var(--success-green);">85%</div>
+                            </div>
+                            <div class="ring-label">Auto-Convert Rate</div>
+                            <div class="ring-sublabel">Target: 80%</div>
+                        </div>
+                        <div class="ring-item">
+                            <svg class="ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                                <circle class="ring-progress purple" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="33"/>
+                            </svg>
+                            <div class="ring-center">
+                                <div class="ring-value" style="color: var(--cat-light);">90%</div>
+                            </div>
+                            <div class="ring-label">Validation Pass</div>
+                            <div class="ring-sublabel">Target: 95%</div>
+                        </div>
+                        <div class="ring-item">
+                            <svg class="ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                                <circle class="ring-progress blue" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="82"/>
+                            </svg>
+                            <div class="ring-center">
+                                <div class="ring-value" style="color: var(--blue);">75%</div>
+                            </div>
+                            <div class="ring-label">Schedule Adherence</div>
+                            <div class="ring-sublabel">Target: 85%</div>
+                        </div>
+                        <div class="ring-item">
+                            <svg class="ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                                <circle class="ring-progress yellow" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="65"/>
+                            </svg>
+                            <div class="ring-center">
+                                <div class="ring-value" style="color: var(--warning-yellow);">80%</div>
+                            </div>
+                            <div class="ring-label">Resource Utilization</div>
+                            <div class="ring-sublabel">Target: 75%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 6: CONVERSION FUNNEL -->
+        <section class="module" id="funnel">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Conversion Funnel</h2>
+                    <p>Object progression through migration stages</p>
+                </div>
+            </div>
+            
+            <div class="funnel-container">
+                <div class="funnel-header">
+                    <div class="funnel-title">Migration Pipeline Throughput</div>
+                </div>
+                <div class="funnel-body">
+                    <div class="funnel-chart">
+                        <div class="funnel-stage">
+                            <div class="funnel-label">Discovered</div>
+                            <div class="funnel-bar-container">
+                                <div class="funnel-bar s1">12,847 objects</div>
+                            </div>
+                            <div class="funnel-value"><span>100%</span></div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="funnel-label">Assessed</div>
+                            <div class="funnel-bar-container">
+                                <div class="funnel-bar s2">10,920 ready</div>
+                            </div>
+                            <div class="funnel-value"><span>85%</span> pass</div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="funnel-label">Converted</div>
+                            <div class="funnel-bar-container">
+                                <div class="funnel-bar s3">9,282 auto</div>
+                            </div>
+                            <div class="funnel-value"><span>72%</span> auto</div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="funnel-label">Validated</div>
+                            <div class="funnel-bar-container">
+                                <div class="funnel-bar s4">7,066 passed</div>
+                            </div>
+                            <div class="funnel-value"><span>55%</span> done</div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="funnel-label">Production</div>
+                            <div class="funnel-bar-container">
+                                <div class="funnel-bar s5">5,781 live</div>
+                            </div>
+                            <div class="funnel-value"><span>45%</span> migrated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 7: AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered migration automation</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔄</div>
+                    <div class="agent-name">MigrationCrew</div>
+                    <div class="agent-role">Multi-Agent Migration Orchestration</div>
+                    <p class="agent-desc">Coordinates specialized agents to execute large-scale data platform migrations with automated assessment, conversion, validation, and cutover.</p>
+                    <ul class="agent-capabilities">
+                        <li>Source system discovery and dependency mapping</li>
+                        <li>Automated schema and code conversion</li>
+                        <li>Parallel data validation execution</li>
+                        <li>Wave-based cutover orchestration</li>
+                        <li>Real-time migration monitoring</li>
+                        <li>Automated rollback on failure</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">YAML</div>
+                        </div>
+                        <div class="code-filename">migration_crew.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Migration Factory Crew</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+assessment_agent = Agent(
+    role=<span class="code-string">"Migration Assessment Specialist"</span>,
+    goal=<span class="code-string">"Analyze source systems and score readiness"</span>,
+    backstory=<span class="code-string">"""Expert at discovering database schemas, 
+    mapping dependencies, and estimating complexity."""</span>,
+    llm=llm,
+    tools=[schema_scanner, dependency_mapper]
+)
+
+conversion_agent = Agent(
+    role=<span class="code-string">"Code Conversion Engineer"</span>,
+    goal=<span class="code-string">"Transform source code to target syntax"</span>,
+    backstory=<span class="code-string">"""Polyglot database expert who converts SQL 
+    dialects and stored procedures across platforms."""</span>,
+    llm=llm,
+    tools=[sql_parser, syntax_converter]
+)
+
+validation_agent = Agent(
+    role=<span class="code-string">"Data Validation Engineer"</span>,
+    goal=<span class="code-string">"Ensure data integrity between systems"</span>,
+    backstory=<span class="code-string">"""Quality engineer who designs and executes
+    comprehensive data validation test suites."""</span>,
+    llm=llm,
+    tools=[row_counter, checksum_validator]
+)
+
+migration_crew = Crew(
+    agents=[assessment_agent, conversion_agent, 
+            validation_agent],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 8: TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Migration Tools</h2>
+                    <p>Platforms and accelerators for enterprise migrations</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟠</div>
+                        <div class="tool-card-name">AWS SCT</div>
+                    </div>
+                    <div class="tool-card-desc">Schema Conversion Tool for heterogeneous migrations with assessment reports and action items.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔵</div>
+                        <div class="tool-card-name">Azure DMS</div>
+                    </div>
+                    <div class="tool-card-desc">Database Migration Service for minimal-downtime migrations to Azure SQL and Cosmos DB.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟢</div>
+                        <div class="tool-card-name">Databricks Migration</div>
+                    </div>
+                    <div class="tool-card-desc">Unity Catalog migration tools, workspace converters, and notebook transformers.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟣</div>
+                        <div class="tool-card-name">Ora2Pg</div>
+                    </div>
+                    <div class="tool-card-desc">Open-source Oracle to PostgreSQL migration with PL/SQL conversion capabilities.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Explore This Category</h2>
+                    <p>Deep dives into migration factory topics</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat13-p1-assessment.html" class="page-card">
+                    <div class="page-num">Page 13.1</div>
+                    <div class="page-title">Assessment</div>
+                    <div class="page-desc">Discovery, complexity scoring, and migration readiness analysis</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat13-p2-conversion.html" class="page-card">
+                    <div class="page-num">Page 13.2</div>
+                    <div class="page-title">Conversion</div>
+                    <div class="page-desc">Automated SQL dialect and code transformation pipelines</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat13-p3-validation.html" class="page-card">
+                    <div class="page-num">Page 13.3</div>
+                    <div class="page-title">Validation</div>
+                    <div class="page-desc">Data integrity verification and reconciliation strategies</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat13-p4-cutover.html" class="page-card">
+                    <div class="page-num">Page 13.4</div>
+                    <div class="page-title">Cutover</div>
+                    <div class="page-desc">Production switchover planning and execution playbooks</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat13-p5-wave-planning.html" class="page-card">
+                    <div class="page-num">Page 13.5</div>
+                    <div class="page-title">Wave Planning</div>
+                    <div class="page-desc">Workload grouping, scheduling, and dependency management</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat13-p6-tooling.html" class="page-card">
+                    <div class="page-num">Page 13.6</div>
+                    <div class="page-title">Tooling</div>
+                    <div class="page-desc">Migration platforms, accelerators, and automation frameworks</div>
+                    <div class="page-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat12-cloud-platforms-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">12: Cloud Platforms</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 13</div>
+        <a href="cat13-p1-assessment.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">First Page</div>
+                <div class="footer-link-title">13.1: Assessment</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

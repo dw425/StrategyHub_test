@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Privacy | Security & Compliance | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 11 - SECURITY RED */
+            --brand-orange: #FF9900;
+            --cat-primary: #EF4444;
+            --cat-light: #F87171;
+            --cat-dark: #DC2626;
+            --cat-glow: rgba(239, 68, 68, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        /* MAIN */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); border-radius: 16px 16px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left > p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* MODULES */
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* OVERVIEW CONTENT */
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* CONSENT DASHBOARD */
+        .consent-dashboard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .consent-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .consent-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .consent-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--green); }
+        .consent-status::before { content: ''; width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .consent-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px; }
+        .consent-stat { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; }
+        .consent-stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .consent-stat-value.green { color: var(--green); }
+        .consent-stat-value.yellow { color: var(--yellow); }
+        .consent-stat-value.red { color: var(--red); }
+        .consent-stat-value.blue { color: var(--blue); }
+        .consent-stat-label { font-size: 11px; color: var(--text-muted); }
+        .consent-stat-trend { font-size: 10px; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .consent-stat-trend.up { color: var(--green); }
+        .consent-stat-trend.down { color: var(--red); }
+        
+        /* DATA FLOW VISUALIZATION */
+        .dataflow-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .dataflow-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .dataflow-title { font-size: 14px; font-weight: 600; }
+        .dataflow-legend { display: flex; gap: 16px; }
+        .dataflow-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .dataflow-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dataflow-legend-dot.allowed { background: var(--green); }
+        .dataflow-legend-dot.blocked { background: var(--red); }
+        .dataflow-legend-dot.consent { background: var(--yellow); }
+        
+        .dataflow-visual { padding: 24px; background: var(--bg-dark); position: relative; }
+        .dataflow-svg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; }
+        .dataflow-svg path { fill: none; stroke-width: 0.4; }
+        .dataflow-svg .flow-allowed { stroke: var(--green); }
+        .dataflow-svg .flow-blocked { stroke: var(--red); }
+        .dataflow-svg .flow-consent { stroke: var(--yellow); }
+        .dataflow-svg .flow-animated { animation: dashFlow 2s linear infinite; }
+        @keyframes dashFlow { to { stroke-dashoffset: -8; } }
+        
+        .dataflow-grid { display: grid; grid-template-columns: 160px 1fr 180px 1fr 160px; gap: 0; align-items: center; position: relative; z-index: 1; }
+        .dataflow-column { display: flex; flex-direction: column; gap: 12px; }
+        .dataflow-column-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: center; margin-bottom: 8px; }
+        .dataflow-node { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; transition: all 0.3s; }
+        .dataflow-node:hover { border-color: var(--node-color); transform: scale(1.05); z-index: 2; }
+        .dataflow-node-icon { font-size: 22px; margin-bottom: 6px; }
+        .dataflow-node-name { font-size: 12px; font-weight: 600; }
+        .dataflow-node-type { font-size: 10px; color: var(--text-muted); }
+        
+        .dataflow-engine-wrapper { display: flex; justify-content: center; align-items: center; height: 100%; }
+        .dataflow-engine { background: linear-gradient(135deg, var(--cat-dark), var(--violet)); border-radius: 16px; padding: 24px 32px; text-align: center; position: relative; box-shadow: 0 0 40px rgba(139, 92, 246, 0.3); z-index: 2; }
+        .dataflow-engine-icon { font-size: 32px; margin-bottom: 10px; }
+        .dataflow-engine-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .dataflow-engine-desc { font-size: 11px; color: rgba(255,255,255,0.7); }
+        
+        .dataflow-spacer { }
+        
+        .status-indicator { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-dot.allowed { background: var(--green); }
+        .status-dot.blocked { background: var(--red); }
+        .status-dot.consent { background: var(--yellow); }
+        
+        /* DSAR WORKFLOW */
+        .dsar-workflow { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .dsar-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .dsar-title { font-size: 14px; font-weight: 600; }
+        .dsar-stats { display: flex; gap: 16px; }
+        .dsar-stat { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+        .dsar-stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dsar-content { padding: 24px; }
+        .dsar-timeline { display: flex; justify-content: space-between; position: relative; }
+        .dsar-timeline::before { content: ''; position: absolute; top: 24px; left: 40px; right: 40px; height: 3px; background: linear-gradient(90deg, var(--blue), var(--violet), var(--green)); }
+        .dsar-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; flex: 1; }
+        .dsar-step-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; border: 3px solid var(--step-color); background: var(--bg-card); }
+        .dsar-step-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; text-align: center; }
+        .dsar-step-time { font-size: 10px; color: var(--text-muted); text-align: center; }
+        
+        /* CONSENT TYPES */
+        .consent-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .consent-type { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: all 0.3s; }
+        .consent-type:hover { border-color: var(--type-color); transform: translateY(-4px); }
+        .consent-type::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--type-color); }
+        .consent-type-icon { font-size: 28px; margin-bottom: 12px; }
+        .consent-type-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .consent-type-status { font-size: 10px; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
+        .consent-type-status.required { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .consent-type-status.optional { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .consent-type-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* PRIVACY PRINCIPLES */
+        .principles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .principle-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .principle-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .principle-number { width: 28px; height: 28px; background: var(--cat-glow); border: 1px solid var(--cat-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--cat-light); margin-bottom: 12px; }
+        .principle-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .principle-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+        
+        /* PIA PROCESS */
+        .pia-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .pia-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .pia-title { font-size: 14px; font-weight: 600; }
+        .pia-content { padding: 24px; }
+        .pia-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .pia-step { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .pia-step::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: var(--cat-light); font-size: 14px; }
+        .pia-step:last-child::after { display: none; }
+        .pia-step-num { width: 24px; height: 24px; background: var(--cat-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--cat-light); margin: 0 auto 10px; }
+        .pia-step-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .pia-step-desc { font-size: 9px; color: var(--text-muted); }
+        
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-category { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* BEST PRACTICES */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(239,68,68,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; overflow-x: auto; max-height: 400px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        .code-property { color: #7EE787; }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); font-size: 13px; padding: 8px 16px; border-radius: 8px; transition: all 0.2s; }
+        .footer-link:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .footer-link span { font-size: 18px; }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 500; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .consent-stats { grid-template-columns: repeat(2, 1fr); }
+            .consent-types { grid-template-columns: repeat(2, 1fr); }
+            .principles-grid { grid-template-columns: 1fr; }
+            .pia-steps { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .dsar-timeline { flex-direction: column; gap: 16px; }
+            .dsar-timeline::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="sep">/</span>
+        <a href="cat11-security-compliance-overview.html">Security & Compliance</a>
+        <span class="sep">/</span>
+        <span class="current">Data Privacy</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🛡️ Security & Compliance</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat11-security-compliance-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat11-p1-compliance-frameworks.html"><span class="nav-icon">📋</span> 11.1 Compliance Frameworks</a></li>
+            <li><a href="cat11-p2-data-privacy.html" class="active"><span class="nav-icon">🔒</span> 11.2 Data Privacy</a></li>
+            <li><a href="cat11-p3-data-governance.html"><span class="nav-icon">⚖️</span> 11.3 Data Governance</a></li>
+            <li><a href="cat11-p4-risk-management.html"><span class="nav-icon">⚠️</span> 11.4 Risk Management</a></li>
+            <li><a href="cat11-p5-identity-access.html"><span class="nav-icon">🪪</span> 11.5 Identity & Access</a></li>
+            <li><a href="cat11-p6-audit-logging.html"><span class="nav-icon">📊</span> 11.6 Audit & Logging</a></li>
+            <li><a href="cat11-p7-incident-response.html"><span class="nav-icon">🚨</span> 11.7 Incident Response</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#consent"><span class="nav-icon">✅</span> Consent Management</a></li>
+            <li><a href="#dataflow"><span class="nav-icon">🔄</span> Data Flows</a></li>
+            <li><a href="#dsar"><span class="nav-icon">📨</span> DSAR Workflow</a></li>
+            <li><a href="#types"><span class="nav-icon">🍪</span> Consent Types</a></li>
+            <li><a href="#principles"><span class="nav-icon">🏛️</span> Privacy Principles</a></li>
+            <li><a href="#pia"><span class="nav-icon">📋</span> PIA Process</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🔒 Page 11.2</span>
+                <h1>Data Privacy</h1>
+                <p>Consent management, data subject rights, and privacy-by-design principles. Build robust privacy controls that protect personal data while maintaining operational efficiency and regulatory compliance.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">30</div><div class="hero-metric-label">Days DSAR Deadline</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">€20M</div><div class="hero-metric-label">Max GDPR Fine</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">140+</div><div class="hero-metric-label">Global Privacy Laws</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">72hr</div><div class="hero-metric-label">Breach Notification</div></div>
+            </div>
+        </section>
+        
+        <!-- OVERVIEW CONTENT -->
+        <section class="module">
+            <div class="overview-content">
+                <h3>Privacy as a Competitive Advantage</h3>
+                <p>Data privacy is no longer just a compliance checkbox—it's a business differentiator. Organizations that handle personal data responsibly build trust with customers, reduce regulatory risk, and create sustainable data practices. GDPR, CCPA, and dozens of other privacy regulations mandate specific rights for individuals and obligations for organizations.</p>
+                <p>Effective privacy management requires understanding data flows, managing consent preferences, automating data subject requests, and embedding privacy considerations into product design from the start. Modern privacy platforms like OneTrust and BigID help automate these processes at scale.</p>
+            </div>
+        </section>
+        
+        <!-- CONSENT DASHBOARD -->
+        <section class="module" id="consent">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Consent Management Dashboard</h2>
+                    <p>Real-time consent collection and preference management</p>
+                </div>
+            </div>
+            
+            <div class="consent-dashboard">
+                <div class="consent-header">
+                    <div class="consent-title">📊 Consent Analytics</div>
+                    <div class="consent-status">Live Tracking Active</div>
+                </div>
+                <div class="consent-stats">
+                    <div class="consent-stat">
+                        <div class="consent-stat-value green">847K</div>
+                        <div class="consent-stat-label">Active Consents</div>
+                        <div class="consent-stat-trend up">↑ 12% this month</div>
+                    </div>
+                    <div class="consent-stat">
+                        <div class="consent-stat-value yellow">23K</div>
+                        <div class="consent-stat-label">Pending Requests</div>
+                        <div class="consent-stat-trend down">↓ 8% vs last week</div>
+                    </div>
+                    <div class="consent-stat">
+                        <div class="consent-stat-value blue">156</div>
+                        <div class="consent-stat-label">Active Policies</div>
+                        <div class="consent-stat-trend up">↑ 3 new this week</div>
+                    </div>
+                    <div class="consent-stat">
+                        <div class="consent-stat-value red">12.3K</div>
+                        <div class="consent-stat-label">Opt-Out Requests</div>
+                        <div class="consent-stat-trend down">↓ 15% this month</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DATA FLOW VISUALIZATION -->
+        <section class="module" id="dataflow">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Privacy-Controlled Data Flows</h2>
+                    <p>Consent-based routing through the privacy engine</p>
+                </div>
+            </div>
+            
+            <div class="dataflow-container">
+                <div class="dataflow-header">
+                    <div class="dataflow-title">🔄 Data Flow Control Center</div>
+                    <div class="dataflow-legend">
+                        <div class="dataflow-legend-item"><div class="dataflow-legend-dot allowed"></div>Allowed</div>
+                        <div class="dataflow-legend-item"><div class="dataflow-legend-dot blocked"></div>Blocked</div>
+                        <div class="dataflow-legend-item"><div class="dataflow-legend-dot consent"></div>Consent Required</div>
+                    </div>
+                </div>
+                <div class="dataflow-visual">
+                    <!-- SVG Flow Lines - coordinates match 16% / 50% / 84% column positions -->
+                    <svg class="dataflow-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <!-- Source to Engine flows (all allowed - green) -->
+                        <!-- Web Forms to Engine -->
+                        <path class="flow-allowed flow-animated" d="M 16 15 C 30 15, 40 50, 42 50" stroke-dasharray="2,1"/>
+                        <!-- Mobile Apps to Engine -->
+                        <path class="flow-allowed flow-animated" d="M 16 38 C 28 38, 38 50, 42 50" stroke-dasharray="2,1"/>
+                        <!-- APIs to Engine -->
+                        <path class="flow-allowed flow-animated" d="M 16 62 C 28 62, 38 50, 42 50" stroke-dasharray="2,1"/>
+                        <!-- Cookies to Engine -->
+                        <path class="flow-allowed flow-animated" d="M 16 85 C 30 85, 40 50, 42 50" stroke-dasharray="2,1"/>
+                        
+                        <!-- Engine to Destination flows -->
+                        <!-- Engine to Data Lake - Allowed -->
+                        <path class="flow-allowed flow-animated" d="M 58 50 C 60 50, 70 15, 84 15" stroke-dasharray="2,1"/>
+                        <!-- Engine to Analytics - Consent Required -->
+                        <path class="flow-consent flow-animated" d="M 58 50 C 62 50, 72 38, 84 38" stroke-dasharray="1.5,1"/>
+                        <!-- Engine to Ad Networks - Blocked -->
+                        <path class="flow-blocked" d="M 58 50 C 62 50, 68 62, 75 62" stroke-dasharray="1.5,1"/>
+                        <!-- Engine to Email Service - Allowed -->
+                        <path class="flow-allowed flow-animated" d="M 58 50 C 60 50, 70 85, 84 85" stroke-dasharray="2,1"/>
+                        
+                        <!-- Blocked X marker -->
+                        <circle cx="75" cy="62" r="3" fill="#1a1a2e" stroke="#EF4444" stroke-width="0.5"/>
+                        <text x="75" y="63.5" text-anchor="middle" fill="#EF4444" font-size="4" font-weight="bold">✕</text>
+                    </svg>
+                    
+                    <div class="dataflow-grid">
+                        <!-- Data Sources Column -->
+                        <div class="dataflow-column">
+                            <div class="dataflow-column-title">Data Sources</div>
+                            <div class="dataflow-node" style="--node-color: var(--blue);">
+                                <div class="dataflow-node-icon">🌐</div>
+                                <div class="dataflow-node-name">Web Forms</div>
+                                <div class="dataflow-node-type">User Input</div>
+                            </div>
+                            <div class="dataflow-node" style="--node-color: var(--violet);">
+                                <div class="dataflow-node-icon">📱</div>
+                                <div class="dataflow-node-name">Mobile Apps</div>
+                                <div class="dataflow-node-type">Device Data</div>
+                            </div>
+                            <div class="dataflow-node" style="--node-color: var(--cyan);">
+                                <div class="dataflow-node-icon">🔌</div>
+                                <div class="dataflow-node-name">APIs</div>
+                                <div class="dataflow-node-type">Third-Party</div>
+                            </div>
+                            <div class="dataflow-node" style="--node-color: var(--pink);">
+                                <div class="dataflow-node-icon">🍪</div>
+                                <div class="dataflow-node-name">Cookies</div>
+                                <div class="dataflow-node-type">Tracking</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Spacer for flow lines -->
+                        <div class="dataflow-spacer"></div>
+                        
+                        <!-- Privacy Engine Center -->
+                        <div class="dataflow-engine-wrapper">
+                            <div class="dataflow-engine">
+                                <div class="dataflow-engine-icon">🛡️</div>
+                                <div class="dataflow-engine-name">Privacy Engine</div>
+                                <div class="dataflow-engine-desc">Consent & Policy Enforcement</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Spacer for flow lines -->
+                        <div class="dataflow-spacer"></div>
+                        
+                        <!-- Destinations Column -->
+                        <div class="dataflow-column">
+                            <div class="dataflow-column-title">Destinations</div>
+                            <div class="dataflow-node" style="--node-color: var(--green);">
+                                <div class="dataflow-node-icon">💾</div>
+                                <div class="dataflow-node-name">Data Lake</div>
+                                <div class="status-indicator"><span class="status-dot allowed"></span><span style="font-size:9px;color:var(--green);">Allowed</span></div>
+                            </div>
+                            <div class="dataflow-node" style="--node-color: var(--yellow);">
+                                <div class="dataflow-node-icon">📊</div>
+                                <div class="dataflow-node-name">Analytics</div>
+                                <div class="status-indicator"><span class="status-dot consent"></span><span style="font-size:9px;color:var(--yellow);">Consent Req</span></div>
+                            </div>
+                            <div class="dataflow-node" style="--node-color: var(--red);">
+                                <div class="dataflow-node-icon">📢</div>
+                                <div class="dataflow-node-name">Ad Networks</div>
+                                <div class="status-indicator"><span class="status-dot blocked"></span><span style="font-size:9px;color:var(--red);">Blocked</span></div>
+                            </div>
+                            <div class="dataflow-node" style="--node-color: var(--green);">
+                                <div class="dataflow-node-icon">📧</div>
+                                <div class="dataflow-node-name">Email Service</div>
+                                <div class="status-indicator"><span class="status-dot allowed"></span><span style="font-size:9px;color:var(--green);">Allowed</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DSAR WORKFLOW -->
+        <section class="module" id="dsar">
+            <div class="module-header">
+                <div class="module-icon">📨</div>
+                <div class="module-info">
+                    <h2>DSAR Processing Workflow</h2>
+                    <p>Data Subject Access Request handling within 30-day deadline</p>
+                </div>
+            </div>
+            
+            <div class="dsar-workflow">
+                <div class="dsar-header">
+                    <div class="dsar-title">📋 Request Lifecycle</div>
+                    <div class="dsar-stats">
+                        <div class="dsar-stat"><div class="dsar-stat-dot" style="background: var(--blue);"></div> 47 In Progress</div>
+                        <div class="dsar-stat"><div class="dsar-stat-dot" style="background: var(--green);"></div> 1,234 Completed</div>
+                        <div class="dsar-stat"><div class="dsar-stat-dot" style="background: var(--yellow);"></div> 8 Pending Review</div>
+                    </div>
+                </div>
+                <div class="dsar-content">
+                    <div class="dsar-timeline">
+                        <div class="dsar-step" style="--step-color: var(--blue);">
+                            <div class="dsar-step-icon">📥</div>
+                            <div class="dsar-step-name">Request Received</div>
+                            <div class="dsar-step-time">Day 0</div>
+                        </div>
+                        <div class="dsar-step" style="--step-color: var(--violet);">
+                            <div class="dsar-step-icon">🔍</div>
+                            <div class="dsar-step-name">Identity Verification</div>
+                            <div class="dsar-step-time">Day 1-3</div>
+                        </div>
+                        <div class="dsar-step" style="--step-color: var(--cyan);">
+                            <div class="dsar-step-icon">📊</div>
+                            <div class="dsar-step-name">Data Discovery</div>
+                            <div class="dsar-step-time">Day 4-14</div>
+                        </div>
+                        <div class="dsar-step" style="--step-color: var(--yellow);">
+                            <div class="dsar-step-icon">👁️</div>
+                            <div class="dsar-step-name">Legal Review</div>
+                            <div class="dsar-step-time">Day 15-25</div>
+                        </div>
+                        <div class="dsar-step" style="--step-color: var(--green);">
+                            <div class="dsar-step-icon">📤</div>
+                            <div class="dsar-step-name">Response Delivered</div>
+                            <div class="dsar-step-time">Day 26-30</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CONSENT TYPES -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">🍪</div>
+                <div class="module-info">
+                    <h2>Consent Categories</h2>
+                    <p>Cookie and tracking consent management by purpose</p>
+                </div>
+            </div>
+            
+            <div class="consent-types">
+                <div class="consent-type" style="--type-color: var(--green);">
+                    <div class="consent-type-icon">⚙️</div>
+                    <div class="consent-type-name">Strictly Necessary</div>
+                    <span class="consent-type-status required">Always Active</span>
+                    <div class="consent-type-desc">Essential cookies for site functionality. Cannot be disabled. Authentication, shopping cart, security tokens.</div>
+                </div>
+                <div class="consent-type" style="--type-color: var(--blue);">
+                    <div class="consent-type-icon">📊</div>
+                    <div class="consent-type-name">Performance</div>
+                    <span class="consent-type-status optional">Consent Required</span>
+                    <div class="consent-type-desc">Analytics and site performance tracking. Google Analytics, page load metrics, error monitoring.</div>
+                </div>
+                <div class="consent-type" style="--type-color: var(--violet);">
+                    <div class="consent-type-icon">🎯</div>
+                    <div class="consent-type-name">Functional</div>
+                    <span class="consent-type-status optional">Consent Required</span>
+                    <div class="consent-type-desc">Personalization and enhanced features. Language preferences, chat widgets, social sharing.</div>
+                </div>
+                <div class="consent-type" style="--type-color: var(--yellow);">
+                    <div class="consent-type-icon">📢</div>
+                    <div class="consent-type-name">Targeting</div>
+                    <span class="consent-type-status optional">Consent Required</span>
+                    <div class="consent-type-desc">Advertising and retargeting cookies. Cross-site tracking, ad networks, marketing pixels.</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PRIVACY PRINCIPLES -->
+        <section class="module" id="principles">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Privacy by Design Principles</h2>
+                    <p>Seven foundational principles for building privacy into systems</p>
+                </div>
+            </div>
+            
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <div class="principle-number">1</div>
+                    <div class="principle-name">Proactive not Reactive</div>
+                    <div class="principle-desc">Anticipate and prevent privacy-invasive events before they happen. Privacy is built in, not bolted on.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-number">2</div>
+                    <div class="principle-name">Privacy as Default</div>
+                    <div class="principle-desc">Personal data is automatically protected. No action required from individuals to protect their privacy.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-number">3</div>
+                    <div class="principle-name">Privacy Embedded</div>
+                    <div class="principle-desc">Privacy is integral to system design, not a feature or add-on. Core component of functionality.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-number">4</div>
+                    <div class="principle-name">Full Functionality</div>
+                    <div class="principle-desc">Privacy and security are not trade-offs. Achieve both objectives without compromise.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-number">5</div>
+                    <div class="principle-name">End-to-End Security</div>
+                    <div class="principle-desc">Lifecycle protection from collection through deletion. Secure throughout data lifecycle.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-number">6</div>
+                    <div class="principle-name">Visibility & Transparency</div>
+                    <div class="principle-desc">Keep practices open to independent verification. Users can verify promises are kept.</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PIA PROCESS -->
+        <section class="module" id="pia">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Privacy Impact Assessment</h2>
+                    <p>Systematic evaluation of privacy risks for new projects</p>
+                </div>
+            </div>
+            
+            <div class="pia-container">
+                <div class="pia-header">
+                    <div class="pia-title">🔍 PIA Workflow</div>
+                </div>
+                <div class="pia-content">
+                    <div class="pia-steps">
+                        <div class="pia-step">
+                            <div class="pia-step-num">1</div>
+                            <div class="pia-step-name">Threshold Check</div>
+                            <div class="pia-step-desc">Determine if PIA required</div>
+                        </div>
+                        <div class="pia-step">
+                            <div class="pia-step-num">2</div>
+                            <div class="pia-step-name">Data Mapping</div>
+                            <div class="pia-step-desc">Identify data flows</div>
+                        </div>
+                        <div class="pia-step">
+                            <div class="pia-step-num">3</div>
+                            <div class="pia-step-name">Risk Analysis</div>
+                            <div class="pia-step-desc">Assess privacy risks</div>
+                        </div>
+                        <div class="pia-step">
+                            <div class="pia-step-num">4</div>
+                            <div class="pia-step-name">Mitigation</div>
+                            <div class="pia-step-desc">Define controls</div>
+                        </div>
+                        <div class="pia-step">
+                            <div class="pia-step-num">5</div>
+                            <div class="pia-step-name">Sign-Off</div>
+                            <div class="pia-step-desc">DPO approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Privacy program do's and don'ts</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Implement granular consent management with clear opt-in/opt-out options</li>
+                        <li>Automate DSAR processing to meet 30-day deadlines consistently</li>
+                        <li>Maintain comprehensive data inventories and processing records</li>
+                        <li>Conduct PIAs before launching new products or features</li>
+                        <li>Apply data minimization—collect only what's necessary</li>
+                        <li>Encrypt personal data at rest and in transit</li>
+                        <li>Train employees on privacy responsibilities annually</li>
+                        <li>Document legal basis for each data processing activity</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Use dark patterns to manipulate consent decisions</li>
+                        <li>Collect data "just in case" without specific purpose</li>
+                        <li>Share data with third parties without proper agreements</li>
+                        <li>Ignore data subject requests or miss response deadlines</li>
+                        <li>Rely on pre-checked consent boxes (opt-out patterns)</li>
+                        <li>Store personal data longer than necessary</li>
+                        <li>Assume one consent covers all processing purposes</li>
+                        <li>Process children's data without appropriate safeguards</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Privacy Platforms</h2>
+                    <p>Tools for managing privacy at scale</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">🔵</div>
+                        <div>
+                            <div class="tool-name">OneTrust</div>
+                            <div class="tool-category">Privacy Management</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Enterprise privacy platform with consent management, DSAR automation, and data mapping.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">🟣</div>
+                        <div>
+                            <div class="tool-name">BigID</div>
+                            <div class="tool-category">Data Discovery</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">AI-powered data discovery and classification for privacy compliance.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🟢</div>
+                        <div>
+                            <div class="tool-name">TrustArc</div>
+                            <div class="tool-category">Consent Platform</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Cookie consent management and privacy compliance automation.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">🟠</div>
+                        <div>
+                            <div class="tool-name">Cookiebot</div>
+                            <div class="tool-category">Cookie Consent</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Cookie scanning and consent banner management for websites.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #EC4899, #BE185D);">💗</div>
+                        <div>
+                            <div class="tool-name">Osano</div>
+                            <div class="tool-category">Privacy Platform</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Consent management with real-time privacy monitoring and vendor tracking.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">🔷</div>
+                        <div>
+                            <div class="tool-name">Transcend</div>
+                            <div class="tool-category">Data Rights</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Automated data subject request fulfillment across all systems.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);">🔴</div>
+                        <div>
+                            <div class="tool-name">Privitar</div>
+                            <div class="tool-category">Data Privacy</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Data anonymization and de-identification for analytics and AI.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #1F2937, #374151);">⚫</div>
+                        <div>
+                            <div class="tool-name">DataGrail</div>
+                            <div class="tool-category">Privacy Control</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Privacy control center with automated DSR processing.</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered privacy automation</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔒</div>
+                    <div class="agent-name">PrivacyGuard</div>
+                    <div class="agent-role">Data Protection Specialist</div>
+                    <div class="agent-desc">Automates privacy operations including consent management, DSAR processing, data discovery, and privacy impact assessments. Monitors data flows for policy violations and ensures timely response to data subject requests.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automated DSAR processing & fulfillment</li>
+                        <li>Consent preference enforcement</li>
+                        <li>Personal data discovery across systems</li>
+                        <li>Privacy impact assessment automation</li>
+                        <li>Data flow monitoring & alerts</li>
+                        <li>Retention policy enforcement</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Python</div>
+                        <div class="code-tab">Config</div>
+                        <div class="code-filename">privacy_agent.py</div>
+                    </div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain.tools <span class="code-keyword">import</span> Tool
+
+<span class="code-comment"># Define the Privacy Guard Agent</span>
+<span class="code-property">privacy_agent</span> = Agent(
+    <span class="code-property">role</span>=<span class="code-string">"Data Protection Specialist"</span>,
+    <span class="code-property">goal</span>=<span class="code-string">"""Process data subject requests and 
+    enforce privacy policies across systems"""</span>,
+    <span class="code-property">backstory</span>=<span class="code-string">"""Expert in GDPR, CCPA, and global 
+    privacy regulations with deep knowledge of 
+    consent management and data subject rights."""</span>,
+    <span class="code-property">tools</span>=[
+        data_discovery_tool,
+        consent_manager,
+        dsar_processor,
+        retention_enforcer
+    ],
+    <span class="code-property">verbose</span>=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># DSAR Processing Task</span>
+<span class="code-property">dsar_task</span> = Task(
+    <span class="code-property">description</span>=<span class="code-string">"""
+    1. Verify requester identity
+    2. Search all systems for personal data
+    3. Compile data package
+    4. Apply redactions for third-party data
+    5. Generate response within 30 days
+    """</span>,
+    <span class="code-property">agent</span>=privacy_agent,
+    <span class="code-property">expected_output</span>=<span class="code-string">"Complete DSAR response 
+    package with all personal data"</span>
+)
+
+<span class="code-comment"># Consent Enforcement Task</span>
+<span class="code-property">consent_task</span> = Task(
+    <span class="code-property">description</span>=<span class="code-string">"""
+    1. Monitor data flows in real-time
+    2. Check consent preferences per user
+    3. Block unauthorized data transfers
+    4. Log all enforcement actions
+    """</span>,
+    <span class="code-property">agent</span>=privacy_agent
+)
+
+<span class="code-comment"># Run the privacy crew</span>
+<span class="code-property">crew</span> = Crew(
+    <span class="code-property">agents</span>=[privacy_agent],
+    <span class="code-property">tasks</span>=[dsar_task, consent_task]
+)
+<span class="code-property">result</span> = crew.<span class="code-function">kickoff</span>()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat11-p1-compliance-frameworks.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">11.1 Compliance Frameworks</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 11.2</div>
+        <a href="cat11-p3-data-governance.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">11.3 Data Governance</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

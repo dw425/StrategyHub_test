@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversion | Migration Factory | Category 13 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #7C3AED;
+            --cat-light: #A78BFA;
+            --cat-dark: #6D28D9;
+            --cat-glow: rgba(124, 58, 237, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Overview Intro */
+        .overview-intro { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); }
+        .overview-text p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; }
+        .overview-highlights { display: flex; flex-direction: column; gap: var(--space-md); padding-left: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .highlight-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); background: var(--bg-card-alt); border-radius: var(--radius-lg); }
+        .highlight-icon { font-size: 24px; }
+        .highlight-value { font-size: var(--font-lg); font-weight: 700; color: var(--cat-light); display: block; }
+        .highlight-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           NEW PIPELINE VISUAL DESIGN - COMPACT
+        ═══════════════════════════════════════════════════════════════ */
+        .pipeline-visual { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); padding: var(--space-lg); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); }
+        .pipeline-stage { background: var(--bg-dark); border: 2px solid var(--stage-color); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; position: relative; }
+        .pipeline-stage:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .pipeline-stage::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; z-index: 10; }
+        .pipeline-stage:last-child::after { display: none; }
+        .pipeline-stage-number { background: var(--stage-color); color: white; font-size: 10px; font-weight: 700; padding: 3px 0; text-align: center; }
+        .pipeline-stage-content { padding: var(--space-md); text-align: center; border-bottom: 1px solid var(--border-color); }
+        .pipeline-stage-icon { font-size: 24px; margin-bottom: var(--space-xs); }
+        .pipeline-stage-title { font-size: var(--font-sm); font-weight: 700; color: var(--text-primary); }
+        .pipeline-stage-details { padding: var(--space-sm) var(--space-md); }
+        .pipeline-stage-details p { font-size: 10px; color: var(--text-secondary); margin-bottom: var(--space-xs); line-height: 1.4; }
+        .pipeline-stage-details ul { list-style: none; margin: 0; padding: 0; }
+        .pipeline-stage-details li { font-size: 10px; color: var(--text-muted); padding: 2px 0; padding-left: 12px; position: relative; }
+        .pipeline-stage-details li::before { content: '→'; position: absolute; left: 0; color: var(--stage-color); font-size: 10px; }
+        .pipeline-connector { display: none; }
+        
+        .pipeline-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .pipeline-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; }
+        .pipeline-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .pipeline-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 4px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CODE DIFF VIEW
+        ═══════════════════════════════════════════════════════════════ */
+        .diff-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .diff-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .diff-title { font-size: var(--font-sm); font-weight: 600; }
+        .diff-tabs { display: flex; gap: var(--space-sm); }
+        .diff-tab { padding: var(--space-xs) var(--space-md); font-size: var(--font-xs); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; }
+        .diff-tab:hover, .diff-tab.active { background: var(--cat-glow); border-color: var(--cat-primary); color: var(--cat-light); }
+        
+        .diff-body { display: grid; grid-template-columns: 1fr 1fr; }
+        .diff-pane { padding: 0; }
+        .diff-pane-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: var(--font-xs); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .diff-pane.source .diff-pane-header { color: var(--danger-red); border-right: 1px solid var(--border-color); }
+        .diff-pane.target .diff-pane-header { color: var(--success-green); }
+        .diff-pane-content { padding: var(--space-md); font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; line-height: 1.8; background: var(--bg-dark); min-height: 300px; overflow-x: auto; }
+        .diff-pane.source .diff-pane-content { border-right: 1px solid var(--border-color); }
+        
+        .diff-line { display: flex; }
+        .diff-line-num { width: 35px; color: var(--text-muted); text-align: right; padding-right: var(--space-sm); user-select: none; flex-shrink: 0; }
+        .diff-line-code { flex: 1; padding-left: var(--space-sm); }
+        .diff-line.removed { background: rgba(239, 68, 68, 0.1); }
+        .diff-line.removed .diff-line-code { color: var(--danger-red); }
+        .diff-line.added { background: rgba(16, 185, 129, 0.1); }
+        .diff-line.added .diff-line-code { color: var(--success-green); }
+        .diff-line.highlight { background: rgba(124, 58, 237, 0.1); }
+        
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        .code-comment { color: #6A737D; }
+        .code-number { color: #79C0FF; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TRANSFORMATION CALLOUTS
+        ═══════════════════════════════════════════════════════════════ */
+        .transform-callouts { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-top: var(--space-xl); }
+        .callout-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .callout-header h4 { font-size: var(--font-sm); font-weight: 600; margin: 0; }
+        .callout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border-color); }
+        .callout-item { background: var(--bg-card); padding: var(--space-lg); }
+        .callout-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; background: var(--cat-glow); color: var(--cat-light); border-radius: var(--radius-sm); margin-bottom: var(--space-sm); }
+        .callout-title { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); }
+        .callout-desc { font-size: var(--font-xs); color: var(--text-secondary); line-height: 1.6; }
+        .callout-desc code { background: var(--bg-dark); padding: 1px 6px; border-radius: var(--radius-sm); font-family: 'Monaco', monospace; font-size: 11px; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DIALECT MAPPING MATRIX
+        ═══════════════════════════════════════════════════════════════ */
+        .mapping-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .mapping-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .mapping-title { font-size: var(--font-sm); font-weight: 600; }
+        .mapping-body { padding: 0; overflow-x: auto; }
+        .mapping-table { width: 100%; border-collapse: collapse; font-size: var(--font-sm); }
+        .mapping-table th, .mapping-table td { padding: var(--space-md); text-align: left; border-bottom: 1px solid var(--border-color); }
+        .mapping-table th { background: var(--bg-card-alt); font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .mapping-table tr:last-child td { border-bottom: none; }
+        .mapping-table tr:hover td { background: var(--bg-card-alt); }
+        .mapping-category { font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+        .mapping-source { font-family: 'Monaco', monospace; font-size: var(--font-xs); color: var(--danger-red); background: rgba(239, 68, 68, 0.1); padding: 2px 6px; border-radius: var(--radius-sm); }
+        .mapping-target { font-family: 'Monaco', monospace; font-size: var(--font-xs); color: var(--success-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: var(--radius-sm); }
+        .mapping-auto { display: inline-flex; align-items: center; gap: 4px; font-size: var(--font-xs); padding: 2px 8px; border-radius: var(--radius-full); }
+        .mapping-auto.yes { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .mapping-auto.partial { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .mapping-auto.no { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .mapping-notes { font-size: var(--font-xs); color: var(--text-muted); max-width: 200px; }
+
+        /* Coverage Stats */
+        .coverage-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-top: var(--space-xl); }
+        .coverage-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); }
+        .coverage-stat-icon { font-size: 24px; font-weight: 700; }
+        .coverage-stat-info { flex: 1; }
+        .coverage-stat-value { font-size: var(--font-lg); font-weight: 700; }
+        .coverage-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .coverage-stat-pct { font-size: var(--font-xl); font-weight: 700; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONVERSION STATS DASHBOARD
+        ═══════════════════════════════════════════════════════════════ */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .stat-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .stat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); }
+        .stat-card-icon { font-size: 24px; }
+        .stat-card-trend { font-size: var(--font-xs); padding: 2px 8px; border-radius: var(--radius-full); }
+        .stat-card-trend.up { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .stat-card-trend.down { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .stat-card-value { font-size: var(--font-2xl); font-weight: 700; margin-bottom: var(--space-xs); }
+        .stat-card-value.green { color: var(--success-green); }
+        .stat-card-value.yellow { color: var(--warning-yellow); }
+        .stat-card-value.red { color: var(--danger-red); }
+        .stat-card-value.purple { color: var(--cat-light); }
+        .stat-card-label { font-size: var(--font-sm); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONVERSION RULES CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .rules-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .rule-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .rule-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); }
+        .rule-card-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .rule-card-icon { font-size: 24px; }
+        .rule-card-title { font-size: var(--font-base); font-weight: 600; }
+        .rule-card-count { margin-left: auto; font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-full); }
+        .rule-card-body { padding: var(--space-lg); }
+        .rule-card-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .rule-examples { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .rule-example { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); padding: var(--space-sm); background: var(--bg-dark); border-radius: var(--radius-md); }
+        .rule-from { color: var(--danger-red); font-family: 'Monaco', monospace; }
+        .rule-arrow { color: var(--text-muted); }
+        .rule-to { color: var(--success-green); font-family: 'Monaco', monospace; }
+        .rule-card-footer { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-color); }
+        .rule-coverage { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           EDGE CASES / MANUAL REVIEW TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .edge-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .edge-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .edge-title { font-size: var(--font-sm); font-weight: 600; }
+        .edge-count { font-size: var(--font-xs); color: var(--warning-yellow); }
+        .edge-body { padding: 0; }
+        .edge-table { width: 100%; border-collapse: collapse; }
+        .edge-table th, .edge-table td { padding: var(--space-md) var(--space-lg); text-align: left; border-bottom: 1px solid var(--border-color); font-size: var(--font-sm); }
+        .edge-table th { background: var(--bg-dark); font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .edge-table tr:last-child td { border-bottom: none; }
+        .edge-table tr:hover td { background: var(--bg-card-alt); }
+        .edge-pattern { font-family: 'Monaco', monospace; font-size: var(--font-xs); color: var(--warning-yellow); }
+        .edge-severity { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; }
+        .edge-severity.high { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .edge-severity.medium { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .edge-severity.low { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .edge-action { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* Resolution Tracking */
+        .resolution-tracking { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-top: var(--space-xl); }
+        .resolution-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .resolution-header h4 { font-size: var(--font-sm); font-weight: 600; margin: 0; }
+        .resolution-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-color); }
+        .resolution-item { background: var(--bg-card); padding: var(--space-xl); display: flex; align-items: center; gap: var(--space-lg); justify-content: center; }
+        .resolution-status { font-size: 24px; font-weight: 700; }
+        .resolution-status.resolved { color: var(--success-green); }
+        .resolution-status.in-progress { color: var(--warning-yellow); }
+        .resolution-status.pending { color: var(--text-muted); }
+        .resolution-count { font-size: var(--font-xl); font-weight: 700; }
+        .resolution-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PROGRESS TRACKER
+        ═══════════════════════════════════════════════════════════════ */
+        .progress-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .progress-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .progress-title { font-size: var(--font-sm); font-weight: 600; }
+        .progress-body { padding: var(--space-xl); }
+        .progress-bars { display: flex; flex-direction: column; gap: var(--space-lg); }
+        .progress-item { display: grid; grid-template-columns: 140px 1fr 80px; gap: var(--space-md); align-items: center; }
+        .progress-label { font-size: var(--font-sm); font-weight: 500; }
+        .progress-bar-track { height: 24px; background: var(--bg-card-alt); border-radius: var(--radius-md); overflow: hidden; position: relative; }
+        .progress-bar-fill { height: 100%; border-radius: var(--radius-md); transition: width 1s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: var(--space-sm); }
+        .progress-bar-fill.green { background: linear-gradient(90deg, #059669, var(--success-green)); }
+        .progress-bar-fill.yellow { background: linear-gradient(90deg, #D97706, var(--warning-yellow)); }
+        .progress-bar-fill.red { background: linear-gradient(90deg, #B91C1C, var(--danger-red)); }
+        .progress-bar-fill.purple { background: linear-gradient(90deg, var(--cat-dark), var(--cat-light)); }
+        .progress-bar-text { font-size: 10px; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .progress-count { font-size: var(--font-sm); color: var(--text-muted); text-align: right; }
+
+        /* Blockers Alert */
+        .blockers-alert { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger-red); border-radius: var(--radius-lg); overflow: hidden; margin-top: var(--space-xl); }
+        .blockers-alert-header { padding: var(--space-md) var(--space-lg); background: rgba(239, 68, 68, 0.2); display: flex; align-items: center; gap: var(--space-sm); }
+        .blockers-alert-icon { font-size: 18px; }
+        .blockers-alert-title { font-size: var(--font-sm); font-weight: 600; color: var(--danger-red); }
+        .blockers-alert-body { padding: var(--space-lg); }
+        .blockers-alert-body p { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); }
+        .blockers-actions { display: flex; gap: var(--space-md); }
+        .blocker-action { font-size: var(--font-xs); color: var(--text-muted); background: var(--bg-card); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(124,58,237,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .rules-grid { grid-template-columns: repeat(2, 1fr); }
+            .diff-body { grid-template-columns: 1fr; }
+            .overview-intro { grid-template-columns: 1fr; }
+            .overview-highlights { padding-left: 0; border-left: none; border-top: 1px solid var(--border-color); padding-top: var(--space-lg); flex-direction: row; flex-wrap: wrap; }
+            .pipeline-visual { grid-template-columns: repeat(3, 1fr); }
+            .pipeline-stage::after { display: none; }
+            .pipeline-metrics { grid-template-columns: repeat(2, 1fr); }
+            .callout-grid { grid-template-columns: 1fr; }
+            .coverage-stats { grid-template-columns: 1fr; }
+            .resolution-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .rules-grid { grid-template-columns: 1fr; }
+            .progress-item { grid-template-columns: 1fr; gap: var(--space-sm); }
+            .pipeline-metrics { grid-template-columns: 1fr; }
+            .pipeline-visual { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat13-migration-factory-overview.html">Migration Factory</a>
+        <span class="sep">/</span>
+        <span class="current">Conversion</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔄 Category 13</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat13-migration-factory-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat13-p1-assessment.html"><span class="nav-icon">📋</span> 13.1 Assessment</a></li>
+            <li><a href="cat13-p2-conversion.html" class="active"><span class="nav-icon">🔀</span> 13.2 Conversion</a></li>
+            <li><a href="cat13-p3-validation.html"><span class="nav-icon">✅</span> 13.3 Validation</a></li>
+            <li><a href="cat13-p4-cutover.html"><span class="nav-icon">🚀</span> 13.4 Cutover</a></li>
+            <li><a href="cat13-p5-wave-planning.html"><span class="nav-icon">📊</span> 13.5 Wave Planning</a></li>
+            <li><a href="cat13-p6-tooling.html"><span class="nav-icon">🛠️</span> 13.6 Tooling</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">🔀</span> Overview</a></li>
+            <li><a href="#pipeline"><span class="nav-icon">⚙️</span> Pipeline</a></li>
+            <li><a href="#diff"><span class="nav-icon">📝</span> Code Transform</a></li>
+            <li><a href="#mapping"><span class="nav-icon">🗺️</span> Dialect Mapping</a></li>
+            <li><a href="#rules"><span class="nav-icon">📐</span> Conversion Rules</a></li>
+            <li><a href="#progress"><span class="nav-icon">📊</span> Progress</a></li>
+            <li><a href="#edge"><span class="nav-icon">⚠️</span> Edge Cases</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔀 Page 13.2</span>
+                <h1>Conversion</h1>
+                <p>Automated SQL dialect transformation and code conversion pipelines for large-scale migration execution.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Auto-Convert Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">847K</div><div class="hero-metric-label">Lines Converted</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">234</div><div class="hero-metric-label">Conversion Rules</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">12</div><div class="hero-metric-label">Source Dialects</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">🔀</div>
+                <div class="module-info">
+                    <h2>Conversion Overview</h2>
+                    <p>Transforming source code to target platform syntax</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p><strong>Conversion</strong> is the core transformation engine of the migration factory. It takes source database objects—SQL queries, stored procedures, functions, and ETL jobs—and automatically transforms them into target platform syntax while preserving business logic and data integrity.</p>
+                    <p>The conversion process uses a combination of pattern-based rules, abstract syntax tree (AST) manipulation, and AI-assisted rewriting to achieve high automation rates. Objects are categorized by conversion complexity, with simple transformations fully automated and complex cases flagged for manual review.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">⚡</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">500/hr</span>
+                            <span class="highlight-label">Objects Converted</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🎯</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">98.5%</span>
+                            <span class="highlight-label">Syntax Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔧</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">15%</span>
+                            <span class="highlight-label">Manual Review</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Conversion Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-icon">✅</span>
+                        <span class="stat-card-trend up">↑ 3%</span>
+                    </div>
+                    <div class="stat-card-value green">10,920</div>
+                    <div class="stat-card-label">Auto-Converted</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-icon">👁️</span>
+                        <span class="stat-card-trend down">↓ 12</span>
+                    </div>
+                    <div class="stat-card-value yellow">1,478</div>
+                    <div class="stat-card-label">Needs Review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-icon">✏️</span>
+                    </div>
+                    <div class="stat-card-value red">449</div>
+                    <div class="stat-card-label">Manual Rewrite</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-icon">⏳</span>
+                    </div>
+                    <div class="stat-card-value purple">2,341</div>
+                    <div class="stat-card-label">In Queue</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 2: PIPELINE -->
+        <section class="module" id="pipeline">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Conversion Pipeline</h2>
+                    <p>Five-stage automated transformation process</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The conversion pipeline processes source code through five distinct stages, each building on the previous. The architecture is designed for <strong>parallelization</strong>—thousands of objects can be processed simultaneously while maintaining dependency order and conflict resolution.</p>
+                    <p>Each stage produces artifacts that feed the next stage, with comprehensive logging and rollback capability. Failed conversions are automatically retried with alternative strategies before being flagged for manual review.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔄</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">Parallel</span>
+                            <span class="highlight-label">Processing Model</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔁</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">3 retries</span>
+                            <span class="highlight-label">Auto-Recovery</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pipeline Visual -->
+            <div class="pipeline-visual">
+                <div class="pipeline-stage" style="--stage-color: var(--danger-red);">
+                    <div class="pipeline-stage-number">1</div>
+                    <div class="pipeline-stage-content">
+                        <div class="pipeline-stage-icon">📥</div>
+                        <div class="pipeline-stage-title">Input</div>
+                    </div>
+                    <div class="pipeline-stage-details">
+                        <p>Ingest source DDL and code from assessment.</p>
+                        <ul>
+                            <li>Extract from catalog</li>
+                            <li>Normalize UTF-8</li>
+                            <li>Parse dependencies</li>
+                            <li>Queue by complexity</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pipeline-stage" style="--stage-color: var(--orange);">
+                    <div class="pipeline-stage-number">2</div>
+                    <div class="pipeline-stage-content">
+                        <div class="pipeline-stage-icon">🌳</div>
+                        <div class="pipeline-stage-title">Parse</div>
+                    </div>
+                    <div class="pipeline-stage-details">
+                        <p>Build AST for structural analysis.</p>
+                        <ul>
+                            <li>Tokenize source</li>
+                            <li>Build AST nodes</li>
+                            <li>Identify constructs</li>
+                            <li>Map data types</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pipeline-stage" style="--stage-color: var(--cat-primary);">
+                    <div class="pipeline-stage-number">3</div>
+                    <div class="pipeline-stage-content">
+                        <div class="pipeline-stage-icon">🔀</div>
+                        <div class="pipeline-stage-title">Transform</div>
+                    </div>
+                    <div class="pipeline-stage-details">
+                        <p>Apply rules to convert dialect.</p>
+                        <ul>
+                            <li>Match patterns</li>
+                            <li>Apply transforms</li>
+                            <li>Handle edge cases</li>
+                            <li>Preserve semantics</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pipeline-stage" style="--stage-color: var(--cyan);">
+                    <div class="pipeline-stage-number">4</div>
+                    <div class="pipeline-stage-content">
+                        <div class="pipeline-stage-icon">⚡</div>
+                        <div class="pipeline-stage-title">Optimize</div>
+                    </div>
+                    <div class="pipeline-stage-details">
+                        <p>Apply platform best practices.</p>
+                        <ul>
+                            <li>Partition hints</li>
+                            <li>Optimize joins</li>
+                            <li>Vectorize ops</li>
+                            <li>Apply caching</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pipeline-stage" style="--stage-color: var(--success-green);">
+                    <div class="pipeline-stage-number">5</div>
+                    <div class="pipeline-stage-content">
+                        <div class="pipeline-stage-icon">📤</div>
+                        <div class="pipeline-stage-title">Output</div>
+                    </div>
+                    <div class="pipeline-stage-details">
+                        <p>Generate final target code.</p>
+                        <ul>
+                            <li>Regenerate SQL</li>
+                            <li>Format & lint</li>
+                            <li>Generate docs</li>
+                            <li>Package deploy</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pipeline Metrics -->
+            <div class="pipeline-metrics">
+                <div class="pipeline-metric">
+                    <div class="pipeline-metric-value">2.3s</div>
+                    <div class="pipeline-metric-label">Avg Time per Object</div>
+                </div>
+                <div class="pipeline-metric">
+                    <div class="pipeline-metric-value">32</div>
+                    <div class="pipeline-metric-label">Parallel Workers</div>
+                </div>
+                <div class="pipeline-metric">
+                    <div class="pipeline-metric-value">99.2%</div>
+                    <div class="pipeline-metric-label">Pipeline Success Rate</div>
+                </div>
+                <div class="pipeline-metric">
+                    <div class="pipeline-metric-value">847K</div>
+                    <div class="pipeline-metric-label">Lines Processed Today</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 3: CODE DIFF VIEW -->
+        <section class="module" id="diff">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Code Transformation</h2>
+                    <p>Side-by-side source and target comparison</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The transformation engine analyzes source code structure and applies intelligent conversions that preserve business logic while adapting to target platform idioms. Below is a real example showing how an Oracle PL/SQL procedure becomes a Databricks SQL function.</p>
+                    <p><strong>Why this matters:</strong> Manual conversion of 1,923 stored procedures would take an estimated 7,700+ developer hours. Automated conversion with AI-assisted review reduces this to under 800 hours—a <strong>90% time savings</strong>.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">⏱️</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">90%</span>
+                            <span class="highlight-label">Time Saved</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🎯</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">100%</span>
+                            <span class="highlight-label">Logic Preserved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="diff-container">
+                <div class="diff-header">
+                    <div class="diff-title">SQL Dialect Transformation: Oracle → Databricks</div>
+                    <div class="diff-tabs">
+                        <div class="diff-tab active">Stored Procedure</div>
+                        <div class="diff-tab">Function</div>
+                        <div class="diff-tab">Query</div>
+                    </div>
+                </div>
+                <div class="diff-body">
+                    <div class="diff-pane source">
+                        <div class="diff-pane-header">
+                            <span>●</span> Source: Oracle PL/SQL
+                        </div>
+                        <div class="diff-pane-content">
+                            <div class="diff-line removed"><span class="diff-line-num">1</span><span class="diff-line-code"><span class="code-keyword">CREATE OR REPLACE PROCEDURE</span> calc_revenue</span></div>
+                            <div class="diff-line removed"><span class="diff-line-num">2</span><span class="diff-line-code">  (p_year <span class="code-keyword">IN</span> <span class="code-function">NUMBER</span>, p_result <span class="code-keyword">OUT</span> <span class="code-function">SYS_REFCURSOR</span>)</span></div>
+                            <div class="diff-line removed"><span class="diff-line-num">3</span><span class="diff-line-code"><span class="code-keyword">AS</span></span></div>
+                            <div class="diff-line"><span class="diff-line-num">4</span><span class="diff-line-code"><span class="code-keyword">BEGIN</span></span></div>
+                            <div class="diff-line removed"><span class="diff-line-num">5</span><span class="diff-line-code">  <span class="code-keyword">OPEN</span> p_result <span class="code-keyword">FOR</span></span></div>
+                            <div class="diff-line"><span class="diff-line-num">6</span><span class="diff-line-code">  <span class="code-keyword">SELECT</span></span></div>
+                            <div class="diff-line"><span class="diff-line-num">7</span><span class="diff-line-code">    region,</span></div>
+                            <div class="diff-line removed"><span class="diff-line-num">8</span><span class="diff-line-code">    <span class="code-function">NVL</span>(revenue, <span class="code-number">0</span>) <span class="code-keyword">AS</span> revenue,</span></div>
+                            <div class="diff-line removed"><span class="diff-line-num">9</span><span class="diff-line-code">    <span class="code-function">TO_CHAR</span>(sale_date, <span class="code-string">'YYYY-MM'</span>) <span class="code-keyword">AS</span> month</span></div>
+                            <div class="diff-line"><span class="diff-line-num">10</span><span class="diff-line-code">  <span class="code-keyword">FROM</span> sales</span></div>
+                            <div class="diff-line removed"><span class="diff-line-num">11</span><span class="diff-line-code">  <span class="code-keyword">WHERE</span> <span class="code-function">EXTRACT</span>(<span class="code-keyword">YEAR FROM</span> sale_date) = p_year;</span></div>
+                            <div class="diff-line"><span class="diff-line-num">12</span><span class="diff-line-code"><span class="code-keyword">END</span>;</span></div>
+                        </div>
+                    </div>
+                    <div class="diff-pane target">
+                        <div class="diff-pane-header">
+                            <span>●</span> Target: Databricks SQL
+                        </div>
+                        <div class="diff-pane-content">
+                            <div class="diff-line added"><span class="diff-line-num">1</span><span class="diff-line-code"><span class="code-keyword">CREATE OR REPLACE FUNCTION</span> calc_revenue</span></div>
+                            <div class="diff-line added"><span class="diff-line-num">2</span><span class="diff-line-code">  (p_year <span class="code-function">INT</span>)</span></div>
+                            <div class="diff-line added"><span class="diff-line-num">3</span><span class="diff-line-code"><span class="code-keyword">RETURNS TABLE</span></span></div>
+                            <div class="diff-line"><span class="diff-line-num">4</span><span class="diff-line-code"><span class="code-keyword">RETURN</span></span></div>
+                            <div class="diff-line added"><span class="diff-line-num">5</span><span class="diff-line-code">  </span></div>
+                            <div class="diff-line"><span class="diff-line-num">6</span><span class="diff-line-code">  <span class="code-keyword">SELECT</span></span></div>
+                            <div class="diff-line"><span class="diff-line-num">7</span><span class="diff-line-code">    region,</span></div>
+                            <div class="diff-line added"><span class="diff-line-num">8</span><span class="diff-line-code">    <span class="code-function">COALESCE</span>(revenue, <span class="code-number">0</span>) <span class="code-keyword">AS</span> revenue,</span></div>
+                            <div class="diff-line added"><span class="diff-line-num">9</span><span class="diff-line-code">    <span class="code-function">DATE_FORMAT</span>(sale_date, <span class="code-string">'yyyy-MM'</span>) <span class="code-keyword">AS</span> month</span></div>
+                            <div class="diff-line"><span class="diff-line-num">10</span><span class="diff-line-code">  <span class="code-keyword">FROM</span> sales</span></div>
+                            <div class="diff-line added"><span class="diff-line-num">11</span><span class="diff-line-code">  <span class="code-keyword">WHERE</span> <span class="code-function">YEAR</span>(sale_date) = p_year;</span></div>
+                            <div class="diff-line"><span class="diff-line-num">12</span><span class="diff-line-code"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transformation Callouts -->
+            <div class="transform-callouts">
+                <div class="callout-header">
+                    <h4>🔍 Key Transformations Explained</h4>
+                </div>
+                <div class="callout-grid">
+                    <div class="callout-item">
+                        <div class="callout-badge">Lines 1-3</div>
+                        <div class="callout-title">Procedure → Table Function</div>
+                        <div class="callout-desc">Oracle's <code>PROCEDURE</code> with <code>SYS_REFCURSOR OUT</code> parameter becomes a Databricks <code>FUNCTION RETURNS TABLE</code>. This is a structural transformation—the procedure's cursor-based output is replaced with a direct table return, which is more idiomatic for Spark SQL and enables better query optimization.</div>
+                    </div>
+                    <div class="callout-item">
+                        <div class="callout-badge">Line 2</div>
+                        <div class="callout-title">NUMBER → INT</div>
+                        <div class="callout-desc">Oracle's <code>NUMBER</code> type maps to Databricks <code>INT</code> for whole numbers. The conversion engine analyzes usage context to choose the appropriate numeric type (INT, BIGINT, DECIMAL, DOUBLE).</div>
+                    </div>
+                    <div class="callout-item">
+                        <div class="callout-badge">Line 8</div>
+                        <div class="callout-title">NVL → COALESCE</div>
+                        <div class="callout-desc">Oracle's proprietary <code>NVL()</code> function converts to ANSI-standard <code>COALESCE()</code>. COALESCE is more portable and supports multiple fallback values, making the code more maintainable.</div>
+                    </div>
+                    <div class="callout-item">
+                        <div class="callout-badge">Line 9</div>
+                        <div class="callout-title">TO_CHAR → DATE_FORMAT</div>
+                        <div class="callout-desc">Date formatting syntax changes from Oracle's <code>TO_CHAR(date, 'YYYY-MM')</code> to Spark's <code>DATE_FORMAT(date, 'yyyy-MM')</code>. Note the lowercase format specifiers—the engine handles these subtle differences automatically.</div>
+                    </div>
+                    <div class="callout-item">
+                        <div class="callout-badge">Line 11</div>
+                        <div class="callout-title">EXTRACT → YEAR()</div>
+                        <div class="callout-desc">While EXTRACT is ANSI SQL, Databricks' native <code>YEAR()</code> function is more performant and commonly used. The optimizer recognizes this pattern and applies the idiomatic replacement.</div>
+                    </div>
+                    <div class="callout-item">
+                        <div class="callout-badge">Line 5</div>
+                        <div class="callout-title">OPEN CURSOR → Removed</div>
+                        <div class="callout-desc">The <code>OPEN p_result FOR</code> cursor operation is eliminated entirely. Table functions in Databricks return results directly without cursor management, simplifying the code and improving performance.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 4: DIALECT MAPPING -->
+        <section class="module" id="mapping">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Dialect Mapping</h2>
+                    <p>Function and syntax translation rules</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The dialect mapping library contains <strong>234 translation rules</strong> covering functions, operators, data types, and procedural constructs. Each rule specifies how source patterns map to target equivalents, including parameter reordering, syntax restructuring, and semantic adjustments.</p>
+                    <p>Rules are prioritized by specificity—more specific patterns match first, allowing general fallbacks for edge cases. The library is continuously updated as new patterns are discovered during migration execution.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📚</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">234</span>
+                            <span class="highlight-label">Active Rules</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🎯</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">92%</span>
+                            <span class="highlight-label">Auto-Convert</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mapping-container">
+                <div class="mapping-header">
+                    <div class="mapping-title">Oracle → Databricks Function Mapping</div>
+                </div>
+                <div class="mapping-body">
+                    <table class="mapping-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Source (Oracle)</th>
+                                <th>Target (Databricks)</th>
+                                <th>Auto</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="mapping-category">📅 Date Functions</span></td>
+                                <td><span class="mapping-source">SYSDATE</span></td>
+                                <td><span class="mapping-target">CURRENT_TIMESTAMP()</span></td>
+                                <td><span class="mapping-auto yes">✓ Auto</span></td>
+                                <td class="mapping-notes">Direct replacement</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="mapping-source">TO_DATE(str, fmt)</span></td>
+                                <td><span class="mapping-target">TO_DATE(str, fmt)</span></td>
+                                <td><span class="mapping-auto partial">~ Partial</span></td>
+                                <td class="mapping-notes">Format string translation needed</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="mapping-source">ADD_MONTHS(d, n)</span></td>
+                                <td><span class="mapping-target">ADD_MONTHS(d, n)</span></td>
+                                <td><span class="mapping-auto yes">✓ Auto</span></td>
+                                <td class="mapping-notes">Direct 1:1 mapping</td>
+                            </tr>
+                            <tr>
+                                <td><span class="mapping-category">🔤 String Functions</span></td>
+                                <td><span class="mapping-source">NVL(a, b)</span></td>
+                                <td><span class="mapping-target">COALESCE(a, b)</span></td>
+                                <td><span class="mapping-auto yes">✓ Auto</span></td>
+                                <td class="mapping-notes">Standard SQL equivalent</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="mapping-source">SUBSTR(s, p, l)</span></td>
+                                <td><span class="mapping-target">SUBSTRING(s, p, l)</span></td>
+                                <td><span class="mapping-auto yes">✓ Auto</span></td>
+                                <td class="mapping-notes">Function rename only</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="mapping-source">DECODE(a,b,c,...)</span></td>
+                                <td><span class="mapping-target">CASE WHEN a=b THEN c...</span></td>
+                                <td><span class="mapping-auto partial">~ Partial</span></td>
+                                <td class="mapping-notes">Structure transformation</td>
+                            </tr>
+                            <tr>
+                                <td><span class="mapping-category">🔢 Numeric Functions</span></td>
+                                <td><span class="mapping-source">TRUNC(n, d)</span></td>
+                                <td><span class="mapping-target">TRUNCATE(n, d)</span></td>
+                                <td><span class="mapping-auto yes">✓ Auto</span></td>
+                                <td class="mapping-notes">Function rename only</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="mapping-source">MOD(a, b)</span></td>
+                                <td><span class="mapping-target">a % b</span></td>
+                                <td><span class="mapping-auto yes">✓ Auto</span></td>
+                                <td class="mapping-notes">Operator conversion</td>
+                            </tr>
+                            <tr>
+                                <td><span class="mapping-category">⚙️ Procedural</span></td>
+                                <td><span class="mapping-source">SYS_REFCURSOR</span></td>
+                                <td><span class="mapping-target">RETURNS TABLE</span></td>
+                                <td><span class="mapping-auto partial">~ Partial</span></td>
+                                <td class="mapping-notes">Restructure procedure</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="mapping-source">DBMS_OUTPUT.PUT_LINE</span></td>
+                                <td><span class="mapping-target">-- (removed)</span></td>
+                                <td><span class="mapping-auto no">✗ Manual</span></td>
+                                <td class="mapping-notes">No direct equivalent, remove or log</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Coverage Stats -->
+            <div class="coverage-stats">
+                <div class="coverage-stat">
+                    <div class="coverage-stat-icon" style="color: var(--success-green);">✓</div>
+                    <div class="coverage-stat-info">
+                        <div class="coverage-stat-value">178</div>
+                        <div class="coverage-stat-label">Fully Automated</div>
+                    </div>
+                    <div class="coverage-stat-pct">76%</div>
+                </div>
+                <div class="coverage-stat">
+                    <div class="coverage-stat-icon" style="color: var(--warning-yellow);">~</div>
+                    <div class="coverage-stat-info">
+                        <div class="coverage-stat-value">38</div>
+                        <div class="coverage-stat-label">Semi-Automated</div>
+                    </div>
+                    <div class="coverage-stat-pct">16%</div>
+                </div>
+                <div class="coverage-stat">
+                    <div class="coverage-stat-icon" style="color: var(--danger-red);">✗</div>
+                    <div class="coverage-stat-info">
+                        <div class="coverage-stat-value">18</div>
+                        <div class="coverage-stat-label">Manual Required</div>
+                    </div>
+                    <div class="coverage-stat-pct">8%</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 5: CONVERSION RULES -->
+        <section class="module" id="rules">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Conversion Rules</h2>
+                    <p>Pattern-based transformation categories</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Conversion rules are organized into three categories based on transformation complexity. <strong>Syntax rules</strong> handle direct text substitutions, <strong>function rules</strong> manage parameter reordering and semantic changes, and <strong>procedural rules</strong> restructure control flow and program architecture.</p>
+                    <p>Each rule is tested against a corpus of 10,000+ real-world code samples to ensure accuracy. Rules include both the transformation logic and regression tests to prevent breaking changes when the rule library is updated.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🧪</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">10K+</span>
+                            <span class="highlight-label">Test Samples</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">✅</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">99.8%</span>
+                            <span class="highlight-label">Rule Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-card-header">
+                        <span class="rule-card-icon">🔤</span>
+                        <span class="rule-card-title">Syntax Rules</span>
+                        <span class="rule-card-count">78 rules</span>
+                    </div>
+                    <div class="rule-card-body">
+                        <div class="rule-card-desc">Direct syntax transformations including keyword changes, operator replacements, and statement restructuring. These are deterministic 1:1 mappings with no semantic analysis required.</div>
+                        <div class="rule-examples">
+                            <div class="rule-example">
+                                <span class="rule-from">VARCHAR2</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">STRING</span>
+                            </div>
+                            <div class="rule-example">
+                                <span class="rule-from">NUMBER(10,2)</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">DECIMAL(10,2)</span>
+                            </div>
+                            <div class="rule-example">
+                                <span class="rule-from">||</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">CONCAT()</span>
+                            </div>
+                        </div>
+                        <div class="rule-card-footer">
+                            <span class="rule-coverage">Coverage: 100% automated</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-card-header">
+                        <span class="rule-card-icon">⚡</span>
+                        <span class="rule-card-title">Function Rules</span>
+                        <span class="rule-card-count">124 rules</span>
+                    </div>
+                    <div class="rule-card-body">
+                        <div class="rule-card-desc">Built-in function translations for date, string, numeric, and conversion operations. Some require parameter reordering or semantic adjustments for edge cases.</div>
+                        <div class="rule-examples">
+                            <div class="rule-example">
+                                <span class="rule-from">NVL()</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">COALESCE()</span>
+                            </div>
+                            <div class="rule-example">
+                                <span class="rule-from">TO_CHAR()</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">DATE_FORMAT()</span>
+                            </div>
+                            <div class="rule-example">
+                                <span class="rule-from">INSTR()</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">LOCATE()</span>
+                            </div>
+                        </div>
+                        <div class="rule-card-footer">
+                            <span class="rule-coverage">Coverage: 94% automated</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-card-header">
+                        <span class="rule-card-icon">🔧</span>
+                        <span class="rule-card-title">Procedural Rules</span>
+                        <span class="rule-card-count">32 rules</span>
+                    </div>
+                    <div class="rule-card-body">
+                        <div class="rule-card-desc">PL/SQL to Spark SQL transformations for loops, cursors, exception handling, and control flow. Most complex category requiring structural rewrites.</div>
+                        <div class="rule-examples">
+                            <div class="rule-example">
+                                <span class="rule-from">FOR..LOOP</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">WHILE/CTE</span>
+                            </div>
+                            <div class="rule-example">
+                                <span class="rule-from">CURSOR</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">Temp View</span>
+                            </div>
+                            <div class="rule-example">
+                                <span class="rule-from">EXCEPTION</span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-to">TRY/CATCH</span>
+                            </div>
+                        </div>
+                        <div class="rule-card-footer">
+                            <span class="rule-coverage">Coverage: 68% automated</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 6: PROGRESS -->
+        <section class="module" id="progress">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Conversion Progress</h2>
+                    <p>Real-time conversion status by object type</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Progress is tracked at multiple levels: overall migration, wave-level, and individual object. The dashboard below shows current conversion status by object type, highlighting areas that need attention.</p>
+                    <p><strong>Color coding:</strong> Green (≥85%) indicates on-track completion, yellow (60-84%) requires monitoring, and red (&lt;60%) signals blockers that need immediate attention.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📈</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">72%</span>
+                            <span class="highlight-label">Overall Progress</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">⏰</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">8 days</span>
+                            <span class="highlight-label">Est. Remaining</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-header">
+                    <div class="progress-title">Conversion Status by Object Type</div>
+                </div>
+                <div class="progress-body">
+                    <div class="progress-bars">
+                        <div class="progress-item">
+                            <div class="progress-label">Tables</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill green" style="width: 94%;">
+                                    <span class="progress-bar-text">94%</span>
+                                </div>
+                            </div>
+                            <div class="progress-count">3,977 / 4,231</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">Views</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill green" style="width: 88%;">
+                                    <span class="progress-bar-text">88%</span>
+                                </div>
+                            </div>
+                            <div class="progress-count">2,505 / 2,847</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">Stored Procedures</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill yellow" style="width: 72%;">
+                                    <span class="progress-bar-text">72%</span>
+                                </div>
+                            </div>
+                            <div class="progress-count">1,385 / 1,923</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">Functions</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill yellow" style="width: 68%;">
+                                    <span class="progress-bar-text">68%</span>
+                                </div>
+                            </div>
+                            <div class="progress-count">990 / 1,456</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">ETL Pipelines</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill red" style="width: 45%;">
+                                    <span class="progress-bar-text">45%</span>
+                                </div>
+                            </div>
+                            <div class="progress-count">389 / 864</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">Scheduled Jobs</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill yellow" style="width: 58%;">
+                                    <span class="progress-bar-text">58%</span>
+                                </div>
+                            </div>
+                            <div class="progress-count">368 / 634</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blockers Alert -->
+            <div class="blockers-alert">
+                <div class="blockers-alert-header">
+                    <span class="blockers-alert-icon">⚠️</span>
+                    <span class="blockers-alert-title">ETL Pipelines Below Target</span>
+                </div>
+                <div class="blockers-alert-body">
+                    <p>ETL conversion is at 45% due to complex Informatica mappings with custom Java transformations. The team has prioritized these for manual review starting Monday.</p>
+                    <div class="blockers-actions">
+                        <span class="blocker-action">12 mappings assigned to Senior Dev</span>
+                        <span class="blocker-action">Expected completion: +4 days</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 7: EDGE CASES -->
+        <section class="module" id="edge">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Edge Cases & Manual Review</h2>
+                    <p>Patterns requiring human intervention</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Not all code can be automatically converted. The conversion engine identifies patterns that are too complex, ambiguous, or platform-specific for automated handling. These are flagged for manual review by experienced engineers.</p>
+                    <p>Edge cases are prioritized by <strong>severity</strong> (impact on migration success) and <strong>frequency</strong> (how many objects are affected). High-severity items are addressed first to unblock dependent conversions.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔴</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">449</span>
+                            <span class="highlight-label">Manual Review</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">⏱️</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">~4 hrs</span>
+                            <span class="highlight-label">Avg Resolution</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="edge-container">
+                <div class="edge-header">
+                    <div class="edge-title">Flagged Conversion Patterns</div>
+                    <div class="edge-count">449 objects require manual review</div>
+                </div>
+                <div class="edge-body">
+                    <table class="edge-table">
+                        <thead>
+                            <tr>
+                                <th>Pattern</th>
+                                <th>Count</th>
+                                <th>Severity</th>
+                                <th>Issue</th>
+                                <th>Recommended Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="edge-pattern">DBMS_SQL.*</span></td>
+                                <td>89</td>
+                                <td><span class="edge-severity high">High</span></td>
+                                <td>Dynamic SQL package</td>
+                                <td class="edge-action">Rewrite using prepared statements</td>
+                            </tr>
+                            <tr>
+                                <td><span class="edge-pattern">UTL_FILE.*</span></td>
+                                <td>67</td>
+                                <td><span class="edge-severity high">High</span></td>
+                                <td>File I/O operations</td>
+                                <td class="edge-action">Replace with cloud storage APIs</td>
+                            </tr>
+                            <tr>
+                                <td><span class="edge-pattern">CONNECT BY</span></td>
+                                <td>124</td>
+                                <td><span class="edge-severity medium">Medium</span></td>
+                                <td>Hierarchical query</td>
+                                <td class="edge-action">Convert to recursive CTE</td>
+                            </tr>
+                            <tr>
+                                <td><span class="edge-pattern">MODEL clause</span></td>
+                                <td>23</td>
+                                <td><span class="edge-severity high">High</span></td>
+                                <td>Spreadsheet-style calculations</td>
+                                <td class="edge-action">Rewrite using window functions</td>
+                            </tr>
+                            <tr>
+                                <td><span class="edge-pattern">BULK COLLECT</span></td>
+                                <td>78</td>
+                                <td><span class="edge-severity medium">Medium</span></td>
+                                <td>Batch processing</td>
+                                <td class="edge-action">Use DataFrame operations</td>
+                            </tr>
+                            <tr>
+                                <td><span class="edge-pattern">AUTONOMOUS_TRANSACTION</span></td>
+                                <td>34</td>
+                                <td><span class="edge-severity low">Low</span></td>
+                                <td>Independent transaction</td>
+                                <td class="edge-action">Restructure as separate job</td>
+                            </tr>
+                            <tr>
+                                <td><span class="edge-pattern">REF CURSOR</span></td>
+                                <td>34</td>
+                                <td><span class="edge-severity medium">Medium</span></td>
+                                <td>Dynamic result sets</td>
+                                <td class="edge-action">Return TABLE type instead</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Resolution Tracking -->
+            <div class="resolution-tracking">
+                <div class="resolution-header">
+                    <h4>📋 Resolution Progress</h4>
+                </div>
+                <div class="resolution-grid">
+                    <div class="resolution-item">
+                        <div class="resolution-status resolved">✓</div>
+                        <div class="resolution-info">
+                            <div class="resolution-count">127</div>
+                            <div class="resolution-label">Resolved</div>
+                        </div>
+                    </div>
+                    <div class="resolution-item">
+                        <div class="resolution-status in-progress">◐</div>
+                        <div class="resolution-info">
+                            <div class="resolution-count">89</div>
+                            <div class="resolution-label">In Progress</div>
+                        </div>
+                    </div>
+                    <div class="resolution-item">
+                        <div class="resolution-status pending">○</div>
+                        <div class="resolution-info">
+                            <div class="resolution-count">233</div>
+                            <div class="resolution-label">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 8: AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered code conversion automation</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔀</div>
+                    <div class="agent-name">ConversionAgent</div>
+                    <div class="agent-role">Automated Code Transformation</div>
+                    <p class="agent-desc">Leverages LLMs and rule engines to automatically convert source database code to target platform syntax while preserving business logic and optimizing for performance.</p>
+                    <ul class="agent-capabilities">
+                        <li>SQL dialect translation (12+ source dialects)</li>
+                        <li>Stored procedure conversion</li>
+                        <li>Function mapping and rewriting</li>
+                        <li>ETL pipeline transformation</li>
+                        <li>Performance optimization hints</li>
+                        <li>Edge case flagging for review</li>
+                        <li>Batch processing at scale</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">conversion_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Conversion Agent with SQL Transformation</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Tool
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> sqlglot <span class="code-keyword">import</span> transpile
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># SQL Transpiler Tool</span>
+sql_transpiler = Tool(
+    name=<span class="code-string">"sql_transpiler"</span>,
+    description=<span class="code-string">"Converts SQL between dialects using 
+    rule-based transformation engine"</span>,
+    func=<span class="code-keyword">lambda</span> sql: transpile(
+        sql, 
+        read=<span class="code-string">"oracle"</span>, 
+        write=<span class="code-string">"databricks"</span>
+    )[<span class="code-number">0</span>]
+)
+
+<span class="code-comment"># AI Rewriter for complex cases</span>
+ai_rewriter = Tool(
+    name=<span class="code-string">"ai_rewriter"</span>,
+    description=<span class="code-string">"Uses LLM to rewrite complex PL/SQL 
+    patterns that rule engine can't handle"</span>,
+    func=rewrite_with_llm
+)
+
+<span class="code-comment"># Edge Case Detector</span>
+edge_detector = Tool(
+    name=<span class="code-string">"edge_detector"</span>,
+    description=<span class="code-string">"Identifies patterns requiring 
+    manual review and flags for human attention"</span>,
+    func=detect_edge_cases
+)
+
+conversion_agent = Agent(
+    role=<span class="code-string">"SQL Conversion Specialist"</span>,
+    goal=<span class="code-string">"Transform source SQL to target dialect 
+    with maximum automation and accuracy"</span>,
+    backstory=<span class="code-string">"""Expert database engineer skilled at 
+    converting legacy SQL across platforms while 
+    preserving logic and optimizing performance."""</span>,
+    llm=llm,
+    tools=[sql_transpiler, ai_rewriter, edge_detector],
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat13-p1-assessment.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">13.1: Assessment</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 13</div>
+        <a href="cat13-p3-validation.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">13.3: Validation</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

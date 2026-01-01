@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration Strategies | Cloud Platforms | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #0EA5E9;
+            --cat-light: #38BDF8;
+            --cat-dark: #0284C7;
+            --cat-glow: rgba(14, 165, 233, 0.15);
+            --page-primary: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* 6Rs Cards */
+        .six-rs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .r-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 16px; padding: 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .r-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+        .r-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .r-card.retire::before { background: var(--red); }
+        .r-card.retain::before { background: #6B7280; }
+        .r-card.rehost::before { background: var(--yellow); }
+        .r-card.replatform::before { background: var(--blue); }
+        .r-card.refactor::before { background: var(--purple); }
+        .r-card.repurchase::before { background: var(--green); }
+        .r-card:hover { border-color: var(--r-color); }
+        .r-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .r-number { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: white; }
+        .r-card.retire .r-number { background: var(--red); }
+        .r-card.retain .r-number { background: #6B7280; }
+        .r-card.rehost .r-number { background: var(--yellow); }
+        .r-card.replatform .r-number { background: var(--blue); }
+        .r-card.refactor .r-number { background: var(--purple); }
+        .r-card.repurchase .r-number { background: var(--green); }
+        .r-title { font-size: 18px; font-weight: 700; }
+        .r-subtitle { font-size: 12px; color: var(--text-muted); }
+        .r-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .r-stats { display: flex; gap: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .r-stat { flex: 1; }
+        .r-stat-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .r-stat-label { font-size: 10px; color: var(--text-muted); }
+        .r-usecases { margin-top: 12px; }
+        .r-usecase { font-size: 11px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .r-usecase::before { content: '→'; color: var(--page-light); }
+
+        /* Migration Phases */
+        .phases-timeline { display: flex; gap: 0; margin-bottom: 24px; position: relative; }
+        .phases-timeline::before { content: ''; position: absolute; top: 32px; left: 60px; right: 60px; height: 4px; background: linear-gradient(90deg, var(--purple), var(--blue), var(--cyan), var(--green)); border-radius: 2px; }
+        .phase-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .phase-icon { width: 64px; height: 64px; background: var(--bg-card); border: 3px solid var(--phase-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .phase-name { font-size: 14px; font-weight: 600; color: var(--phase-color); margin-bottom: 4px; }
+        .phase-duration { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .phase-tasks { font-size: 11px; color: var(--text-secondary); text-align: center; line-height: 1.5; }
+
+        /* Wave Planning */
+        .wave-container { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .wave-title { font-size: 14px; font-weight: 600; color: var(--page-light); margin-bottom: 20px; }
+        .wave-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .wave-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .wave-label { width: 80px; font-size: 13px; font-weight: 600; color: var(--text-primary); flex-shrink: 0; }
+        .wave-bar { flex: 1; height: 40px; background: var(--bg-card); border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; }
+        .wave-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; }
+        .wave-fill span { font-size: 11px; color: white; font-weight: 600; white-space: nowrap; }
+        .wave-apps { font-size: 11px; color: var(--text-muted); margin-left: 12px; white-space: nowrap; }
+
+        /* Assessment Checklist */
+        .checklist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .checklist-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .checklist-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .checklist-icon { font-size: 24px; }
+        .checklist-title { font-size: 14px; font-weight: 600; }
+        .checklist-items { list-style: none; }
+        .checklist-items li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; padding-left: 24px; position: relative; border-bottom: 1px solid var(--border-color); }
+        .checklist-items li:last-child { border-bottom: none; }
+        .checklist-items li::before { content: '☐'; position: absolute; left: 0; color: var(--page-light); }
+
+        /* Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-name { font-size: 14px; font-weight: 600; }
+        .tool-provider { font-size: 10px; color: var(--text-muted); }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Risk Matrix */
+        .risk-matrix { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .risk-title { font-size: 14px; font-weight: 600; color: var(--page-light); margin-bottom: 20px; text-align: center; }
+        .risk-grid { display: grid; grid-template-columns: auto repeat(3, 1fr); gap: 8px; }
+        .risk-header { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; padding: 8px; }
+        .risk-ylabel { font-size: 11px; color: var(--text-muted); writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: flex; align-items: center; justify-content: center; }
+        .risk-cell { padding: 16px; border-radius: 8px; text-align: center; font-size: 11px; font-weight: 600; }
+        .risk-low { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .risk-medium { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .risk-high { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+
+        /* Comparison Table */
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+
+        /* Agent Grid */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .agent-grid, .checklist-grid { grid-template-columns: 1fr; }
+            .six-rs-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .related-grid { grid-template-columns: 1fr; }
+            .phases-timeline { flex-direction: column; gap: 24px; }
+            .phases-timeline::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">☁️ Cloud Platforms</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat12-cloud-platforms-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat12-p1-cloud-providers.html"><span class="nav-icon">🏢</span> 12.1 Cloud Providers</a></li>
+            <li><a href="cat12-p2-architecture-patterns.html"><span class="nav-icon">🏗️</span> 12.2 Architecture Patterns</a></li>
+            <li><a href="cat12-p3-migration-strategies.html" class="active"><span class="nav-icon">🚀</span> 12.3 Migration Strategies</a></li>
+            <li><a href="cat12-p4-compute-containers.html"><span class="nav-icon">📦</span> 12.4 Compute & Containers</a></li>
+            <li><a href="cat12-p5-storage-databases.html"><span class="nav-icon">💾</span> 12.5 Storage & Databases</a></li>
+            <li><a href="cat12-p6-networking-security.html"><span class="nav-icon">🌐</span> 12.6 Networking & Security</a></li>
+            <li><a href="cat12-p7-cost-optimization.html"><span class="nav-icon">💰</span> 12.7 Cost Optimization</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#6rs"><span class="nav-icon">🔄</span> The 6 R's</a></li>
+            <li><a href="#phases"><span class="nav-icon">📅</span> Migration Phases</a></li>
+            <li><a href="#waves"><span class="nav-icon">🌊</span> Wave Planning</a></li>
+            <li><a href="#assessment"><span class="nav-icon">📝</span> Assessment</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Migration Tools</a></li>
+            <li><a href="#risks"><span class="nav-icon">⚠️</span> Risk Management</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🚀 Page 12.3</span>
+                <h1>Migration Strategies</h1>
+                <p>Plan and execute successful cloud migrations. From assessment to cutover, master the 6 R's framework, wave planning, and tools that ensure migrations succeed on time and budget.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">6</div><div class="hero-metric-label">Migration Strategies (R's)</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">70%</div><div class="hero-metric-label">Migrations Delayed</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">3-5</div><div class="hero-metric-label">Waves Typical</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">30%</div><div class="hero-metric-label">Avg Cost Savings</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Migration Fundamentals</h2>
+                    <p>Key concepts for successful cloud migrations</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>Why Migrations Fail</h3>
+                    <p><strong>Inadequate Assessment:</strong> Underestimating dependencies, technical debt, and complexity leads to delays and budget overruns.</p>
+                    <p><strong>Big Bang Approach:</strong> Trying to migrate everything at once increases risk. Phased waves reduce exposure.</p>
+                    <p><strong>Ignoring People:</strong> Technical migration is easy compared to change management. Train teams early.</p>
+                </div>
+                <div>
+                    <h3>Success Factors</h3>
+                    <p><strong>Executive Sponsorship:</strong> Migrations need top-down support and clear business outcomes tied to cloud adoption.</p>
+                    <p><strong>Application Rationalization:</strong> Don't migrate everything. Retire unused apps, consolidate duplicates first.</p>
+                    <p><strong>Automation First:</strong> Manual migrations don't scale. Invest in tooling and repeatable processes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- The 6 R's -->
+        <section class="module" id="6rs">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>The 6 R's of Cloud Migration</h2>
+                    <p>Strategic approaches for every workload type</p>
+                </div>
+            </div>
+
+            <div class="six-rs-grid">
+                <div class="r-card retire">
+                    <div class="r-header">
+                        <div class="r-number">1</div>
+                        <div>
+                            <div class="r-title">Retire</div>
+                            <div class="r-subtitle">Decommission</div>
+                        </div>
+                    </div>
+                    <div class="r-desc">Identify and eliminate applications that are no longer needed. Don't waste resources migrating dead weight.</div>
+                    <div class="r-stats">
+                        <div class="r-stat"><div class="r-stat-value">10-20%</div><div class="r-stat-label">Typical Portfolio</div></div>
+                        <div class="r-stat"><div class="r-stat-value">$0</div><div class="r-stat-label">Migration Cost</div></div>
+                    </div>
+                    <div class="r-usecases">
+                        <div class="r-usecase">Legacy apps with no users</div>
+                        <div class="r-usecase">Duplicate functionality</div>
+                        <div class="r-usecase">End-of-life systems</div>
+                    </div>
+                </div>
+
+                <div class="r-card retain">
+                    <div class="r-header">
+                        <div class="r-number">2</div>
+                        <div>
+                            <div class="r-title">Retain</div>
+                            <div class="r-subtitle">Keep On-Premises</div>
+                        </div>
+                    </div>
+                    <div class="r-desc">Some workloads aren't ready for cloud. Keep them on-premises for now, revisit later when conditions change.</div>
+                    <div class="r-stats">
+                        <div class="r-stat"><div class="r-stat-value">5-15%</div><div class="r-stat-label">Typical Portfolio</div></div>
+                        <div class="r-stat"><div class="r-stat-value">Low</div><div class="r-stat-label">Effort</div></div>
+                    </div>
+                    <div class="r-usecases">
+                        <div class="r-usecase">Recent hardware investment</div>
+                        <div class="r-usecase">Compliance restrictions</div>
+                        <div class="r-usecase">Mainframe dependencies</div>
+                    </div>
+                </div>
+
+                <div class="r-card rehost">
+                    <div class="r-header">
+                        <div class="r-number">3</div>
+                        <div>
+                            <div class="r-title">Rehost</div>
+                            <div class="r-subtitle">Lift & Shift</div>
+                        </div>
+                    </div>
+                    <div class="r-desc">Move applications as-is to cloud VMs. Fastest path with minimal changes. Optimize later.</div>
+                    <div class="r-stats">
+                        <div class="r-stat"><div class="r-stat-value">30-40%</div><div class="r-stat-label">Typical Portfolio</div></div>
+                        <div class="r-stat"><div class="r-stat-value">1-3 mo</div><div class="r-stat-label">Per App</div></div>
+                    </div>
+                    <div class="r-usecases">
+                        <div class="r-usecase">Quick datacenter exit</div>
+                        <div class="r-usecase">Time-sensitive migrations</div>
+                        <div class="r-usecase">Low-complexity apps</div>
+                    </div>
+                </div>
+
+                <div class="r-card replatform">
+                    <div class="r-header">
+                        <div class="r-number">4</div>
+                        <div>
+                            <div class="r-title">Replatform</div>
+                            <div class="r-subtitle">Lift & Optimize</div>
+                        </div>
+                    </div>
+                    <div class="r-desc">Make targeted optimizations during migration—managed databases, auto-scaling—without major redesign.</div>
+                    <div class="r-stats">
+                        <div class="r-stat"><div class="r-stat-value">20-30%</div><div class="r-stat-label">Typical Portfolio</div></div>
+                        <div class="r-stat"><div class="r-stat-value">2-6 mo</div><div class="r-stat-label">Per App</div></div>
+                    </div>
+                    <div class="r-usecases">
+                        <div class="r-usecase">Database to RDS/Cloud SQL</div>
+                        <div class="r-usecase">Containers without redesign</div>
+                        <div class="r-usecase">Managed services swap</div>
+                    </div>
+                </div>
+
+                <div class="r-card refactor">
+                    <div class="r-header">
+                        <div class="r-number">5</div>
+                        <div>
+                            <div class="r-title">Refactor</div>
+                            <div class="r-subtitle">Re-Architect</div>
+                        </div>
+                    </div>
+                    <div class="r-desc">Redesign applications for cloud-native. Microservices, serverless, containers. Maximum cloud benefits.</div>
+                    <div class="r-stats">
+                        <div class="r-stat"><div class="r-stat-value">10-20%</div><div class="r-stat-label">Typical Portfolio</div></div>
+                        <div class="r-stat"><div class="r-stat-value">6-18 mo</div><div class="r-stat-label">Per App</div></div>
+                    </div>
+                    <div class="r-usecases">
+                        <div class="r-usecase">Strategic business apps</div>
+                        <div class="r-usecase">Scale/performance critical</div>
+                        <div class="r-usecase">Competitive advantage</div>
+                    </div>
+                </div>
+
+                <div class="r-card repurchase">
+                    <div class="r-header">
+                        <div class="r-number">6</div>
+                        <div>
+                            <div class="r-title">Repurchase</div>
+                            <div class="r-subtitle">Replace with SaaS</div>
+                        </div>
+                    </div>
+                    <div class="r-desc">Replace custom or packaged software with SaaS alternatives. Transfer maintenance to vendors.</div>
+                    <div class="r-stats">
+                        <div class="r-stat"><div class="r-stat-value">10-15%</div><div class="r-stat-label">Typical Portfolio</div></div>
+                        <div class="r-stat"><div class="r-stat-value">3-12 mo</div><div class="r-stat-label">Per App</div></div>
+                    </div>
+                    <div class="r-usecases">
+                        <div class="r-usecase">CRM → Salesforce</div>
+                        <div class="r-usecase">Email → M365/Google</div>
+                        <div class="r-usecase">ERP → SAP S/4HANA Cloud</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Migration Phases -->
+        <section class="module" id="phases">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Migration Phases</h2>
+                    <p>The journey from assessment to optimization</p>
+                </div>
+            </div>
+
+            <div class="phases-timeline">
+                <div class="phase-item" style="--phase-color: #8B5CF6;">
+                    <div class="phase-icon" style="border-color: #8B5CF6;">📊</div>
+                    <div class="phase-name">Assess</div>
+                    <div class="phase-duration">4-8 weeks</div>
+                    <div class="phase-tasks">Discovery, dependency mapping, TCO analysis, strategy selection</div>
+                </div>
+                <div class="phase-item" style="--phase-color: #3B82F6;">
+                    <div class="phase-icon" style="border-color: #3B82F6;">📐</div>
+                    <div class="phase-name">Plan</div>
+                    <div class="phase-duration">4-6 weeks</div>
+                    <div class="phase-tasks">Wave planning, landing zone design, runbook creation</div>
+                </div>
+                <div class="phase-item" style="--phase-color: #06B6D4;">
+                    <div class="phase-icon" style="border-color: #06B6D4;">🔧</div>
+                    <div class="phase-name">Build</div>
+                    <div class="phase-duration">6-12 weeks</div>
+                    <div class="phase-tasks">Landing zone deployment, network connectivity, security setup</div>
+                </div>
+                <div class="phase-item" style="--phase-color: #10B981;">
+                    <div class="phase-icon" style="border-color: #10B981;">🚀</div>
+                    <div class="phase-name">Migrate</div>
+                    <div class="phase-duration">Ongoing</div>
+                    <div class="phase-tasks">Wave execution, testing, cutover, validation</div>
+                </div>
+                <div class="phase-item" style="--phase-color: #F59E0B;">
+                    <div class="phase-icon" style="border-color: #F59E0B;">⚡</div>
+                    <div class="phase-name">Optimize</div>
+                    <div class="phase-duration">Continuous</div>
+                    <div class="phase-tasks">Right-sizing, reserved instances, modernization</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wave Planning -->
+        <section class="module" id="waves">
+            <div class="module-header">
+                <div class="module-icon">🌊</div>
+                <div class="module-info">
+                    <h2>Wave Planning</h2>
+                    <p>Organize migrations into manageable groups</p>
+                </div>
+            </div>
+
+            <div class="wave-container">
+                <div class="wave-title">Sample Wave Schedule (12-Month Program)</div>
+                <div class="wave-row">
+                    <div class="wave-label">Wave 0</div>
+                    <div class="wave-bar">
+                        <div class="wave-fill" style="width: 15%; background: linear-gradient(90deg, #8B5CF6, #A78BFA);"><span>Foundation</span></div>
+                    </div>
+                    <div class="wave-apps">Landing zone, network, security baseline</div>
+                </div>
+                <div class="wave-row">
+                    <div class="wave-label">Wave 1</div>
+                    <div class="wave-bar">
+                        <div class="wave-fill" style="width: 20%; background: linear-gradient(90deg, #3B82F6, #60A5FA);"><span>Pilot Apps</span></div>
+                    </div>
+                    <div class="wave-apps">5-10 low-risk apps • Prove process</div>
+                </div>
+                <div class="wave-row">
+                    <div class="wave-label">Wave 2</div>
+                    <div class="wave-bar">
+                        <div class="wave-fill" style="width: 35%; background: linear-gradient(90deg, #06B6D4, #22D3EE);"><span>Business Apps</span></div>
+                    </div>
+                    <div class="wave-apps">20-30 apps • Mixed complexity</div>
+                </div>
+                <div class="wave-row">
+                    <div class="wave-label">Wave 3</div>
+                    <div class="wave-bar">
+                        <div class="wave-fill" style="width: 55%; background: linear-gradient(90deg, #10B981, #34D399);"><span>Core Systems</span></div>
+                    </div>
+                    <div class="wave-apps">50+ apps • Critical workloads</div>
+                </div>
+                <div class="wave-row">
+                    <div class="wave-label">Wave 4</div>
+                    <div class="wave-bar">
+                        <div class="wave-fill" style="width: 70%; background: linear-gradient(90deg, #F59E0B, #FBBF24);"><span>Remaining + Cleanup</span></div>
+                    </div>
+                    <div class="wave-apps">Long-tail apps • DC decommission</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Wave Grouping Criteria</h3>
+                    <p><strong>Dependencies:</strong> Group applications that depend on each other. Migrate databases before apps that use them.</p>
+                    <p><strong>Business Criticality:</strong> Start with lower-risk apps to build confidence and refine processes.</p>
+                    <p><strong>Team Capacity:</strong> Size waves to match available migration and testing resources.</p>
+                </div>
+                <div>
+                    <h3>Wave Success Metrics</h3>
+                    <p><strong>On-Time Cutover:</strong> % of apps migrated within planned window (target: 90%+).</p>
+                    <p><strong>Rollback Rate:</strong> % of cutovers that required rollback (target: <5%).</p>
+                    <p><strong>Post-Migration Incidents:</strong> P1/P2 incidents within 30 days (target: <2 per wave).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assessment -->
+        <section class="module" id="assessment">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Migration Assessment</h2>
+                    <p>What to evaluate before migrating</p>
+                </div>
+            </div>
+
+            <div class="checklist-grid">
+                <div class="checklist-card">
+                    <div class="checklist-header">
+                        <div class="checklist-icon">🖥️</div>
+                        <div class="checklist-title">Technical Assessment</div>
+                    </div>
+                    <ul class="checklist-items">
+                        <li>Current server inventory (CPU, RAM, storage)</li>
+                        <li>Operating system versions and patch levels</li>
+                        <li>Application dependencies and integrations</li>
+                        <li>Network topology and bandwidth requirements</li>
+                        <li>Database types, sizes, and replication needs</li>
+                        <li>Licensing (bring your own vs. included)</li>
+                        <li>Performance baselines and SLA requirements</li>
+                    </ul>
+                </div>
+                <div class="checklist-card">
+                    <div class="checklist-header">
+                        <div class="checklist-icon">💼</div>
+                        <div class="checklist-title">Business Assessment</div>
+                    </div>
+                    <ul class="checklist-items">
+                        <li>Business criticality (Tier 1/2/3)</li>
+                        <li>Downtime tolerance and maintenance windows</li>
+                        <li>Compliance and data residency requirements</li>
+                        <li>Current and projected costs (TCO)</li>
+                        <li>Business owner and stakeholder identification</li>
+                        <li>Retirement candidates and consolidation opportunities</li>
+                        <li>Training and change management needs</li>
+                    </ul>
+                </div>
+                <div class="checklist-card">
+                    <div class="checklist-header">
+                        <div class="checklist-icon">🔒</div>
+                        <div class="checklist-title">Security Assessment</div>
+                    </div>
+                    <ul class="checklist-items">
+                        <li>Data classification (PII, PHI, financial)</li>
+                        <li>Encryption requirements (at-rest, in-transit)</li>
+                        <li>Authentication and access control needs</li>
+                        <li>Compliance frameworks (SOC 2, HIPAA, PCI)</li>
+                        <li>Network segmentation requirements</li>
+                        <li>Logging and audit trail needs</li>
+                        <li>Vulnerability and penetration testing</li>
+                    </ul>
+                </div>
+                <div class="checklist-card">
+                    <div class="checklist-header">
+                        <div class="checklist-icon">🔗</div>
+                        <div class="checklist-title">Dependency Mapping</div>
+                    </div>
+                    <ul class="checklist-items">
+                        <li>Upstream systems (data sources)</li>
+                        <li>Downstream systems (consumers)</li>
+                        <li>Shared databases and storage</li>
+                        <li>API integrations and protocols</li>
+                        <li>Batch job schedules and dependencies</li>
+                        <li>SSO and identity provider connections</li>
+                        <li>Third-party vendor integrations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Migration Tools -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Migration Tools</h2>
+                    <p>Provider and third-party migration solutions</p>
+                </div>
+            </div>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🟠</div>
+                        <div>
+                            <div class="tool-name">AWS MGN</div>
+                            <div class="tool-provider">AWS Application Migration</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Automated lift-and-shift migrations with continuous replication. Minimal downtime cutovers.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔵</div>
+                        <div>
+                            <div class="tool-name">Azure Migrate</div>
+                            <div class="tool-provider">Microsoft</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Discovery, assessment, and migration hub. Server, database, and app migration tools.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔷</div>
+                        <div>
+                            <div class="tool-name">Migrate for Compute</div>
+                            <div class="tool-provider">Google Cloud</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Migrate VMs from on-prem, AWS, or Azure to GCP Compute Engine.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🗄️</div>
+                        <div>
+                            <div class="tool-name">AWS DMS</div>
+                            <div class="tool-provider">Database Migration Service</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Migrate databases to AWS with minimal downtime. Supports heterogeneous migrations.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔍</div>
+                        <div>
+                            <div class="tool-name">Flexera One</div>
+                            <div class="tool-provider">Flexera</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">IT asset management, cloud cost optimization, and migration planning platform.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">📊</div>
+                        <div>
+                            <div class="tool-name">Cloudamize</div>
+                            <div class="tool-provider">Cloudamize</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Machine learning-based cloud assessment and migration planning. Right-sizing recommendations.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🚀</div>
+                        <div>
+                            <div class="tool-name">CloudEndure</div>
+                            <div class="tool-provider">AWS (acquired)</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Block-level replication for near-zero downtime migrations and disaster recovery.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔄</div>
+                        <div>
+                            <div class="tool-name">Zerto</div>
+                            <div class="tool-provider">HPE</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Continuous replication for migrations and DR. Multi-cloud support.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk Management -->
+        <section class="module" id="risks">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Migration Risk Management</h2>
+                    <p>Identify and mitigate common migration risks</p>
+                </div>
+            </div>
+
+            <div class="risk-matrix">
+                <div class="risk-title">Risk Assessment Matrix</div>
+                <div class="risk-grid">
+                    <div class="risk-header"></div>
+                    <div class="risk-header">Low Complexity</div>
+                    <div class="risk-header">Medium Complexity</div>
+                    <div class="risk-header">High Complexity</div>
+                    
+                    <div class="risk-ylabel">High Business Impact</div>
+                    <div class="risk-cell risk-medium">Medium Risk<br><small>Careful planning</small></div>
+                    <div class="risk-cell risk-high">High Risk<br><small>Expert resources</small></div>
+                    <div class="risk-cell risk-high">Critical Risk<br><small>Executive oversight</small></div>
+                    
+                    <div class="risk-ylabel">Medium Business Impact</div>
+                    <div class="risk-cell risk-low">Low Risk<br><small>Standard process</small></div>
+                    <div class="risk-cell risk-medium">Medium Risk<br><small>Enhanced testing</small></div>
+                    <div class="risk-cell risk-high">High Risk<br><small>Pilot first</small></div>
+                    
+                    <div class="risk-ylabel">Low Business Impact</div>
+                    <div class="risk-cell risk-low">Minimal Risk<br><small>Quick wins</small></div>
+                    <div class="risk-cell risk-low">Low Risk<br><small>Good practice</small></div>
+                    <div class="risk-cell risk-medium">Medium Risk<br><small>Learning opportunity</small></div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Risk Category</th>
+                        <th>Common Issues</th>
+                        <th>Mitigation Strategies</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Technical</strong></td>
+                        <td>Hidden dependencies, incompatible OS versions, performance degradation</td>
+                        <td>Thorough discovery, parallel testing, performance baselines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data</strong></td>
+                        <td>Data loss, corruption, sync failures, extended replication times</td>
+                        <td>Validated backups, checksums, incremental sync, rollback plans</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security</strong></td>
+                        <td>Misconfigured firewalls, exposed data, compliance violations</td>
+                        <td>Security reviews, penetration testing, compliance audits</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business</strong></td>
+                        <td>Extended downtime, user disruption, missed SLAs</td>
+                        <td>Maintenance windows, phased rollouts, communication plans</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resource</strong></td>
+                        <td>Skill gaps, team burnout, competing priorities</td>
+                        <td>Training, managed services, realistic timelines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost</strong></td>
+                        <td>Budget overruns, dual-running costs, license surprises</td>
+                        <td>Detailed TCO, contingency budgets, license audits</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Agent -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered migration planning</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🚀 MigrationPlanner</h3>
+                    <p>Analyzes application portfolios and generates optimized migration plans. Recommends 6R strategies, creates wave groupings, estimates timelines and costs, and identifies risks based on workload characteristics.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Portfolio analysis and discovery</div>
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> 6R strategy recommendation</div>
+                        <div class="agent-capability"><span class="capability-icon">🌊</span> Wave planning optimization</div>
+                        <div class="agent-capability"><span class="capability-icon">💰</span> TCO and timeline estimation</div>
+                        <div class="agent-capability"><span class="capability-icon">⚠️</span> Risk identification and scoring</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">migration_planner_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Migration planning tools</span>
+discovery_tool = ApplicationDiscoveryTool()
+dependency_tool = DependencyMapperTool()
+tco_tool = TCOCalculatorTool()
+wave_tool = WavePlannerTool()
+
+<span class="code-comment"># Migration Planner Agent</span>
+planner = Agent(
+    role=<span class="code-string">"Cloud Migration Planner"</span>,
+    goal=<span class="code-string">"""Analyze application portfolios,
+    recommend optimal migration strategies,
+    and create detailed wave plans."""</span>,
+    tools=[discovery_tool, dependency_tool, 
+           tco_tool, wave_tool],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Migration Planning Task</span>
+plan_task = Task(
+    description=<span class="code-string">"""
+    1. Inventory all applications
+    2. Map dependencies between apps
+    3. Assess each app against 6Rs
+    4. Calculate TCO for each strategy
+    5. Group apps into migration waves
+    6. Estimate timeline and resources
+    7. Identify and score risks
+    """</span>,
+    agent=planner
+)
+
+crew = Crew(agents=[planner], tasks=[plan_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring cloud platforms</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat12-p2-architecture-patterns.html" class="related-card">
+                    <div class="related-icon">🏗️</div>
+                    <div class="related-title">Architecture Patterns</div>
+                    <div class="related-desc">Target architectures for migrated workloads</div>
+                </a>
+                <a href="cat12-p4-compute-containers.html" class="related-card">
+                    <div class="related-icon">📦</div>
+                    <div class="related-title">Compute & Containers</div>
+                    <div class="related-desc">VM and container options for rehosted apps</div>
+                </a>
+                <a href="cat12-p7-cost-optimization.html" class="related-card">
+                    <div class="related-icon">💰</div>
+                    <div class="related-title">Cost Optimization</div>
+                    <div class="related-desc">Optimize costs post-migration</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat12-p2-architecture-patterns.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">12.2 Architecture Patterns</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 12.3</div>
+        <a href="cat12-p4-compute-containers.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">12.4 Compute & Containers</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

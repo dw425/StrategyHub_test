@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation | Migration Factory | Category 13 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #7C3AED;
+            --cat-light: #A78BFA;
+            --cat-dark: #6D28D9;
+            --cat-glow: rgba(124, 58, 237, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Overview Intro */
+        .overview-intro { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); }
+        .overview-text p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; }
+        .overview-text p:last-child { margin-bottom: 0; }
+        .overview-highlights { display: flex; flex-direction: column; gap: var(--space-md); padding-left: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .highlight-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); background: var(--bg-card-alt); border-radius: var(--radius-lg); }
+        .highlight-icon { font-size: 24px; }
+        .highlight-value { font-size: var(--font-lg); font-weight: 700; color: var(--cat-light); display: block; }
+        .highlight-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VALIDATION PYRAMID - COMPACT HORIZONTAL
+        ═══════════════════════════════════════════════════════════════ */
+        .pyramid-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .pyramid-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .pyramid-title { font-size: var(--font-sm); font-weight: 600; }
+        .pyramid-body { padding: var(--space-lg); }
+        
+        .pyramid-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .pyramid-tier { padding: var(--space-lg); border-radius: var(--radius-lg); text-align: center; transition: all 0.3s; position: relative; }
+        .pyramid-tier:hover { transform: translateY(-2px); }
+        .pyramid-tier::after { content: ''; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-left: 8px solid var(--border-color); border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+        .pyramid-tier:last-child::after { display: none; }
+        .pyramid-tier.unit { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success-green); }
+        .pyramid-tier.integration { background: rgba(59, 130, 246, 0.1); border: 1px solid var(--blue); }
+        .pyramid-tier.system { background: rgba(124, 58, 237, 0.1); border: 1px solid var(--cat-primary); }
+        .pyramid-tier.uat { background: rgba(249, 115, 22, 0.1); border: 1px solid var(--orange); }
+        .pyramid-tier-icon { font-size: 20px; margin-bottom: var(--space-xs); }
+        .pyramid-tier-name { font-size: var(--font-sm); font-weight: 700; margin-bottom: var(--space-xs); }
+        .pyramid-tier-stats { display: flex; justify-content: center; gap: var(--space-md); font-size: var(--font-xs); }
+        .pyramid-stat { display: flex; flex-direction: column; align-items: center; }
+        .pyramid-stat-value { font-weight: 700; font-size: var(--font-sm); }
+        .pyramid-stat-label { color: var(--text-muted); font-size: 10px; }
+
+        /* Layer Detail Cards */
+        .layer-details { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .layer-detail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .layer-detail-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-sm); border-left: 3px solid; }
+        .layer-detail-icon { font-size: 14px; }
+        .layer-detail-title { font-size: var(--font-xs); font-weight: 600; }
+        .layer-detail-time { margin-left: auto; font-size: 10px; color: var(--text-muted); }
+        .layer-detail-body { padding: var(--space-md); }
+        .layer-detail-body p { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: var(--space-sm); }
+        .layer-detail-checks { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+        .check-item { font-size: 10px; color: var(--success-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: var(--radius-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TEST RESULTS DASHBOARD
+        ═══════════════════════════════════════════════════════════════ */
+        .results-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .result-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+        .result-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+        .result-card.passed::before { background: var(--success-green); }
+        .result-card.failed::before { background: var(--danger-red); }
+        .result-card.skipped::before { background: var(--warning-yellow); }
+        .result-card.running::before { background: var(--blue); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .result-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .result-card-icon { font-size: 32px; margin-bottom: var(--space-sm); }
+        .result-card-value { font-size: var(--font-2xl); font-weight: 700; margin-bottom: var(--space-xs); }
+        .result-card-value.green { color: var(--success-green); }
+        .result-card-value.red { color: var(--danger-red); }
+        .result-card-value.yellow { color: var(--warning-yellow); }
+        .result-card-value.blue { color: var(--blue); }
+        .result-card-label { font-size: var(--font-sm); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DATA COMPARISON TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .comparison-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .comparison-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .comparison-title { font-size: var(--font-sm); font-weight: 600; }
+        .comparison-badge { font-size: 10px; padding: 4px 10px; border-radius: var(--radius-full); }
+        .comparison-badge.match { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .comparison-badge.mismatch { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .comparison-body { padding: 0; overflow-x: auto; }
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: var(--font-sm); }
+        .comparison-table th, .comparison-table td { padding: var(--space-md); text-align: left; border-bottom: 1px solid var(--border-color); }
+        .comparison-table th { background: var(--bg-dark); font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover td { background: var(--bg-card-alt); }
+        .comparison-table .table-name { font-weight: 600; }
+        .comparison-table .count { font-family: 'Monaco', monospace; }
+        .comparison-table .match { color: var(--success-green); }
+        .comparison-table .mismatch { color: var(--danger-red); }
+        .comparison-table .status-icon { font-size: 16px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TEST CASE CATEGORIES
+        ═══════════════════════════════════════════════════════════════ */
+        .test-categories { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .test-category { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .test-category-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .test-category-icon { font-size: 24px; }
+        .test-category-title { font-size: var(--font-base); font-weight: 600; }
+        .test-category-count { margin-left: auto; font-size: var(--font-xs); padding: 2px 8px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); }
+        .test-category-body { padding: var(--space-lg); }
+        .test-category-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .test-items { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .test-item { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); padding: var(--space-sm); background: var(--bg-dark); border-radius: var(--radius-md); }
+        .test-item-status { width: 8px; height: 8px; border-radius: 50%; }
+        .test-item-status.pass { background: var(--success-green); }
+        .test-item-status.fail { background: var(--danger-red); }
+        .test-item-status.skip { background: var(--warning-yellow); }
+        .test-item-name { flex: 1; }
+        .test-item-time { color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RECONCILIATION SUMMARY CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .recon-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .recon-summary-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .recon-summary-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-sm); }
+        .recon-summary-icon { font-size: 16px; }
+        .recon-summary-title { font-size: var(--font-xs); font-weight: 600; }
+        .recon-summary-body { padding: var(--space-md); }
+        .recon-summary-stat { text-align: center; margin-bottom: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .recon-summary-value { font-size: var(--font-xl); font-weight: 700; display: block; }
+        .recon-summary-value.green { color: var(--success-green); }
+        .recon-summary-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .recon-summary-detail { display: flex; flex-direction: column; gap: var(--space-xs); }
+        .recon-detail-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); }
+        .recon-detail-row.match { color: var(--success-green); font-weight: 600; }
+        
+        /* Reconciliation Schedule */
+        .recon-schedule { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .recon-schedule-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .recon-schedule-header h4 { font-size: var(--font-sm); font-weight: 600; margin: 0; }
+        .recon-schedule-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border-color); }
+        .schedule-item { background: var(--bg-card); padding: var(--space-md); }
+        .schedule-freq { font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .schedule-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.4; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SIGN-OFF CRITERIA
+        ═══════════════════════════════════════════════════════════════ */
+        .criteria-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .criteria-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .criteria-title { font-size: var(--font-sm); font-weight: 600; }
+        .criteria-body { padding: 0; }
+        .criteria-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-color); }
+        .criteria-item:last-child { border-bottom: none; }
+        .criteria-item:hover { background: var(--bg-card-alt); }
+        .criteria-check { font-size: 18px; flex-shrink: 0; }
+        .criteria-info { flex: 1; }
+        .criteria-name { display: block; font-size: var(--font-sm); font-weight: 500; }
+        .criteria-owner { display: block; font-size: var(--font-xs); color: var(--text-muted); }
+        .criteria-status { font-size: var(--font-xs); padding: 2px 10px; border-radius: var(--radius-full); }
+        .criteria-item.done .criteria-status { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .criteria-item.in-progress .criteria-status { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .criteria-item.blocked .criteria-status { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DEFECT TRACKER
+        ═══════════════════════════════════════════════════════════════ */
+        .defect-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .defect-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .defect-title { font-size: var(--font-sm); font-weight: 600; }
+        .defect-count { font-size: var(--font-xs); color: var(--danger-red); }
+        .defect-body { padding: 0; }
+        .defect-table { width: 100%; border-collapse: collapse; }
+        .defect-table th, .defect-table td { padding: var(--space-md) var(--space-lg); text-align: left; border-bottom: 1px solid var(--border-color); font-size: var(--font-sm); }
+        .defect-table th { background: var(--bg-dark); font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .defect-table tr:last-child td { border-bottom: none; }
+        .defect-table tr:hover td { background: var(--bg-card-alt); }
+        .defect-id { font-family: 'Monaco', monospace; font-size: var(--font-xs); color: var(--cat-light); }
+        .defect-severity { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; }
+        .defect-severity.critical { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .defect-severity.high { background: rgba(249, 115, 22, 0.2); color: var(--orange); }
+        .defect-severity.medium { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .defect-severity.low { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .defect-status { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; }
+        .defect-status.open { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+        .defect-status.in-progress { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .defect-status.resolved { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VALIDATION TIMELINE
+        ═══════════════════════════════════════════════════════════════ */
+        .timeline-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .timeline-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .timeline-title { font-size: var(--font-sm); font-weight: 600; }
+        .timeline-body { padding: var(--space-xl); }
+        .timeline-phases { display: flex; gap: var(--space-md); }
+        .timeline-phase { flex: 1; position: relative; }
+        .timeline-phase-bar { height: 8px; border-radius: var(--radius-full); margin-bottom: var(--space-md); }
+        .timeline-phase-bar.complete { background: var(--success-green); }
+        .timeline-phase-bar.active { background: linear-gradient(90deg, var(--cat-primary), var(--cat-light)); animation: pulse 1.5s infinite; }
+        .timeline-phase-bar.pending { background: var(--border-color); }
+        .timeline-phase-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .timeline-phase-dates { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-sm); }
+        .timeline-phase-status { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-full); display: inline-block; }
+        .timeline-phase-status.complete { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .timeline-phase-status.active { background: var(--cat-glow); color: var(--cat-light); }
+        .timeline-phase-status.pending { background: var(--bg-card-alt); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(124,58,237,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        .code-comment { color: #6A737D; }
+        .code-number { color: #79C0FF; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: repeat(2, 1fr); }
+            .test-categories { grid-template-columns: repeat(2, 1fr); }
+            .overview-intro { grid-template-columns: 1fr; }
+            .overview-highlights { padding-left: 0; border-left: none; border-top: 1px solid var(--border-color); padding-top: var(--space-lg); flex-direction: row; flex-wrap: wrap; }
+            .timeline-phases { flex-direction: column; }
+            .pyramid-grid { grid-template-columns: repeat(2, 1fr); }
+            .pyramid-tier::after { display: none; }
+            .layer-details { grid-template-columns: repeat(2, 1fr); }
+            .recon-summary { grid-template-columns: repeat(2, 1fr); }
+            .recon-schedule-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .results-grid { grid-template-columns: 1fr; }
+            .test-categories { grid-template-columns: 1fr; }
+            .pyramid-grid { grid-template-columns: 1fr; }
+            .layer-details { grid-template-columns: 1fr; }
+            .recon-summary { grid-template-columns: 1fr; }
+            .recon-schedule-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat13-migration-factory-overview.html">Migration Factory</a>
+        <span class="sep">/</span>
+        <span class="current">Validation</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔄 Category 13</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat13-migration-factory-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat13-p1-assessment.html"><span class="nav-icon">📋</span> 13.1 Assessment</a></li>
+            <li><a href="cat13-p2-conversion.html"><span class="nav-icon">🔀</span> 13.2 Conversion</a></li>
+            <li><a href="cat13-p3-validation.html" class="active"><span class="nav-icon">✅</span> 13.3 Validation</a></li>
+            <li><a href="cat13-p4-cutover.html"><span class="nav-icon">🚀</span> 13.4 Cutover</a></li>
+            <li><a href="cat13-p5-wave-planning.html"><span class="nav-icon">📊</span> 13.5 Wave Planning</a></li>
+            <li><a href="cat13-p6-tooling.html"><span class="nav-icon">🛠️</span> 13.6 Tooling</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">✅</span> Overview</a></li>
+            <li><a href="#pyramid"><span class="nav-icon">🔺</span> Test Pyramid</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Data Comparison</a></li>
+            <li><a href="#categories"><span class="nav-icon">📁</span> Test Categories</a></li>
+            <li><a href="#recon"><span class="nav-icon">🔄</span> Reconciliation</a></li>
+            <li><a href="#signoff"><span class="nav-icon">✍️</span> Sign-off</a></li>
+            <li><a href="#defects"><span class="nav-icon">🐛</span> Defects</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">✅ Page 13.3</span>
+                <h1>Validation</h1>
+                <p>Comprehensive testing and data reconciliation to ensure migration accuracy and business continuity.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">99.7%</div><div class="hero-metric-label">Pass Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">24,847</div><div class="hero-metric-label">Tests Executed</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100%</div><div class="hero-metric-label">Data Match</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">12</div><div class="hero-metric-label">Open Defects</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Validation Overview</h2>
+                    <p>Ensuring migration quality through comprehensive testing</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p><strong>Validation</strong> is the quality gate that ensures converted code produces identical results to the source system. It encompasses multiple testing layers—from unit tests on individual objects to full system integration tests—combined with data reconciliation to verify row counts, checksums, and business rule compliance.</p>
+                    <p>The validation process runs continuously throughout the migration, catching regressions early and providing confidence for stakeholders. Automated test generation creates baseline tests from production query patterns, while AI-assisted test analysis identifies gaps in coverage.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🧪</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">4 layers</span>
+                            <span class="highlight-label">Test Pyramid</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">⚡</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">< 2 hrs</span>
+                            <span class="highlight-label">Full Suite Time</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔄</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">CI/CD</span>
+                            <span class="highlight-label">Integration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Results Summary -->
+            <div class="results-grid">
+                <div class="result-card passed">
+                    <div class="result-card-icon">✅</div>
+                    <div class="result-card-value green">24,773</div>
+                    <div class="result-card-label">Tests Passed</div>
+                </div>
+                <div class="result-card failed">
+                    <div class="result-card-icon">❌</div>
+                    <div class="result-card-value red">74</div>
+                    <div class="result-card-label">Tests Failed</div>
+                </div>
+                <div class="result-card skipped">
+                    <div class="result-card-icon">⏭️</div>
+                    <div class="result-card-value yellow">127</div>
+                    <div class="result-card-label">Tests Skipped</div>
+                </div>
+                <div class="result-card running">
+                    <div class="result-card-icon">🔄</div>
+                    <div class="result-card-value blue">342</div>
+                    <div class="result-card-label">Currently Running</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 2: TEST PYRAMID -->
+        <section class="module" id="pyramid">
+            <div class="module-header">
+                <div class="module-icon">🔺</div>
+                <div class="module-info">
+                    <h2>Test Pyramid</h2>
+                    <p>Layered validation strategy from unit to UAT</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The test pyramid ensures comprehensive coverage at every level. <strong>Unit tests</strong> validate individual SQL statements and functions, <strong>integration tests</strong> verify object interactions, <strong>system tests</strong> confirm end-to-end workflows, and <strong>UAT</strong> validates business acceptance criteria with real users.</p>
+                    <p>Each layer catches different types of defects. Unit tests are fast and numerous, catching syntax and logic errors early. Higher layers are slower but validate complex interactions and business requirements.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📊</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">92%</span>
+                            <span class="highlight-label">Code Coverage</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🎯</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">99.7%</span>
+                            <span class="highlight-label">Pass Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pyramid-container">
+                <div class="pyramid-header">
+                    <div class="pyramid-title">🔺 Test Pyramid Layers (Left to Right: Foundation → Apex)</div>
+                </div>
+                <div class="pyramid-body">
+                    <div class="pyramid-grid">
+                        <div class="pyramid-tier unit">
+                            <div class="pyramid-tier-icon">🧪</div>
+                            <div class="pyramid-tier-name">Unit Tests</div>
+                            <div class="pyramid-tier-stats">
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">19,568</span><span class="pyramid-stat-label">Tests</span></div>
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">99.8%</span><span class="pyramid-stat-label">Pass</span></div>
+                            </div>
+                        </div>
+                        <div class="pyramid-tier integration">
+                            <div class="pyramid-tier-icon">🔀</div>
+                            <div class="pyramid-tier-name">Integration</div>
+                            <div class="pyramid-tier-stats">
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">4,231</span><span class="pyramid-stat-label">Tests</span></div>
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">99.5%</span><span class="pyramid-stat-label">Pass</span></div>
+                            </div>
+                        </div>
+                        <div class="pyramid-tier system">
+                            <div class="pyramid-tier-icon">🔗</div>
+                            <div class="pyramid-tier-name">System</div>
+                            <div class="pyramid-tier-stats">
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">892</span><span class="pyramid-stat-label">Tests</span></div>
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">99.2%</span><span class="pyramid-stat-label">Pass</span></div>
+                            </div>
+                        </div>
+                        <div class="pyramid-tier uat">
+                            <div class="pyramid-tier-icon">👥</div>
+                            <div class="pyramid-tier-name">UAT</div>
+                            <div class="pyramid-tier-stats">
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">156</span><span class="pyramid-stat-label">Tests</span></div>
+                                <div class="pyramid-stat"><span class="pyramid-stat-value">98%</span><span class="pyramid-stat-label">Pass</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test Layer Details -->
+            <div class="layer-details">
+                <div class="layer-detail-card">
+                    <div class="layer-detail-header" style="border-color: var(--success-green);">
+                        <span class="layer-detail-icon">🧪</span>
+                        <span class="layer-detail-title">Unit Tests</span>
+                        <span class="layer-detail-time">8 min runtime</span>
+                    </div>
+                    <div class="layer-detail-body">
+                        <p>Validates individual SQL statements, functions, and views in isolation. Tests syntax correctness, data type handling, NULL behavior, and expected output for known inputs.</p>
+                        <div class="layer-detail-checks">
+                            <span class="check-item">✓ SQL syntax valid</span>
+                            <span class="check-item">✓ Data types match</span>
+                            <span class="check-item">✓ NULL handling correct</span>
+                            <span class="check-item">✓ Edge cases covered</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layer-detail-card">
+                    <div class="layer-detail-header" style="border-color: var(--blue);">
+                        <span class="layer-detail-icon">🔀</span>
+                        <span class="layer-detail-title">Integration Tests</span>
+                        <span class="layer-detail-time">18 min runtime</span>
+                    </div>
+                    <div class="layer-detail-body">
+                        <p>Tests object interactions: views referencing tables, procedures calling functions, ETL pipelines with multiple steps. Validates dependency chains work correctly.</p>
+                        <div class="layer-detail-checks">
+                            <span class="check-item">✓ Dependencies resolve</span>
+                            <span class="check-item">✓ Data flows correctly</span>
+                            <span class="check-item">✓ Transactions work</span>
+                            <span class="check-item">✓ Error handling</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layer-detail-card">
+                    <div class="layer-detail-header" style="border-color: var(--cat-primary);">
+                        <span class="layer-detail-icon">🔗</span>
+                        <span class="layer-detail-title">System Tests</span>
+                        <span class="layer-detail-time">45 min runtime</span>
+                    </div>
+                    <div class="layer-detail-body">
+                        <p>End-to-end workflow validation across the entire data platform. Tests complete business processes from source ingestion through reporting output.</p>
+                        <div class="layer-detail-checks">
+                            <span class="check-item">✓ E2E workflows</span>
+                            <span class="check-item">✓ Cross-system data</span>
+                            <span class="check-item">✓ Performance SLAs</span>
+                            <span class="check-item">✓ Failover scenarios</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layer-detail-card">
+                    <div class="layer-detail-header" style="border-color: var(--orange);">
+                        <span class="layer-detail-icon">👥</span>
+                        <span class="layer-detail-title">User Acceptance</span>
+                        <span class="layer-detail-time">4 hr runtime</span>
+                    </div>
+                    <div class="layer-detail-body">
+                        <p>Business users validate real-world scenarios against acceptance criteria. Confirms reports match expectations and business rules are correctly implemented.</p>
+                        <div class="layer-detail-checks">
+                            <span class="check-item">✓ Business rules</span>
+                            <span class="check-item">✓ Report accuracy</span>
+                            <span class="check-item">✓ User workflows</span>
+                            <span class="check-item">✓ Sign-off criteria</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 3: DATA COMPARISON -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Data Comparison</h2>
+                    <p>Row-level validation between source and target</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Data comparison validates that the migrated data exactly matches the source. We compare <strong>row counts</strong>, <strong>column checksums</strong>, and <strong>sample record contents</strong> across all critical tables. Any discrepancy triggers immediate investigation.</p>
+                    <p>For large tables, we use statistical sampling combined with checksum validation to verify data integrity without comparing every row. Critical tables are validated at 100% coverage regardless of size.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📊</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">4,231</span>
+                            <span class="highlight-label">Tables Compared</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">✅</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">100%</span>
+                            <span class="highlight-label">Match Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-container">
+                <div class="comparison-header">
+                    <div class="comparison-title">Critical Table Comparison Results</div>
+                    <div class="comparison-badge match">All Matched ✓</div>
+                </div>
+                <div class="comparison-body">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Table Name</th>
+                                <th>Source Rows</th>
+                                <th>Target Rows</th>
+                                <th>Checksum</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="table-name">TRANSACTION_HISTORY</td>
+                                <td class="count">847,293,412</td>
+                                <td class="count">847,293,412</td>
+                                <td class="match">✓ Match</td>
+                                <td><span class="status-icon">✅</span></td>
+                            </tr>
+                            <tr>
+                                <td class="table-name">CUSTOMER_360</td>
+                                <td class="count">12,847,921</td>
+                                <td class="count">12,847,921</td>
+                                <td class="match">✓ Match</td>
+                                <td><span class="status-icon">✅</span></td>
+                            </tr>
+                            <tr>
+                                <td class="table-name">ORDER_DETAILS</td>
+                                <td class="count">234,891,234</td>
+                                <td class="count">234,891,234</td>
+                                <td class="match">✓ Match</td>
+                                <td><span class="status-icon">✅</span></td>
+                            </tr>
+                            <tr>
+                                <td class="table-name">PRODUCT_CATALOG</td>
+                                <td class="count">1,247,832</td>
+                                <td class="count">1,247,832</td>
+                                <td class="match">✓ Match</td>
+                                <td><span class="status-icon">✅</span></td>
+                            </tr>
+                            <tr>
+                                <td class="table-name">EVENT_LOG</td>
+                                <td class="count">2,891,234,567</td>
+                                <td class="count">2,891,234,567</td>
+                                <td class="match">✓ Match</td>
+                                <td><span class="status-icon">✅</span></td>
+                            </tr>
+                            <tr>
+                                <td class="table-name">INVENTORY_SNAPSHOT</td>
+                                <td class="count">89,234,123</td>
+                                <td class="count">89,234,123</td>
+                                <td class="match">✓ Match</td>
+                                <td><span class="status-icon">✅</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 4: TEST CATEGORIES -->
+        <section class="module" id="categories">
+            <div class="module-header">
+                <div class="module-icon">📁</div>
+                <div class="module-info">
+                    <h2>Test Categories</h2>
+                    <p>Specialized test suites by validation type</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Tests are organized into functional categories, each with specialized assertions and expected outcomes. This organization enables targeted reruns when specific areas fail and provides clear reporting for different stakeholder groups.</p>
+                    <p>Each category has its own entry/exit criteria, with critical categories blocking deployment if any tests fail. Non-critical categories may proceed with documented exceptions and remediation plans.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📋</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">6</span>
+                            <span class="highlight-label">Categories</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🚫</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">3</span>
+                            <span class="highlight-label">Blockers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="test-categories">
+                <div class="test-category">
+                    <div class="test-category-header">
+                        <span class="test-category-icon">📊</span>
+                        <span class="test-category-title">Data Integrity</span>
+                        <span class="test-category-count">4,892 tests</span>
+                    </div>
+                    <div class="test-category-body">
+                        <div class="test-category-desc">Validates row counts, checksums, null handling, and data type preservation across all migrated tables.</div>
+                        <div class="test-items">
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Row count validation</span><span class="test-item-time">2.3s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Checksum comparison</span><span class="test-item-time">45.2s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">NULL preservation</span><span class="test-item-time">1.8s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Data type fidelity</span><span class="test-item-time">3.1s</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-category">
+                    <div class="test-category-header">
+                        <span class="test-category-icon">⚡</span>
+                        <span class="test-category-title">Query Equivalence</span>
+                        <span class="test-category-count">8,234 tests</span>
+                    </div>
+                    <div class="test-category-body">
+                        <div class="test-category-desc">Compares query results between source and target systems using production query patterns.</div>
+                        <div class="test-items">
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">SELECT result match</span><span class="test-item-time">12.4s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Aggregation accuracy</span><span class="test-item-time">8.7s</span></div>
+                            <div class="test-item"><span class="test-item-status fail"></span><span class="test-item-name">Window function parity</span><span class="test-item-time">4.2s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Join semantics</span><span class="test-item-time">6.1s</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-category">
+                    <div class="test-category-header">
+                        <span class="test-category-icon">🔧</span>
+                        <span class="test-category-title">Procedure Output</span>
+                        <span class="test-category-count">3,127 tests</span>
+                    </div>
+                    <div class="test-category-body">
+                        <div class="test-category-desc">Validates stored procedure and function outputs match between source and target.</div>
+                        <div class="test-items">
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Return value match</span><span class="test-item-time">5.6s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Output parameter parity</span><span class="test-item-time">3.2s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Side effect validation</span><span class="test-item-time">8.9s</span></div>
+                            <div class="test-item"><span class="test-item-status skip"></span><span class="test-item-name">Exception handling</span><span class="test-item-time">-</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-category">
+                    <div class="test-category-header">
+                        <span class="test-category-icon">🚀</span>
+                        <span class="test-category-title">Performance</span>
+                        <span class="test-category-count">1,847 tests</span>
+                    </div>
+                    <div class="test-category-body">
+                        <div class="test-category-desc">Ensures migrated queries meet or exceed source system performance benchmarks.</div>
+                        <div class="test-items">
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Query latency SLA</span><span class="test-item-time">varies</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Throughput validation</span><span class="test-item-time">30.2s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Concurrent load test</span><span class="test-item-time">120s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Resource utilization</span><span class="test-item-time">60s</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-category">
+                    <div class="test-category-header">
+                        <span class="test-category-icon">🔄</span>
+                        <span class="test-category-title">ETL Pipelines</span>
+                        <span class="test-category-count">2,891 tests</span>
+                    </div>
+                    <div class="test-category-body">
+                        <div class="test-category-desc">Validates ETL job outputs, scheduling, dependencies, and error handling.</div>
+                        <div class="test-items">
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Output data match</span><span class="test-item-time">15.3s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Schedule execution</span><span class="test-item-time">2.1s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Dependency chain</span><span class="test-item-time">4.8s</span></div>
+                            <div class="test-item"><span class="test-item-status fail"></span><span class="test-item-name">Failure recovery</span><span class="test-item-time">8.2s</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-category">
+                    <div class="test-category-header">
+                        <span class="test-category-icon">🔐</span>
+                        <span class="test-category-title">Security & Access</span>
+                        <span class="test-category-count">1,856 tests</span>
+                    </div>
+                    <div class="test-category-body">
+                        <div class="test-category-desc">Verifies permissions, role assignments, and data masking rules are correctly migrated.</div>
+                        <div class="test-items">
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Permission parity</span><span class="test-item-time">3.4s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Role assignments</span><span class="test-item-time">2.1s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Data masking rules</span><span class="test-item-time">5.7s</span></div>
+                            <div class="test-item"><span class="test-item-status pass"></span><span class="test-item-name">Audit trail integrity</span><span class="test-item-time">4.3s</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 5: RECONCILIATION -->
+        <section class="module" id="recon">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Data Reconciliation</h2>
+                    <p>Automated balance verification and audit trails</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Data reconciliation validates that migrated data exactly matches the source across multiple dimensions: <strong>row counts</strong>, <strong>column checksums</strong>, <strong>aggregation totals</strong>, and <strong>sample record comparison</strong>. Any variance triggers immediate investigation.</p>
+                    <p>Reconciliation runs continuously during migration and post-cutover. For large tables, we use statistical sampling combined with checksum validation. Critical tables are validated at 100% coverage regardless of size.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📊</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">4,231</span>
+                            <span class="highlight-label">Tables Reconciled</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">✅</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">100%</span>
+                            <span class="highlight-label">Match Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reconciliation Summary -->
+            <div class="recon-summary">
+                <div class="recon-summary-card">
+                    <div class="recon-summary-header">
+                        <span class="recon-summary-icon">📊</span>
+                        <span class="recon-summary-title">Row Count Validation</span>
+                    </div>
+                    <div class="recon-summary-body">
+                        <div class="recon-summary-stat">
+                            <span class="recon-summary-value green">4,231 / 4,231</span>
+                            <span class="recon-summary-label">Tables Matched</span>
+                        </div>
+                        <div class="recon-summary-detail">
+                            <div class="recon-detail-row"><span>Source Total Rows</span><span>4,847,293,412</span></div>
+                            <div class="recon-detail-row"><span>Target Total Rows</span><span>4,847,293,412</span></div>
+                            <div class="recon-detail-row match"><span>Variance</span><span>0 rows (0.000%)</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="recon-summary-card">
+                    <div class="recon-summary-header">
+                        <span class="recon-summary-icon">🔐</span>
+                        <span class="recon-summary-title">Checksum Validation</span>
+                    </div>
+                    <div class="recon-summary-body">
+                        <div class="recon-summary-stat">
+                            <span class="recon-summary-value green">100%</span>
+                            <span class="recon-summary-label">Checksums Match</span>
+                        </div>
+                        <div class="recon-summary-detail">
+                            <div class="recon-detail-row"><span>MD5 Hash Verified</span><span>4,231 tables</span></div>
+                            <div class="recon-detail-row"><span>Column-level CRC</span><span>89,423 columns</span></div>
+                            <div class="recon-detail-row match"><span>Mismatches Found</span><span>0</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="recon-summary-card">
+                    <div class="recon-summary-header">
+                        <span class="recon-summary-icon">⚖️</span>
+                        <span class="recon-summary-title">Aggregation Validation</span>
+                    </div>
+                    <div class="recon-summary-body">
+                        <div class="recon-summary-stat">
+                            <span class="recon-summary-value green">847</span>
+                            <span class="recon-summary-label">Metrics Validated</span>
+                        </div>
+                        <div class="recon-summary-detail">
+                            <div class="recon-detail-row"><span>SUM/COUNT/AVG Tests</span><span>847 passed</span></div>
+                            <div class="recon-detail-row"><span>Financial Totals</span><span>$847.2M matched</span></div>
+                            <div class="recon-detail-row match"><span>Variance Threshold</span><span>< 0.001%</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="recon-summary-card">
+                    <div class="recon-summary-header">
+                        <span class="recon-summary-icon">🔍</span>
+                        <span class="recon-summary-title">Sample Comparison</span>
+                    </div>
+                    <div class="recon-summary-body">
+                        <div class="recon-summary-stat">
+                            <span class="recon-summary-value green">1.2M</span>
+                            <span class="recon-summary-label">Records Sampled</span>
+                        </div>
+                        <div class="recon-summary-detail">
+                            <div class="recon-detail-row"><span>Random Samples</span><span>1,247,832 rows</span></div>
+                            <div class="recon-detail-row"><span>Byte-level Match</span><span>100%</span></div>
+                            <div class="recon-detail-row match"><span>Confidence Level</span><span>99.99%</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reconciliation Schedule -->
+            <div class="recon-schedule">
+                <div class="recon-schedule-header">
+                    <h4>📅 Reconciliation Schedule</h4>
+                </div>
+                <div class="recon-schedule-grid">
+                    <div class="schedule-item">
+                        <div class="schedule-freq">Continuous</div>
+                        <div class="schedule-desc">Row count validation on all active tables during migration</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-freq">Hourly</div>
+                        <div class="schedule-desc">Checksum verification on critical business tables</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-freq">Daily</div>
+                        <div class="schedule-desc">Full aggregation validation and sample comparison</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-freq">Weekly</div>
+                        <div class="schedule-desc">Complete audit report for stakeholder review</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 5.5: SIGN-OFF CRITERIA -->
+        <section class="module" id="signoff">
+            <div class="module-header">
+                <div class="module-icon">✍️</div>
+                <div class="module-info">
+                    <h2>Sign-off Criteria</h2>
+                    <p>Exit gates for validation completion</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Migration validation is complete when all sign-off criteria are met. These criteria ensure that the migration delivers the expected business value with acceptable risk. Each criterion has a <strong>threshold</strong> and <strong>owner</strong> responsible for sign-off.</p>
+                    <p>Critical criteria block deployment if not met. Non-critical criteria may proceed with documented exceptions and remediation plans approved by the steering committee.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">✅</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">8 / 10</span>
+                            <span class="highlight-label">Criteria Met</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🎯</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">2</span>
+                            <span class="highlight-label">In Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="criteria-container">
+                <div class="criteria-header">
+                    <div class="criteria-title">📋 Validation Sign-off Checklist</div>
+                </div>
+                <div class="criteria-body">
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Data Integrity - 100% row count match</span>
+                            <span class="criteria-owner">Data Engineering Lead</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Query Equivalence - 99.5% result match</span>
+                            <span class="criteria-owner">QA Lead</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Performance - Meets or exceeds baseline</span>
+                            <span class="criteria-owner">Platform Architect</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Security - All permissions validated</span>
+                            <span class="criteria-owner">Security Lead</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">ETL Pipelines - All jobs successful</span>
+                            <span class="criteria-owner">Data Engineering Lead</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Reconciliation - Zero financial variance</span>
+                            <span class="criteria-owner">Finance Lead</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item in-progress">
+                        <span class="criteria-check">🔄</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">UAT - Business user acceptance</span>
+                            <span class="criteria-owner">Business Lead</span>
+                        </div>
+                        <span class="criteria-status">In Progress</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Zero Critical Defects - All P0/P1 resolved</span>
+                            <span class="criteria-owner">Project Manager</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                    <div class="criteria-item in-progress">
+                        <span class="criteria-check">🔄</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Documentation - Runbook complete</span>
+                            <span class="criteria-owner">Tech Lead</span>
+                        </div>
+                        <span class="criteria-status">In Progress</span>
+                    </div>
+                    <div class="criteria-item done">
+                        <span class="criteria-check">✅</span>
+                        <div class="criteria-info">
+                            <span class="criteria-name">Rollback Tested - Recovery validated</span>
+                            <span class="criteria-owner">Platform Architect</span>
+                        </div>
+                        <span class="criteria-status">Complete</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 6: DEFECTS -->
+        <section class="module" id="defects">
+            <div class="module-header">
+                <div class="module-icon">🐛</div>
+                <div class="module-info">
+                    <h2>Defect Tracking</h2>
+                    <p>Open issues from validation testing</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>Defects discovered during validation are tracked through resolution. Each defect is assigned a <strong>severity</strong> based on business impact, an <strong>owner</strong> responsible for resolution, and a <strong>target date</strong> aligned with wave deployment schedules.</p>
+                    <p>Critical and high-severity defects block wave deployment. Medium and low defects may be deferred with documented business justification and remediation timeline.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔴</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">0</span>
+                            <span class="highlight-label">Critical Open</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🟡</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">12</span>
+                            <span class="highlight-label">Total Open</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="defect-container">
+                <div class="defect-header">
+                    <div class="defect-title">Open Validation Defects</div>
+                    <div class="defect-count">12 open defects</div>
+                </div>
+                <div class="defect-body">
+                    <table class="defect-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Description</th>
+                                <th>Severity</th>
+                                <th>Owner</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="defect-id">DEF-1247</span></td>
+                                <td>Window function LAG() returns NULL instead of default</td>
+                                <td><span class="defect-severity high">High</span></td>
+                                <td>J. Chen</td>
+                                <td><span class="defect-status in-progress">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="defect-id">DEF-1251</span></td>
+                                <td>Date truncation in TIMESTAMP columns</td>
+                                <td><span class="defect-severity high">High</span></td>
+                                <td>M. Patel</td>
+                                <td><span class="defect-status in-progress">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="defect-id">DEF-1253</span></td>
+                                <td>Decimal precision loss in SUM aggregations</td>
+                                <td><span class="defect-severity medium">Medium</span></td>
+                                <td>S. Kumar</td>
+                                <td><span class="defect-status open">Open</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="defect-id">DEF-1256</span></td>
+                                <td>CONNECT BY hierarchical query performance</td>
+                                <td><span class="defect-severity medium">Medium</span></td>
+                                <td>A. Rodriguez</td>
+                                <td><span class="defect-status in-progress">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="defect-id">DEF-1258</span></td>
+                                <td>NLS_DATE_FORMAT conversion edge case</td>
+                                <td><span class="defect-severity low">Low</span></td>
+                                <td>K. Thompson</td>
+                                <td><span class="defect-status open">Open</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Validation Timeline -->
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <div class="timeline-title">📅 Validation Timeline</div>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-phases">
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-bar complete"></div>
+                            <div class="timeline-phase-name">Unit Testing</div>
+                            <div class="timeline-phase-dates">Dec 15 - Dec 20</div>
+                            <div class="timeline-phase-status complete">Complete</div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-bar complete"></div>
+                            <div class="timeline-phase-name">Integration</div>
+                            <div class="timeline-phase-dates">Dec 21 - Dec 26</div>
+                            <div class="timeline-phase-status complete">Complete</div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-bar active"></div>
+                            <div class="timeline-phase-name">System Testing</div>
+                            <div class="timeline-phase-dates">Dec 27 - Jan 2</div>
+                            <div class="timeline-phase-status active">In Progress</div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-bar pending"></div>
+                            <div class="timeline-phase-name">UAT</div>
+                            <div class="timeline-phase-dates">Jan 3 - Jan 10</div>
+                            <div class="timeline-phase-status pending">Pending</div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-bar pending"></div>
+                            <div class="timeline-phase-name">Sign-off</div>
+                            <div class="timeline-phase-dates">Jan 11 - Jan 12</div>
+                            <div class="timeline-phase-status pending">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 7: AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered test generation and analysis</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">✅</div>
+                    <div class="agent-name">ValidationAgent</div>
+                    <div class="agent-role">Automated Testing & Analysis</div>
+                    <p class="agent-desc">Generates test cases from production query patterns, executes parallel test suites, compares results between source and target, and analyzes failures to identify root causes and suggest fixes.</p>
+                    <ul class="agent-capabilities">
+                        <li>Auto-generate tests from query logs</li>
+                        <li>Parallel test execution at scale</li>
+                        <li>Result comparison and diff analysis</li>
+                        <li>Data reconciliation automation</li>
+                        <li>Failure root cause analysis</li>
+                        <li>Coverage gap identification</li>
+                        <li>Regression detection</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">validation_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Validation Agent with Test Generation</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Tool
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> databricks.sdk <span class="code-keyword">import</span> WorkspaceClient
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+dbx = WorkspaceClient()
+
+<span class="code-comment"># Test Generator Tool</span>
+test_generator = Tool(
+    name=<span class="code-string">"test_generator"</span>,
+    description=<span class="code-string">"Generates validation tests from 
+    production query patterns and expected results"</span>,
+    func=generate_tests_from_queries
+)
+
+<span class="code-comment"># Data Comparator Tool</span>
+data_comparator = Tool(
+    name=<span class="code-string">"data_comparator"</span>,
+    description=<span class="code-string">"Compares query results between 
+    source and target systems with diff analysis"</span>,
+    func=compare_datasets
+)
+
+<span class="code-comment"># Reconciliation Tool</span>
+reconciler = Tool(
+    name=<span class="code-string">"reconciler"</span>,
+    description=<span class="code-string">"Validates business metrics and 
+    financial totals between systems"</span>,
+    func=reconcile_metrics
+)
+
+<span class="code-comment"># Failure Analyzer Tool</span>
+failure_analyzer = Tool(
+    name=<span class="code-string">"failure_analyzer"</span>,
+    description=<span class="code-string">"Analyzes test failures to identify 
+    root causes and suggest remediation"</span>,
+    func=analyze_failures
+)
+
+validation_agent = Agent(
+    role=<span class="code-string">"Migration Validation Specialist"</span>,
+    goal=<span class="code-string">"Ensure 100% data accuracy and functional 
+    equivalence between source and target"</span>,
+    backstory=<span class="code-string">"""Expert QA engineer specializing in 
+    data platform migrations with deep experience 
+    in automated testing and reconciliation."""</span>,
+    llm=llm,
+    tools=[test_generator, data_comparator, 
+           reconciler, failure_analyzer],
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat13-p2-conversion.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">13.2: Conversion</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 13</div>
+        <a href="cat13-p4-cutover.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">13.4: Cutover</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

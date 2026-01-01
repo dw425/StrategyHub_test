@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Governance | Security & Compliance | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 11 - SECURITY RED */
+            --brand-orange: #FF9900;
+            --cat-primary: #EF4444;
+            --cat-light: #F87171;
+            --cat-dark: #DC2626;
+            --cat-glow: rgba(239, 68, 68, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        /* MAIN */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); border-radius: 16px 16px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left > p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* MODULES */
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* OVERVIEW CONTENT */
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* DATA QUALITY DASHBOARD */
+        .quality-dashboard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .quality-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .quality-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .quality-score { display: flex; align-items: center; gap: 8px; }
+        .quality-score-value { font-size: 20px; font-weight: 700; color: var(--green); }
+        .quality-score-label { font-size: 11px; color: var(--text-muted); }
+        
+        .quality-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 20px; }
+        .quality-metric { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .quality-metric::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--metric-color); border-radius: 12px 12px 0 0; }
+        .quality-metric-icon { font-size: 24px; margin-bottom: 8px; }
+        .quality-metric-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .quality-metric-name { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .quality-bar { height: 4px; background: var(--bg-card-alt); border-radius: 2px; overflow: hidden; }
+        .quality-bar-fill { height: 100%; border-radius: 2px; background: var(--metric-color); }
+        
+        /* DATA LINEAGE VISUALIZATION */
+        .lineage-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .lineage-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .lineage-title { font-size: 14px; font-weight: 600; }
+        .lineage-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .lineage-visual { padding: 24px; background: var(--bg-dark); position: relative; }
+        
+        .lineage-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; position: relative; z-index: 1; }
+        .lineage-column { display: flex; flex-direction: column; gap: 12px; }
+        .lineage-column-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: center; margin-bottom: 8px; }
+        .lineage-node { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 12px; text-align: center; transition: all 0.3s; position: relative; }
+        .lineage-node:hover { border-color: var(--violet); transform: scale(1.05); z-index: 10; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+        .lineage-node-icon { font-size: 22px; margin-bottom: 8px; }
+        .lineage-node-name { font-size: 12px; font-weight: 600; }
+        .lineage-node-type { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .lineage-spacer { height: 82px; } /* Match node height for alignment */
+        
+        /* Curved connection overlay */
+        .lineage-connections { position: absolute; top: 24px; left: 24px; right: 24px; bottom: 24px; pointer-events: none; z-index: 0; }
+        .lineage-connections svg { width: 100%; height: 100%; }
+        .lineage-connections path { fill: none; stroke: var(--violet); stroke-width: 0.4; stroke-dasharray: 1.5,1; opacity: 0.7; animation: lineageDash 1.5s linear infinite; }
+        @keyframes lineageDash { to { stroke-dashoffset: -6; } }
+        
+        /* DATA CATALOG */
+        .catalog-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .catalog-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .catalog-title { font-size: 14px; font-weight: 600; }
+        .catalog-search { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; }
+        .catalog-search-icon { font-size: 14px; color: var(--text-muted); }
+        .catalog-search input { background: none; border: none; color: var(--text-primary); font-size: 12px; width: 150px; outline: none; }
+        .catalog-search input::placeholder { color: var(--text-muted); }
+        
+        .catalog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px; }
+        .catalog-item { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; transition: all 0.3s; }
+        .catalog-item:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .catalog-item-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .catalog-item-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .catalog-item-name { font-size: 13px; font-weight: 600; }
+        .catalog-item-type { font-size: 9px; color: var(--text-muted); }
+        .catalog-item-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .catalog-item-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+        .catalog-item-tag { font-size: 9px; padding: 3px 8px; border-radius: 6px; background: var(--bg-card-alt); color: var(--text-muted); }
+        .catalog-item-tag.pii { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .catalog-item-tag.sensitive { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        
+        /* GOVERNANCE PILLARS */
+        .pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .pillar-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: all 0.3s; }
+        .pillar-card:hover { border-color: var(--pillar-color); transform: translateY(-4px); }
+        .pillar-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--pillar-color); }
+        .pillar-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; background: var(--bg-card-alt); }
+        .pillar-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+        .pillar-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* STEWARDSHIP MODEL */
+        .stewardship-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .stewardship-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .stewardship-title { font-size: 14px; font-weight: 600; }
+        .stewardship-content { padding: 24px; }
+        .stewardship-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .steward-role { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .steward-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 12px; border: 2px solid var(--role-color); background: var(--bg-card); }
+        .steward-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .steward-scope { font-size: 10px; color: var(--role-color); margin-bottom: 12px; }
+        .steward-responsibilities { list-style: none; text-align: left; }
+        .steward-responsibilities li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .steward-responsibilities li::before { content: '•'; color: var(--role-color); }
+        
+        /* DATA LIFECYCLE */
+        .lifecycle-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .lifecycle-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .lifecycle-title { font-size: 14px; font-weight: 600; }
+        .lifecycle-content { padding: 24px; }
+        .lifecycle-stages { display: flex; justify-content: space-between; position: relative; }
+        .lifecycle-stages::before { content: ''; position: absolute; top: 24px; left: 40px; right: 40px; height: 3px; background: linear-gradient(90deg, var(--blue), var(--cyan), var(--green), var(--yellow), var(--orange), var(--red)); border-radius: 2px; }
+        .lifecycle-stage { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; flex: 1; }
+        .lifecycle-stage-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; border: 3px solid var(--stage-color); background: var(--bg-card); }
+        .lifecycle-stage-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; text-align: center; }
+        .lifecycle-stage-desc { font-size: 9px; color: var(--text-muted); text-align: center; max-width: 80px; }
+        
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-category { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* BEST PRACTICES */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(239,68,68,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; overflow-x: auto; max-height: 400px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        .code-property { color: #7EE787; }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); font-size: 13px; padding: 8px 16px; border-radius: 8px; transition: all 0.2s; }
+        .footer-link:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .footer-link span { font-size: 18px; }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 500; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .quality-metrics { grid-template-columns: repeat(2, 1fr); }
+            .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+            .catalog-grid { grid-template-columns: 1fr; }
+            .stewardship-grid { grid-template-columns: 1fr; }
+            .lifecycle-stages { flex-wrap: wrap; gap: 16px; }
+            .lifecycle-stages::before { display: none; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .lineage-grid { grid-template-columns: 1fr; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="sep">/</span>
+        <a href="cat11-security-compliance-overview.html">Security & Compliance</a>
+        <span class="sep">/</span>
+        <span class="current">Data Governance</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🛡️ Security & Compliance</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat11-security-compliance-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat11-p1-compliance-frameworks.html"><span class="nav-icon">📋</span> 11.1 Compliance Frameworks</a></li>
+            <li><a href="cat11-p2-data-privacy.html"><span class="nav-icon">🔒</span> 11.2 Data Privacy</a></li>
+            <li><a href="cat11-p3-data-governance.html" class="active"><span class="nav-icon">⚖️</span> 11.3 Data Governance</a></li>
+            <li><a href="cat11-p4-risk-management.html"><span class="nav-icon">⚠️</span> 11.4 Risk Management</a></li>
+            <li><a href="cat11-p5-identity-access.html"><span class="nav-icon">🪪</span> 11.5 Identity & Access</a></li>
+            <li><a href="cat11-p6-audit-logging.html"><span class="nav-icon">📊</span> 11.6 Audit & Logging</a></li>
+            <li><a href="cat11-p7-incident-response.html"><span class="nav-icon">🚨</span> 11.7 Incident Response</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#quality"><span class="nav-icon">✅</span> Data Quality</a></li>
+            <li><a href="#lineage"><span class="nav-icon">🔄</span> Data Lineage</a></li>
+            <li><a href="#catalog"><span class="nav-icon">📚</span> Data Catalog</a></li>
+            <li><a href="#pillars"><span class="nav-icon">🏛️</span> Pillars</a></li>
+            <li><a href="#stewardship"><span class="nav-icon">👥</span> Stewardship</a></li>
+            <li><a href="#lifecycle"><span class="nav-icon">🔁</span> Lifecycle</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">⚖️ Page 11.3</span>
+                <h1>Data Governance</h1>
+                <p>Establish trust in your data through quality management, lineage tracking, and stewardship. Build a data governance program that enables self-service analytics while maintaining control and compliance.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">95%</div><div class="hero-metric-label">Data Quality Target</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2.4K</div><div class="hero-metric-label">Cataloged Assets</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">156</div><div class="hero-metric-label">Data Policies</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">12</div><div class="hero-metric-label">Data Stewards</div></div>
+            </div>
+        </section>
+        
+        <!-- OVERVIEW CONTENT -->
+        <section class="module">
+            <div class="overview-content">
+                <h3>Why Data Governance Matters</h3>
+                <p>Data governance ensures that data is accurate, consistent, secure, and used appropriately across the organization. It establishes accountability through data stewardship, enables trust through quality metrics, and supports compliance through lineage tracking. Without governance, organizations face data silos, inconsistent definitions, and compliance risks.</p>
+                <p>Modern data governance balances control with agility. Rather than creating bottlenecks, effective governance programs enable self-service analytics by providing clear data catalogs, automated quality checks, and transparent lineage—so data consumers can find, understand, and trust the data they need.</p>
+            </div>
+        </section>
+        
+        <!-- DATA QUALITY DASHBOARD -->
+        <section class="module" id="quality">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Data Quality Dashboard</h2>
+                    <p>Real-time quality metrics across dimensions</p>
+                </div>
+            </div>
+            
+            <div class="quality-dashboard">
+                <div class="quality-header">
+                    <div class="quality-title">📊 Quality Score Overview</div>
+                    <div class="quality-score">
+                        <span class="quality-score-value">94.2%</span>
+                        <span class="quality-score-label">Overall Quality</span>
+                    </div>
+                </div>
+                <div class="quality-metrics">
+                    <div class="quality-metric" style="--metric-color: var(--green);">
+                        <div class="quality-metric-icon">✓</div>
+                        <div class="quality-metric-value" style="color: var(--green);">98.5%</div>
+                        <div class="quality-metric-name">Completeness</div>
+                        <div class="quality-bar"><div class="quality-bar-fill" style="width: 98.5%;"></div></div>
+                    </div>
+                    <div class="quality-metric" style="--metric-color: var(--blue);">
+                        <div class="quality-metric-icon">🎯</div>
+                        <div class="quality-metric-value" style="color: var(--blue);">96.2%</div>
+                        <div class="quality-metric-name">Accuracy</div>
+                        <div class="quality-bar"><div class="quality-bar-fill" style="width: 96.2%;"></div></div>
+                    </div>
+                    <div class="quality-metric" style="--metric-color: var(--violet);">
+                        <div class="quality-metric-icon">🔗</div>
+                        <div class="quality-metric-value" style="color: var(--violet);">91.8%</div>
+                        <div class="quality-metric-name">Consistency</div>
+                        <div class="quality-bar"><div class="quality-bar-fill" style="width: 91.8%;"></div></div>
+                    </div>
+                    <div class="quality-metric" style="--metric-color: var(--cyan);">
+                        <div class="quality-metric-icon">⏱️</div>
+                        <div class="quality-metric-value" style="color: var(--cyan);">94.7%</div>
+                        <div class="quality-metric-name">Timeliness</div>
+                        <div class="quality-bar"><div class="quality-bar-fill" style="width: 94.7%;"></div></div>
+                    </div>
+                    <div class="quality-metric" style="--metric-color: var(--yellow);">
+                        <div class="quality-metric-icon">🔑</div>
+                        <div class="quality-metric-value" style="color: var(--yellow);">89.9%</div>
+                        <div class="quality-metric-name">Uniqueness</div>
+                        <div class="quality-bar"><div class="quality-bar-fill" style="width: 89.9%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DATA LINEAGE -->
+        <section class="module" id="lineage">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Data Lineage</h2>
+                    <p>Track data from source to consumption</p>
+                </div>
+            </div>
+            
+            <div class="lineage-container">
+                <div class="lineage-header">
+                    <div class="lineage-title">🗺️ Customer 360 Lineage Map</div>
+                    <div class="lineage-subtitle">Tracing data flow from source systems through transformations to analytics</div>
+                </div>
+                <div class="lineage-visual">
+                    <!-- SVG Connections Layer -->
+                    <div class="lineage-connections">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <!-- Sources (x=10) to Raw Layer (x=30) - horizontal lines -->
+                            <path d="M 15 18 L 25 18"/>
+                            <path d="M 15 50 L 25 50"/>
+                            <path d="M 15 82 L 25 82"/>
+                            
+                            <!-- Raw Layer (x=30) to Transformed (x=50) - converging to center -->
+                            <path d="M 35 18 C 42 18, 43 50, 45 50"/>
+                            <path d="M 35 50 L 45 50"/>
+                            <path d="M 35 82 C 42 82, 43 50, 45 50"/>
+                            
+                            <!-- Transformed (x=50) to Curated (x=70) - diverging -->
+                            <path d="M 55 50 C 60 50, 63 28, 65 28"/>
+                            <path d="M 55 50 C 60 50, 63 72, 65 72"/>
+                            
+                            <!-- Curated (x=70) to Consumption (x=90) -->
+                            <path d="M 75 28 L 85 28"/>
+                            <path d="M 75 72 L 85 72"/>
+                        </svg>
+                    </div>
+                    
+                    <div class="lineage-grid">
+                        <!-- Sources Column -->
+                        <div class="lineage-column">
+                            <div class="lineage-column-title">Sources</div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">🗄️</div>
+                                <div class="lineage-node-name">Salesforce</div>
+                                <div class="lineage-node-type">CRM</div>
+                            </div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">💳</div>
+                                <div class="lineage-node-name">Stripe</div>
+                                <div class="lineage-node-type">Payments</div>
+                            </div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">📧</div>
+                                <div class="lineage-node-name">Marketo</div>
+                                <div class="lineage-node-type">Marketing</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Raw Layer Column -->
+                        <div class="lineage-column">
+                            <div class="lineage-column-title">Raw Layer</div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">📥</div>
+                                <div class="lineage-node-name">raw_contacts</div>
+                                <div class="lineage-node-type">Bronze</div>
+                            </div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">📥</div>
+                                <div class="lineage-node-name">raw_transactions</div>
+                                <div class="lineage-node-type">Bronze</div>
+                            </div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">📥</div>
+                                <div class="lineage-node-name">raw_campaigns</div>
+                                <div class="lineage-node-type">Bronze</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Transformed Column -->
+                        <div class="lineage-column">
+                            <div class="lineage-column-title">Transformed</div>
+                            <div class="lineage-spacer"></div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">⚙️</div>
+                                <div class="lineage-node-name">stg_customer</div>
+                                <div class="lineage-node-type">Silver</div>
+                            </div>
+                            <div class="lineage-spacer"></div>
+                        </div>
+                        
+                        <!-- Curated Column -->
+                        <div class="lineage-column">
+                            <div class="lineage-column-title">Curated</div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">✨</div>
+                                <div class="lineage-node-name">dim_customer</div>
+                                <div class="lineage-node-type">Gold</div>
+                            </div>
+                            <div class="lineage-spacer"></div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">✨</div>
+                                <div class="lineage-node-name">fact_revenue</div>
+                                <div class="lineage-node-type">Gold</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Consumption Column -->
+                        <div class="lineage-column">
+                            <div class="lineage-column-title">Consumption</div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">📊</div>
+                                <div class="lineage-node-name">Customer 360</div>
+                                <div class="lineage-node-type">Dashboard</div>
+                            </div>
+                            <div class="lineage-spacer"></div>
+                            <div class="lineage-node">
+                                <div class="lineage-node-icon">🤖</div>
+                                <div class="lineage-node-name">Churn Model</div>
+                                <div class="lineage-node-type">ML</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DATA CATALOG -->
+        <section class="module" id="catalog">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Data Catalog</h2>
+                    <p>Discover and understand your data assets</p>
+                </div>
+            </div>
+            
+            <div class="catalog-container">
+                <div class="catalog-header">
+                    <div class="catalog-title">🔍 Browse Data Assets</div>
+                    <div class="catalog-search">
+                        <span class="catalog-search-icon">🔎</span>
+                        <input type="text" placeholder="Search assets...">
+                    </div>
+                </div>
+                <div class="catalog-grid">
+                    <div class="catalog-item">
+                        <div class="catalog-item-header">
+                            <div class="catalog-item-icon" style="background: linear-gradient(135deg, var(--blue), #1D4ED8);">👤</div>
+                            <div>
+                                <div class="catalog-item-name">dim_customer</div>
+                                <div class="catalog-item-type">Table • Gold Layer</div>
+                            </div>
+                        </div>
+                        <div class="catalog-item-desc">Master customer dimension with demographics, segmentation, and lifetime value calculations.</div>
+                        <div class="catalog-item-meta">
+                            <span class="catalog-item-tag pii">PII</span>
+                            <span class="catalog-item-tag">Certified</span>
+                            <span class="catalog-item-tag">Daily</span>
+                        </div>
+                    </div>
+                    <div class="catalog-item">
+                        <div class="catalog-item-header">
+                            <div class="catalog-item-icon" style="background: linear-gradient(135deg, var(--green), #059669);">💰</div>
+                            <div>
+                                <div class="catalog-item-name">fact_revenue</div>
+                                <div class="catalog-item-type">Table • Gold Layer</div>
+                            </div>
+                        </div>
+                        <div class="catalog-item-desc">Revenue transactions with product, customer, and time dimensions for financial reporting.</div>
+                        <div class="catalog-item-meta">
+                            <span class="catalog-item-tag sensitive">Financial</span>
+                            <span class="catalog-item-tag">Certified</span>
+                            <span class="catalog-item-tag">Hourly</span>
+                        </div>
+                    </div>
+                    <div class="catalog-item">
+                        <div class="catalog-item-header">
+                            <div class="catalog-item-icon" style="background: linear-gradient(135deg, var(--violet), #6D28D9);">📦</div>
+                            <div>
+                                <div class="catalog-item-name">dim_product</div>
+                                <div class="catalog-item-type">Table • Gold Layer</div>
+                            </div>
+                        </div>
+                        <div class="catalog-item-desc">Product master data with categories, attributes, and pricing information.</div>
+                        <div class="catalog-item-meta">
+                            <span class="catalog-item-tag">Certified</span>
+                            <span class="catalog-item-tag">Daily</span>
+                        </div>
+                    </div>
+                    <div class="catalog-item">
+                        <div class="catalog-item-header">
+                            <div class="catalog-item-icon" style="background: linear-gradient(135deg, var(--cyan), #0891B2);">📊</div>
+                            <div>
+                                <div class="catalog-item-name">agg_daily_metrics</div>
+                                <div class="catalog-item-type">Table • Analytics</div>
+                            </div>
+                        </div>
+                        <div class="catalog-item-desc">Pre-aggregated daily business metrics for executive dashboards.</div>
+                        <div class="catalog-item-meta">
+                            <span class="catalog-item-tag">Certified</span>
+                            <span class="catalog-item-tag">Daily</span>
+                        </div>
+                    </div>
+                    <div class="catalog-item">
+                        <div class="catalog-item-header">
+                            <div class="catalog-item-icon" style="background: linear-gradient(135deg, var(--pink), #BE185D);">🎯</div>
+                            <div>
+                                <div class="catalog-item-name">ml_churn_scores</div>
+                                <div class="catalog-item-type">Table • ML Output</div>
+                            </div>
+                        </div>
+                        <div class="catalog-item-desc">Customer churn probability scores from ML model with feature contributions.</div>
+                        <div class="catalog-item-meta">
+                            <span class="catalog-item-tag pii">PII</span>
+                            <span class="catalog-item-tag">Model v2.3</span>
+                            <span class="catalog-item-tag">Daily</span>
+                        </div>
+                    </div>
+                    <div class="catalog-item">
+                        <div class="catalog-item-header">
+                            <div class="catalog-item-icon" style="background: linear-gradient(135deg, var(--yellow), #D97706);">📈</div>
+                            <div>
+                                <div class="catalog-item-name">rpt_sales_pipeline</div>
+                                <div class="catalog-item-type">Report • Sales</div>
+                            </div>
+                        </div>
+                        <div class="catalog-item-desc">Sales pipeline analysis with stage progression and conversion metrics.</div>
+                        <div class="catalog-item-meta">
+                            <span class="catalog-item-tag sensitive">Confidential</span>
+                            <span class="catalog-item-tag">Real-time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- GOVERNANCE PILLARS -->
+        <section class="module" id="pillars">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Governance Pillars</h2>
+                    <p>Core components of a data governance program</p>
+                </div>
+            </div>
+            
+            <div class="pillars-grid">
+                <div class="pillar-card" style="--pillar-color: var(--blue);">
+                    <div class="pillar-icon">📋</div>
+                    <div class="pillar-name">Data Quality</div>
+                    <div class="pillar-desc">Measure and improve accuracy, completeness, consistency, and timeliness of data through automated profiling and validation.</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: var(--violet);">
+                    <div class="pillar-icon">🗺️</div>
+                    <div class="pillar-name">Data Lineage</div>
+                    <div class="pillar-desc">Track data from source to consumption, understand transformations, and perform impact analysis for changes.</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: var(--green);">
+                    <div class="pillar-icon">📚</div>
+                    <div class="pillar-name">Data Catalog</div>
+                    <div class="pillar-desc">Enable discovery with searchable metadata, business glossaries, and documentation of data assets.</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: var(--orange);">
+                    <div class="pillar-icon">👥</div>
+                    <div class="pillar-name">Data Stewardship</div>
+                    <div class="pillar-desc">Establish ownership and accountability for data domains with clear roles and responsibilities.</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- STEWARDSHIP MODEL -->
+        <section class="module" id="stewardship">
+            <div class="module-header">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h2>Stewardship Model</h2>
+                    <p>Roles and responsibilities in data governance</p>
+                </div>
+            </div>
+            
+            <div class="stewardship-container">
+                <div class="stewardship-header">
+                    <div class="stewardship-title">🏢 Governance Organization</div>
+                </div>
+                <div class="stewardship-content">
+                    <div class="stewardship-grid">
+                        <div class="steward-role" style="--role-color: var(--violet);">
+                            <div class="steward-icon">👔</div>
+                            <div class="steward-title">Data Owner</div>
+                            <div class="steward-scope">Executive Level</div>
+                            <ul class="steward-responsibilities">
+                                <li>Accountable for data domain</li>
+                                <li>Approves access policies</li>
+                                <li>Defines quality standards</li>
+                                <li>Sponsors governance initiatives</li>
+                            </ul>
+                        </div>
+                        <div class="steward-role" style="--role-color: var(--blue);">
+                            <div class="steward-icon">🛡️</div>
+                            <div class="steward-title">Data Steward</div>
+                            <div class="steward-scope">Domain Level</div>
+                            <ul class="steward-responsibilities">
+                                <li>Maintains data definitions</li>
+                                <li>Resolves quality issues</li>
+                                <li>Documents business rules</li>
+                                <li>Reviews access requests</li>
+                            </ul>
+                        </div>
+                        <div class="steward-role" style="--role-color: var(--green);">
+                            <div class="steward-icon">⚙️</div>
+                            <div class="steward-title">Data Custodian</div>
+                            <div class="steward-scope">Technical Level</div>
+                            <ul class="steward-responsibilities">
+                                <li>Implements technical controls</li>
+                                <li>Manages data infrastructure</li>
+                                <li>Enforces security policies</li>
+                                <li>Monitors data pipelines</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DATA LIFECYCLE -->
+        <section class="module" id="lifecycle">
+            <div class="module-header">
+                <div class="module-icon">🔁</div>
+                <div class="module-info">
+                    <h2>Data Lifecycle Management</h2>
+                    <p>Managing data from creation to deletion</p>
+                </div>
+            </div>
+            
+            <div class="lifecycle-container">
+                <div class="lifecycle-header">
+                    <div class="lifecycle-title">📅 Lifecycle Stages</div>
+                </div>
+                <div class="lifecycle-content">
+                    <div class="lifecycle-stages">
+                        <div class="lifecycle-stage" style="--stage-color: var(--blue);">
+                            <div class="lifecycle-stage-icon">📥</div>
+                            <div class="lifecycle-stage-name">Create</div>
+                            <div class="lifecycle-stage-desc">Data entry & ingestion</div>
+                        </div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--cyan);">
+                            <div class="lifecycle-stage-icon">💾</div>
+                            <div class="lifecycle-stage-name">Store</div>
+                            <div class="lifecycle-stage-desc">Secure storage & backup</div>
+                        </div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--green);">
+                            <div class="lifecycle-stage-icon">🔄</div>
+                            <div class="lifecycle-stage-name">Use</div>
+                            <div class="lifecycle-stage-desc">Access & analytics</div>
+                        </div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--yellow);">
+                            <div class="lifecycle-stage-icon">📤</div>
+                            <div class="lifecycle-stage-name">Share</div>
+                            <div class="lifecycle-stage-desc">Distribution & APIs</div>
+                        </div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--orange);">
+                            <div class="lifecycle-stage-icon">📦</div>
+                            <div class="lifecycle-stage-name">Archive</div>
+                            <div class="lifecycle-stage-desc">Long-term retention</div>
+                        </div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--red);">
+                            <div class="lifecycle-stage-icon">🗑️</div>
+                            <div class="lifecycle-stage-name">Destroy</div>
+                            <div class="lifecycle-stage-desc">Secure deletion</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Data governance do's and don'ts</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Start with high-value, high-visibility data domains</li>
+                        <li>Automate data quality monitoring and alerting</li>
+                        <li>Maintain a business glossary with clear definitions</li>
+                        <li>Implement data lineage tracking at the column level</li>
+                        <li>Assign clear ownership for each data domain</li>
+                        <li>Integrate governance into data pipelines (shift-left)</li>
+                        <li>Measure and report on data quality metrics regularly</li>
+                        <li>Enable self-service discovery through a data catalog</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Try to govern all data at once—start small and expand</li>
+                        <li>Create governance that blocks productivity</li>
+                        <li>Rely on manual processes for quality checks</li>
+                        <li>Ignore data quality issues in source systems</li>
+                        <li>Skip documentation for "temporary" solutions</li>
+                        <li>Assume IT alone can solve governance challenges</li>
+                        <li>Treat governance as a one-time project</li>
+                        <li>Create data silos through overly restrictive access</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Governance Platforms</h2>
+                    <p>Tools for implementing data governance</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--orange), #D97706);">🟠</div>
+                        <div>
+                            <div class="tool-name">Databricks UC</div>
+                            <div class="tool-category">Unified Governance</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Unity Catalog provides unified governance for data and AI on Databricks with fine-grained access control.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--blue), #1D4ED8);">🔵</div>
+                        <div>
+                            <div class="tool-name">Collibra</div>
+                            <div class="tool-category">Data Intelligence</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Enterprise data catalog with business glossary, lineage, and stewardship workflows.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--violet), #6D28D9);">🟣</div>
+                        <div>
+                            <div class="tool-name">Atlan</div>
+                            <div class="tool-category">Data Workspace</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Modern data catalog with collaboration features and active metadata management.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--green), #059669);">🟢</div>
+                        <div>
+                            <div class="tool-name">Alation</div>
+                            <div class="tool-category">Data Catalog</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">AI-powered data catalog with collaborative data governance capabilities.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--cyan), #0891B2);">🔷</div>
+                        <div>
+                            <div class="tool-name">Monte Carlo</div>
+                            <div class="tool-category">Data Observability</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Data observability platform for monitoring quality, lineage, and freshness.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--pink), #BE185D);">💗</div>
+                        <div>
+                            <div class="tool-name">Great Expectations</div>
+                            <div class="tool-category">Data Quality</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Open-source data quality framework with automated testing and documentation.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, var(--yellow), #D97706);">🟡</div>
+                        <div>
+                            <div class="tool-name">dbt</div>
+                            <div class="tool-category">Transformation</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Data transformation with built-in documentation, testing, and lineage tracking.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: linear-gradient(135deg, #1F2937, #374151);">⚫</div>
+                        <div>
+                            <div class="tool-name">OpenMetadata</div>
+                            <div class="tool-category">Open Source</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Open-source metadata platform with discovery, lineage, and quality features.</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered data governance automation</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">⚖️</div>
+                    <div class="agent-name">GovernanceBot</div>
+                    <div class="agent-role">Data Stewardship Specialist</div>
+                    <div class="agent-desc">Automates data governance tasks including quality monitoring, lineage discovery, metadata enrichment, and policy enforcement. Continuously scans data assets, identifies issues, and routes them to appropriate stewards for resolution.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automated data quality profiling</li>
+                        <li>Lineage discovery & impact analysis</li>
+                        <li>Metadata auto-enrichment</li>
+                        <li>Policy violation detection</li>
+                        <li>Stewardship task routing</li>
+                        <li>Business glossary suggestions</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Python</div>
+                        <div class="code-tab">Config</div>
+                        <div class="code-filename">governance_agent.py</div>
+                    </div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain.tools <span class="code-keyword">import</span> Tool
+
+<span class="code-comment"># Define the Governance Agent</span>
+<span class="code-property">governance_agent</span> = Agent(
+    <span class="code-property">role</span>=<span class="code-string">"Data Stewardship Specialist"</span>,
+    <span class="code-property">goal</span>=<span class="code-string">"""Monitor data quality, discover lineage, 
+    and enforce governance policies"""</span>,
+    <span class="code-property">backstory</span>=<span class="code-string">"""Expert in data governance with deep 
+    knowledge of data quality dimensions, metadata 
+    management, and stewardship best practices."""</span>,
+    <span class="code-property">tools</span>=[
+        quality_profiler,
+        lineage_discoverer,
+        catalog_enricher,
+        policy_enforcer
+    ],
+    <span class="code-property">verbose</span>=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Quality Assessment Task</span>
+<span class="code-property">quality_task</span> = Task(
+    <span class="code-property">description</span>=<span class="code-string">"""
+    1. Profile data assets for quality metrics
+    2. Check completeness, accuracy, consistency
+    3. Identify anomalies and outliers
+    4. Generate quality score reports
+    5. Route issues to data stewards
+    """</span>,
+    <span class="code-property">agent</span>=governance_agent,
+    <span class="code-property">expected_output</span>=<span class="code-string">"Quality assessment report 
+    with scores and remediation tasks"</span>
+)
+
+<span class="code-comment"># Lineage Discovery Task</span>
+<span class="code-property">lineage_task</span> = Task(
+    <span class="code-property">description</span>=<span class="code-string">"""
+    1. Scan transformation code
+    2. Map column-level lineage
+    3. Identify upstream dependencies
+    4. Document data flows
+    """</span>,
+    <span class="code-property">agent</span>=governance_agent
+)
+
+<span class="code-comment"># Run the governance crew</span>
+<span class="code-property">crew</span> = Crew(
+    <span class="code-property">agents</span>=[governance_agent],
+    <span class="code-property">tasks</span>=[quality_task, lineage_task]
+)
+<span class="code-property">result</span> = crew.<span class="code-function">kickoff</span>()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat11-p2-data-privacy.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">11.2 Data Privacy</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 11.3</div>
+        <a href="cat11-p4-risk-management.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">11.4 Risk Management</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

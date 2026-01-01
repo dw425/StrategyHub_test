@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Providers | Cloud Platforms | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #0EA5E9;
+            --cat-light: #38BDF8;
+            --cat-dark: #0284C7;
+            --cat-glow: rgba(14, 165, 233, 0.15);
+            --page-primary: #0EA5E9;
+            --page-light: #38BDF8;
+            --page-glow: rgba(14, 165, 233, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Market Share Summary */
+        .market-summary { display: flex; gap: 24px; margin-bottom: 24px; }
+        .market-total, .market-growth { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 24px; flex: 1; text-align: center; }
+        .market-total-value, .market-growth-value { font-size: 32px; font-weight: 700; color: var(--page-light); }
+        .market-growth-value { color: var(--green); }
+        .market-total-label, .market-growth-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Market Cards */
+        .market-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .market-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .market-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .market-card.aws { border-color: rgba(255,153,0,0.4); }
+        .market-card.aws:hover { border-color: #FF9900; }
+        .market-card.azure { border-color: rgba(0,120,212,0.4); }
+        .market-card.azure:hover { border-color: #0078D4; }
+        .market-card.gcp { border-color: rgba(66,133,244,0.4); }
+        .market-card.gcp:hover { border-color: #4285F4; }
+        .market-card.others { border-color: rgba(107,114,128,0.4); }
+        .market-card.others:hover { border-color: #6B7280; }
+        .market-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .market-card-logo { font-size: 20px; font-weight: 800; }
+        .market-card.aws .market-card-logo { color: #FF9900; }
+        .market-card.azure .market-card-logo { color: #0078D4; }
+        .market-card.gcp .market-card-logo { color: #4285F4; }
+        .market-card.others .market-card-logo { color: #6B7280; }
+        .market-card-share { font-size: 24px; font-weight: 700; }
+        .market-card.aws .market-card-share { color: #FF9900; }
+        .market-card.azure .market-card-share { color: #0078D4; }
+        .market-card.gcp .market-card-share { color: #4285F4; }
+        .market-card.others .market-card-share { color: #6B7280; }
+        .market-card-bar { height: 8px; background: var(--bg-card); border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+        .market-card-fill { height: 100%; border-radius: 4px; }
+        .market-card.aws .market-card-fill { background: linear-gradient(90deg, #FF9900, #FFB84D); }
+        .market-card.azure .market-card-fill { background: linear-gradient(90deg, #0078D4, #50A5E6); }
+        .market-card.gcp .market-card-fill { background: linear-gradient(90deg, #4285F4, #7BAAF7); }
+        .market-card.others .market-card-fill { background: linear-gradient(90deg, #6B7280, #9CA3AF); }
+        .market-card-stats { display: flex; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .market-stat { flex: 1; }
+        .market-stat .stat-value { display: block; font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .market-stat .stat-label { display: block; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .market-card-details { display: flex; flex-direction: column; gap: 6px; }
+        .detail-item { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+
+        /* Market Insights */
+        .market-insights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .insight-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; display: flex; gap: 14px; }
+        .insight-icon { font-size: 24px; flex-shrink: 0; }
+        .insight-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .insight-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Provider Cards */
+        .provider-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .provider-card-header { padding: 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid; }
+        .provider-logo { display: flex; align-items: center; gap: 16px; }
+        .provider-logo-icon { font-size: 36px; font-weight: 800; }
+        .provider-logo-meta h3 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+        .provider-logo-meta p { font-size: 12px; color: var(--text-muted); }
+        .provider-stats { display: flex; gap: 32px; }
+        .provider-stat { text-align: center; }
+        .provider-stat-value { font-size: 20px; font-weight: 700; }
+        .provider-stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .provider-card-body { padding: 24px; }
+
+        /* Service Grid */
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .service-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .service-item:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .service-icon { font-size: 24px; margin-bottom: 8px; }
+        .service-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .service-category { font-size: 10px; color: var(--text-muted); }
+
+        /* Strengths/Weaknesses */
+        .sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .sw-card { background: var(--bg-card); border-radius: 10px; padding: 20px; }
+        .sw-card.strengths { border-left: 4px solid var(--green); }
+        .sw-card.weaknesses { border-left: 4px solid var(--yellow); }
+        .sw-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .sw-title.green { color: var(--green); }
+        .sw-title.yellow { color: var(--yellow); }
+        .sw-list { list-style: none; }
+        .sw-list li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; padding-left: 16px; position: relative; line-height: 1.5; }
+        .sw-list li::before { content: '→'; position: absolute; left: 0; color: var(--text-muted); }
+
+        /* Regions Grid */
+        .regions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+        .region-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; }
+        .region-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .region-details { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px; }
+        .region-count { font-size: 11px; color: var(--page-light); font-weight: 600; }
+
+        /* Comparison Table */
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .provider-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .badge-aws { background: rgba(255,153,0,0.15); color: #FF9900; }
+        .badge-azure { background: rgba(0,120,212,0.15); color: #0078D4; }
+        .badge-gcp { background: rgba(66,133,244,0.15); color: #4285F4; }
+
+        /* Pricing Grid */
+        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .pricing-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .pricing-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .pricing-icon { font-size: 24px; }
+        .pricing-name { font-size: 14px; font-weight: 600; }
+        .pricing-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .pricing-examples { list-style: none; }
+        .pricing-examples li { font-size: 11px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .pricing-examples li::before { content: '•'; color: var(--page-light); }
+
+        /* Selection Cards */
+        .selection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .selection-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .selection-card:hover { transform: translateY(-4px); }
+        .selection-card.aws { border-color: #FF9900; }
+        .selection-card.azure { border-color: #0078D4; }
+        .selection-card.gcp { border-color: #4285F4; }
+        .selection-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .selection-logo { font-size: 24px; font-weight: 800; }
+        .selection-title { font-size: 14px; font-weight: 600; }
+        .selection-list { list-style: none; }
+        .selection-list li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; padding-left: 16px; position: relative; }
+        .selection-list li::before { content: '✓'; position: absolute; left: 0; }
+        .selection-card.aws .selection-list li::before { color: #FF9900; }
+        .selection-card.azure .selection-list li::before { color: #0078D4; }
+        .selection-card.gcp .selection-list li::before { color: #4285F4; }
+
+        /* Agent Grid */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .sw-grid, .agent-grid { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .pricing-grid, .selection-grid, .regions-grid, .related-grid { grid-template-columns: 1fr; }
+            .market-cards, .market-insights { grid-template-columns: 1fr; }
+            .market-summary { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">☁️ Cloud Platforms</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat12-cloud-platforms-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat12-p1-cloud-providers.html" class="active"><span class="nav-icon">🏢</span> 12.1 Cloud Providers</a></li>
+            <li><a href="cat12-p2-architecture-patterns.html"><span class="nav-icon">🏗️</span> 12.2 Architecture Patterns</a></li>
+            <li><a href="cat12-p3-migration-strategies.html"><span class="nav-icon">🚀</span> 12.3 Migration Strategies</a></li>
+            <li><a href="cat12-p4-compute-containers.html"><span class="nav-icon">📦</span> 12.4 Compute & Containers</a></li>
+            <li><a href="cat12-p5-storage-databases.html"><span class="nav-icon">💾</span> 12.5 Storage & Databases</a></li>
+            <li><a href="cat12-p6-networking-security.html"><span class="nav-icon">🌐</span> 12.6 Networking & Security</a></li>
+            <li><a href="cat12-p7-cost-optimization.html"><span class="nav-icon">💰</span> 12.7 Cost Optimization</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#market"><span class="nav-icon">📊</span> Market Share</a></li>
+            <li><a href="#aws"><span class="nav-icon">🟠</span> AWS</a></li>
+            <li><a href="#azure"><span class="nav-icon">🔵</span> Microsoft Azure</a></li>
+            <li><a href="#gcp"><span class="nav-icon">🔷</span> Google Cloud</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Service Comparison</a></li>
+            <li><a href="#pricing"><span class="nav-icon">💳</span> Pricing Models</a></li>
+            <li><a href="#selection"><span class="nav-icon">🎯</span> Selection Guide</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🏢 Page 12.1</span>
+                <h1>Cloud Providers</h1>
+                <p>Deep dive into AWS, Microsoft Azure, and Google Cloud Platform. Understand their services, strengths, pricing models, and when to choose each provider for your workloads.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">3</div><div class="hero-metric-label">Hyperscalers</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">66%</div><div class="hero-metric-label">Combined Market Share</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">500+</div><div class="hero-metric-label">Total Services</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100+</div><div class="hero-metric-label">Global Regions</div></div>
+            </div>
+        </section>
+
+        <!-- Market Share -->
+        <section class="module" id="market">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Cloud Market Share</h2>
+                    <p>Q4 2024 infrastructure cloud market distribution</p>
+                </div>
+            </div>
+
+            <div class="market-summary">
+                <div class="market-total">
+                    <div class="market-total-value">$82.7B</div>
+                    <div class="market-total-label">Q4 2024 Total Cloud Infrastructure Spend</div>
+                </div>
+                <div class="market-growth">
+                    <div class="market-growth-value">+22%</div>
+                    <div class="market-growth-label">YoY Growth Rate</div>
+                </div>
+            </div>
+
+            <div class="market-cards">
+                <div class="market-card aws">
+                    <div class="market-card-header">
+                        <div class="market-card-logo">AWS</div>
+                        <div class="market-card-share">32%</div>
+                    </div>
+                    <div class="market-card-bar">
+                        <div class="market-card-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="market-card-stats">
+                        <div class="market-stat">
+                            <span class="stat-value">$26.3B</span>
+                            <span class="stat-label">Quarterly Revenue</span>
+                        </div>
+                        <div class="market-stat">
+                            <span class="stat-value">+19%</span>
+                            <span class="stat-label">YoY Growth</span>
+                        </div>
+                    </div>
+                    <div class="market-card-details">
+                        <div class="detail-item">🏆 Market leader since 2006</div>
+                        <div class="detail-item">🌍 33 regions, 105 availability zones</div>
+                        <div class="detail-item">📦 200+ cloud services</div>
+                    </div>
+                </div>
+
+                <div class="market-card azure">
+                    <div class="market-card-header">
+                        <div class="market-card-logo">Azure</div>
+                        <div class="market-card-share">23%</div>
+                    </div>
+                    <div class="market-card-bar">
+                        <div class="market-card-fill" style="width: 72%;"></div>
+                    </div>
+                    <div class="market-card-stats">
+                        <div class="market-stat">
+                            <span class="stat-value">$19.1B</span>
+                            <span class="stat-label">Quarterly Revenue</span>
+                        </div>
+                        <div class="market-stat">
+                            <span class="stat-value">+28%</span>
+                            <span class="stat-label">YoY Growth</span>
+                        </div>
+                    </div>
+                    <div class="market-card-details">
+                        <div class="detail-item">🚀 Fastest growing hyperscaler</div>
+                        <div class="detail-item">🌍 60+ regions worldwide</div>
+                        <div class="detail-item">🏢 Enterprise & hybrid leader</div>
+                    </div>
+                </div>
+
+                <div class="market-card gcp">
+                    <div class="market-card-header">
+                        <div class="market-card-logo">GCP</div>
+                        <div class="market-card-share">11%</div>
+                    </div>
+                    <div class="market-card-bar">
+                        <div class="market-card-fill" style="width: 34%;"></div>
+                    </div>
+                    <div class="market-card-stats">
+                        <div class="market-stat">
+                            <span class="stat-value">$9.2B</span>
+                            <span class="stat-label">Quarterly Revenue</span>
+                        </div>
+                        <div class="market-stat">
+                            <span class="stat-value">+26%</span>
+                            <span class="stat-label">YoY Growth</span>
+                        </div>
+                    </div>
+                    <div class="market-card-details">
+                        <div class="detail-item">🧠 AI/ML & data analytics leader</div>
+                        <div class="detail-item">🌍 40 regions, 121 zones</div>
+                        <div class="detail-item">☸️ Kubernetes creators</div>
+                    </div>
+                </div>
+
+                <div class="market-card others">
+                    <div class="market-card-header">
+                        <div class="market-card-logo">Others</div>
+                        <div class="market-card-share">34%</div>
+                    </div>
+                    <div class="market-card-bar">
+                        <div class="market-card-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="market-card-stats">
+                        <div class="market-stat">
+                            <span class="stat-value">$28.1B</span>
+                            <span class="stat-label">Combined Revenue</span>
+                        </div>
+                        <div class="market-stat">
+                            <span class="stat-value">Varies</span>
+                            <span class="stat-label">Growth Rates</span>
+                        </div>
+                    </div>
+                    <div class="market-card-details">
+                        <div class="detail-item">🇨🇳 Alibaba Cloud (4% - China leader)</div>
+                        <div class="detail-item">🔴 Oracle Cloud (3% - DB workloads)</div>
+                        <div class="detail-item">🔷 IBM Cloud (2% - Enterprise/AI)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="market-insights">
+                <div class="insight-card">
+                    <div class="insight-icon">📈</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Key Trend: AI Driving Growth</div>
+                        <div class="insight-text">AI/ML workloads now account for 15-20% of cloud spend, with GPU instance revenue growing 3x faster than traditional compute.</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">🔄</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Multi-Cloud Adoption</div>
+                        <div class="insight-text">76% of enterprises now use 2+ cloud providers. Average organization uses 2.6 public clouds and 2.7 private clouds.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AWS -->
+        <section class="module" id="aws">
+            <div class="module-header">
+                <div class="module-icon" style="background: rgba(255,153,0,0.15); border-color: #FF9900;">🟠</div>
+                <div class="module-info">
+                    <h2>Amazon Web Services (AWS)</h2>
+                    <p>The pioneer and market leader in cloud computing</p>
+                </div>
+            </div>
+
+            <div class="provider-card">
+                <div class="provider-card-header" style="background: linear-gradient(135deg, rgba(255,153,0,0.1), transparent); border-color: #FF9900;">
+                    <div class="provider-logo">
+                        <div class="provider-logo-icon" style="color: #FF9900;">AWS</div>
+                        <div class="provider-logo-meta">
+                            <h3>Amazon Web Services</h3>
+                            <p>Pioneer since 2006 • Most mature ecosystem</p>
+                        </div>
+                    </div>
+                    <div class="provider-stats">
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #FF9900;">200+</div>
+                            <div class="provider-stat-label">Services</div>
+                        </div>
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #FF9900;">33</div>
+                            <div class="provider-stat-label">Regions</div>
+                        </div>
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #FF9900;">105</div>
+                            <div class="provider-stat-label">AZs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="provider-card-body">
+                    <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Core Services</h4>
+                    <div class="services-grid">
+                        <div class="service-item"><div class="service-icon">💻</div><div class="service-name">EC2</div><div class="service-category">Compute</div></div>
+                        <div class="service-item"><div class="service-icon">📦</div><div class="service-name">S3</div><div class="service-category">Storage</div></div>
+                        <div class="service-item"><div class="service-icon">⚡</div><div class="service-name">Lambda</div><div class="service-category">Serverless</div></div>
+                        <div class="service-item"><div class="service-icon">🗄️</div><div class="service-name">RDS</div><div class="service-category">Database</div></div>
+                        <div class="service-item"><div class="service-icon">☸️</div><div class="service-name">EKS</div><div class="service-category">Kubernetes</div></div>
+                        <div class="service-item"><div class="service-icon">🌐</div><div class="service-name">CloudFront</div><div class="service-category">CDN</div></div>
+                        <div class="service-item"><div class="service-icon">🔐</div><div class="service-name">IAM</div><div class="service-category">Identity</div></div>
+                        <div class="service-item"><div class="service-icon">📊</div><div class="service-name">Redshift</div><div class="service-category">Data Warehouse</div></div>
+                    </div>
+
+                    <div class="sw-grid">
+                        <div class="sw-card strengths">
+                            <div class="sw-title green">✓ Strengths</div>
+                            <ul class="sw-list">
+                                <li>Largest service catalog (200+ services)</li>
+                                <li>Most extensive global infrastructure</li>
+                                <li>Mature serverless ecosystem (Lambda pioneer)</li>
+                                <li>Best documentation and community support</li>
+                                <li>Strong enterprise adoption and case studies</li>
+                                <li>Comprehensive compliance certifications</li>
+                            </ul>
+                        </div>
+                        <div class="sw-card weaknesses">
+                            <div class="sw-title yellow">⚠ Considerations</div>
+                            <ul class="sw-list">
+                                <li>Complex pricing across many services</li>
+                                <li>Steep learning curve for new users</li>
+                                <li>Console UI can be overwhelming</li>
+                                <li>Premium pricing vs. competitors</li>
+                                <li>Requires expertise to optimize costs</li>
+                                <li>Less integrated than Azure for Microsoft shops</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="regions-grid">
+                        <div class="region-card">
+                            <div class="region-name">North America</div>
+                            <div class="region-details">US East (N. Virginia, Ohio), US West (Oregon, N. California), Canada, GovCloud</div>
+                            <div class="region-count">7 regions • 21 AZs</div>
+                        </div>
+                        <div class="region-card">
+                            <div class="region-name">Europe</div>
+                            <div class="region-details">Ireland, London, Frankfurt, Paris, Stockholm, Milan, Zurich, Spain</div>
+                            <div class="region-count">8 regions • 25 AZs</div>
+                        </div>
+                        <div class="region-card">
+                            <div class="region-name">Asia Pacific</div>
+                            <div class="region-details">Tokyo, Seoul, Singapore, Sydney, Mumbai, Hong Kong, Jakarta, Osaka</div>
+                            <div class="region-count">10 regions • 32 AZs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Azure -->
+        <section class="module" id="azure">
+            <div class="module-header">
+                <div class="module-icon" style="background: rgba(0,120,212,0.15); border-color: #0078D4;">🔵</div>
+                <div class="module-info">
+                    <h2>Microsoft Azure</h2>
+                    <p>Enterprise cloud with deep Microsoft integration</p>
+                </div>
+            </div>
+
+            <div class="provider-card">
+                <div class="provider-card-header" style="background: linear-gradient(135deg, rgba(0,120,212,0.1), transparent); border-color: #0078D4;">
+                    <div class="provider-logo">
+                        <div class="provider-logo-icon" style="color: #0078D4;">Azure</div>
+                        <div class="provider-logo-meta">
+                            <h3>Microsoft Azure</h3>
+                            <p>Enterprise favorite • Hybrid cloud leader</p>
+                        </div>
+                    </div>
+                    <div class="provider-stats">
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #0078D4;">200+</div>
+                            <div class="provider-stat-label">Services</div>
+                        </div>
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #0078D4;">60+</div>
+                            <div class="provider-stat-label">Regions</div>
+                        </div>
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #0078D4;">190</div>
+                            <div class="provider-stat-label">Countries</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="provider-card-body">
+                    <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Core Services</h4>
+                    <div class="services-grid">
+                        <div class="service-item"><div class="service-icon">💻</div><div class="service-name">Virtual Machines</div><div class="service-category">Compute</div></div>
+                        <div class="service-item"><div class="service-icon">📦</div><div class="service-name">Blob Storage</div><div class="service-category">Storage</div></div>
+                        <div class="service-item"><div class="service-icon">⚡</div><div class="service-name">Functions</div><div class="service-category">Serverless</div></div>
+                        <div class="service-item"><div class="service-icon">🗄️</div><div class="service-name">SQL Database</div><div class="service-category">Database</div></div>
+                        <div class="service-item"><div class="service-icon">☸️</div><div class="service-name">AKS</div><div class="service-category">Kubernetes</div></div>
+                        <div class="service-item"><div class="service-icon">🔐</div><div class="service-name">Entra ID</div><div class="service-category">Identity</div></div>
+                        <div class="service-item"><div class="service-icon">🔄</div><div class="service-name">Azure Arc</div><div class="service-category">Hybrid</div></div>
+                        <div class="service-item"><div class="service-icon">📊</div><div class="service-name">Synapse</div><div class="service-category">Analytics</div></div>
+                    </div>
+
+                    <div class="sw-grid">
+                        <div class="sw-card strengths">
+                            <div class="sw-title green">✓ Strengths</div>
+                            <ul class="sw-list">
+                                <li>Seamless Microsoft 365 / Office integration</li>
+                                <li>Best hybrid cloud solution (Azure Arc, Stack)</li>
+                                <li>Enterprise identity leadership (Entra ID)</li>
+                                <li>Strong .NET and Visual Studio support</li>
+                                <li>Most regions globally (60+ regions)</li>
+                                <li>Government and compliance strength</li>
+                            </ul>
+                        </div>
+                        <div class="sw-card weaknesses">
+                            <div class="sw-title yellow">⚠ Considerations</div>
+                            <ul class="sw-list">
+                                <li>Service naming frequently changes</li>
+                                <li>Documentation can lag new features</li>
+                                <li>Portal performance issues at scale</li>
+                                <li>Some services less mature than AWS equivalents</li>
+                                <li>Linux/open-source ecosystem not as deep</li>
+                                <li>Complex licensing for enterprise features</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 14px; font-weight: 600; margin: 24px 0 16px; color: var(--text-primary);">Microsoft Ecosystem Integration</h4>
+                    <div class="services-grid">
+                        <div class="service-item"><div class="service-icon">📧</div><div class="service-name">Microsoft 365</div><div class="service-category">Productivity</div></div>
+                        <div class="service-item"><div class="service-icon">💬</div><div class="service-name">Teams</div><div class="service-category">Collaboration</div></div>
+                        <div class="service-item"><div class="service-icon">⚡</div><div class="service-name">Power Platform</div><div class="service-category">Low-Code</div></div>
+                        <div class="service-item"><div class="service-icon">📈</div><div class="service-name">Dynamics 365</div><div class="service-category">CRM/ERP</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GCP -->
+        <section class="module" id="gcp">
+            <div class="module-header">
+                <div class="module-icon" style="background: rgba(66,133,244,0.15); border-color: #4285F4;">🔷</div>
+                <div class="module-info">
+                    <h2>Google Cloud Platform (GCP)</h2>
+                    <p>Data, AI/ML, and Kubernetes excellence</p>
+                </div>
+            </div>
+
+            <div class="provider-card">
+                <div class="provider-card-header" style="background: linear-gradient(135deg, rgba(66,133,244,0.1), transparent); border-color: #4285F4;">
+                    <div class="provider-logo">
+                        <div class="provider-logo-icon" style="color: #4285F4;">GCP</div>
+                        <div class="provider-logo-meta">
+                            <h3>Google Cloud Platform</h3>
+                            <p>Data analytics leader • Kubernetes creators</p>
+                        </div>
+                    </div>
+                    <div class="provider-stats">
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #4285F4;">100+</div>
+                            <div class="provider-stat-label">Services</div>
+                        </div>
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #4285F4;">40</div>
+                            <div class="provider-stat-label">Regions</div>
+                        </div>
+                        <div class="provider-stat">
+                            <div class="provider-stat-value" style="color: #4285F4;">121</div>
+                            <div class="provider-stat-label">Zones</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="provider-card-body">
+                    <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Core Services</h4>
+                    <div class="services-grid">
+                        <div class="service-item"><div class="service-icon">💻</div><div class="service-name">Compute Engine</div><div class="service-category">Compute</div></div>
+                        <div class="service-item"><div class="service-icon">📦</div><div class="service-name">Cloud Storage</div><div class="service-category">Storage</div></div>
+                        <div class="service-item"><div class="service-icon">📊</div><div class="service-name">BigQuery</div><div class="service-category">Data Warehouse</div></div>
+                        <div class="service-item"><div class="service-icon">☸️</div><div class="service-name">GKE</div><div class="service-category">Kubernetes</div></div>
+                        <div class="service-item"><div class="service-icon">🤖</div><div class="service-name">Vertex AI</div><div class="service-category">ML Platform</div></div>
+                        <div class="service-item"><div class="service-icon">⚡</div><div class="service-name">Cloud Functions</div><div class="service-category">Serverless</div></div>
+                        <div class="service-item"><div class="service-icon">🔄</div><div class="service-name">Pub/Sub</div><div class="service-category">Messaging</div></div>
+                        <div class="service-item"><div class="service-icon">🌐</div><div class="service-name">Cloud CDN</div><div class="service-category">CDN</div></div>
+                    </div>
+
+                    <div class="sw-grid">
+                        <div class="sw-card strengths">
+                            <div class="sw-title green">✓ Strengths</div>
+                            <ul class="sw-list">
+                                <li>BigQuery - best serverless data warehouse</li>
+                                <li>GKE - best managed Kubernetes (creators of K8s)</li>
+                                <li>AI/ML leadership with Vertex AI and TPUs</li>
+                                <li>Global network backbone (lowest latency)</li>
+                                <li>Competitive and transparent pricing</li>
+                                <li>Sustained use discounts (automatic)</li>
+                            </ul>
+                        </div>
+                        <div class="sw-card weaknesses">
+                            <div class="sw-title yellow">⚠ Considerations</div>
+                            <ul class="sw-list">
+                                <li>Smaller enterprise footprint than AWS/Azure</li>
+                                <li>Fewer compliance certifications in some regions</li>
+                                <li>Less mature enterprise support programs</li>
+                                <li>Smaller partner ecosystem</li>
+                                <li>Product discontinuation concerns</li>
+                                <li>Less intuitive IAM model</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 14px; font-weight: 600; margin: 24px 0 16px; color: var(--text-primary);">Data & AI Leadership</h4>
+                    <div class="services-grid">
+                        <div class="service-item"><div class="service-icon">📊</div><div class="service-name">BigQuery</div><div class="service-category">Serverless DW</div></div>
+                        <div class="service-item"><div class="service-icon">🔄</div><div class="service-name">Dataflow</div><div class="service-category">Stream/Batch</div></div>
+                        <div class="service-item"><div class="service-icon">🤖</div><div class="service-name">Vertex AI</div><div class="service-category">MLOps</div></div>
+                        <div class="service-item"><div class="service-icon">⚡</div><div class="service-name">TPUs</div><div class="service-category">AI Accelerators</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Comparison -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Service Comparison</h2>
+                    <p>Equivalent services across providers</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th><span class="provider-badge badge-aws">AWS</span></th>
+                        <th><span class="provider-badge badge-azure">Azure</span></th>
+                        <th><span class="provider-badge badge-gcp">GCP</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Virtual Machines</strong></td><td>EC2</td><td>Virtual Machines</td><td>Compute Engine</td></tr>
+                    <tr><td><strong>Object Storage</strong></td><td>S3</td><td>Blob Storage</td><td>Cloud Storage</td></tr>
+                    <tr><td><strong>Block Storage</strong></td><td>EBS</td><td>Managed Disks</td><td>Persistent Disk</td></tr>
+                    <tr><td><strong>Serverless Functions</strong></td><td>Lambda</td><td>Functions</td><td>Cloud Functions</td></tr>
+                    <tr><td><strong>Kubernetes</strong></td><td>EKS</td><td>AKS</td><td>GKE</td></tr>
+                    <tr><td><strong>Container Registry</strong></td><td>ECR</td><td>Container Registry</td><td>Artifact Registry</td></tr>
+                    <tr><td><strong>Managed SQL</strong></td><td>RDS</td><td>SQL Database</td><td>Cloud SQL</td></tr>
+                    <tr><td><strong>NoSQL Document</strong></td><td>DynamoDB</td><td>Cosmos DB</td><td>Firestore</td></tr>
+                    <tr><td><strong>Data Warehouse</strong></td><td>Redshift</td><td>Synapse Analytics</td><td>BigQuery</td></tr>
+                    <tr><td><strong>Stream Processing</strong></td><td>Kinesis</td><td>Event Hubs</td><td>Pub/Sub + Dataflow</td></tr>
+                    <tr><td><strong>CDN</strong></td><td>CloudFront</td><td>Azure CDN / Front Door</td><td>Cloud CDN</td></tr>
+                    <tr><td><strong>DNS</strong></td><td>Route 53</td><td>Azure DNS</td><td>Cloud DNS</td></tr>
+                    <tr><td><strong>Load Balancer</strong></td><td>ALB / NLB / GLB</td><td>Load Balancer</td><td>Cloud Load Balancing</td></tr>
+                    <tr><td><strong>Identity (IAM)</strong></td><td>IAM</td><td>Entra ID + RBAC</td><td>Cloud IAM</td></tr>
+                    <tr><td><strong>Secrets</strong></td><td>Secrets Manager</td><td>Key Vault</td><td>Secret Manager</td></tr>
+                    <tr><td><strong>ML Platform</strong></td><td>SageMaker</td><td>Azure ML</td><td>Vertex AI</td></tr>
+                    <tr><td><strong>IaC Native</strong></td><td>CloudFormation</td><td>ARM / Bicep</td><td>Deployment Manager</td></tr>
+                    <tr><td><strong>Monitoring</strong></td><td>CloudWatch</td><td>Azure Monitor</td><td>Cloud Monitoring</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Pricing -->
+        <section class="module" id="pricing">
+            <div class="module-header">
+                <div class="module-icon">💳</div>
+                <div class="module-info">
+                    <h2>Pricing Models</h2>
+                    <p>Understanding how cloud providers charge</p>
+                </div>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-icon">⏱️</div>
+                        <div class="pricing-name">On-Demand</div>
+                    </div>
+                    <div class="pricing-desc">Pay for compute capacity by the second or hour with no long-term commitments. Maximum flexibility, premium pricing.</div>
+                    <ul class="pricing-examples">
+                        <li>AWS: EC2 On-Demand</li>
+                        <li>Azure: Pay-As-You-Go VMs</li>
+                        <li>GCP: On-Demand pricing</li>
+                    </ul>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-icon">📅</div>
+                        <div class="pricing-name">Reserved / Committed</div>
+                    </div>
+                    <div class="pricing-desc">1-3 year commitments for significant discounts (30-72%). Best for steady-state workloads.</div>
+                    <ul class="pricing-examples">
+                        <li>AWS: Reserved Instances, Savings Plans</li>
+                        <li>Azure: Reserved VM Instances</li>
+                        <li>GCP: Committed Use Discounts</li>
+                    </ul>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-icon">🎲</div>
+                        <div class="pricing-name">Spot / Preemptible</div>
+                    </div>
+                    <div class="pricing-desc">Spare capacity at 60-90% discount. Can be interrupted with notice. Great for batch workloads.</div>
+                    <ul class="pricing-examples">
+                        <li>AWS: Spot Instances</li>
+                        <li>Azure: Spot VMs</li>
+                        <li>GCP: Preemptible / Spot VMs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>AWS Unique Pricing</h3>
+                    <p><strong>Savings Plans:</strong> Flexible commitment covering EC2, Fargate, and Lambda usage with up to 72% savings.</p>
+                    <p><strong>Spot Fleet:</strong> Automated spot instance management across multiple pools for maximum availability.</p>
+                </div>
+                <div>
+                    <h3>Azure Unique Pricing</h3>
+                    <p><strong>Hybrid Benefit:</strong> Use existing Windows Server/SQL licenses in cloud for up to 40% savings.</p>
+                    <p><strong>Dev/Test Pricing:</strong> Reduced rates for development and testing workloads.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>GCP Unique Pricing</h3>
+                    <p><strong>Sustained Use Discounts:</strong> Automatic discounts (up to 30%) just for running VMs 25%+ of month—no commitment needed. <strong>Per-Second Billing:</strong> All compute billed per-second with 1-minute minimum.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Selection Guide -->
+        <section class="module" id="selection">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Provider Selection Guide</h2>
+                    <p>When to choose each cloud provider</p>
+                </div>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card aws">
+                    <div class="selection-header">
+                        <div class="selection-logo" style="color: #FF9900;">AWS</div>
+                        <div class="selection-title">Choose AWS When...</div>
+                    </div>
+                    <ul class="selection-list">
+                        <li>You need the broadest service catalog</li>
+                        <li>Global scale with maximum coverage</li>
+                        <li>Serverless/event-driven is primary pattern</li>
+                        <li>Extensive marketplace integrations needed</li>
+                        <li>Team has existing AWS expertise</li>
+                        <li>Complex multi-service architectures</li>
+                    </ul>
+                </div>
+                
+                <div class="selection-card azure">
+                    <div class="selection-header">
+                        <div class="selection-logo" style="color: #0078D4;">Azure</div>
+                        <div class="selection-title">Choose Azure When...</div>
+                    </div>
+                    <ul class="selection-list">
+                        <li>You're a Microsoft shop (Windows, .NET, M365)</li>
+                        <li>Hybrid cloud with on-prem is essential</li>
+                        <li>Enterprise identity (Entra ID) integration</li>
+                        <li>Government/compliance requirements</li>
+                        <li>Leverage existing Microsoft licensing</li>
+                        <li>Power Platform is part of strategy</li>
+                    </ul>
+                </div>
+                
+                <div class="selection-card gcp">
+                    <div class="selection-header">
+                        <div class="selection-logo" style="color: #4285F4;">GCP</div>
+                        <div class="selection-title">Choose GCP When...</div>
+                    </div>
+                    <ul class="selection-list">
+                        <li>Data analytics/warehousing (BigQuery) core</li>
+                        <li>Best-in-class Kubernetes (GKE) needed</li>
+                        <li>AI/ML workloads are significant</li>
+                        <li>Transparent, predictable pricing matters</li>
+                        <li>Low-latency global networking critical</li>
+                        <li>Open-source technologies preferred</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div class="overview-full">
+                    <h3>Multi-Cloud Considerations</h3>
+                    <p>Many enterprises adopt multi-cloud for: <strong>Best-of-breed</strong> (use each provider's strengths), <strong>Avoid lock-in</strong>, <strong>Compliance</strong> (data residency), <strong>M&A</strong> (inherited infrastructure), or <strong>Resilience</strong> (DR across providers).</p>
+                    <p><strong>⚠️ Warning:</strong> Multi-cloud adds complexity in networking, identity, operations, and skills. Only adopt if clear business drivers justify the overhead. "Single cloud, multi-region" often provides better resilience with less complexity.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered cloud provider analysis</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>☁️ CloudAdvisor</h3>
+                    <p>Analyzes workload requirements, existing technology stack, team expertise, and business constraints to recommend optimal cloud provider strategy. Compares pricing, services, and capabilities across AWS, Azure, and GCP.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> Workload-to-provider matching</div>
+                        <div class="agent-capability"><span class="capability-icon">⚖️</span> Service equivalency mapping</div>
+                        <div class="agent-capability"><span class="capability-icon">💰</span> Total cost of ownership analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">🌐</span> Multi-cloud strategy assessment</div>
+                        <div class="agent-capability"><span class="capability-icon">✅</span> Compliance requirement matching</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">cloud_advisor_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Initialize provider analysis tools</span>
+aws_pricing = AWSPricingTool()
+azure_pricing = AzurePricingTool()
+gcp_pricing = GCPPricingTool()
+
+<span class="code-comment"># Cloud Advisor Agent</span>
+cloud_advisor = Agent(
+    role=<span class="code-string">"Cloud Strategy Advisor"</span>,
+    goal=<span class="code-string">"""Analyze requirements and recommend 
+    optimal cloud provider strategy."""</span>,
+    tools=[aws_pricing, azure_pricing, gcp_pricing],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Provider Analysis Task</span>
+analysis_task = Task(
+    description=<span class="code-string">"""
+    1. Analyze workload requirements
+    2. Map required services across providers
+    3. Assess compliance requirements
+    4. Calculate TCO across providers
+    5. Provide recommendation with rationale
+    """</span>,
+    agent=cloud_advisor
+)
+
+crew = Crew(agents=[cloud_advisor], tasks=[analysis_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring cloud platforms</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat12-p2-architecture-patterns.html" class="related-card">
+                    <div class="related-icon">🏗️</div>
+                    <div class="related-title">Architecture Patterns</div>
+                    <div class="related-desc">Multi-region, microservices, serverless reference architectures</div>
+                </a>
+                <a href="cat12-p3-migration-strategies.html" class="related-card">
+                    <div class="related-icon">🚀</div>
+                    <div class="related-title">Migration Strategies</div>
+                    <div class="related-desc">6Rs framework, wave planning, and assessment tools</div>
+                </a>
+                <a href="cat12-p7-cost-optimization.html" class="related-card">
+                    <div class="related-icon">💰</div>
+                    <div class="related-title">Cost Optimization</div>
+                    <div class="related-desc">FinOps practices, reserved instances, and rightsizing</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat12-cloud-platforms-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 12.1</div>
+        <a href="cat12-p2-architecture-patterns.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">12.2 Architecture Patterns</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

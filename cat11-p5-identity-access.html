@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity & Access Management | Security & Compliance | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EF4444;
+            --cat-light: #F87171;
+            --cat-dark: #DC2626;
+            --cat-glow: rgba(239, 68, 68, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); border-radius: 16px 16px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left > p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content h4 { font-size: 14px; margin: 16px 0 10px 0; color: var(--text-primary); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content ul { margin: 12px 0; padding-left: 20px; }
+        .overview-content ul li { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.6; }
+        .principles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .principle-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .principle-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--principle-color); border-radius: 12px 12px 0 0; }
+        .principle-icon { font-size: 28px; margin-bottom: 12px; }
+        .principle-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .principle-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .iam-dashboard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .iam-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .iam-title { font-size: 14px; font-weight: 600; }
+        .iam-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px; }
+        .iam-stat { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .iam-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--stat-color); border-radius: 12px 12px 0 0; }
+        .iam-stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .iam-stat-label { font-size: 11px; color: var(--text-muted); }
+        .iam-stat-sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .auth-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .auth-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .auth-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .auth-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .auth-title { font-size: 15px; font-weight: 600; }
+        .auth-type { font-size: 10px; color: var(--text-muted); }
+        .auth-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .auth-factors { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .auth-factor { font-size: 10px; padding: 4px 8px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+        .auth-strength { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+        .auth-strength-bar { flex: 1; height: 6px; background: var(--bg-dark); border-radius: 3px; overflow: hidden; }
+        .auth-strength-fill { height: 100%; border-radius: 3px; }
+        .auth-strength-label { font-size: 10px; color: var(--text-muted); }
+        .authz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .authz-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .authz-title { font-size: 14px; font-weight: 600; }
+        .authz-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .authz-content { padding: 24px; }
+        .authz-models { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .authz-model { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .authz-model-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .authz-model-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .authz-model-name { font-size: 14px; font-weight: 600; }
+        .authz-model-full { font-size: 10px; color: var(--text-muted); }
+        .authz-model-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .authz-model-example { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-size: 10px; color: var(--text-muted); }
+        .authz-model-example code { color: var(--cyan); font-family: monospace; }
+        .authz-model-pros { margin-top: 12px; }
+        .authz-model-pros span { font-size: 10px; display: inline-block; padding: 3px 8px; background: rgba(16, 185, 129, 0.15); color: var(--green); border-radius: 4px; margin-right: 4px; margin-bottom: 4px; }
+        .lifecycle-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .lifecycle-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .lifecycle-title { font-size: 14px; font-weight: 600; }
+        .lifecycle-content { padding: 24px; }
+        .lifecycle-stages { display: flex; justify-content: space-between; position: relative; margin-bottom: 24px; }
+        .lifecycle-stages::before { content: ''; position: absolute; top: 28px; left: 60px; right: 60px; height: 3px; background: linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--orange), var(--red)); border-radius: 2px; }
+        .lifecycle-stage { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; flex: 1; }
+        .lifecycle-stage-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; border: 3px solid var(--stage-color); background: var(--bg-card); }
+        .lifecycle-stage-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .lifecycle-stage-desc { font-size: 10px; color: var(--text-muted); text-align: center; max-width: 100px; }
+        .lifecycle-details { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .lifecycle-detail { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; }
+        .lifecycle-detail-title { font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--detail-color); }
+        .lifecycle-detail-list { list-style: none; }
+        .lifecycle-detail-list li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; gap: 6px; }
+        .lifecycle-detail-list li::before { content: '•'; color: var(--detail-color); }
+        .pam-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .pam-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .pam-title { font-size: 14px; font-weight: 600; }
+        .pam-content { padding: 24px; }
+        .pam-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .pam-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .pam-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .pam-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .pam-card-title { font-size: 14px; font-weight: 600; }
+        .pam-card-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .pam-card-features { list-style: none; }
+        .pam-card-features li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; gap: 6px; }
+        .pam-card-features li::before { content: '→'; color: var(--cat-light); }
+        .zerotrust-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+        .zerotrust-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .zerotrust-title { font-size: 14px; font-weight: 600; }
+        .zerotrust-content { padding: 24px; }
+        .zerotrust-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .zerotrust-pillar { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .zerotrust-pillar-icon { font-size: 32px; margin-bottom: 12px; }
+        .zerotrust-pillar-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--cat-light); }
+        .zerotrust-pillar-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+        .zerotrust-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .zerotrust-layers { display: flex; flex-direction: column; gap: 12px; }
+        .zerotrust-layer { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; }
+        .zerotrust-layer-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: var(--cat-glow); border: 2px solid var(--cat-primary); color: var(--cat-light); }
+        .zerotrust-layer-content { flex: 1; }
+        .zerotrust-layer-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .zerotrust-layer-desc { font-size: 11px; color: var(--text-secondary); }
+        .zerotrust-layer-tech { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); }
+        .tool-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tool-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-category { font-size: 9px; color: var(--text-muted); }
+        .tool-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 8px; line-height: 1.5; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(239,68,68,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 20px; font-family: monospace; font-size: 11px; line-height: 1.8; overflow-x: auto; max-height: 400px; overflow-y: auto; background: var(--bg-dark); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #7EE787; }
+        .code-function { color: #D2A8FF; }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); font-size: 13px; padding: 8px 16px; border-radius: 8px; }
+        .footer-link:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 500; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .auth-grid, .pam-grid, .practices-grid, .agent-grid { grid-template-columns: 1fr; }
+            .iam-stats, .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .principles-grid, .authz-models, .zerotrust-pillars, .lifecycle-details { grid-template-columns: 1fr; }
+            .lifecycle-stages { flex-wrap: wrap; gap: 16px; }
+            .lifecycle-stages::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Home</a><span class="sep">/</span>
+        <a href="cat11-security-compliance-overview.html">Security & Compliance</a><span class="sep">/</span>
+        <span class="current">Identity & Access Management</span>
+    </div>
+</header>
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🛡️ Security & Compliance</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat11-security-compliance-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat11-p1-compliance-frameworks.html"><span class="nav-icon">📋</span> 11.1 Compliance Frameworks</a></li>
+            <li><a href="cat11-p2-data-privacy.html"><span class="nav-icon">🔒</span> 11.2 Data Privacy</a></li>
+            <li><a href="cat11-p3-data-governance.html"><span class="nav-icon">⚖️</span> 11.3 Data Governance</a></li>
+            <li><a href="cat11-p4-risk-management.html"><span class="nav-icon">⚠️</span> 11.4 Risk Management</a></li>
+            <li><a href="cat11-p5-identity-access.html" class="active"><span class="nav-icon">🪪</span> 11.5 Identity & Access</a></li>
+            <li><a href="cat11-p6-audit-logging.html"><span class="nav-icon">📊</span> 11.6 Audit & Logging</a></li>
+            <li><a href="cat11-p7-incident-response.html"><span class="nav-icon">🚨</span> 11.7 Incident Response</a></li>
+        </ul>
+    </div>
+</aside>
+<div class="main-wrapper">
+    <div class="main-content">
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <span class="hero-tag">🪪 Page 11.5</span>
+                <h1>Identity & Access Management</h1>
+                <p>Control who can access what resources and under what conditions. Implement robust authentication, authorization, and identity governance to protect your data platform while enabling productivity.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">12,847</div><div class="hero-metric-label">Managed Identities</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">98.7%</div><div class="hero-metric-label">MFA Adoption</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">847</div><div class="hero-metric-label">Active Roles</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">4.2M</div><div class="hero-metric-label">Daily Auth Events</div></div>
+            </div>
+        </section>
+        
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="overview-content">
+                <h3>What is Identity & Access Management (IAM)?</h3>
+                <p>Identity and Access Management (IAM) is the security discipline that ensures the right individuals have appropriate access to the right resources at the right time for the right reasons. IAM encompasses the policies, processes, and technologies used to manage digital identities and control access to systems, applications, and data.</p>
+                <h4>The IAM Challenge for Data Platforms</h4>
+                <p>Modern data platforms present unique IAM challenges: thousands of users with varying needs, sensitive data requiring granular access controls, service accounts for automated pipelines, external partner access, and regulatory requirements for access governance. Without proper IAM, organizations face data breaches, compliance violations, and operational inefficiencies.</p>
+                <h4>Authentication vs. Authorization</h4>
+                <p>IAM consists of two fundamental processes that work together:</p>
+                <ul>
+                    <li><strong>Authentication (AuthN):</strong> Verifying that users are who they claim to be. "Who are you?" This is typically done through passwords, biometrics, tokens, or certificates. Authentication establishes identity.</li>
+                    <li><strong>Authorization (AuthZ):</strong> Determining what an authenticated user is allowed to do. "What can you do?" This involves checking permissions, roles, and policies to grant or deny access to specific resources.</li>
+                </ul>
+                <h4>The Principle of Least Privilege</h4>
+                <p>The foundation of good IAM is the principle of least privilege: users should have only the minimum access necessary to perform their job functions. This limits the blast radius of compromised accounts and reduces the risk of accidental or intentional data exposure. Implementing least privilege requires continuous review and adjustment as roles and responsibilities change.</p>
+            </div>
+        </section>
+        
+        <!-- CORE PRINCIPLES -->
+        <section class="module" id="principles">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info"><h2>IAM Core Principles</h2><p>Foundational concepts for secure access management</p></div>
+            </div>
+            <div class="principles-grid">
+                <div class="principle-card" style="--principle-color: var(--green);">
+                    <div class="principle-icon">🔐</div>
+                    <div class="principle-title">Least Privilege</div>
+                    <div class="principle-desc">Grant users only the minimum permissions required to perform their job functions. Start with no access and add permissions as needed, rather than starting with broad access and restricting later.</div>
+                </div>
+                <div class="principle-card" style="--principle-color: var(--blue);">
+                    <div class="principle-icon">🔀</div>
+                    <div class="principle-title">Separation of Duties</div>
+                    <div class="principle-desc">Divide critical tasks among multiple people to prevent fraud and errors. No single person should control all aspects of a sensitive process—for example, the person who requests access should not approve it.</div>
+                </div>
+                <div class="principle-card" style="--principle-color: var(--violet);">
+                    <div class="principle-icon">⏱️</div>
+                    <div class="principle-title">Just-In-Time Access</div>
+                    <div class="principle-desc">Provide elevated access only when needed and for the minimum time required. Privileged access should be temporary by default, with automatic expiration after the task is complete.</div>
+                </div>
+                <div class="principle-card" style="--principle-color: var(--orange);">
+                    <div class="principle-icon">🔍</div>
+                    <div class="principle-title">Need to Know</div>
+                    <div class="principle-desc">Access to sensitive information should be restricted to those with a legitimate business need. Even with technical access, viewing data requires specific authorization based on job requirements.</div>
+                </div>
+                <div class="principle-card" style="--principle-color: var(--cyan);">
+                    <div class="principle-icon">✅</div>
+                    <div class="principle-title">Defense in Depth</div>
+                    <div class="principle-desc">Implement multiple layers of access controls. If one control fails, others remain in place. Combine network controls, application controls, and data-level controls for comprehensive protection.</div>
+                </div>
+                <div class="principle-card" style="--principle-color: var(--pink);">
+                    <div class="principle-icon">🔄</div>
+                    <div class="principle-title">Continuous Verification</div>
+                    <div class="principle-desc">Don't trust authentication alone—continuously verify that access is still appropriate. Monitor behavior, re-authenticate for sensitive operations, and revoke access when conditions change.</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- IAM DASHBOARD -->
+        <section class="module" id="dashboard">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info"><h2>IAM Dashboard</h2><p>Identity and access metrics overview</p></div>
+            </div>
+            <div class="iam-dashboard">
+                <div class="iam-header"><div class="iam-title">🎯 Identity Posture Summary</div></div>
+                <div class="iam-stats">
+                    <div class="iam-stat" style="--stat-color: var(--blue);"><div class="iam-stat-value" style="color: var(--blue);">12,847</div><div class="iam-stat-label">Total Identities</div><div class="iam-stat-sub">11,234 users • 1,613 service accounts</div></div>
+                    <div class="iam-stat" style="--stat-color: var(--green);"><div class="iam-stat-value" style="color: var(--green);">98.7%</div><div class="iam-stat-label">MFA Enabled</div><div class="iam-stat-sub">147 exceptions pending review</div></div>
+                    <div class="iam-stat" style="--stat-color: var(--orange);"><div class="iam-stat-value" style="color: var(--orange);">847</div><div class="iam-stat-label">Active Roles</div><div class="iam-stat-sub">234 custom • 613 system</div></div>
+                    <div class="iam-stat" style="--stat-color: var(--violet);"><div class="iam-stat-value" style="color: var(--violet);">156</div><div class="iam-stat-label">Privileged Accounts</div><div class="iam-stat-sub">34 admin • 122 elevated</div></div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Key IAM Metrics to Track</h3>
+                <p>Effective IAM requires continuous monitoring of key metrics that indicate the health and security of your identity infrastructure:</p>
+                <ul>
+                    <li><strong>MFA Adoption Rate:</strong> Percentage of users with multi-factor authentication enabled. Target: 100% for humans, risk-based for service accounts.</li>
+                    <li><strong>Orphaned Accounts:</strong> Accounts belonging to users who have left the organization. Should be zero—orphaned accounts are a major breach vector.</li>
+                    <li><strong>Dormant Accounts:</strong> Accounts that haven't been used in 90+ days. Review for removal or extended inactivity justification.</li>
+                    <li><strong>Privileged Access Ratio:</strong> Percentage of users with admin/elevated access. Lower is better—typically under 5% is healthy.</li>
+                    <li><strong>Access Review Completion:</strong> Percentage of required access reviews completed on time. Target: 100% within SLA.</li>
+                    <li><strong>Failed Authentication Rate:</strong> Percentage of login attempts that fail. Spikes may indicate attacks or user friction.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- AUTHENTICATION METHODS -->
+        <section class="module" id="authentication">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info"><h2>Authentication Methods</h2><p>How to verify user identity</p></div>
+            </div>
+            <div class="auth-grid">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon" style="background: linear-gradient(135deg, var(--green), #059669);">🔑</div>
+                        <div><div class="auth-title">Multi-Factor Authentication (MFA)</div><div class="auth-type">Something you know + have + are</div></div>
+                    </div>
+                    <div class="auth-desc">Requires two or more verification factors from different categories. Even if one factor (like a password) is compromised, attackers can't access the account without the additional factors.</div>
+                    <div class="auth-factors"><span class="auth-factor">TOTP Apps</span><span class="auth-factor">Hardware Keys</span><span class="auth-factor">Push Notifications</span><span class="auth-factor">SMS (not recommended)</span><span class="auth-factor">Biometrics</span></div>
+                    <div class="auth-strength"><span>Security:</span><div class="auth-strength-bar"><div class="auth-strength-fill" style="width: 90%; background: var(--green);"></div></div><span class="auth-strength-label">Very High</span></div>
+                </div>
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon" style="background: linear-gradient(135deg, var(--blue), #1D4ED8);">🌐</div>
+                        <div><div class="auth-title">Single Sign-On (SSO)</div><div class="auth-type">One identity, many applications</div></div>
+                    </div>
+                    <div class="auth-desc">Users authenticate once and gain access to multiple applications without re-entering credentials. Reduces password fatigue, improves user experience, and centralizes authentication control.</div>
+                    <div class="auth-factors"><span class="auth-factor">SAML 2.0</span><span class="auth-factor">OAuth 2.0</span><span class="auth-factor">OpenID Connect</span><span class="auth-factor">WS-Federation</span></div>
+                    <div class="auth-strength"><span>Security:</span><div class="auth-strength-bar"><div class="auth-strength-fill" style="width: 75%; background: var(--blue);"></div></div><span class="auth-strength-label">High (with MFA)</span></div>
+                </div>
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon" style="background: linear-gradient(135deg, var(--violet), #6D28D9);">👆</div>
+                        <div><div class="auth-title">Passwordless Authentication</div><div class="auth-type">No passwords to steal or forget</div></div>
+                    </div>
+                    <div class="auth-desc">Eliminates passwords entirely using biometrics, security keys, or magic links. Removes the most common attack vector (credential theft) and improves user experience.</div>
+                    <div class="auth-factors"><span class="auth-factor">FIDO2/WebAuthn</span><span class="auth-factor">Windows Hello</span><span class="auth-factor">Face ID/Touch ID</span><span class="auth-factor">Magic Links</span></div>
+                    <div class="auth-strength"><span>Security:</span><div class="auth-strength-bar"><div class="auth-strength-fill" style="width: 95%; background: var(--violet);"></div></div><span class="auth-strength-label">Excellent</span></div>
+                </div>
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon" style="background: linear-gradient(135deg, var(--orange), #D97706);">📜</div>
+                        <div><div class="auth-title">Certificate-Based Authentication</div><div class="auth-type">Cryptographic identity proof</div></div>
+                    </div>
+                    <div class="auth-desc">Uses X.509 digital certificates to prove identity. Common for service-to-service authentication, machine identities, and high-security environments requiring PKI.</div>
+                    <div class="auth-factors"><span class="auth-factor">mTLS</span><span class="auth-factor">Smart Cards</span><span class="auth-factor">Client Certificates</span><span class="auth-factor">Device Certificates</span></div>
+                    <div class="auth-strength"><span>Security:</span><div class="auth-strength-bar"><div class="auth-strength-fill" style="width: 85%; background: var(--orange);"></div></div><span class="auth-strength-label">Very High</span></div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Choosing the Right Authentication Method</h3>
+                <p>The best authentication method depends on your security requirements, user population, and technical environment:</p>
+                <ul>
+                    <li><strong>Human Users (Internal):</strong> SSO with MFA mandatory. Consider passwordless for improved security and UX.</li>
+                    <li><strong>Human Users (External/Customers):</strong> Risk-based MFA with passwordless options. Balance security with friction.</li>
+                    <li><strong>Service Accounts:</strong> Certificate-based authentication or managed identities. Never use passwords in code.</li>
+                    <li><strong>Machine-to-Machine:</strong> mTLS with certificate rotation. Consider short-lived tokens from identity providers.</li>
+                    <li><strong>Privileged Access:</strong> Hardware security keys (FIDO2) plus additional factors. No SMS or email OTP.</li>
+                </ul>
+            </div>
+        </section>
+        <!-- AUTHORIZATION MODELS -->
+        <section class="module" id="authorization">
+            <div class="module-header">
+                <div class="module-icon">🔓</div>
+                <div class="module-info"><h2>Authorization Models</h2><p>How to control what users can access</p></div>
+            </div>
+            <div class="authz-container">
+                <div class="authz-header">
+                    <div class="authz-title">🎛️ Access Control Models</div>
+                    <div class="authz-subtitle">Different approaches to defining and enforcing access permissions</div>
+                </div>
+                <div class="authz-content">
+                    <div class="authz-models">
+                        <div class="authz-model">
+                            <div class="authz-model-header">
+                                <div class="authz-model-icon" style="background: linear-gradient(135deg, var(--blue), #1D4ED8);">👥</div>
+                                <div><div class="authz-model-name">RBAC</div><div class="authz-model-full">Role-Based Access Control</div></div>
+                            </div>
+                            <div class="authz-model-desc">Assigns permissions to roles, then assigns users to roles. Users inherit all permissions of their assigned roles. Simple to manage and audit—most common model.</div>
+                            <div class="authz-model-example"><code>User: Alice</code> → <code>Role: Data Analyst</code> → <code>Permissions: read_warehouse, run_queries</code></div>
+                            <div class="authz-model-pros"><span>Simple</span><span>Scalable</span><span>Auditable</span></div>
+                        </div>
+                        <div class="authz-model">
+                            <div class="authz-model-header">
+                                <div class="authz-model-icon" style="background: linear-gradient(135deg, var(--violet), #6D28D9);">🏷️</div>
+                                <div><div class="authz-model-name">ABAC</div><div class="authz-model-full">Attribute-Based Access Control</div></div>
+                            </div>
+                            <div class="authz-model-desc">Evaluates attributes of users, resources, actions, and environment to make access decisions. Highly flexible but more complex to implement and audit.</div>
+                            <div class="authz-model-example"><code>IF user.department="Finance" AND resource.classification="Confidential" AND time.hour BETWEEN 9-17 THEN allow</code></div>
+                            <div class="authz-model-pros"><span>Flexible</span><span>Dynamic</span><span>Context-Aware</span></div>
+                        </div>
+                        <div class="authz-model">
+                            <div class="authz-model-header">
+                                <div class="authz-model-icon" style="background: linear-gradient(135deg, var(--green), #059669);">📊</div>
+                                <div><div class="authz-model-name">ReBAC</div><div class="authz-model-full">Relationship-Based Access Control</div></div>
+                            </div>
+                            <div class="authz-model-desc">Grants access based on relationships between users and resources. Ideal for collaborative applications where access depends on resource ownership or team membership.</div>
+                            <div class="authz-model-example"><code>User: Bob</code> → <code>Relation: owner_of</code> → <code>Resource: Project_X</code> → <code>Can: edit, share, delete</code></div>
+                            <div class="authz-model-pros"><span>Intuitive</span><span>Collaborative</span><span>Graph-Based</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Choosing an Authorization Model</h3>
+                <p>Most organizations use a combination of models based on their specific needs:</p>
+                <ul>
+                    <li><strong>RBAC:</strong> Best for stable organizational structures with well-defined job functions. Start here—it covers 80% of use cases and is easiest to manage.</li>
+                    <li><strong>ABAC:</strong> Best when access decisions depend on multiple dynamic factors like time, location, or data classification. Add on top of RBAC for fine-grained control.</li>
+                    <li><strong>ReBAC:</strong> Best for collaborative platforms, document management, or any application where access flows from ownership and sharing relationships.</li>
+                </ul>
+                <h4>Data Platform Authorization</h4>
+                <p>For data platforms like Databricks, Snowflake, or BigQuery, implement layered authorization: RBAC for workspace/catalog access, ABAC for row/column-level security based on data classification, and dynamic data masking for sensitive fields. Always prefer deny-by-default and explicit grants over broad permissions.</p>
+            </div>
+        </section>
+        
+        <!-- IDENTITY LIFECYCLE -->
+        <section class="module" id="lifecycle">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info"><h2>Identity Lifecycle Management</h2><p>Managing identities from creation to deletion</p></div>
+            </div>
+            <div class="lifecycle-container">
+                <div class="lifecycle-header"><div class="lifecycle-title">📋 Identity Lifecycle Stages</div></div>
+                <div class="lifecycle-content">
+                    <div class="lifecycle-stages">
+                        <div class="lifecycle-stage" style="--stage-color: var(--green);"><div class="lifecycle-stage-icon">👤</div><div class="lifecycle-stage-name">Joiner</div><div class="lifecycle-stage-desc">New identity creation & provisioning</div></div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--blue);"><div class="lifecycle-stage-icon">🔧</div><div class="lifecycle-stage-name">Mover</div><div class="lifecycle-stage-desc">Role changes & access adjustments</div></div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--yellow);"><div class="lifecycle-stage-icon">🔍</div><div class="lifecycle-stage-name">Review</div><div class="lifecycle-stage-desc">Periodic access certification</div></div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--orange);"><div class="lifecycle-stage-icon">⚠️</div><div class="lifecycle-stage-name">Exception</div><div class="lifecycle-stage-desc">Handle violations & anomalies</div></div>
+                        <div class="lifecycle-stage" style="--stage-color: var(--red);"><div class="lifecycle-stage-icon">🚪</div><div class="lifecycle-stage-name">Leaver</div><div class="lifecycle-stage-desc">Offboarding & deprovisioning</div></div>
+                    </div>
+                    <div class="lifecycle-details">
+                        <div class="lifecycle-detail" style="--detail-color: var(--green);"><div class="lifecycle-detail-title">1. Joiner</div><ul class="lifecycle-detail-list"><li>Create identity in IdP</li><li>Assign base roles</li><li>Provision to applications</li><li>Set up MFA</li><li>Verify with manager</li></ul></div>
+                        <div class="lifecycle-detail" style="--detail-color: var(--blue);"><div class="lifecycle-detail-title">2. Mover</div><ul class="lifecycle-detail-list"><li>Detect role change</li><li>Remove old access</li><li>Grant new access</li><li>Transfer ownership</li><li>Update attributes</li></ul></div>
+                        <div class="lifecycle-detail" style="--detail-color: var(--yellow);"><div class="lifecycle-detail-title">3. Review</div><ul class="lifecycle-detail-list"><li>Quarterly certifications</li><li>Manager attestation</li><li>Privileged access review</li><li>Dormant account cleanup</li><li>Role mining analysis</li></ul></div>
+                        <div class="lifecycle-detail" style="--detail-color: var(--orange);"><div class="lifecycle-detail-title">4. Exception</div><ul class="lifecycle-detail-list"><li>Policy violations</li><li>SoD conflicts</li><li>Excessive permissions</li><li>Suspicious activity</li><li>Emergency access</li></ul></div>
+                        <div class="lifecycle-detail" style="--detail-color: var(--red);"><div class="lifecycle-detail-title">5. Leaver</div><ul class="lifecycle-detail-list"><li>Disable immediately</li><li>Revoke all access</li><li>Transfer data ownership</li><li>Retain audit logs</li><li>Delete after retention</li></ul></div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Why Lifecycle Management Matters</h3>
+                <p>Poor identity lifecycle management is a leading cause of security incidents. When employees leave but accounts remain active (orphaned accounts), attackers have a ready-made entry point. When employees change roles but keep old permissions (access creep), the principle of least privilege erodes over time.</p>
+                <h4>Automation is Essential</h4>
+                <p>Manual lifecycle management doesn't scale. Integrate your identity provider with HR systems to automatically trigger provisioning on hire, access changes on transfers, and deprovisioning on termination. The goal is zero-delay deprovisioning—accounts should be disabled within minutes of termination notification, not days or weeks.</p>
+            </div>
+        </section>
+        
+        <!-- PRIVILEGED ACCESS MANAGEMENT -->
+        <section class="module" id="pam">
+            <div class="module-header">
+                <div class="module-icon">👑</div>
+                <div class="module-info"><h2>Privileged Access Management</h2><p>Securing the keys to the kingdom</p></div>
+            </div>
+            <div class="pam-container">
+                <div class="pam-header"><div class="pam-title">🔐 PAM Capabilities</div></div>
+                <div class="pam-content">
+                    <div class="pam-grid">
+                        <div class="pam-card">
+                            <div class="pam-card-header"><div class="pam-card-icon" style="background: linear-gradient(135deg, var(--red), #B91C1C);">🗄️</div><div class="pam-card-title">Credential Vaulting</div></div>
+                            <div class="pam-card-desc">Store privileged credentials in an encrypted vault rather than in scripts, config files, or human memory. Credentials are checked out for use and automatically rotated.</div>
+                            <ul class="pam-card-features"><li>Encrypted secret storage</li><li>Automatic credential rotation</li><li>Check-out/check-in workflow</li><li>Emergency break-glass access</li></ul>
+                        </div>
+                        <div class="pam-card">
+                            <div class="pam-card-header"><div class="pam-card-icon" style="background: linear-gradient(135deg, var(--blue), #1D4ED8);">🎬</div><div class="pam-card-title">Session Recording</div></div>
+                            <div class="pam-card-desc">Record all privileged sessions for forensic analysis and compliance. Includes keystroke logging, screen recording, and command capture for audit trails.</div>
+                            <ul class="pam-card-features"><li>Full session video recording</li><li>Command/keystroke capture</li><li>Searchable audit logs</li><li>Tamper-proof storage</li></ul>
+                        </div>
+                        <div class="pam-card">
+                            <div class="pam-card-header"><div class="pam-card-icon" style="background: linear-gradient(135deg, var(--violet), #6D28D9);">⏱️</div><div class="pam-card-title">Just-In-Time Access</div></div>
+                            <div class="pam-card-desc">Provide elevated privileges only when needed for a specific task. Access is time-limited and automatically expires—no standing privileges.</div>
+                            <ul class="pam-card-features"><li>Request/approval workflow</li><li>Time-bound elevation</li><li>Automatic de-escalation</li><li>Emergency procedures</li></ul>
+                        </div>
+                        <div class="pam-card">
+                            <div class="pam-card-header"><div class="pam-card-icon" style="background: linear-gradient(135deg, var(--green), #059669);">🤖</div><div class="pam-card-title">Service Account Governance</div></div>
+                            <div class="pam-card-desc">Manage non-human identities used by applications, scripts, and automation. Service accounts often have elevated privileges and are prime targets.</div>
+                            <ul class="pam-card-features"><li>Service account inventory</li><li>Owner assignment</li><li>Credential rotation</li><li>Usage monitoring</li></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Why PAM is Critical</h3>
+                <p>Privileged accounts—administrators, root users, service accounts with elevated permissions—are the most valuable targets for attackers. A compromised privileged account can lead to complete system takeover, data exfiltration, and persistent access that's hard to detect.</p>
+                <h4>PAM Best Practices</h4>
+                <ul>
+                    <li><strong>Eliminate standing privileges:</strong> No one should have permanent admin access. Use just-in-time elevation for specific tasks.</li>
+                    <li><strong>Vault all credentials:</strong> Privileged passwords should never be known by humans or stored in plaintext.</li>
+                    <li><strong>Require MFA + approval:</strong> Privileged access should require hardware MFA and manager/peer approval.</li>
+                    <li><strong>Record everything:</strong> All privileged sessions should be recorded for forensic and compliance purposes.</li>
+                    <li><strong>Monitor behavior:</strong> Use analytics to detect anomalous privileged activity that may indicate compromise.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- ZERO TRUST -->
+        <section class="module" id="zerotrust">
+            <div class="module-header">
+                <div class="module-icon">🏰</div>
+                <div class="module-info"><h2>Zero Trust Architecture</h2><p>Never trust, always verify</p></div>
+            </div>
+            <div class="zerotrust-container">
+                <div class="zerotrust-header"><div class="zerotrust-title">🛡️ Zero Trust Principles</div></div>
+                <div class="zerotrust-content">
+                    <div class="zerotrust-pillars">
+                        <div class="zerotrust-pillar"><div class="zerotrust-pillar-icon">🔍</div><div class="zerotrust-pillar-title">Verify Explicitly</div><div class="zerotrust-pillar-desc">Always authenticate and authorize based on all available data points: identity, location, device health, service/workload, data classification, and anomalies.</div></div>
+                        <div class="zerotrust-pillar"><div class="zerotrust-pillar-icon">🔐</div><div class="zerotrust-pillar-title">Least Privilege Access</div><div class="zerotrust-pillar-desc">Limit user access with just-in-time and just-enough access (JIT/JEA), risk-based adaptive policies, and data protection to help secure both data and productivity.</div></div>
+                        <div class="zerotrust-pillar"><div class="zerotrust-pillar-icon">💥</div><div class="zerotrust-pillar-title">Assume Breach</div><div class="zerotrust-pillar-desc">Minimize blast radius and segment access. Verify end-to-end encryption and use analytics to get visibility, drive threat detection, and improve defenses.</div></div>
+                    </div>
+                    <div class="zerotrust-diagram">
+                        <div class="zerotrust-layers">
+                            <div class="zerotrust-layer"><div class="zerotrust-layer-num">1</div><div class="zerotrust-layer-content"><div class="zerotrust-layer-title">Identity Verification</div><div class="zerotrust-layer-desc">Strong authentication with MFA, passwordless, and continuous validation of user and device identity.</div><div class="zerotrust-layer-tech">Azure AD, Okta, Ping Identity, certificates</div></div></div>
+                            <div class="zerotrust-layer"><div class="zerotrust-layer-num">2</div><div class="zerotrust-layer-content"><div class="zerotrust-layer-title">Device Compliance</div><div class="zerotrust-layer-desc">Verify device health, patch status, and compliance before granting access. Managed devices only for sensitive data.</div><div class="zerotrust-layer-tech">Intune, Jamf, CrowdStrike, device posture checks</div></div></div>
+                            <div class="zerotrust-layer"><div class="zerotrust-layer-num">3</div><div class="zerotrust-layer-content"><div class="zerotrust-layer-title">Network Micro-Segmentation</div><div class="zerotrust-layer-desc">Segment networks to limit lateral movement. Every connection is authenticated and encrypted, even internal traffic.</div><div class="zerotrust-layer-tech">Zscaler, Cloudflare Access, micro-perimeters</div></div></div>
+                            <div class="zerotrust-layer"><div class="zerotrust-layer-num">4</div><div class="zerotrust-layer-content"><div class="zerotrust-layer-title">Application & Data Protection</div><div class="zerotrust-layer-desc">Enforce policies at the application and data layer. Apply DLP, encryption, and access controls based on data sensitivity.</div><div class="zerotrust-layer-tech">CASB, DLP, encryption, data classification</div></div></div>
+                            <div class="zerotrust-layer"><div class="zerotrust-layer-num">5</div><div class="zerotrust-layer-content"><div class="zerotrust-layer-title">Continuous Monitoring</div><div class="zerotrust-layer-desc">Real-time visibility into all access attempts. Detect anomalies, respond to threats, and adapt policies dynamically.</div><div class="zerotrust-layer-tech">SIEM, UEBA, XDR, threat intelligence</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Zero Trust for Data Platforms</h3>
+                <p>Traditional perimeter-based security assumed everything inside the network was trusted. Zero Trust recognizes that threats can come from anywhere—including inside the network—and that the perimeter has dissolved with cloud and remote work.</p>
+                <p>For data platforms, Zero Trust means: verify every user and service accessing data, regardless of location. Don't trust the network—encrypt all connections. Assume any component could be compromised and limit blast radius through segmentation. Continuously monitor for anomalous access patterns.</p>
+            </div>
+        </section>
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info"><h2>Best Practices</h2><p>IAM do's and don'ts</p></div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do's</div>
+                    <ul class="practice-list">
+                        <li>Require MFA for all human users without exception—hardware keys for privileged access</li>
+                        <li>Implement SSO to reduce password sprawl and centralize authentication control</li>
+                        <li>Automate provisioning/deprovisioning with HR system integration for zero-delay offboarding</li>
+                        <li>Use managed identities or workload identity federation for service accounts—no passwords</li>
+                        <li>Conduct quarterly access reviews with manager attestation and auto-revocation for non-response</li>
+                        <li>Implement just-in-time privileged access—eliminate standing admin privileges</li>
+                        <li>Apply least privilege by default—explicit grants only, deny everything else</li>
+                        <li>Monitor and alert on authentication anomalies: impossible travel, unusual times, failed attempts</li>
+                        <li>Encrypt all authentication traffic and store credentials in vaults, never in code</li>
+                        <li>Document all roles and permissions with clear business justification</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don'ts</div>
+                    <ul class="practice-list">
+                        <li>Allow shared accounts or credentials—every identity should be individual and accountable</li>
+                        <li>Use SMS for MFA—it's vulnerable to SIM swapping and interception attacks</li>
+                        <li>Store passwords, API keys, or secrets in source code, config files, or environment variables</li>
+                        <li>Grant standing privileged access—admin rights should be temporary and just-in-time</li>
+                        <li>Rely on self-service access requests without approval workflows and review cycles</li>
+                        <li>Keep orphaned accounts after employee termination—deactivate within hours, not days</li>
+                        <li>Use service accounts interactively or share them across multiple applications</li>
+                        <li>Grant broad permissions like "Owner" or "Admin" when specific permissions suffice</li>
+                        <li>Skip access reviews because they're time-consuming—automate and enforce completion</li>
+                        <li>Trust internal network traffic—apply Zero Trust principles everywhere</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info"><h2>IAM Platforms</h2><p>Tools for identity and access management</p></div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--blue), #1D4ED8);">🔵</div><div><div class="tool-name">Microsoft Entra ID</div><div class="tool-category">Identity Provider</div></div></div><div class="tool-desc">Enterprise identity platform (formerly Azure AD) with SSO, MFA, conditional access, and governance.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--violet), #6D28D9);">🟣</div><div><div class="tool-name">Okta</div><div class="tool-category">Identity Provider</div></div></div><div class="tool-desc">Cloud-native identity management with universal directory, SSO, MFA, and lifecycle management.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--orange), #D97706);">🟠</div><div><div class="tool-name">CyberArk</div><div class="tool-category">PAM</div></div></div><div class="tool-desc">Privileged access management with credential vaulting, session recording, and JIT access.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--green), #059669);">🟢</div><div><div class="tool-name">HashiCorp Vault</div><div class="tool-category">Secrets Management</div></div></div><div class="tool-desc">Secrets management platform for dynamic credentials, encryption, and PKI services.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--cyan), #0891B2);">🔷</div><div><div class="tool-name">Ping Identity</div><div class="tool-category">Identity Provider</div></div></div><div class="tool-desc">Enterprise IAM with adaptive authentication, API security, and customer identity management.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--pink), #BE185D);">💗</div><div><div class="tool-name">SailPoint</div><div class="tool-category">IGA</div></div></div><div class="tool-desc">Identity governance and administration with access reviews, role mining, and compliance.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, var(--yellow), #D97706);">🟡</div><div><div class="tool-name">BeyondTrust</div><div class="tool-category">PAM</div></div></div><div class="tool-desc">Privileged access management with password safe, endpoint privilege management, and remote access.</div></div>
+                <div class="tool-card"><div class="tool-header"><div class="tool-icon" style="background: linear-gradient(135deg, #1F2937, #374151);">⚫</div><div><div class="tool-name">Auth0</div><div class="tool-category">CIAM</div></div></div><div class="tool-desc">Customer identity platform with universal login, social connections, and extensible authentication.</div></div>
+            </div>
+        </section>
+        
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info"><h2>Agent This</h2><p>AI-powered identity management automation</p></div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🪪</div>
+                    <div class="agent-name">IdentityGuard</div>
+                    <div class="agent-role">IAM Automation Specialist</div>
+                    <div class="agent-desc">Automates identity lifecycle management, access reviews, and anomaly detection. Integrates with identity providers, HR systems, and ticketing platforms to streamline provisioning, detect risky access patterns, and enforce least privilege continuously.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automated provisioning from HR system events</li>
+                        <li>Intelligent access request routing and approval</li>
+                        <li>Continuous access review automation</li>
+                        <li>Orphaned account detection and cleanup</li>
+                        <li>Privilege creep detection and remediation</li>
+                        <li>Anomalous access pattern alerting</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Python</div>
+                        <div class="code-tab">Config</div>
+                        <div class="code-filename">identity_agent.py</div>
+                    </div>
+                    <div class="code-content"><pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain.tools <span class="code-keyword">import</span> Tool
+
+<span class="code-comment"># Define the Identity Guard Agent</span>
+<span class="code-property">identity_agent</span> = Agent(
+    <span class="code-property">role</span>=<span class="code-string">"IAM Automation Specialist"</span>,
+    <span class="code-property">goal</span>=<span class="code-string">"""Automate identity lifecycle, 
+    enforce least privilege, and detect 
+    anomalous access patterns"""</span>,
+    <span class="code-property">backstory</span>=<span class="code-string">"""Expert in identity governance 
+    with deep knowledge of RBAC, ABAC, 
+    PAM, and Zero Trust architecture."""</span>,
+    <span class="code-property">tools</span>=[
+        idp_api,          <span class="code-comment"># Okta/Entra ID</span>
+        hr_system_api,    <span class="code-comment"># Workday/SAP</span>
+        pam_api,          <span class="code-comment"># CyberArk</span>
+        siem_api,         <span class="code-comment"># Splunk/Sentinel</span>
+        ticketing_api     <span class="code-comment"># ServiceNow</span>
+    ],
+    <span class="code-property">verbose</span>=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Access Review Automation Task</span>
+<span class="code-property">review_task</span> = Task(
+    <span class="code-property">description</span>=<span class="code-string">"""
+    1. Pull current access entitlements
+    2. Compare against role definitions
+    3. Identify excess permissions
+    4. Flag dormant access (90+ days)
+    5. Generate review notifications
+    6. Auto-revoke on non-response
+    """</span>,
+    <span class="code-property">agent</span>=identity_agent,
+    <span class="code-property">expected_output</span>=<span class="code-string">"Access review report 
+    with remediation actions"</span>
+)
+
+<span class="code-comment"># Anomaly Detection Task</span>
+<span class="code-property">anomaly_task</span> = Task(
+    <span class="code-property">description</span>=<span class="code-string">"""
+    1. Analyze authentication logs
+    2. Detect impossible travel
+    3. Flag unusual access times
+    4. Identify privilege escalation
+    5. Alert on suspicious patterns
+    """</span>,
+    <span class="code-property">agent</span>=identity_agent
+)
+
+<span class="code-comment"># Run the identity management crew</span>
+<span class="code-property">crew</span> = Crew(
+    <span class="code-property">agents</span>=[identity_agent],
+    <span class="code-property">tasks</span>=[review_task, anomaly_task]
+)
+<span class="code-property">result</span> = crew.<span class="code-function">kickoff</span>()</pre></div>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+</div>
+<footer>
+    <div class="footer-nav">
+        <a href="cat11-p4-risk-management.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous</div><div class="footer-link-title">11.4 Risk Management</div></div></a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 11.5</div>
+        <a href="cat11-p6-audit-logging.html" class="footer-link"><div><div class="footer-link-label">Next</div><div class="footer-link-title">11.6 Audit & Logging</div></div><span>→</span></a>
+    </div>
+</footer>
+</body>
+</html>

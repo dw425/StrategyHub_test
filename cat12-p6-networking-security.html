@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking & Security | Cloud Platforms | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #0EA5E9;
+            --cat-light: #38BDF8;
+            --cat-dark: #0284C7;
+            --cat-glow: rgba(14, 165, 233, 0.15);
+            --page-primary: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Network Architecture Visual */
+        .network-arch { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .network-title { font-size: 14px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .network-layers { display: flex; flex-direction: column; gap: 16px; }
+        .network-layer { display: flex; align-items: center; gap: 16px; }
+        .layer-label { width: 120px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: right; flex-shrink: 0; }
+        .layer-boxes { flex: 1; display: flex; gap: 12px; }
+        .layer-box { flex: 1; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; transition: all 0.3s; }
+        .layer-box:hover { border-color: var(--page-primary); }
+        .layer-box-icon { font-size: 20px; margin-bottom: 4px; }
+        .layer-box-name { font-size: 11px; font-weight: 600; }
+        .layer-box-detail { font-size: 9px; color: var(--text-muted); }
+
+        /* Service Cards */
+        .service-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .service-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .service-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .service-icon { font-size: 28px; margin-bottom: 12px; }
+        .service-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .service-type { font-size: 11px; color: var(--page-light); margin-bottom: 8px; }
+        .service-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
+        .service-providers { font-size: 10px; color: var(--text-muted); }
+
+        /* Security Layers */
+        .security-stack { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .security-layer { display: flex; align-items: stretch; gap: 16px; }
+        .security-layer-name { width: 140px; background: var(--bg-dark); border: 2px solid; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex-shrink: 0; }
+        .security-layer-icon { font-size: 24px; margin-bottom: 8px; }
+        .security-layer-title { font-size: 12px; font-weight: 700; }
+        .security-layer-content { flex: 1; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .security-item { text-align: center; }
+        .security-item-icon { font-size: 20px; margin-bottom: 4px; }
+        .security-item-name { font-size: 11px; font-weight: 600; }
+        .security-item-detail { font-size: 9px; color: var(--text-muted); }
+
+        /* Comparison Table */
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+
+        /* Connectivity Cards */
+        .connect-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .connect-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s; }
+        .connect-card:hover { border-color: var(--page-primary); }
+        .connect-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .connect-icon { font-size: 28px; }
+        .connect-title { font-size: 16px; font-weight: 700; }
+        .connect-subtitle { font-size: 11px; color: var(--text-muted); }
+        .connect-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .connect-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .connect-spec { text-align: center; }
+        .connect-spec-value { font-size: 14px; font-weight: 700; color: var(--page-light); }
+        .connect-spec-label { font-size: 9px; color: var(--text-muted); }
+        .connect-providers { display: flex; gap: 6px; margin-top: 12px; }
+        .provider-badge { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .badge-aws { background: rgba(255,153,0,0.15); color: #FF9900; }
+        .badge-azure { background: rgba(0,120,212,0.15); color: #0078D4; }
+        .badge-gcp { background: rgba(66,133,244,0.15); color: #4285F4; }
+
+        /* Zero Trust Visual */
+        .zero-trust { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .zt-title { font-size: 14px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .zt-pillars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+        .zt-pillar { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s; }
+        .zt-pillar:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .zt-pillar-icon { font-size: 32px; margin-bottom: 12px; }
+        .zt-pillar-name { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+        .zt-pillar-desc { font-size: 11px; color: var(--text-secondary); }
+
+        /* Compliance Cards */
+        .compliance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .compliance-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .compliance-icon { font-size: 32px; margin-bottom: 12px; }
+        .compliance-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .compliance-type { font-size: 11px; color: var(--page-light); margin-bottom: 8px; }
+        .compliance-desc { font-size: 11px; color: var(--text-secondary); }
+
+        /* Agent Grid */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .agent-grid { grid-template-columns: 1fr; }
+            .service-grid, .compliance-grid { grid-template-columns: repeat(2, 1fr); }
+            .connect-grid, .related-grid { grid-template-columns: 1fr; }
+            .zt-pillars { grid-template-columns: repeat(2, 1fr); }
+            .security-layer { flex-direction: column; }
+            .security-layer-name { width: 100%; }
+            .security-layer-content { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">☁️ Cloud Platforms</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat12-cloud-platforms-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat12-p1-cloud-providers.html"><span class="nav-icon">🏢</span> 12.1 Cloud Providers</a></li>
+            <li><a href="cat12-p2-architecture-patterns.html"><span class="nav-icon">🏗️</span> 12.2 Architecture Patterns</a></li>
+            <li><a href="cat12-p3-migration-strategies.html"><span class="nav-icon">🚀</span> 12.3 Migration Strategies</a></li>
+            <li><a href="cat12-p4-compute-containers.html"><span class="nav-icon">📦</span> 12.4 Compute & Containers</a></li>
+            <li><a href="cat12-p5-storage-databases.html"><span class="nav-icon">💾</span> 12.5 Storage & Databases</a></li>
+            <li><a href="cat12-p6-networking-security.html" class="active"><span class="nav-icon">🌐</span> 12.6 Networking & Security</a></li>
+            <li><a href="cat12-p7-cost-optimization.html"><span class="nav-icon">💰</span> 12.7 Cost Optimization</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#vpc"><span class="nav-icon">🏗️</span> VPC & Networking</a></li>
+            <li><a href="#connectivity"><span class="nav-icon">🔗</span> Connectivity</a></li>
+            <li><a href="#dns-cdn"><span class="nav-icon">🌍</span> DNS & CDN</a></li>
+            <li><a href="#security-layers"><span class="nav-icon">🛡️</span> Security Layers</a></li>
+            <li><a href="#identity"><span class="nav-icon">👤</span> Identity & Access</a></li>
+            <li><a href="#zero-trust"><span class="nav-icon">🔐</span> Zero Trust</a></li>
+            <li><a href="#compliance"><span class="nav-icon">📋</span> Compliance</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🌐 Page 12.6</span>
+                <h1>Networking & Security</h1>
+                <p>Design secure, high-performance cloud networks. From VPCs and hybrid connectivity to Zero Trust architecture and compliance frameworks—protect your cloud infrastructure at every layer.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">99.99%</div><div class="hero-metric-label">Network SLA</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100 Gbps</div><div class="hero-metric-label">Direct Connect</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">300+</div><div class="hero-metric-label">Edge Locations</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">143</div><div class="hero-metric-label">Compliance Certs</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Cloud Network Fundamentals</h2>
+                    <p>Understanding cloud networking and security</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>Software-Defined Networking</h3>
+                    <p>Cloud networks are software-defined, meaning you configure virtual networks, subnets, routing, and security through APIs and consoles rather than physical hardware.</p>
+                    <p><strong>Benefits:</strong> Instant provisioning, programmable infrastructure, consistent security policies, and integration with IaC tools like Terraform.</p>
+                    <p><strong>Key Concepts:</strong> Virtual Private Clouds (VPCs), subnets, route tables, internet gateways, NAT gateways, and network ACLs.</p>
+                </div>
+                <div>
+                    <h3>Defense in Depth</h3>
+                    <p>Cloud security follows defense-in-depth: multiple layers of security controls so that if one layer fails, others still protect your resources.</p>
+                    <p><strong>Layers:</strong> Network perimeter (WAF, DDoS), network segmentation (subnets, security groups), identity (IAM, MFA), data (encryption), and application (secure coding).</p>
+                    <p><strong>Shared Responsibility:</strong> Providers secure the infrastructure; you secure your configurations, data, and applications.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Network Design Principles</h3>
+                    <p><strong>Least Privilege Networking:</strong> Only allow traffic that's explicitly required. Default deny all, then open specific ports and protocols. <strong>Segmentation:</strong> Separate workloads by environment (dev/prod), sensitivity (PCI/non-PCI), and function (web/app/data tiers). <strong>Private by Default:</strong> Keep resources in private subnets. Use load balancers, API gateways, and bastion hosts for controlled access. <strong>Centralized Egress:</strong> Route outbound traffic through inspection points for logging, filtering, and compliance.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VPC & Networking -->
+        <section class="module" id="vpc">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>VPC & Virtual Networking</h2>
+                    <p>Build isolated cloud networks</p>
+                </div>
+            </div>
+
+            <div class="network-arch">
+                <div class="network-title">Typical VPC Architecture</div>
+                <div class="network-layers">
+                    <div class="network-layer">
+                        <div class="layer-label">Internet</div>
+                        <div class="layer-boxes">
+                            <div class="layer-box"><div class="layer-box-icon">🌐</div><div class="layer-box-name">Internet Gateway</div><div class="layer-box-detail">Public access</div></div>
+                            <div class="layer-box"><div class="layer-box-icon">🛡️</div><div class="layer-box-name">WAF</div><div class="layer-box-detail">Web filtering</div></div>
+                            <div class="layer-box"><div class="layer-box-icon">⚡</div><div class="layer-box-name">CDN</div><div class="layer-box-detail">Edge caching</div></div>
+                        </div>
+                    </div>
+                    <div class="network-layer">
+                        <div class="layer-label">Public Subnets</div>
+                        <div class="layer-boxes">
+                            <div class="layer-box"><div class="layer-box-icon">⚖️</div><div class="layer-box-name">Load Balancer</div><div class="layer-box-detail">ALB / NLB</div></div>
+                            <div class="layer-box"><div class="layer-box-icon">🚪</div><div class="layer-box-name">NAT Gateway</div><div class="layer-box-detail">Outbound only</div></div>
+                            <div class="layer-box"><div class="layer-box-icon">🖥️</div><div class="layer-box-name">Bastion Host</div><div class="layer-box-detail">SSH/RDP jump</div></div>
+                        </div>
+                    </div>
+                    <div class="network-layer">
+                        <div class="layer-label">Private Subnets</div>
+                        <div class="layer-boxes">
+                            <div class="layer-box"><div class="layer-box-icon">📦</div><div class="layer-box-name">Application Tier</div><div class="layer-box-detail">ECS / EKS / VMs</div></div>
+                            <div class="layer-box"><div class="layer-box-icon">🗄️</div><div class="layer-box-name">Database Tier</div><div class="layer-box-detail">RDS / ElastiCache</div></div>
+                            <div class="layer-box"><div class="layer-box-icon">🔒</div><div class="layer-box-name">Sensitive Data</div><div class="layer-box-detail">Isolated subnet</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Virtual Network</strong></td><td>VPC</td><td>VNet</td><td>VPC</td><td>Isolated network boundary</td></tr>
+                    <tr><td><strong>Subnet</strong></td><td>Subnet (AZ-scoped)</td><td>Subnet</td><td>Subnet (regional)</td><td>IP address segmentation</td></tr>
+                    <tr><td><strong>Route Table</strong></td><td>Route Table</td><td>Route Table</td><td>Routes</td><td>Traffic routing rules</td></tr>
+                    <tr><td><strong>Internet Gateway</strong></td><td>Internet Gateway</td><td>-</td><td>-</td><td>Public internet access</td></tr>
+                    <tr><td><strong>NAT</strong></td><td>NAT Gateway</td><td>NAT Gateway</td><td>Cloud NAT</td><td>Private subnet outbound</td></tr>
+                    <tr><td><strong>Firewall (Instance)</strong></td><td>Security Groups</td><td>NSG</td><td>Firewall Rules</td><td>Instance-level filtering</td></tr>
+                    <tr><td><strong>Firewall (Subnet)</strong></td><td>Network ACL</td><td>NSG</td><td>Firewall Rules</td><td>Subnet-level filtering</td></tr>
+                    <tr><td><strong>VPC Peering</strong></td><td>VPC Peering</td><td>VNet Peering</td><td>VPC Peering</td><td>Connect VPCs privately</td></tr>
+                    <tr><td><strong>Transit Hub</strong></td><td>Transit Gateway</td><td>Virtual WAN</td><td>Network Connectivity Center</td><td>Hub-and-spoke topology</td></tr>
+                    <tr><td><strong>Private Endpoints</strong></td><td>VPC Endpoints</td><td>Private Endpoints</td><td>Private Service Connect</td><td>Private access to services</td></tr>
+                    <tr><td><strong>Flow Logs</strong></td><td>VPC Flow Logs</td><td>NSG Flow Logs</td><td>VPC Flow Logs</td><td>Network traffic logging</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>VPC Design Best Practices</h3>
+                    <p><strong>CIDR Planning:</strong> Use non-overlapping ranges for peering. Reserve space for growth (/16 for prod VPCs).</p>
+                    <p><strong>Multi-AZ:</strong> Deploy subnets across multiple availability zones for high availability.</p>
+                    <p><strong>Public vs Private:</strong> Only load balancers and bastion hosts in public subnets. Everything else private.</p>
+                    <p><strong>VPC Endpoints:</strong> Use endpoints for AWS services (S3, DynamoDB) to keep traffic off the internet.</p>
+                </div>
+                <div>
+                    <h3>Security Groups vs NACLs</h3>
+                    <p><strong>Security Groups:</strong> Stateful (return traffic auto-allowed), instance-level, allow rules only, evaluated together.</p>
+                    <p><strong>Network ACLs:</strong> Stateless (must allow return traffic), subnet-level, allow and deny rules, evaluated in order.</p>
+                    <p><strong>Recommendation:</strong> Use Security Groups as primary control. Use NACLs for subnet-wide blocks (e.g., block known bad IPs).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connectivity -->
+        <section class="module" id="connectivity">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Hybrid & Multi-Cloud Connectivity</h2>
+                    <p>Connect on-premises and cloud environments</p>
+                </div>
+            </div>
+
+            <div class="connect-grid">
+                <div class="connect-card">
+                    <div class="connect-header">
+                        <div class="connect-icon">🔒</div>
+                        <div>
+                            <div class="connect-title">Site-to-Site VPN</div>
+                            <div class="connect-subtitle">Encrypted tunnel over internet</div>
+                        </div>
+                    </div>
+                    <div class="connect-desc">IPsec VPN tunnel between on-premises and cloud. Quick to set up, runs over public internet with encryption. Good for dev/test or backup connectivity.</div>
+                    <div class="connect-specs">
+                        <div class="connect-spec"><div class="connect-spec-value">1.25 Gbps</div><div class="connect-spec-label">Max Throughput</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">Variable</div><div class="connect-spec-label">Latency</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">$0.05/hr</div><div class="connect-spec-label">Approx Cost</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">Hours</div><div class="connect-spec-label">Setup Time</div></div>
+                    </div>
+                    <div class="connect-providers">
+                        <span class="provider-badge badge-aws">VPN Gateway</span>
+                        <span class="provider-badge badge-azure">VPN Gateway</span>
+                        <span class="provider-badge badge-gcp">Cloud VPN</span>
+                    </div>
+                </div>
+
+                <div class="connect-card">
+                    <div class="connect-header">
+                        <div class="connect-icon">⚡</div>
+                        <div>
+                            <div class="connect-title">Direct Connect</div>
+                            <div class="connect-subtitle">Dedicated private connection</div>
+                        </div>
+                    </div>
+                    <div class="connect-desc">Dedicated physical connection bypassing the internet. Consistent low latency, high bandwidth. Required for large data transfers and latency-sensitive workloads.</div>
+                    <div class="connect-specs">
+                        <div class="connect-spec"><div class="connect-spec-value">100 Gbps</div><div class="connect-spec-label">Max Throughput</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">~1-5ms</div><div class="connect-spec-label">Latency</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">$0.02/GB</div><div class="connect-spec-label">Data Transfer</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">Weeks</div><div class="connect-spec-label">Setup Time</div></div>
+                    </div>
+                    <div class="connect-providers">
+                        <span class="provider-badge badge-aws">Direct Connect</span>
+                        <span class="provider-badge badge-azure">ExpressRoute</span>
+                        <span class="provider-badge badge-gcp">Cloud Interconnect</span>
+                    </div>
+                </div>
+
+                <div class="connect-card">
+                    <div class="connect-header">
+                        <div class="connect-icon">🌐</div>
+                        <div>
+                            <div class="connect-title">SD-WAN / SASE</div>
+                            <div class="connect-subtitle">Software-defined wide area network</div>
+                        </div>
+                    </div>
+                    <div class="connect-desc">Overlay network with intelligent routing across multiple transports. Combines networking with security (SASE). Ideal for branch offices and remote workers.</div>
+                    <div class="connect-specs">
+                        <div class="connect-spec"><div class="connect-spec-value">Dynamic</div><div class="connect-spec-label">Bandwidth</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">Optimized</div><div class="connect-spec-label">Latency</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">Per user</div><div class="connect-spec-label">Pricing</div></div>
+                        <div class="connect-spec"><div class="connect-spec-value">Days</div><div class="connect-spec-label">Setup Time</div></div>
+                    </div>
+                    <div class="connect-providers">
+                        <span class="provider-badge badge-aws">Cloud WAN</span>
+                        <span class="provider-badge badge-azure">Virtual WAN</span>
+                        <span class="provider-badge badge-gcp">Network Connectivity</span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Connectivity Service</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>IPsec VPN</strong></td><td>Site-to-Site VPN</td><td>VPN Gateway</td><td>Cloud VPN (Classic/HA)</td><td>Encrypted over internet</td></tr>
+                    <tr><td><strong>Dedicated 1-10G</strong></td><td>Direct Connect</td><td>ExpressRoute</td><td>Dedicated Interconnect</td><td>High bandwidth, low latency</td></tr>
+                    <tr><td><strong>Partner Connect</strong></td><td>Direct Connect Partners</td><td>ExpressRoute Partners</td><td>Partner Interconnect</td><td>Via carrier/exchange</td></tr>
+                    <tr><td><strong>Transit Hub</strong></td><td>Transit Gateway</td><td>Virtual WAN Hub</td><td>Network Connectivity Center</td><td>Hub-and-spoke at scale</td></tr>
+                    <tr><td><strong>Multi-Cloud</strong></td><td>Transit Gateway + VPN</td><td>Virtual WAN</td><td>Network Connectivity Center</td><td>Connect AWS + Azure + GCP</td></tr>
+                    <tr><td><strong>Global Backbone</strong></td><td>Global Accelerator</td><td>Front Door</td><td>Premium Tier Network</td><td>Optimized global routing</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>When to Use VPN vs Direct Connect</h3>
+                    <p><strong>Use VPN:</strong> Dev/test environments, backup connectivity, low bandwidth needs (<500 Mbps), quick setup, variable traffic.</p>
+                    <p><strong>Use Direct Connect:</strong> Production workloads, large data transfers (>100GB/day), latency-sensitive apps, compliance requirements, predictable costs.</p>
+                    <p><strong>Best Practice:</strong> Direct Connect primary + VPN backup for redundancy.</p>
+                </div>
+                <div>
+                    <h3>Multi-Cloud Networking</h3>
+                    <p><strong>Challenge:</strong> Connecting VPCs across AWS, Azure, GCP without hairpinning through on-premises.</p>
+                    <p><strong>Options:</strong> Cloud-to-cloud VPN (simple), dedicated interconnect at colocation (better), third-party SD-WAN (best for many clouds).</p>
+                    <p><strong>Vendors:</strong> Megaport, Equinix Fabric, PacketFabric provide cloud-to-cloud connectivity.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DNS & CDN -->
+        <section class="module" id="dns-cdn">
+            <div class="module-header">
+                <div class="module-icon">🌍</div>
+                <div class="module-info">
+                    <h2>DNS, CDN & Edge Services</h2>
+                    <p>Global content delivery and name resolution</p>
+                </div>
+            </div>
+
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-icon">🌐</div>
+                    <div class="service-name">DNS Services</div>
+                    <div class="service-type">Name Resolution</div>
+                    <div class="service-desc">Managed DNS with global anycast, health checks, and routing policies (geolocation, latency, weighted).</div>
+                    <div class="service-providers">Route 53 | Azure DNS | Cloud DNS</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">⚡</div>
+                    <div class="service-name">CDN</div>
+                    <div class="service-type">Content Delivery</div>
+                    <div class="service-desc">Cache content at edge locations globally. Reduce latency, offload origin servers, handle traffic spikes.</div>
+                    <div class="service-providers">CloudFront | Azure CDN | Cloud CDN</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🚀</div>
+                    <div class="service-name">Global Accelerator</div>
+                    <div class="service-type">Network Optimization</div>
+                    <div class="service-desc">Route traffic through cloud backbone instead of public internet. Static IPs, instant failover.</div>
+                    <div class="service-providers">Global Accelerator | Front Door | Premium Network</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">⚡</div>
+                    <div class="service-name">Edge Functions</div>
+                    <div class="service-type">Edge Compute</div>
+                    <div class="service-desc">Run code at edge locations for personalization, A/B testing, auth, and header manipulation.</div>
+                    <div class="service-providers">Lambda@Edge | Azure Functions | Cloud Functions</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>CloudFront (AWS)</th>
+                        <th>Azure CDN / Front Door</th>
+                        <th>Cloud CDN (GCP)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Edge Locations</strong></td><td>450+ in 90+ cities</td><td>200+ (CDN), 180+ (AFD)</td><td>200+ locations</td></tr>
+                    <tr><td><strong>Origin Types</strong></td><td>S3, ALB, EC2, custom</td><td>Blob, App Service, custom</td><td>GCS, Compute, custom</td></tr>
+                    <tr><td><strong>SSL/TLS</strong></td><td>Free ACM certs, SNI</td><td>Free managed certs</td><td>Free managed certs</td></tr>
+                    <tr><td><strong>Edge Compute</strong></td><td>Lambda@Edge, CF Functions</td><td>Rules Engine, Functions</td><td>Cloud Functions</td></tr>
+                    <tr><td><strong>WAF Integration</strong></td><td>AWS WAF</td><td>Azure WAF</td><td>Cloud Armor</td></tr>
+                    <tr><td><strong>DDoS Protection</strong></td><td>Shield Standard (free)</td><td>DDoS Protection Basic</td><td>Cloud Armor (standard)</td></tr>
+                    <tr><td><strong>Real-time Logs</strong></td><td>Kinesis, S3</td><td>Log Analytics</td><td>Cloud Logging</td></tr>
+                    <tr><td><strong>Pricing</strong></td><td>$0.085/GB (first 10TB)</td><td>$0.081/GB (Zone 1)</td><td>$0.08/GB (first 10TB)</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>DNS Routing Policies</h3>
+                    <p><strong>Simple:</strong> Single resource, round-robin if multiple values.</p>
+                    <p><strong>Weighted:</strong> Distribute traffic by percentage (90/10 split for canary).</p>
+                    <p><strong>Latency-Based:</strong> Route to lowest-latency region for the user.</p>
+                    <p><strong>Geolocation:</strong> Route based on user's geographic location (compliance, localization).</p>
+                    <p><strong>Failover:</strong> Active-passive with health checks.</p>
+                </div>
+                <div>
+                    <h3>CDN Best Practices</h3>
+                    <p><strong>Cache Headers:</strong> Set appropriate Cache-Control headers. Long TTL for static assets, short for dynamic.</p>
+                    <p><strong>Invalidation:</strong> Use versioned URLs (style.v2.css) instead of cache invalidation when possible.</p>
+                    <p><strong>Compression:</strong> Enable Gzip/Brotli compression for text-based content.</p>
+                    <p><strong>Security:</strong> Restrict origin access to CDN only. Use signed URLs for private content.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Layers -->
+        <section class="module" id="security-layers">
+            <div class="module-header">
+                <div class="module-icon">🛡️</div>
+                <div class="module-info">
+                    <h2>Security Services & Layers</h2>
+                    <p>Defense in depth across the stack</p>
+                </div>
+            </div>
+
+            <div class="security-stack">
+                <div class="security-layer">
+                    <div class="security-layer-name" style="border-color: #EF4444;">
+                        <div class="security-layer-icon">🌐</div>
+                        <div class="security-layer-title" style="color: #EF4444;">Perimeter</div>
+                    </div>
+                    <div class="security-layer-content">
+                        <div class="security-item"><div class="security-item-icon">🛡️</div><div class="security-item-name">WAF</div><div class="security-item-detail">Web app firewall</div></div>
+                        <div class="security-item"><div class="security-item-icon">⚡</div><div class="security-item-name">DDoS Protection</div><div class="security-item-detail">Volumetric attacks</div></div>
+                        <div class="security-item"><div class="security-item-icon">🚫</div><div class="security-item-name">Bot Management</div><div class="security-item-detail">Automated threats</div></div>
+                        <div class="security-item"><div class="security-item-icon">🔒</div><div class="security-item-name">SSL/TLS</div><div class="security-item-detail">Encryption in transit</div></div>
+                    </div>
+                </div>
+                <div class="security-layer">
+                    <div class="security-layer-name" style="border-color: #F59E0B;">
+                        <div class="security-layer-icon">🔥</div>
+                        <div class="security-layer-title" style="color: #F59E0B;">Network</div>
+                    </div>
+                    <div class="security-layer-content">
+                        <div class="security-item"><div class="security-item-icon">🧱</div><div class="security-item-name">Firewall</div><div class="security-item-detail">Network filtering</div></div>
+                        <div class="security-item"><div class="security-item-icon">🔒</div><div class="security-item-name">Security Groups</div><div class="security-item-detail">Instance firewall</div></div>
+                        <div class="security-item"><div class="security-item-icon">📊</div><div class="security-item-name">Flow Logs</div><div class="security-item-detail">Traffic visibility</div></div>
+                        <div class="security-item"><div class="security-item-icon">🕵️</div><div class="security-item-name">IDS/IPS</div><div class="security-item-detail">Intrusion detection</div></div>
+                    </div>
+                </div>
+                <div class="security-layer">
+                    <div class="security-layer-name" style="border-color: #10B981;">
+                        <div class="security-layer-icon">👤</div>
+                        <div class="security-layer-title" style="color: #10B981;">Identity</div>
+                    </div>
+                    <div class="security-layer-content">
+                        <div class="security-item"><div class="security-item-icon">🔑</div><div class="security-item-name">IAM</div><div class="security-item-detail">Access control</div></div>
+                        <div class="security-item"><div class="security-item-icon">📱</div><div class="security-item-name">MFA</div><div class="security-item-detail">Multi-factor auth</div></div>
+                        <div class="security-item"><div class="security-item-icon">🎫</div><div class="security-item-name">SSO</div><div class="security-item-detail">Single sign-on</div></div>
+                        <div class="security-item"><div class="security-item-icon">🔐</div><div class="security-item-name">Secrets Manager</div><div class="security-item-detail">Credential storage</div></div>
+                    </div>
+                </div>
+                <div class="security-layer">
+                    <div class="security-layer-name" style="border-color: #3B82F6;">
+                        <div class="security-layer-icon">💾</div>
+                        <div class="security-layer-title" style="color: #3B82F6;">Data</div>
+                    </div>
+                    <div class="security-layer-content">
+                        <div class="security-item"><div class="security-item-icon">🔒</div><div class="security-item-name">Encryption</div><div class="security-item-detail">At rest & transit</div></div>
+                        <div class="security-item"><div class="security-item-icon">🗝️</div><div class="security-item-name">KMS</div><div class="security-item-detail">Key management</div></div>
+                        <div class="security-item"><div class="security-item-icon">🏷️</div><div class="security-item-name">Classification</div><div class="security-item-detail">Data labeling</div></div>
+                        <div class="security-item"><div class="security-item-icon">🚫</div><div class="security-item-name">DLP</div><div class="security-item-detail">Data loss prevention</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Security Service</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Web Application Firewall</strong></td><td>AWS WAF</td><td>Azure WAF</td><td>Cloud Armor</td><td>OWASP Top 10, SQL injection, XSS</td></tr>
+                    <tr><td><strong>DDoS Protection</strong></td><td>Shield Standard/Advanced</td><td>DDoS Protection</td><td>Cloud Armor</td><td>Volumetric and application attacks</td></tr>
+                    <tr><td><strong>Network Firewall</strong></td><td>Network Firewall</td><td>Azure Firewall</td><td>Cloud Firewall</td><td>Stateful inspection, IDS/IPS</td></tr>
+                    <tr><td><strong>Secrets Management</strong></td><td>Secrets Manager</td><td>Key Vault</td><td>Secret Manager</td><td>API keys, passwords, certificates</td></tr>
+                    <tr><td><strong>Key Management</strong></td><td>KMS</td><td>Key Vault</td><td>Cloud KMS</td><td>Encryption key lifecycle</td></tr>
+                    <tr><td><strong>Certificate Manager</strong></td><td>ACM</td><td>App Service Certs</td><td>Certificate Manager</td><td>SSL/TLS certificate provisioning</td></tr>
+                    <tr><td><strong>Threat Detection</strong></td><td>GuardDuty</td><td>Defender for Cloud</td><td>Security Command Center</td><td>Anomaly detection, threat intel</td></tr>
+                    <tr><td><strong>Vulnerability Scanning</strong></td><td>Inspector</td><td>Defender for Cloud</td><td>Security Command Center</td><td>OS and container vulnerabilities</td></tr>
+                    <tr><td><strong>SIEM</strong></td><td>Security Lake</td><td>Sentinel</td><td>Chronicle SIEM</td><td>Security event aggregation</td></tr>
+                    <tr><td><strong>Compliance Manager</strong></td><td>Audit Manager</td><td>Compliance Manager</td><td>Assured Workloads</td><td>Compliance evidence collection</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>WAF Rules & Managed Rule Sets</h3>
+                    <p><strong>OWASP Core Rule Set:</strong> Blocks SQL injection, XSS, LFI, RFI, and command injection. Start with this.</p>
+                    <p><strong>IP Reputation:</strong> Block known bad actors, Tor exit nodes, and anonymous proxies.</p>
+                    <p><strong>Rate Limiting:</strong> Prevent brute force and credential stuffing attacks.</p>
+                    <p><strong>Bot Control:</strong> Challenge or block automated traffic (scrapers, credential stuffers).</p>
+                </div>
+                <div>
+                    <h3>Network Firewall Features</h3>
+                    <p><strong>Stateful Inspection:</strong> Track connection state, auto-allow return traffic.</p>
+                    <p><strong>Domain Filtering:</strong> Allow/deny traffic by domain name (not just IP).</p>
+                    <p><strong>IDS/IPS:</strong> Detect and block known attack signatures (Suricata rules).</p>
+                    <p><strong>TLS Inspection:</strong> Decrypt and inspect encrypted traffic (with caveats).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Identity & Access Management -->
+        <section class="module" id="identity">
+            <div class="module-header">
+                <div class="module-icon">👤</div>
+                <div class="module-info">
+                    <h2>Identity & Access Management</h2>
+                    <p>Control who can access what</p>
+                </div>
+            </div>
+
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-icon">🔑</div>
+                    <div class="service-name">IAM Policies</div>
+                    <div class="service-type">Permission Management</div>
+                    <div class="service-desc">JSON-based policies defining who can do what on which resources. Attach to users, groups, roles.</div>
+                    <div class="service-providers">IAM | Azure RBAC | Cloud IAM</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🎭</div>
+                    <div class="service-name">Roles & Service Accounts</div>
+                    <div class="service-type">Machine Identity</div>
+                    <div class="service-desc">Temporary credentials for services and cross-account access. No long-lived keys.</div>
+                    <div class="service-providers">IAM Roles | Managed Identity | Service Accounts</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🏢</div>
+                    <div class="service-name">Identity Federation</div>
+                    <div class="service-type">Enterprise SSO</div>
+                    <div class="service-desc">Connect enterprise identity providers (Okta, Azure AD) for seamless SSO.</div>
+                    <div class="service-providers">IAM Identity Center | Entra ID | Workforce Identity</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📱</div>
+                    <div class="service-name">MFA & Passwordless</div>
+                    <div class="service-type">Strong Authentication</div>
+                    <div class="service-desc">Require second factor for sensitive operations. Phishing-resistant (FIDO2) preferred.</div>
+                    <div class="service-providers">Virtual MFA | Authenticator | Titan Keys</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>IAM Concept</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Human Users</strong></td><td>IAM Users (avoid) → Identity Center</td><td>Entra ID Users</td><td>Google Workspace / Cloud Identity</td></tr>
+                    <tr><td><strong>Groups</strong></td><td>IAM Groups</td><td>Entra ID Groups</td><td>Google Groups</td></tr>
+                    <tr><td><strong>Service Identity</strong></td><td>IAM Roles</td><td>Managed Identity</td><td>Service Accounts</td></tr>
+                    <tr><td><strong>Permission Model</strong></td><td>Policy-based (JSON)</td><td>RBAC (role assignments)</td><td>IAM Policy (bindings)</td></tr>
+                    <tr><td><strong>Least Privilege Tool</strong></td><td>IAM Access Analyzer</td><td>Privileged Identity Management</td><td>IAM Recommender</td></tr>
+                    <tr><td><strong>Cross-Account</strong></td><td>AssumeRole</td><td>Azure Lighthouse</td><td>Cross-project roles</td></tr>
+                    <tr><td><strong>Temporary Credentials</strong></td><td>STS (AssumeRole)</td><td>Managed Identity tokens</td><td>Workload Identity Federation</td></tr>
+                    <tr><td><strong>SSO</strong></td><td>IAM Identity Center (SAML/OIDC)</td><td>Entra ID (native)</td><td>Workforce Identity Federation</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>IAM Best Practices</h3>
+                    <p><strong>Least Privilege:</strong> Grant minimum permissions needed. Start with none, add as required.</p>
+                    <p><strong>No Root/Owner:</strong> Never use root account for daily tasks. Secure with MFA, alert on use.</p>
+                    <p><strong>Roles over Users:</strong> Use IAM roles for services and cross-account access. Avoid long-lived access keys.</p>
+                    <p><strong>Federate Identities:</strong> Connect enterprise IdP. Single source of truth for users.</p>
+                </div>
+                <div>
+                    <h3>Privilege Escalation Prevention</h3>
+                    <p><strong>Permission Boundaries:</strong> Set maximum permissions a role can ever have (AWS).</p>
+                    <p><strong>SCPs:</strong> Service Control Policies limit what entire accounts can do (AWS Organizations).</p>
+                    <p><strong>Deny Policies:</strong> Explicitly deny dangerous actions across the organization.</p>
+                    <p><strong>Just-in-Time Access:</strong> Grant elevated permissions temporarily with approval workflows.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Zero Trust -->
+        <section class="module" id="zero-trust">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Zero Trust Architecture</h2>
+                    <p>Never trust, always verify</p>
+                </div>
+            </div>
+
+            <div class="zero-trust">
+                <div class="zt-title">Zero Trust Pillars</div>
+                <div class="zt-pillars">
+                    <div class="zt-pillar">
+                        <div class="zt-pillar-icon">👤</div>
+                        <div class="zt-pillar-name">Identity</div>
+                        <div class="zt-pillar-desc">Verify every user and service. Strong auth, MFA, continuous validation.</div>
+                    </div>
+                    <div class="zt-pillar">
+                        <div class="zt-pillar-icon">💻</div>
+                        <div class="zt-pillar-name">Devices</div>
+                        <div class="zt-pillar-desc">Validate device health and compliance before granting access.</div>
+                    </div>
+                    <div class="zt-pillar">
+                        <div class="zt-pillar-icon">🌐</div>
+                        <div class="zt-pillar-name">Network</div>
+                        <div class="zt-pillar-desc">Micro-segmentation. No implicit trust based on network location.</div>
+                    </div>
+                    <div class="zt-pillar">
+                        <div class="zt-pillar-icon">📱</div>
+                        <div class="zt-pillar-name">Applications</div>
+                        <div class="zt-pillar-desc">Secure access to apps regardless of location. API authentication.</div>
+                    </div>
+                    <div class="zt-pillar">
+                        <div class="zt-pillar-icon">💾</div>
+                        <div class="zt-pillar-name">Data</div>
+                        <div class="zt-pillar-desc">Classify, encrypt, and control access to data at all times.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Zero Trust Principles</h3>
+                    <p><strong>Verify Explicitly:</strong> Authenticate and authorize every request based on all available data (identity, location, device, data classification).</p>
+                    <p><strong>Least Privilege:</strong> Limit access with just-in-time and just-enough-access. Adaptive policies based on risk.</p>
+                    <p><strong>Assume Breach:</strong> Minimize blast radius. Segment access, use end-to-end encryption, verify continuously.</p>
+                </div>
+                <div>
+                    <h3>Implementation Steps</h3>
+                    <p><strong>1. Strong Identity:</strong> Deploy MFA everywhere. Integrate all apps with SSO.</p>
+                    <p><strong>2. Device Trust:</strong> Require managed/compliant devices. Mobile device management (MDM).</p>
+                    <p><strong>3. Micro-Segmentation:</strong> Service mesh, network policies, security groups per workload.</p>
+                    <p><strong>4. Continuous Monitoring:</strong> Log everything. Detect anomalies. Automated response.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Zero Trust Component</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Identity Verification</strong></td><td>IAM Identity Center + MFA</td><td>Conditional Access</td><td>BeyondCorp Enterprise</td></tr>
+                    <tr><td><strong>Device Trust</strong></td><td>Verified Access</td><td>Intune + Compliance</td><td>Access Context Manager</td></tr>
+                    <tr><td><strong>Network Segmentation</strong></td><td>Security Groups + PrivateLink</td><td>NSG + Private Endpoints</td><td>VPC Service Controls</td></tr>
+                    <tr><td><strong>App Access Proxy</strong></td><td>Verified Access</td><td>Application Proxy</td><td>Identity-Aware Proxy</td></tr>
+                    <tr><td><strong>Threat Detection</strong></td><td>GuardDuty</td><td>Defender for Cloud</td><td>Security Command Center</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Compliance -->
+        <section class="module" id="compliance">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Compliance & Governance</h2>
+                    <p>Meet regulatory requirements in the cloud</p>
+                </div>
+            </div>
+
+            <div class="compliance-grid">
+                <div class="compliance-card">
+                    <div class="compliance-icon">💳</div>
+                    <div class="compliance-name">PCI DSS</div>
+                    <div class="compliance-type">Payment Card Industry</div>
+                    <div class="compliance-desc">Credit card data protection. 12 requirements covering network, access, encryption.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🏥</div>
+                    <div class="compliance-name">HIPAA</div>
+                    <div class="compliance-type">Healthcare</div>
+                    <div class="compliance-desc">Protected health information (PHI). Privacy and security rules.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🇪🇺</div>
+                    <div class="compliance-name">GDPR</div>
+                    <div class="compliance-type">Data Privacy</div>
+                    <div class="compliance-desc">EU data protection. Consent, right to erasure, data portability.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🏛️</div>
+                    <div class="compliance-name">SOC 2</div>
+                    <div class="compliance-type">Service Organizations</div>
+                    <div class="compliance-desc">Trust service criteria: security, availability, processing, confidentiality, privacy.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🇺🇸</div>
+                    <div class="compliance-name">FedRAMP</div>
+                    <div class="compliance-type">US Government</div>
+                    <div class="compliance-desc">Federal cloud security. High/Moderate/Low impact levels.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🌐</div>
+                    <div class="compliance-name">ISO 27001</div>
+                    <div class="compliance-type">Information Security</div>
+                    <div class="compliance-desc">International security standard. ISMS framework and controls.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🏦</div>
+                    <div class="compliance-name">SOX</div>
+                    <div class="compliance-type">Financial</div>
+                    <div class="compliance-desc">Sarbanes-Oxley. Financial reporting controls and audit trails.</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon">🔒</div>
+                    <div class="compliance-name">NIST 800-53</div>
+                    <div class="compliance-type">Security Framework</div>
+                    <div class="compliance-desc">Comprehensive security controls catalog. Federal and enterprise.</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Shared Responsibility</h3>
+                    <p><strong>Provider Responsibility:</strong> Physical security, hypervisor, global infrastructure, managed service internals.</p>
+                    <p><strong>Customer Responsibility:</strong> Data classification, access control, encryption keys, network configuration, OS patching (on VMs).</p>
+                    <p><strong>Key Point:</strong> Cloud providers are compliant; your deployments may not be. You inherit infrastructure compliance but must configure services correctly.</p>
+                </div>
+                <div>
+                    <h3>Compliance Tools</h3>
+                    <p><strong>Config Rules:</strong> AWS Config, Azure Policy, GCP Org Policies—continuous compliance checking.</p>
+                    <p><strong>Audit Evidence:</strong> AWS Audit Manager, Azure Compliance Manager—automated evidence collection.</p>
+                    <p><strong>Data Residency:</strong> Use region constraints, service control policies, resource location policies.</p>
+                    <p><strong>Encryption:</strong> Customer-managed keys (BYOK) for audit control. Document key management procedures.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered security architecture</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🛡️ SecurityArchitect</h3>
+                    <p>Designs secure cloud network architectures, reviews IAM policies for least privilege, recommends security controls based on compliance requirements, and generates Terraform for security infrastructure.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🏗️</span> Network security architecture design</div>
+                        <div class="agent-capability"><span class="capability-icon">🔑</span> IAM policy review and generation</div>
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Compliance mapping and gap analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Security group rule optimization</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Terraform security module generation</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">security_architect_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Security analysis tools</span>
+policy_analyzer = IAMPolicyAnalyzerTool()
+network_scanner = SecurityGroupScannerTool()
+compliance_mapper = ComplianceMapperTool()
+terraform_gen = TerraformSecurityTool()
+
+<span class="code-comment"># Security Architect Agent</span>
+architect = Agent(
+    role=<span class="code-string">"Cloud Security Architect"</span>,
+    goal=<span class="code-string">"""Design secure cloud architectures,
+    review IAM policies, ensure compliance,
+    and generate security infrastructure."""</span>,
+    tools=[policy_analyzer, network_scanner, 
+           compliance_mapper, terraform_gen],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Security Review Task</span>
+review_task = Task(
+    description=<span class="code-string">"""
+    1. Analyze current IAM policies
+    2. Review security group rules
+    3. Map to compliance requirements
+    4. Identify gaps and risks
+    5. Generate remediation Terraform
+    6. Create security architecture doc
+    """</span>,
+    agent=architect
+)
+
+crew = Crew(agents=[architect], tasks=[review_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring cloud platforms</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat12-p2-architecture-patterns.html" class="related-card">
+                    <div class="related-icon">🏗️</div>
+                    <div class="related-title">Architecture Patterns</div>
+                    <div class="related-desc">Multi-region and Well-Architected security</div>
+                </a>
+                <a href="cat12-p5-storage-databases.html" class="related-card">
+                    <div class="related-icon">💾</div>
+                    <div class="related-title">Storage & Databases</div>
+                    <div class="related-desc">Data encryption and backup security</div>
+                </a>
+                <a href="cat12-p7-cost-optimization.html" class="related-card">
+                    <div class="related-icon">💰</div>
+                    <div class="related-title">Cost Optimization</div>
+                    <div class="related-desc">Security tool cost management</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat12-p5-storage-databases.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">12.5 Storage & Databases</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 12.6</div>
+        <a href="cat12-p7-cost-optimization.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">12.7 Cost Optimization</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

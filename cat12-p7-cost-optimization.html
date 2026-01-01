@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Optimization | Cloud Platforms | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #0EA5E9;
+            --cat-light: #38BDF8;
+            --cat-dark: #0284C7;
+            --cat-glow: rgba(14, 165, 233, 0.15);
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Pricing Model Cards */
+        .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .pricing-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 16px; padding: 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .pricing-card:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .pricing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .pricing-card.ondemand::before { background: var(--blue); }
+        .pricing-card.reserved::before { background: var(--green); }
+        .pricing-card.spot::before { background: var(--purple); }
+        .pricing-card.savings::before { background: var(--orange); }
+        .pricing-icon { font-size: 32px; margin-bottom: 12px; }
+        .pricing-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .pricing-savings { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        .pricing-savings.blue { color: var(--blue); }
+        .pricing-savings.green { color: var(--green); }
+        .pricing-savings.purple { color: var(--purple); }
+        .pricing-savings.orange { color: var(--orange); }
+        .pricing-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .pricing-details { list-style: none; }
+        .pricing-details li { font-size: 11px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .pricing-details li::before { content: '•'; color: var(--page-light); }
+
+        /* Savings Visual */
+        .savings-visual { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .savings-title { font-size: 14px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .savings-bars { display: flex; flex-direction: column; gap: 16px; }
+        .savings-row { display: flex; align-items: center; gap: 16px; }
+        .savings-label { width: 140px; font-size: 12px; font-weight: 600; color: var(--text-primary); flex-shrink: 0; }
+        .savings-bar-container { flex: 1; background: var(--bg-card); border-radius: 8px; height: 40px; position: relative; overflow: hidden; }
+        .savings-bar { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 12px; }
+        .savings-bar span { font-size: 11px; color: white; font-weight: 600; }
+        .savings-percent { width: 80px; font-size: 14px; font-weight: 700; text-align: right; flex-shrink: 0; }
+
+        /* Rightsizing Cards */
+        .rightsize-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .rightsize-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .rightsize-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .rightsize-icon { font-size: 28px; }
+        .rightsize-title { font-size: 14px; font-weight: 600; }
+        .rightsize-subtitle { font-size: 11px; color: var(--text-muted); }
+        .rightsize-metric { text-align: center; padding: 16px; background: var(--bg-card); border-radius: 8px; margin-bottom: 12px; }
+        .rightsize-metric-value { font-size: 28px; font-weight: 800; color: var(--page-light); }
+        .rightsize-metric-label { font-size: 10px; color: var(--text-muted); }
+        .rightsize-desc { font-size: 12px; color: var(--text-secondary); }
+
+        /* FinOps Pillars */
+        .finops-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .finops-pillar { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s; }
+        .finops-pillar:hover { border-color: var(--page-primary); transform: translateY(-4px); }
+        .finops-pillar-icon { font-size: 40px; margin-bottom: 16px; }
+        .finops-pillar-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .finops-pillar-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Cost Tools Grid */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); }
+        .tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .tool-logo { width: 36px; height: 36px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .tool-name { font-size: 13px; font-weight: 600; }
+        .tool-provider { font-size: 10px; color: var(--text-muted); }
+        .tool-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* Comparison Table */
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+
+        /* Waste Categories */
+        .waste-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .waste-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .waste-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .waste-title { display: flex; align-items: center; gap: 10px; }
+        .waste-icon { font-size: 24px; }
+        .waste-name { font-size: 14px; font-weight: 600; }
+        .waste-percent { font-size: 20px; font-weight: 800; color: var(--red); }
+        .waste-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+        .waste-fix { font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 6px; }
+        .waste-fix::before { content: '✓'; }
+
+        /* Tagging Strategy */
+        .tag-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .tag-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; }
+        .tag-key { font-size: 12px; font-weight: 600; color: var(--page-light); margin-bottom: 4px; }
+        .tag-value { font-size: 11px; color: var(--text-muted); }
+        .tag-purpose { font-size: 10px; color: var(--text-secondary); margin-top: 8px; }
+
+        /* Agent Grid */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .agent-grid, .waste-grid { grid-template-columns: 1fr; }
+            .pricing-grid, .tools-grid, .tag-grid { grid-template-columns: repeat(2, 1fr); }
+            .rightsize-grid, .finops-pillars, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">☁️ Cloud Platforms</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat12-cloud-platforms-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat12-p1-cloud-providers.html"><span class="nav-icon">🏢</span> 12.1 Cloud Providers</a></li>
+            <li><a href="cat12-p2-architecture-patterns.html"><span class="nav-icon">🏗️</span> 12.2 Architecture Patterns</a></li>
+            <li><a href="cat12-p3-migration-strategies.html"><span class="nav-icon">🚀</span> 12.3 Migration Strategies</a></li>
+            <li><a href="cat12-p4-compute-containers.html"><span class="nav-icon">📦</span> 12.4 Compute & Containers</a></li>
+            <li><a href="cat12-p5-storage-databases.html"><span class="nav-icon">💾</span> 12.5 Storage & Databases</a></li>
+            <li><a href="cat12-p6-networking-security.html"><span class="nav-icon">🌐</span> 12.6 Networking & Security</a></li>
+            <li><a href="cat12-p7-cost-optimization.html" class="active"><span class="nav-icon">💰</span> 12.7 Cost Optimization</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#billing"><span class="nav-icon">📄</span> Understanding Billing</a></li>
+            <li><a href="#metrics"><span class="nav-icon">📈</span> Financial Metrics</a></li>
+            <li><a href="#pricing"><span class="nav-icon">💵</span> Pricing Models</a></li>
+            <li><a href="#commitments"><span class="nav-icon">📝</span> Commitments</a></li>
+            <li><a href="#rightsizing"><span class="nav-icon">📏</span> Rightsizing</a></li>
+            <li><a href="#waste"><span class="nav-icon">🗑️</span> Waste Elimination</a></li>
+            <li><a href="#finops"><span class="nav-icon">📊</span> FinOps Practices</a></li>
+            <li><a href="#allocation"><span class="nav-icon">💸</span> Cost Allocation</a></li>
+            <li><a href="#forecasting"><span class="nav-icon">🔮</span> Budgeting & Forecast</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Cost Tools</a></li>
+            <li><a href="#governance"><span class="nav-icon">⚖️</span> Cost Governance</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Cost-Aware Design</a></li>
+            <li><a href="#tagging"><span class="nav-icon">🏷️</span> Tagging Strategy</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">💰 Page 12.7</span>
+                <h1>Cost Optimization</h1>
+                <p>Maximize cloud value while minimizing waste. Master pricing models, commitment strategies, rightsizing, and FinOps practices to reduce cloud spend by 30-50% without sacrificing performance.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">35%</div><div class="hero-metric-label">Average Cloud Waste</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">72%</div><div class="hero-metric-label">Max Reserved Savings</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">90%</div><div class="hero-metric-label">Max Spot Savings</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">40%</div><div class="hero-metric-label">Rightsizing Potential</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Cost Optimization Fundamentals</h2>
+                    <p>Understanding cloud economics</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>Why Cloud Costs Spiral</h3>
+                    <p><strong>Easy Provisioning:</strong> Spinning up resources is easy; remembering to delete them is hard. Resources accumulate.</p>
+                    <p><strong>Over-Provisioning:</strong> Teams size for peak load "just in case." Average utilization is often 20-30%.</p>
+                    <p><strong>Lack of Visibility:</strong> Without tagging and allocation, no one owns the bill. Accountability drives optimization.</p>
+                    <p><strong>Default Pricing:</strong> On-demand is the most expensive option. Without commitment strategies, you pay premium rates.</p>
+                </div>
+                <div>
+                    <h3>Optimization Framework</h3>
+                    <p><strong>1. Visibility:</strong> You can't optimize what you can't see. Implement tagging, cost allocation, and dashboards first.</p>
+                    <p><strong>2. Waste Elimination:</strong> Delete unused resources. This is free money—no downside risk.</p>
+                    <p><strong>3. Rightsizing:</strong> Match resource size to actual usage. Downsize over-provisioned instances.</p>
+                    <p><strong>4. Commitment:</strong> For stable workloads, commit to reserved instances or savings plans for 30-72% savings.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>The Cost Optimization Maturity Journey</h3>
+                    <p><strong>Crawl:</strong> Basic visibility—cost dashboards, alerts on budget thresholds, initial tagging strategy. <strong>Walk:</strong> Active optimization—rightsizing recommendations, reserved instance purchases, automated shutdown of dev environments. <strong>Run:</strong> FinOps culture—cost ownership by teams, unit economics (cost per transaction), continuous optimization, spot instances for fault-tolerant workloads. <strong>Fly:</strong> Predictive optimization—ML-based forecasting, automated commitment purchases, real-time anomaly detection, cost as a first-class architecture concern.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Understanding Cloud Billing -->
+        <section class="module" id="billing">
+            <div class="module-header">
+                <div class="module-icon">📄</div>
+                <div class="module-info">
+                    <h2>Understanding Cloud Billing</h2>
+                    <p>How cloud providers charge and bill for services</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Cloud vs. Traditional IT Economics</h3>
+                    <p><strong>Traditional (CapEx):</strong> Buy servers upfront, depreciate over 3-5 years. Fixed capacity, long procurement cycles. Costs are predictable but inflexible.</p>
+                    <p><strong>Cloud (OpEx):</strong> Pay as you go, variable costs. Scale up/down instantly. Costs fluctuate with usage—great for growth, challenging for budgeting.</p>
+                    <p><strong>Hybrid Reality:</strong> Commitments (Reserved Instances) bring back some CapEx characteristics. Best strategy uses both: commit to baseline, pay on-demand for variable.</p>
+                </div>
+                <div>
+                    <h3>Billing Dimensions</h3>
+                    <p><strong>Compute:</strong> Per second/hour for VMs. Based on instance type (vCPU, memory, GPU).</p>
+                    <p><strong>Storage:</strong> Per GB-month stored + per request (GET, PUT, LIST). Tiered by access frequency.</p>
+                    <p><strong>Data Transfer:</strong> Ingress usually free. Egress (outbound) charged per GB. Cross-region and internet egress most expensive.</p>
+                    <p><strong>API Requests:</strong> Per million requests for serverless, API Gateway, some storage operations.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Cost Component</th>
+                        <th>How It's Charged</th>
+                        <th>Typical % of Bill</th>
+                        <th>Optimization Lever</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Compute (VMs)</strong></td><td>Per second/hour by instance type</td><td>40-60%</td><td>Rightsizing, Reserved/Spot, ARM</td></tr>
+                    <tr><td><strong>Managed Services</strong></td><td>Per hour + usage (RDS, EKS, etc.)</td><td>15-25%</td><td>Rightsize, consolidate, reserved</td></tr>
+                    <tr><td><strong>Storage</strong></td><td>Per GB-month + operations</td><td>10-20%</td><td>Lifecycle policies, tiering, cleanup</td></tr>
+                    <tr><td><strong>Data Transfer</strong></td><td>Per GB egress</td><td>5-15%</td><td>CDN, keep data in region, VPC endpoints</td></tr>
+                    <tr><td><strong>Serverless</strong></td><td>Per request + duration (GB-seconds)</td><td>5-10%</td><td>Memory optimization, cold start reduction</td></tr>
+                    <tr><td><strong>Support</strong></td><td>% of monthly spend or fixed fee</td><td>3-10%</td><td>Right-size support tier, use community</td></tr>
+                    <tr><td><strong>Licensing</strong></td><td>Per core/user or BYOL</td><td>5-15%</td><td>BYOL, license-included vs. separate</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Hidden Costs to Watch</h3>
+                    <p><strong>NAT Gateway:</strong> $0.045/hour + $0.045/GB. Can exceed the cost of what's behind it. Consider NAT instances for dev.</p>
+                    <p><strong>Cross-AZ Traffic:</strong> $0.01/GB each way between availability zones. Adds up for distributed systems.</p>
+                    <p><strong>CloudWatch Logs:</strong> $0.50/GB ingested + storage. High-volume logging gets expensive fast.</p>
+                    <p><strong>Elastic IPs:</strong> Free when attached, $0.005/hour when idle. Small but often forgotten.</p>
+                </div>
+                <div>
+                    <h3>Reading Your Bill</h3>
+                    <p><strong>Cost Explorer:</strong> Start here. Filter by service, region, tag. Understand where money goes.</p>
+                    <p><strong>Cost and Usage Report (CUR):</strong> Detailed line-item billing. Export to S3, query with Athena for deep analysis.</p>
+                    <p><strong>Billing Alerts:</strong> Set budgets at 50%, 80%, 100%, 120% of expected spend. Get notified before surprises.</p>
+                    <p><strong>Anomaly Detection:</strong> AWS/Azure/GCP can alert on unusual spending patterns automatically.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Financial Metrics -->
+        <section class="module" id="metrics">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Key Financial Metrics</h2>
+                    <p>Measure cloud value and efficiency</p>
+                </div>
+            </div>
+
+            <div class="finops-pillars">
+                <div class="finops-pillar">
+                    <div class="finops-pillar-icon">💵</div>
+                    <div class="finops-pillar-name">Unit Economics</div>
+                    <div class="finops-pillar-desc">Cost per business transaction. Ties infrastructure spend to business value. The north star metric.</div>
+                </div>
+                <div class="finops-pillar">
+                    <div class="finops-pillar-icon">📊</div>
+                    <div class="finops-pillar-name">TCO</div>
+                    <div class="finops-pillar-desc">Total Cost of Ownership. All costs including operations, licensing, training—not just cloud bill.</div>
+                </div>
+                <div class="finops-pillar">
+                    <div class="finops-pillar-icon">📈</div>
+                    <div class="finops-pillar-name">ROI</div>
+                    <div class="finops-pillar-desc">Return on Investment. Business value generated divided by cloud spend. Measures efficiency.</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Formula</th>
+                        <th>Target</th>
+                        <th>Why It Matters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Cost per Transaction</strong></td><td>Cloud Spend / # Transactions</td><td>Decreasing over time</td><td>Shows efficiency gains with scale</td></tr>
+                    <tr><td><strong>Cost per Customer</strong></td><td>Cloud Spend / Active Customers</td><td>Below LTV threshold</td><td>Unit economics for SaaS</td></tr>
+                    <tr><td><strong>Cost per API Call</strong></td><td>Service Cost / API Calls</td><td>Sub-penny for most</td><td>Microservices efficiency</td></tr>
+                    <tr><td><strong>Revenue per $ Cloud</strong></td><td>Revenue / Cloud Spend</td><td>10x+ for SaaS</td><td>Cloud spend efficiency</td></tr>
+                    <tr><td><strong>Commitment Coverage</strong></td><td>Reserved Spend / Eligible Spend</td><td>70-80%</td><td>Savings plan utilization</td></tr>
+                    <tr><td><strong>Waste Ratio</strong></td><td>Idle Resources / Total Spend</td><td><15%</td><td>Optimization opportunity</td></tr>
+                    <tr><td><strong>Utilization Rate</strong></td><td>Actual Usage / Provisioned</td><td>>60% for compute</td><td>Rightsizing indicator</td></tr>
+                    <tr><td><strong>RI/SP Utilization</strong></td><td>Reserved Used / Reserved Purchased</td><td>>95%</td><td>Commitment efficiency</td></tr>
+                    <tr><td><strong>Cost Variance</strong></td><td>(Actual - Budget) / Budget</td><td>±10%</td><td>Forecasting accuracy</td></tr>
+                    <tr><td><strong>Cost per Environment</strong></td><td>Env Spend / # Environments</td><td>Prod > Stage > Dev</td><td>Environment hygiene</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Unit Economics Deep Dive</h3>
+                    <p><strong>Why Unit Economics:</strong> Total cloud spend is meaningless in isolation. $1M/month is great if revenue is $50M; terrible if it's $2M.</p>
+                    <p><strong>Define Your Unit:</strong> Choose the business metric that matters—transactions, API calls, customers, orders, minutes streamed.</p>
+                    <p><strong>Track Over Time:</strong> Cost per unit should decrease as you scale (economies of scale) and optimize.</p>
+                    <p><strong>Benchmark:</strong> Compare against industry standards. SaaS typically spends 15-25% of revenue on infrastructure.</p>
+                </div>
+                <div>
+                    <h3>TCO Calculation</h3>
+                    <p><strong>Direct Costs:</strong> Cloud bill (compute, storage, network, services).</p>
+                    <p><strong>Operational Costs:</strong> Personnel to manage cloud (FinOps, DevOps, SRE teams).</p>
+                    <p><strong>Licensing:</strong> Software licenses (Windows, Oracle, SAP) running on cloud.</p>
+                    <p><strong>Migration/Training:</strong> One-time costs amortized over project life.</p>
+                    <p><strong>Opportunity Cost:</strong> What else could engineering time be spent on?</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Building a Cloud Metrics Dashboard</h3>
+                    <p><strong>Executive View:</strong> Total spend, month-over-month change, forecast vs. budget, top 5 cost drivers, savings achieved. <strong>Team View:</strong> Team's allocated costs, cost per service they own, waste identified, optimization opportunities. <strong>Service View:</strong> Cost per service, cost trend, unit economics, rightsizing recommendations, commitment coverage. Update daily, review weekly with teams, present monthly to leadership.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Models -->
+        <section class="module" id="pricing">
+            <div class="module-header">
+                <div class="module-icon">💵</div>
+                <div class="module-info">
+                    <h2>Cloud Pricing Models</h2>
+                    <p>Understand your options for paying for cloud resources</p>
+                </div>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card ondemand">
+                    <div class="pricing-icon">💳</div>
+                    <div class="pricing-name">On-Demand</div>
+                    <div class="pricing-savings blue">0% off</div>
+                    <div class="pricing-desc">Pay by the second/hour with no commitment. Maximum flexibility, maximum price.</div>
+                    <ul class="pricing-details">
+                        <li>No upfront commitment</li>
+                        <li>Pay only for what you use</li>
+                        <li>Stop anytime</li>
+                        <li>Best for variable/unpredictable</li>
+                        <li>Dev/test environments</li>
+                    </ul>
+                </div>
+                <div class="pricing-card reserved">
+                    <div class="pricing-icon">📋</div>
+                    <div class="pricing-name">Reserved</div>
+                    <div class="pricing-savings green">Up to 72%</div>
+                    <div class="pricing-desc">Commit to 1-3 years for significant discounts. Best for steady-state workloads.</div>
+                    <ul class="pricing-details">
+                        <li>1 or 3 year terms</li>
+                        <li>All upfront = max savings</li>
+                        <li>Specific instance type</li>
+                        <li>Production workloads</li>
+                        <li>Predictable baseline</li>
+                    </ul>
+                </div>
+                <div class="pricing-card spot">
+                    <div class="pricing-icon">⚡</div>
+                    <div class="pricing-name">Spot / Preemptible</div>
+                    <div class="pricing-savings purple">Up to 90%</div>
+                    <div class="pricing-desc">Use spare capacity at massive discounts. Can be interrupted with 2-min notice.</div>
+                    <ul class="pricing-details">
+                        <li>Massive discounts</li>
+                        <li>Can be terminated</li>
+                        <li>Fault-tolerant workloads</li>
+                        <li>Batch processing, CI/CD</li>
+                        <li>Stateless containers</li>
+                    </ul>
+                </div>
+                <div class="pricing-card savings">
+                    <div class="pricing-icon">💰</div>
+                    <div class="pricing-name">Savings Plans</div>
+                    <div class="pricing-savings orange">Up to 66%</div>
+                    <div class="pricing-desc">Commit to spend amount, not instance type. More flexibility than reserved.</div>
+                    <ul class="pricing-details">
+                        <li>Commit to $/hour</li>
+                        <li>Flexible across instances</li>
+                        <li>Compute or EC2 plans</li>
+                        <li>Easier than reserved</li>
+                        <li>AWS & Azure</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="savings-visual">
+                <div class="savings-title">Savings Comparison: m6i.xlarge (4 vCPU, 16GB) - US East</div>
+                <div class="savings-bars">
+                    <div class="savings-row">
+                        <div class="savings-label">On-Demand</div>
+                        <div class="savings-bar-container">
+                            <div class="savings-bar" style="width: 100%; background: linear-gradient(90deg, #3B82F6, #60A5FA);">
+                                <span>$0.192/hour = $140/month</span>
+                            </div>
+                        </div>
+                        <div class="savings-percent" style="color: var(--blue);">Baseline</div>
+                    </div>
+                    <div class="savings-row">
+                        <div class="savings-label">1-yr Reserved (No Upfront)</div>
+                        <div class="savings-bar-container">
+                            <div class="savings-bar" style="width: 64%; background: linear-gradient(90deg, #10B981, #34D399);">
+                                <span>$0.123/hour = $90/month</span>
+                            </div>
+                        </div>
+                        <div class="savings-percent" style="color: var(--green);">36% off</div>
+                    </div>
+                    <div class="savings-row">
+                        <div class="savings-label">1-yr Reserved (All Upfront)</div>
+                        <div class="savings-bar-container">
+                            <div class="savings-bar" style="width: 58%; background: linear-gradient(90deg, #10B981, #34D399);">
+                                <span>$0.112/hour = $82/month</span>
+                            </div>
+                        </div>
+                        <div class="savings-percent" style="color: var(--green);">42% off</div>
+                    </div>
+                    <div class="savings-row">
+                        <div class="savings-label">3-yr Reserved (All Upfront)</div>
+                        <div class="savings-bar-container">
+                            <div class="savings-bar" style="width: 38%; background: linear-gradient(90deg, #10B981, #34D399);">
+                                <span>$0.073/hour = $53/month</span>
+                            </div>
+                        </div>
+                        <div class="savings-percent" style="color: var(--green);">62% off</div>
+                    </div>
+                    <div class="savings-row">
+                        <div class="savings-label">Spot Instance</div>
+                        <div class="savings-bar-container">
+                            <div class="savings-bar" style="width: 30%; background: linear-gradient(90deg, #8B5CF6, #A78BFA);">
+                                <span>~$0.058/hour = $42/month</span>
+                            </div>
+                        </div>
+                        <div class="savings-percent" style="color: var(--purple);">70% off</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Commitment Strategies -->
+        <section class="module" id="commitments">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Commitment Strategies</h2>
+                    <p>Reserved instances, savings plans, and committed use discounts</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Commitment Type</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                        <th>Max Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Instance Reserved</strong></td><td>EC2 Reserved Instances</td><td>Reserved VM Instances</td><td>Committed Use Discounts</td><td>72%</td></tr>
+                    <tr><td><strong>Flexible Compute</strong></td><td>Compute Savings Plans</td><td>-</td><td>Committed Use (flexible)</td><td>66%</td></tr>
+                    <tr><td><strong>Specific Service</strong></td><td>EC2 Savings Plans</td><td>Reserved Capacity</td><td>-</td><td>72%</td></tr>
+                    <tr><td><strong>Database</strong></td><td>RDS Reserved</td><td>SQL Reserved</td><td>Cloud SQL Committed</td><td>60%</td></tr>
+                    <tr><td><strong>Serverless</strong></td><td>Lambda Savings Plans</td><td>-</td><td>-</td><td>17%</td></tr>
+                    <tr><td><strong>Spot/Preemptible</strong></td><td>Spot Instances</td><td>Spot VMs</td><td>Preemptible / Spot VMs</td><td>90%</td></tr>
+                    <tr><td><strong>Sustained Use</strong></td><td>-</td><td>-</td><td>Sustained Use Discounts</td><td>30% (automatic)</td></tr>
+                    <tr><td><strong>Enterprise Discount</strong></td><td>EDP</td><td>Enterprise Agreement</td><td>Committed Spend</td><td>Negotiated</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>When to Use Reserved Instances</h3>
+                    <p><strong>Baseline Coverage:</strong> Reserve for your minimum sustained usage, not peak. Cover 70-80% of steady-state.</p>
+                    <p><strong>Production Only:</strong> Don't reserve dev/test—they should be ephemeral.</p>
+                    <p><strong>Analyze First:</strong> Run workloads on-demand for 2-4 weeks to understand patterns before committing.</p>
+                    <p><strong>Convertible RIs:</strong> Pay slightly more for ability to change instance types as needs evolve.</p>
+                </div>
+                <div>
+                    <h3>Savings Plans vs Reserved Instances</h3>
+                    <p><strong>Savings Plans (AWS):</strong> Commit to $/hour spend, automatically applies to any matching usage. Simpler to manage.</p>
+                    <p><strong>Reserved Instances:</strong> Commit to specific instance type and region. Maximum discount but less flexible.</p>
+                    <p><strong>Recommendation:</strong> Start with Compute Savings Plans for simplicity. Use RIs for very stable, well-understood workloads.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Spot Instance Strategies</h3>
+                    <p><strong>Spot Fleet:</strong> Request capacity across multiple instance types and AZs. AWS finds the cheapest available. <strong>Spot Blocks:</strong> Request uninterrupted spot for 1-6 hours (higher price, more stability). <strong>Interruption Handling:</strong> Use 2-minute warning to checkpoint work, drain connections, or shift to on-demand. <strong>Good Candidates:</strong> Batch processing, CI/CD runners, dev environments, stateless web tiers behind ASG, Spark/EMR clusters. <strong>Avoid For:</strong> Databases, stateful services, single points of failure.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rightsizing -->
+        <section class="module" id="rightsizing">
+            <div class="module-header">
+                <div class="module-icon">📏</div>
+                <div class="module-info">
+                    <h2>Rightsizing</h2>
+                    <p>Match resources to actual usage</p>
+                </div>
+            </div>
+
+            <div class="rightsize-grid">
+                <div class="rightsize-card">
+                    <div class="rightsize-header">
+                        <div class="rightsize-icon">💻</div>
+                        <div>
+                            <div class="rightsize-title">Compute</div>
+                            <div class="rightsize-subtitle">VMs and Containers</div>
+                        </div>
+                    </div>
+                    <div class="rightsize-metric">
+                        <div class="rightsize-metric-value">40%</div>
+                        <div class="rightsize-metric-label">Typical Over-Provisioning</div>
+                    </div>
+                    <div class="rightsize-desc">Most instances run at 20-30% CPU utilization. Downsize by one tier or switch to burstable instances for variable workloads.</div>
+                </div>
+                <div class="rightsize-card">
+                    <div class="rightsize-header">
+                        <div class="rightsize-icon">🗄️</div>
+                        <div>
+                            <div class="rightsize-title">Databases</div>
+                            <div class="rightsize-subtitle">RDS, Cloud SQL, Azure SQL</div>
+                        </div>
+                    </div>
+                    <div class="rightsize-metric">
+                        <div class="rightsize-metric-value">50%</div>
+                        <div class="rightsize-metric-label">Typical Over-Provisioning</div>
+                    </div>
+                    <div class="rightsize-desc">Database instances are often sized for expected (not actual) load. Use Performance Insights to identify underutilized DBs.</div>
+                </div>
+                <div class="rightsize-card">
+                    <div class="rightsize-header">
+                        <div class="rightsize-icon">💾</div>
+                        <div>
+                            <div class="rightsize-title">Storage</div>
+                            <div class="rightsize-subtitle">EBS, Disks, Object</div>
+                        </div>
+                    </div>
+                    <div class="rightsize-metric">
+                        <div class="rightsize-metric-value">30%</div>
+                        <div class="rightsize-metric-label">Unused Storage</div>
+                    </div>
+                    <div class="rightsize-desc">Orphaned volumes, over-provisioned IOPS, data that should be archived. Lifecycle policies are essential.</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Rightsizing Tool</th>
+                        <th>Provider</th>
+                        <th>Coverage</th>
+                        <th>Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Compute Optimizer</strong></td><td>AWS</td><td>EC2, EBS, Lambda, ECS</td><td>ML-based recommendations, savings estimates</td></tr>
+                    <tr><td><strong>Cost Explorer Rightsizing</strong></td><td>AWS</td><td>EC2</td><td>Integrated with Cost Explorer, RI-aware</td></tr>
+                    <tr><td><strong>Azure Advisor</strong></td><td>Azure</td><td>VMs, SQL, Storage</td><td>Recommendations with one-click resize</td></tr>
+                    <tr><td><strong>Recommender</strong></td><td>GCP</td><td>Compute, Disks</td><td>Automatic recommendations, committed use</td></tr>
+                    <tr><td><strong>Spot.io</strong></td><td>Third-party</td><td>Multi-cloud</td><td>Automated optimization, spot management</td></tr>
+                    <tr><td><strong>CloudHealth</strong></td><td>VMware</td><td>Multi-cloud</td><td>Enterprise governance, recommendations</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Rightsizing Process</h3>
+                    <p><strong>1. Collect Metrics:</strong> Enable detailed monitoring. Need 2+ weeks of data for accurate analysis.</p>
+                    <p><strong>2. Identify Candidates:</strong> Look for <30% avg CPU, <50% avg memory. Flag anything with zero connections.</p>
+                    <p><strong>3. Validate:</strong> Check peak usage, not just average. Some workloads are legitimately spiky.</p>
+                    <p><strong>4. Test:</strong> Resize in dev/staging first. Monitor after production changes.</p>
+                </div>
+                <div>
+                    <h3>Graviton / ARM Rightsizing</h3>
+                    <p><strong>20-40% Savings:</strong> AWS Graviton and Azure Ampere ARM instances offer better price-performance.</p>
+                    <p><strong>Compatibility:</strong> Most Linux workloads work out of the box. Java, Python, Node, Go are well-supported.</p>
+                    <p><strong>Not Suitable:</strong> Windows workloads, software with x86 dependencies, some legacy applications.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waste Elimination -->
+        <section class="module" id="waste">
+            <div class="module-header">
+                <div class="module-icon">🗑️</div>
+                <div class="module-info">
+                    <h2>Waste Elimination</h2>
+                    <p>Find and eliminate unnecessary cloud spend</p>
+                </div>
+            </div>
+
+            <div class="waste-grid">
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">💻</div><div class="waste-name">Idle Instances</div></div>
+                        <div class="waste-percent">25%</div>
+                    </div>
+                    <div class="waste-desc">VMs running 24/7 that are only used during business hours, or instances no one is using at all.</div>
+                    <div class="waste-fix">Schedule shutdown for non-prod, terminate unused instances</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">💾</div><div class="waste-name">Orphaned Storage</div></div>
+                        <div class="waste-percent">20%</div>
+                    </div>
+                    <div class="waste-desc">EBS volumes from deleted instances, old snapshots, unused S3 buckets accumulating data.</div>
+                    <div class="waste-fix">Delete unattached volumes, implement lifecycle policies</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">🌐</div><div class="waste-name">Unused Elastic IPs</div></div>
+                        <div class="waste-percent">5%</div>
+                    </div>
+                    <div class="waste-desc">Elastic IPs not attached to running instances. AWS charges $0.005/hour for unused IPs.</div>
+                    <div class="waste-fix">Release unused IPs, audit monthly</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">⚖️</div><div class="waste-name">Idle Load Balancers</div></div>
+                        <div class="waste-percent">10%</div>
+                    </div>
+                    <div class="waste-desc">ALBs/NLBs with no targets, or serving minimal traffic. Base cost adds up across environments.</div>
+                    <div class="waste-fix">Delete unused LBs, consolidate where possible</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">📊</div><div class="waste-name">Over-Provisioned IOPS</div></div>
+                        <div class="waste-percent">15%</div>
+                    </div>
+                    <div class="waste-desc">Provisioned IOPS storage that never approaches the provisioned limit. gp3 is often sufficient.</div>
+                    <div class="waste-fix">Switch to gp3 with baseline IOPS, monitor actuals</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">📸</div><div class="waste-name">Old Snapshots</div></div>
+                        <div class="waste-percent">10%</div>
+                    </div>
+                    <div class="waste-desc">AMI snapshots, database snapshots, and EBS snapshots accumulating without retention policies.</div>
+                    <div class="waste-fix">Implement retention policies, delete snapshots >90 days</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Automated Cleanup</h3>
+                    <p><strong>AWS Trusted Advisor:</strong> Identifies idle instances, underutilized EBS, unused EIPs.</p>
+                    <p><strong>AWS Instance Scheduler:</strong> Automatically stop/start instances on schedule.</p>
+                    <p><strong>Azure Auto-Shutdown:</strong> Built-in VM shutdown scheduling.</p>
+                    <p><strong>Custom Scripts:</strong> Lambda/Functions to find and alert on orphaned resources weekly.</p>
+                </div>
+                <div>
+                    <h3>Quick Wins Checklist</h3>
+                    <p><strong>✓ Delete unattached EBS volumes</strong> (often forgotten when terminating instances)</p>
+                    <p><strong>✓ Release unused Elastic IPs</strong> ($3.60/month each)</p>
+                    <p><strong>✓ Remove old snapshots</strong> (keep only last 7-30 days for most)</p>
+                    <p><strong>✓ Schedule dev environments</strong> (run only during business hours = 65% savings)</p>
+                    <p><strong>✓ Empty or delete unused S3 buckets</strong> (use Storage Lens to find)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FinOps -->
+        <section class="module" id="finops">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>FinOps Practices</h2>
+                    <p>Building a culture of cloud financial management</p>
+                </div>
+            </div>
+
+            <div class="finops-pillars">
+                <div class="finops-pillar">
+                    <div class="finops-pillar-icon">👁️</div>
+                    <div class="finops-pillar-name">Inform</div>
+                    <div class="finops-pillar-desc">Visibility and allocation. Everyone sees what they spend. Cost data is accurate, timely, and accessible.</div>
+                </div>
+                <div class="finops-pillar">
+                    <div class="finops-pillar-icon">⚡</div>
+                    <div class="finops-pillar-name">Optimize</div>
+                    <div class="finops-pillar-desc">Reduce waste and improve efficiency. Rightsizing, commitment purchases, architecture improvements.</div>
+                </div>
+                <div class="finops-pillar">
+                    <div class="finops-pillar-icon">🔄</div>
+                    <div class="finops-pillar-name">Operate</div>
+                    <div class="finops-pillar-desc">Continuous improvement. Processes, automation, and governance for ongoing cost management.</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is FinOps?</h3>
+                    <p><strong>Definition:</strong> FinOps is the practice of bringing financial accountability to the variable spend model of cloud, enabling distributed teams to make business trade-offs between speed, cost, and quality.</p>
+                    <p><strong>Cultural Shift:</strong> Engineers own costs, finance understands technology, and everyone collaborates on optimization.</p>
+                    <p><strong>Not Just Cost Cutting:</strong> FinOps is about maximizing value, not minimizing spend. Sometimes spending more is the right decision.</p>
+                </div>
+                <div>
+                    <h3>FinOps Lifecycle</h3>
+                    <p><strong>1. Inform:</strong> Allocate costs, create visibility, enable benchmarking. Know where money goes.</p>
+                    <p><strong>2. Optimize:</strong> Identify opportunities, implement changes, measure impact. Take action.</p>
+                    <p><strong>3. Operate:</strong> Automate processes, govern spending, continuously improve. Sustain gains.</p>
+                    <p><strong>Iterative:</strong> This is a continuous cycle, not a one-time project. Each iteration improves maturity.</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>FinOps Team Structure</h3>
+                    <p><strong>Centralized FinOps Team:</strong> 1-3 dedicated people for visibility, tools, commitment strategy, and governance.</p>
+                    <p><strong>Embedded Engineers:</strong> Each product team has cost awareness. FinOps provides tools, teams make decisions.</p>
+                    <p><strong>Executive Sponsor:</strong> CFO or CTO ownership ensures budget and authority.</p>
+                    <p><strong>Regular Reviews:</strong> Monthly cost reviews with engineering leadership. Quarterly business reviews with finance.</p>
+                </div>
+                <div>
+                    <h3>Key FinOps Roles</h3>
+                    <p><strong>FinOps Practitioner:</strong> Day-to-day cost analysis, recommendations, reporting. Often 1 per $5-10M cloud spend.</p>
+                    <p><strong>Cloud Economist:</strong> Advanced analysis, forecasting, commitment strategy. Senior role in large organizations.</p>
+                    <p><strong>FinOps Lead:</strong> Manages the practice, stakeholder communication, roadmap. Reports to CTO or CFO.</p>
+                    <p><strong>Engineering Champions:</strong> Engineers in each team who own cost awareness. Not full-time, but accountable.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>FinOps Capability</th>
+                        <th>Crawl</th>
+                        <th>Walk</th>
+                        <th>Run</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Cost Visibility</strong></td><td>Monthly bill review</td><td>Weekly dashboards</td><td>Real-time by team/service</td></tr>
+                    <tr><td><strong>Allocation</strong></td><td>By account</td><td>By tags/cost centers</td><td>By feature/customer</td></tr>
+                    <tr><td><strong>Forecasting</strong></td><td>Spreadsheet estimates</td><td>Trend-based projection</td><td>ML-based prediction</td></tr>
+                    <tr><td><strong>Optimization</strong></td><td>Reactive cleanup</td><td>Monthly rightsizing</td><td>Automated continuous</td></tr>
+                    <tr><td><strong>Commitments</strong></td><td>Ad-hoc purchases</td><td>Quarterly review</td><td>Automated purchasing</td></tr>
+                    <tr><td><strong>Accountability</strong></td><td>Central team pays</td><td>Showback to teams</td><td>Chargeback to P&L</td></tr>
+                    <tr><td><strong>Anomaly Detection</strong></td><td>End-of-month surprise</td><td>Budget alerts</td><td>Real-time AI detection</td></tr>
+                    <tr><td><strong>Architecture Review</strong></td><td>None</td><td>Major projects only</td><td>Every design includes cost</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Showback & Chargeback -->
+        <section class="module" id="allocation">
+            <div class="module-header">
+                <div class="module-icon">💸</div>
+                <div class="module-info">
+                    <h2>Cost Allocation Models</h2>
+                    <p>Showback, chargeback, and cost distribution</p>
+                </div>
+            </div>
+
+            <div class="rightsize-grid">
+                <div class="rightsize-card">
+                    <div class="rightsize-header">
+                        <div class="rightsize-icon">👁️</div>
+                        <div>
+                            <div class="rightsize-title">Showback</div>
+                            <div class="rightsize-subtitle">Visibility without billing</div>
+                        </div>
+                    </div>
+                    <div class="rightsize-metric">
+                        <div class="rightsize-metric-value">Report</div>
+                        <div class="rightsize-metric-label">Teams see costs, don't pay</div>
+                    </div>
+                    <div class="rightsize-desc">Show teams what they spend without actually billing them. Good for building awareness before full chargeback. Less friction, less accountability.</div>
+                </div>
+                <div class="rightsize-card">
+                    <div class="rightsize-header">
+                        <div class="rightsize-icon">💳</div>
+                        <div>
+                            <div class="rightsize-title">Chargeback</div>
+                            <div class="rightsize-subtitle">Full cost transfer</div>
+                        </div>
+                    </div>
+                    <div class="rightsize-metric">
+                        <div class="rightsize-metric-value">Bill</div>
+                        <div class="rightsize-metric-label">Teams pay from budget</div>
+                    </div>
+                    <div class="rightsize-desc">Costs are transferred to team/BU budgets. Full accountability drives optimization. Requires accurate tagging and allocation rules.</div>
+                </div>
+                <div class="rightsize-card">
+                    <div class="rightsize-header">
+                        <div class="rightsize-icon">🔀</div>
+                        <div>
+                            <div class="rightsize-title">Hybrid</div>
+                            <div class="rightsize-subtitle">Partial chargeback</div>
+                        </div>
+                    </div>
+                    <div class="rightsize-metric">
+                        <div class="rightsize-metric-value">Split</div>
+                        <div class="rightsize-metric-label">Direct costs charged, shared split</div>
+                    </div>
+                    <div class="rightsize-desc">Charge direct costs (VMs, storage), allocate shared costs (networking, security) proportionally. Most practical for complex environments.</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Allocation Challenge</th>
+                        <th>Solution</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Shared Services</strong></td><td>Proportional split by usage metric</td><td>Split monitoring costs by # of hosts per team</td></tr>
+                    <tr><td><strong>Untagged Resources</strong></td><td>Default bucket or pro-rata distribution</td><td>Allocate to "Corporate IT" until tagged</td></tr>
+                    <tr><td><strong>Platform Costs</strong></td><td>Flat fee or usage-based internal pricing</td><td>$100/month per Kubernetes namespace</td></tr>
+                    <tr><td><strong>Reserved Instances</strong></td><td>Apply savings to teams using reserved capacity</td><td>RI discount follows the workload</td></tr>
+                    <tr><td><strong>Multi-Tenant Apps</strong></td><td>Allocate by customer usage/revenue</td><td>Split by API calls or data stored per customer</td></tr>
+                    <tr><td><strong>Support Costs</strong></td><td>Flat fee or % of spend</td><td>Add 10% to all allocations for support tier</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Building an Allocation Model</h3>
+                    <p><strong>1. Define Hierarchy:</strong> Business Unit → Team → Service → Environment. Match your org structure.</p>
+                    <p><strong>2. Tag Strategy:</strong> Mandatory tags for allocation dimensions. Enforce at provisioning time.</p>
+                    <p><strong>3. Shared Cost Rules:</strong> Define how platform, networking, and shared services are distributed.</p>
+                    <p><strong>4. Tooling:</strong> AWS Cost Categories, Azure Cost Management, or third-party tools (CloudHealth, Apptio).</p>
+                </div>
+                <div>
+                    <h3>Chargeback Best Practices</h3>
+                    <p><strong>Start with Showback:</strong> Build trust in data accuracy before billing teams.</p>
+                    <p><strong>Monthly Cycles:</strong> Align with financial close. Provide data within 5 days of month end.</p>
+                    <p><strong>Dispute Process:</strong> Allow teams to challenge allocations. Most disputes reveal tagging issues.</p>
+                    <p><strong>Incentivize Optimization:</strong> Teams keep a portion of savings. Creates positive motivation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Budgeting & Forecasting -->
+        <section class="module" id="forecasting">
+            <div class="module-header">
+                <div class="module-icon">🔮</div>
+                <div class="module-info">
+                    <h2>Budgeting & Forecasting</h2>
+                    <p>Predict and plan cloud spending</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Cloud Budgeting Challenges</h3>
+                    <p><strong>Variable Nature:</strong> Unlike fixed IT assets, cloud scales with demand. Usage drives cost, not procurement.</p>
+                    <p><strong>New Services:</strong> Teams adopt new services mid-year. Hard to predict what you don't know exists.</p>
+                    <p><strong>Business Correlation:</strong> Successful products cost more to run. Growth = higher cloud bills.</p>
+                    <p><strong>Price Changes:</strong> Providers change pricing. New regions, new instance types, new discounts.</p>
+                </div>
+                <div>
+                    <h3>Forecasting Methods</h3>
+                    <p><strong>Trend-Based:</strong> Project current spend forward with growth rate. Simple, good for stable workloads.</p>
+                    <p><strong>Driver-Based:</strong> Link spend to business metrics (users, transactions). More accurate for scaling businesses.</p>
+                    <p><strong>Bottom-Up:</strong> Teams estimate their needs. Aggregate for total. Good for major projects.</p>
+                    <p><strong>ML-Based:</strong> Use historical patterns to predict. AWS Cost Explorer, third-party tools provide this.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Forecast Horizon</th>
+                        <th>Method</th>
+                        <th>Accuracy Target</th>
+                        <th>Update Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Next Month</strong></td><td>Trend + known changes</td><td>±5%</td><td>Weekly</td></tr>
+                    <tr><td><strong>Next Quarter</strong></td><td>Driver-based + projects</td><td>±10%</td><td>Monthly</td></tr>
+                    <tr><td><strong>Annual Budget</strong></td><td>Bottom-up + growth rate</td><td>±15-20%</td><td>Quarterly reforecast</td></tr>
+                    <tr><td><strong>Multi-Year Plan</strong></td><td>Business plan correlation</td><td>±25-30%</td><td>Annual</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Building a Cloud Budget</h3>
+                    <p><strong>1. Baseline Current:</strong> Understand current run rate. Exclude one-time costs (migrations).</p>
+                    <p><strong>2. Factor Growth:</strong> Apply business growth rate (users, revenue) to variable costs.</p>
+                    <p><strong>3. Add Projects:</strong> Include known initiatives (new products, migrations, expansions).</p>
+                    <p><strong>4. Apply Optimizations:</strong> Subtract planned savings (RIs, rightsizing, architecture changes).</p>
+                    <p><strong>5. Buffer:</strong> Add 10-15% for unknowns. Cloud has a way of surprising you.</p>
+                </div>
+                <div>
+                    <h3>Variance Management</h3>
+                    <p><strong>Threshold Alerts:</strong> Notify at 80%, 90%, 100% of budget. Don't wait for overruns.</p>
+                    <p><strong>Root Cause Analysis:</strong> When variance occurs, identify why. New feature? Bug? Pricing change?</p>
+                    <p><strong>Reforecast:</strong> Update quarterly. Rolling forecast is more useful than stale annual budget.</p>
+                    <p><strong>Executive Communication:</strong> Explain variance in business terms, not technical. "Traffic up 30% drove cost increase."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost Tools -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Cost Management Tools</h2>
+                    <p>Native and third-party cost optimization solutions</p>
+                </div>
+            </div>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🟠</div>
+                        <div>
+                            <div class="tool-name">Cost Explorer</div>
+                            <div class="tool-provider">AWS</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Visualize, understand, and manage AWS costs. Filter by service, tag, linked account. RI/SP recommendations.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🟠</div>
+                        <div>
+                            <div class="tool-name">Budgets</div>
+                            <div class="tool-provider">AWS</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Set custom budgets and receive alerts when you exceed thresholds. Actions can auto-respond.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔵</div>
+                        <div>
+                            <div class="tool-name">Cost Management</div>
+                            <div class="tool-provider">Azure</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Cost analysis, budgets, and recommendations. Export to Power BI for custom reporting.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔷</div>
+                        <div>
+                            <div class="tool-name">Cost Management</div>
+                            <div class="tool-provider">GCP</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Cost breakdown, budgets, alerts. Export to BigQuery for custom analysis.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🟢</div>
+                        <div>
+                            <div class="tool-name">Kubecost</div>
+                            <div class="tool-provider">Third-party</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Kubernetes cost monitoring. Allocation by namespace, deployment, label. Rightsizing for pods.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🟣</div>
+                        <div>
+                            <div class="tool-name">Spot.io</div>
+                            <div class="tool-provider">NetApp</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Automated spot instance management. Predicts interruptions, handles failover.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">🔴</div>
+                        <div>
+                            <div class="tool-name">CloudHealth</div>
+                            <div class="tool-provider">VMware</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Enterprise multi-cloud cost management. Governance, rightsizing, reserved instance management.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-logo">⚫</div>
+                        <div>
+                            <div class="tool-name">Infracost</div>
+                            <div class="tool-provider">Open Source</div>
+                        </div>
+                    </div>
+                    <div class="tool-desc">Terraform cost estimation in CI/CD. See cost impact of infrastructure changes before apply.</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Capability</th>
+                        <th>AWS Native</th>
+                        <th>Azure Native</th>
+                        <th>GCP Native</th>
+                        <th>Third-Party</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Cost Visibility</strong></td><td>Cost Explorer</td><td>Cost Management</td><td>Cost Management</td><td>CloudHealth, Flexera</td></tr>
+                    <tr><td><strong>Budgets & Alerts</strong></td><td>AWS Budgets</td><td>Budget alerts</td><td>Budget alerts</td><td>All tools</td></tr>
+                    <tr><td><strong>Rightsizing</strong></td><td>Compute Optimizer</td><td>Azure Advisor</td><td>Recommender</td><td>Spot.io, ProsperOps</td></tr>
+                    <tr><td><strong>RI Management</strong></td><td>Cost Explorer</td><td>Reservations</td><td>Committed Use</td><td>ProsperOps, Zesty</td></tr>
+                    <tr><td><strong>Kubernetes</strong></td><td>Split Cost Allocation</td><td>AKS Cost Analysis</td><td>GKE Cost Allocation</td><td>Kubecost, CAST AI</td></tr>
+                    <tr><td><strong>Anomaly Detection</strong></td><td>Cost Anomaly Detection</td><td>Cost alerts</td><td>Budget alerts</td><td>Anodot, CloudHealth</td></tr>
+                    <tr><td><strong>IaC Cost</strong></td><td>-</td><td>-</td><td>-</td><td>Infracost, env0</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Cost Governance -->
+        <section class="module" id="governance">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Cost Governance</h2>
+                    <p>Policies and controls for cloud spending</p>
+                </div>
+            </div>
+
+            <div class="waste-grid">
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">🚫</div><div class="waste-name">Preventive Controls</div></div>
+                    </div>
+                    <div class="waste-desc">Stop expensive resources before they're created. Block high-cost instance types in dev, require approval for production changes.</div>
+                    <div class="waste-fix">SCPs, Azure Policy, Quotas, Approval workflows</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">🔍</div><div class="waste-name">Detective Controls</div></div>
+                    </div>
+                    <div class="waste-desc">Find cost issues after they occur. Budget alerts, anomaly detection, regular cost reviews.</div>
+                    <div class="waste-fix">AWS Budgets, Cost Anomaly Detection, Weekly reports</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">🔧</div><div class="waste-name">Corrective Controls</div></div>
+                    </div>
+                    <div class="waste-desc">Automatically fix cost issues. Auto-shutdown idle resources, auto-rightsize after 30 days.</div>
+                    <div class="waste-fix">Instance Scheduler, Lambda automation, Spot.io</div>
+                </div>
+                <div class="waste-card">
+                    <div class="waste-header">
+                        <div class="waste-title"><div class="waste-icon">📋</div><div class="waste-name">Directive Controls</div></div>
+                    </div>
+                    <div class="waste-desc">Policies and guidelines. Cost review in architecture decisions, mandatory tagging, commitment guidelines.</div>
+                    <div class="waste-fix">Architecture review, Tagging policy, FinOps playbooks</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Governance Framework</h3>
+                    <p><strong>Policy Hierarchy:</strong> Organization → Account/Subscription → Resource Group → Resource. Policies inherit down.</p>
+                    <p><strong>Guardrails:</strong> Set limits that prevent runaway costs—max instance sizes, region restrictions, service allowlists.</p>
+                    <p><strong>Exceptions:</strong> Define process for exceptions. Temporary override with approval and expiration.</p>
+                    <p><strong>Audit Trail:</strong> Log all policy changes and exceptions. Review quarterly.</p>
+                </div>
+                <div>
+                    <h3>Common Governance Policies</h3>
+                    <p><strong>Instance Size Limits:</strong> Block xlarge+ in dev. Require approval for 4xl+.</p>
+                    <p><strong>Region Restrictions:</strong> Limit to approved regions (compliance, latency).</p>
+                    <p><strong>Service Allowlists:</strong> Only approved services in production. Sandbox for experimentation.</p>
+                    <p><strong>Tagging Enforcement:</strong> Block resource creation without required tags.</p>
+                    <p><strong>Budget Limits:</strong> Hard caps per account/project. Alerts before limits.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost-Aware Architecture -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Cost-Aware Architecture</h2>
+                    <p>Design for cost efficiency from the start</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Architecture Cost Levers</h3>
+                    <p><strong>Compute Model:</strong> VMs vs. containers vs. serverless. Serverless can be 10x cheaper for spiky workloads.</p>
+                    <p><strong>Storage Choices:</strong> Block vs. object vs. file. S3 is 10x cheaper than EBS for static data.</p>
+                    <p><strong>Data Architecture:</strong> Keep data close to compute. Cross-region replication costs add up.</p>
+                    <p><strong>Caching Strategy:</strong> Cache reduces database load and cost. CloudFront, ElastiCache, application-level.</p>
+                </div>
+                <div>
+                    <h3>Design for Scale-Down</h3>
+                    <p><strong>Stateless Services:</strong> Scale to zero when not in use. Serverless and containers enable this.</p>
+                    <p><strong>Queue-Based:</strong> Decouple with queues. Process at your pace, not the customer's.</p>
+                    <p><strong>Reserved Baseline:</strong> Design for minimum always-on capacity covered by reservations.</p>
+                    <p><strong>Burst on Demand:</strong> Use spot/on-demand for peaks above the baseline.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Architecture Decision</th>
+                        <th>Cost-Expensive Choice</th>
+                        <th>Cost-Efficient Alternative</th>
+                        <th>Savings Potential</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Compute for variable load</strong></td><td>Over-provisioned VMs</td><td>Auto-scaling + Spot</td><td>60-80%</td></tr>
+                    <tr><td><strong>Static content storage</strong></td><td>EBS volumes</td><td>S3 + CloudFront</td><td>70-90%</td></tr>
+                    <tr><td><strong>Cross-region data</strong></td><td>Constant replication</td><td>Async replication + local cache</td><td>40-60%</td></tr>
+                    <tr><td><strong>Background processing</strong></td><td>Always-on workers</td><td>Lambda + SQS</td><td>50-70%</td></tr>
+                    <tr><td><strong>Dev/Test databases</strong></td><td>Production-sized RDS</td><td>Smaller instances + snapshots</td><td>70-80%</td></tr>
+                    <tr><td><strong>Log storage</strong></td><td>CloudWatch Logs forever</td><td>S3 Glacier after 30 days</td><td>80-90%</td></tr>
+                    <tr><td><strong>NAT traffic</strong></td><td>NAT Gateway</td><td>VPC endpoints for AWS services</td><td>30-50%</td></tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Cost in Architecture Reviews</h3>
+                    <p><strong>Mandatory Question:</strong> "What's the estimated monthly cost?" Every design doc should answer this.</p>
+                    <p><strong>Cost Comparison:</strong> Show alternatives. "Option A costs $X, Option B costs $Y."</p>
+                    <p><strong>Scale Projections:</strong> How does cost scale with growth? Linear? Sub-linear? Super-linear?</p>
+                    <p><strong>Optimization Path:</strong> What can we do later to reduce cost if this grows?</p>
+                </div>
+                <div>
+                    <h3>Well-Architected Cost Optimization</h3>
+                    <p><strong>Expenditure Awareness:</strong> Understand what you spend and why. Attribute costs to business value.</p>
+                    <p><strong>Cost-Effective Resources:</strong> Use the right services and instance types. Don't over-provision.</p>
+                    <p><strong>Match Supply with Demand:</strong> Auto-scaling, serverless, right-sized for actual usage.</p>
+                    <p><strong>Optimize Over Time:</strong> Continuously improve. New services, new pricing, new patterns.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tagging Strategy -->
+        <section class="module" id="tagging">
+            <div class="module-header">
+                <div class="module-icon">🏷️</div>
+                <div class="module-info">
+                    <h2>Tagging Strategy</h2>
+                    <p>Foundation for cost allocation and accountability</p>
+                </div>
+            </div>
+
+            <div class="tag-grid">
+                <div class="tag-card">
+                    <div class="tag-key">Environment</div>
+                    <div class="tag-value">prod | staging | dev | test</div>
+                    <div class="tag-purpose">Filter non-prod for shutdown scheduling</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">Owner</div>
+                    <div class="tag-value">team-payments | team-platform</div>
+                    <div class="tag-purpose">Accountability and chargeback</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">CostCenter</div>
+                    <div class="tag-value">CC-12345</div>
+                    <div class="tag-purpose">Finance allocation</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">Project</div>
+                    <div class="tag-value">project-phoenix</div>
+                    <div class="tag-purpose">Project-level reporting</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">Application</div>
+                    <div class="tag-value">checkout-service</div>
+                    <div class="tag-purpose">Application cost tracking</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">Criticality</div>
+                    <div class="tag-value">critical | high | medium | low</div>
+                    <div class="tag-purpose">Prioritize optimization efforts</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">DataClassification</div>
+                    <div class="tag-value">public | internal | confidential | pii</div>
+                    <div class="tag-purpose">Security and compliance</div>
+                </div>
+                <div class="tag-card">
+                    <div class="tag-key">AutoShutdown</div>
+                    <div class="tag-value">true | false</div>
+                    <div class="tag-purpose">Automation targeting</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Tagging Best Practices</h3>
+                    <p><strong>Mandatory Tags:</strong> Define 4-6 required tags. Use SCPs (AWS) or Azure Policy to enforce.</p>
+                    <p><strong>Consistent Format:</strong> Lowercase, hyphens not underscores, no spaces. Document in a tagging standard.</p>
+                    <p><strong>Automate:</strong> Tag on creation via IaC. Harder to add tags retroactively.</p>
+                    <p><strong>Tag Inheritance:</strong> Tag at the highest level (account, resource group) and inherit down where possible.</p>
+                </div>
+                <div>
+                    <h3>Enforcement Strategies</h3>
+                    <p><strong>Preventive:</strong> AWS SCPs, Azure Policy, GCP Org Policies deny untagged resources.</p>
+                    <p><strong>Detective:</strong> Weekly reports on untagged resources. Name and shame dashboards.</p>
+                    <p><strong>Corrective:</strong> Auto-tag with "owner:unknown" or "environment:untagged" for visibility.</p>
+                    <p><strong>Incentive:</strong> Teams with good tagging get priority on cost optimization help.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Tag Enforcement</th>
+                        <th>Cost Allocation Tags</th>
+                        <th>Inheritance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>AWS</strong></td><td>SCPs, Tag Policies</td><td>Cost Allocation Tags (activate in Billing)</td><td>Limited (some services)</td></tr>
+                    <tr><td><strong>Azure</strong></td><td>Azure Policy</td><td>Tags auto-appear in Cost Management</td><td>Inherit from resource group/subscription</td></tr>
+                    <tr><td><strong>GCP</strong></td><td>Org Policies</td><td>Labels appear in billing export</td><td>Inherit from project/folder</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Agent -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered cost optimization</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>💰 CostOptimizer</h3>
+                    <p>Analyzes cloud spending patterns, identifies waste, recommends commitment strategies, and generates cost reduction action plans. Integrates with Cost Explorer APIs for real-time analysis.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Spending pattern analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">🗑️</span> Waste identification</div>
+                        <div class="agent-capability"><span class="capability-icon">📏</span> Rightsizing recommendations</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Commitment strategy planning</div>
+                        <div class="agent-capability"><span class="capability-icon">📈</span> Cost forecasting</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">cost_optimizer_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Cost analysis tools</span>
+cost_api = CostExplorerTool()
+compute_opt = ComputeOptimizerTool()
+waste_finder = WasteIdentifierTool()
+ri_analyzer = ReservationAnalyzerTool()
+
+<span class="code-comment"># Cost Optimizer Agent</span>
+optimizer = Agent(
+    role=<span class="code-string">"Cloud Cost Optimization Specialist"</span>,
+    goal=<span class="code-string">"""Analyze cloud spending, identify
+    waste, recommend optimizations, and
+    create cost reduction action plans."""</span>,
+    tools=[cost_api, compute_opt, 
+           waste_finder, ri_analyzer],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Optimization Task</span>
+optimize_task = Task(
+    description=<span class="code-string">"""
+    1. Pull last 30 days of cost data
+    2. Identify idle and unused resources
+    3. Analyze rightsizing opportunities
+    4. Calculate optimal RI/SP coverage
+    5. Prioritize by savings potential
+    6. Generate action plan with timeline
+    """</span>,
+    agent=optimizer
+)
+
+crew = Crew(agents=[optimizer], tasks=[optimize_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring cloud platforms</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat12-p1-cloud-providers.html" class="related-card">
+                    <div class="related-icon">🏢</div>
+                    <div class="related-title">Cloud Providers</div>
+                    <div class="related-desc">Provider pricing models and selection</div>
+                </a>
+                <a href="cat12-p4-compute-containers.html" class="related-card">
+                    <div class="related-icon">📦</div>
+                    <div class="related-title">Compute & Containers</div>
+                    <div class="related-desc">Instance types and compute optimization</div>
+                </a>
+                <a href="cat12-p5-storage-databases.html" class="related-card">
+                    <div class="related-icon">💾</div>
+                    <div class="related-title">Storage & Databases</div>
+                    <div class="related-desc">Storage tiers and lifecycle policies</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat12-p6-networking-security.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">12.6 Networking & Security</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 12.7</div>
+        <a href="cat12-cloud-platforms-overview.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

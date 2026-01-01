@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cutover | Migration Factory | Category 13 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #7C3AED;
+            --cat-light: #A78BFA;
+            --cat-dark: #6D28D9;
+            --cat-glow: rgba(124, 58, 237, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px; --font-3xl: 48px; --font-4xl: 64px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: var(--space-2xl) var(--space-xl); }
+        
+        .module { margin-bottom: var(--space-3xl); }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Overview Intro */
+        .overview-intro { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); }
+        .overview-text p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; }
+        .overview-text p:last-child { margin-bottom: 0; }
+        .overview-highlights { display: flex; flex-direction: column; gap: var(--space-md); padding-left: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .highlight-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); background: var(--bg-card-alt); border-radius: var(--radius-lg); }
+        .highlight-icon { font-size: 24px; }
+        .highlight-value { font-size: var(--font-lg); font-weight: 700; color: var(--cat-light); display: block; }
+        .highlight-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MISSION CONTROL CENTER
+        ═══════════════════════════════════════════════════════════════ */
+        .mission-control { background: linear-gradient(180deg, #0d0d12 0%, var(--bg-card) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); position: relative; }
+        .mission-control::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--danger-red), var(--warning-yellow), var(--success-green)); }
+        
+        .mission-header { padding: var(--space-lg); background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .mission-title-area { display: flex; align-items: center; gap: var(--space-lg); }
+        .mission-badge { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) var(--space-md); background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger-red); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--danger-red); }
+        .mission-badge-dot { width: 8px; height: 8px; background: var(--danger-red); border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .mission-label { font-size: var(--font-xl); font-weight: 700; }
+        .mission-date { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .mission-body { padding: var(--space-2xl); }
+        .countdown-section { text-align: center; margin-bottom: var(--space-2xl); }
+        .countdown-label { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 3px; margin-bottom: var(--space-md); }
+        .countdown-display { display: flex; justify-content: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .countdown-unit { background: linear-gradient(180deg, #1a1a24 0%, #0d0d12 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg) var(--space-xl); min-width: 120px; position: relative; }
+        .countdown-unit::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent); }
+        .countdown-value { font-size: var(--font-4xl); font-weight: 800; font-family: 'Monaco', monospace; background: linear-gradient(180deg, #fff, var(--cat-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+        .countdown-text { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: var(--space-sm); }
+        .countdown-colon { font-size: var(--font-3xl); color: var(--cat-light); font-weight: 300; align-self: center; animation: pulse-colon 1s infinite; }
+        @keyframes pulse-colon { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        
+        .mission-actions { display: flex; justify-content: center; gap: var(--space-lg); }
+        .btn-launch { padding: var(--space-md) var(--space-2xl); background: linear-gradient(135deg, var(--success-green), var(--teal)); border: none; border-radius: var(--radius-lg); font-size: var(--font-base); font-weight: 700; color: white; cursor: pointer; display: flex; align-items: center; gap: var(--space-sm); transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-launch:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
+        .btn-abort { padding: var(--space-md) var(--space-2xl); background: transparent; border: 2px solid var(--danger-red); border-radius: var(--radius-lg); font-size: var(--font-base); font-weight: 700; color: var(--danger-red); cursor: pointer; display: flex; align-items: center; gap: var(--space-sm); transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-abort:hover { background: var(--danger-red); color: white; box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
+        
+        .mission-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-top: var(--space-2xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .mission-stat { text-align: center; padding: var(--space-md); }
+        .mission-stat-value { font-size: var(--font-xl); font-weight: 700; margin-bottom: var(--space-xs); }
+        .mission-stat-value.green { color: var(--success-green); }
+        .mission-stat-value.yellow { color: var(--warning-yellow); }
+        .mission-stat-value.blue { color: var(--blue); }
+        .mission-stat-value.purple { color: var(--cat-light); }
+        .mission-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           WAR ROOM
+        ═══════════════════════════════════════════════════════════════ */
+        .warroom-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .warroom-header { padding: var(--space-md) var(--space-lg); background: linear-gradient(90deg, rgba(124, 58, 237, 0.15), transparent); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .warroom-header-icon { font-size: 20px; }
+        .warroom-header-title { font-size: var(--font-sm); font-weight: 600; }
+        .warroom-header-status { margin-left: auto; display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--success-green); }
+        .warroom-header-status::before { content: ''; width: 8px; height: 8px; background: var(--success-green); border-radius: 50%; animation: blink 1s infinite; }
+        .warroom-body { padding: var(--space-lg); }
+        .warroom-intro { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .warroom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .warroom-member { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); transition: all 0.3s; }
+        .warroom-member:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .warroom-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .warroom-avatar.lead { background: linear-gradient(135deg, var(--danger-red), var(--orange)); }
+        .warroom-avatar.platform { background: linear-gradient(135deg, var(--blue), var(--cyan)); }
+        .warroom-avatar.data { background: linear-gradient(135deg, var(--cat-primary), var(--cat-light)); }
+        .warroom-avatar.business { background: linear-gradient(135deg, var(--success-green), var(--teal)); }
+        .warroom-info { flex: 1; min-width: 0; }
+        .warroom-role { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .warroom-name { font-size: var(--font-sm); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .warroom-resp { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+        .warroom-status { width: 10px; height: 10px; background: var(--success-green); border-radius: 50%; flex-shrink: 0; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TIMELINE
+        ═══════════════════════════════════════════════════════════════ */
+        .timeline-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .timeline-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .timeline-title { font-size: var(--font-sm); font-weight: 600; }
+        .timeline-date { font-size: var(--font-xs); color: var(--cat-light); }
+        .timeline-body { padding: var(--space-lg); overflow-x: auto; }
+        .timeline-intro { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        
+        .timeline-track { display: flex; gap: 0; min-width: max-content; position: relative; padding: 60px 0 0 0; }
+        .timeline-track::before { content: ''; position: absolute; top: 78px; left: 60px; right: 60px; height: 3px; background: var(--border-color); border-radius: 2px; }
+        
+        .timeline-phase { flex: 1; min-width: 130px; position: relative; text-align: center; padding: 0 var(--space-sm); }
+        .timeline-phase-time { position: absolute; top: -45px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--cat-light); white-space: nowrap; background: var(--bg-card-alt); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-family: 'Monaco', monospace; }
+        .timeline-phase-dot { width: 20px; height: 20px; border-radius: 50%; margin: 0 auto var(--space-md); position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .timeline-phase-dot.complete { background: var(--success-green); color: white; }
+        .timeline-phase-dot.active { background: var(--warning-yellow); color: var(--bg-dark); animation: pulse-dot 1.5s infinite; }
+        .timeline-phase-dot.pending { background: var(--bg-card-alt); border: 2px solid var(--border-color); color: var(--text-muted); }
+        @keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); } }
+        .timeline-phase-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-sm); }
+        .timeline-phase-card.active { border-color: var(--warning-yellow); background: rgba(245, 158, 11, 0.05); }
+        .timeline-phase-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .timeline-phase-duration { font-size: 10px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           GO/NO-GO
+        ═══════════════════════════════════════════════════════════════ */
+        .gonogo-container { display: grid; grid-template-columns: 1fr 220px 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .gonogo-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .gonogo-panel.go { border-color: rgba(16, 185, 129, 0.3); }
+        .gonogo-panel.nogo { border-color: rgba(239, 68, 68, 0.3); }
+        .gonogo-panel-header { padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-sm); }
+        .gonogo-panel.go .gonogo-panel-header { background: rgba(16, 185, 129, 0.1); }
+        .gonogo-panel.nogo .gonogo-panel-header { background: rgba(239, 68, 68, 0.1); }
+        .gonogo-panel-title { font-size: var(--font-sm); font-weight: 700; }
+        .gonogo-panel.go .gonogo-panel-title { color: var(--success-green); }
+        .gonogo-panel.nogo .gonogo-panel-title { color: var(--danger-red); }
+        .gonogo-panel-body { padding: var(--space-md); }
+        .gonogo-item { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm); border-radius: var(--radius-md); margin-bottom: var(--space-xs); font-size: var(--font-xs); }
+        .gonogo-panel.go .gonogo-item { background: rgba(16, 185, 129, 0.05); }
+        .gonogo-panel.nogo .gonogo-item { background: rgba(239, 68, 68, 0.05); }
+        .gonogo-item-icon { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+        .gonogo-item-text { color: var(--text-secondary); line-height: 1.4; }
+        
+        .gonogo-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-lg); }
+        .gonogo-gauge { width: 140px; height: 140px; position: relative; margin-bottom: var(--space-lg); }
+        .gonogo-gauge-ring { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--success-green) 0deg 324deg, var(--border-color) 324deg 360deg); display: flex; align-items: center; justify-content: center; }
+        .gonogo-gauge-inner { width: 100px; height: 100px; background: var(--bg-card); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .gonogo-gauge-value { font-size: var(--font-xl); font-weight: 700; color: var(--success-green); }
+        .gonogo-gauge-label { font-size: 10px; color: var(--text-muted); }
+        .gonogo-decision { padding: var(--space-sm) var(--space-xl); background: linear-gradient(135deg, var(--success-green), var(--teal)); border-radius: var(--radius-full); font-size: var(--font-sm); font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RUNBOOK TERMINAL
+        ═══════════════════════════════════════════════════════════════ */
+        .runbook-terminal { background: #0d1117; border: 1px solid #30363d; border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); font-family: 'Monaco', 'Consolas', monospace; }
+        .terminal-header { background: #161b22; padding: var(--space-sm) var(--space-md); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid #30363d; }
+        .terminal-dots { display: flex; gap: var(--space-sm); }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+        .terminal-title { font-size: var(--font-xs); color: #8b949e; }
+        .terminal-version { margin-left: auto; font-size: 10px; color: #6e7681; }
+        
+        .terminal-intro { padding: var(--space-md) var(--space-lg); background: #161b22; border-bottom: 1px solid #30363d; }
+        .terminal-intro p { font-size: var(--font-xs); color: #8b949e; line-height: 1.6; }
+        
+        .terminal-body { padding: var(--space-lg); max-height: 600px; overflow-y: auto; }
+        .terminal-phase { margin-bottom: var(--space-xl); }
+        .terminal-phase:last-child { margin-bottom: 0; }
+        .terminal-phase-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px dashed #30363d; }
+        .terminal-phase-num { color: #58a6ff; font-weight: 700; }
+        .terminal-phase-name { color: #c9d1d9; font-weight: 600; }
+        .terminal-phase-duration { color: #6e7681; font-size: var(--font-xs); }
+        .terminal-phase-status { margin-left: auto; font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); }
+        .terminal-phase-status.complete { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .terminal-phase-status.active { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .terminal-phase-status.pending { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+        
+        .terminal-step { display: flex; align-items: flex-start; gap: var(--space-md); padding: var(--space-sm) 0; }
+        .terminal-step-status { color: var(--success-green); font-size: 14px; flex-shrink: 0; }
+        .terminal-step-status.pending { color: #6e7681; }
+        .terminal-step-content { flex: 1; }
+        .terminal-step-desc { color: #c9d1d9; font-size: var(--font-xs); margin-bottom: 4px; }
+        .terminal-step-cmd { color: #7ee787; font-size: 11px; background: rgba(110, 118, 129, 0.1); padding: 4px 8px; border-radius: var(--radius-sm); display: inline-block; }
+        .terminal-step-cmd::before { content: '$ '; color: #6e7681; }
+        .terminal-step-meta { display: flex; gap: var(--space-md); margin-top: 4px; }
+        .terminal-step-owner { color: #58a6ff; font-size: 10px; }
+        .terminal-step-time { color: #6e7681; font-size: 10px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ROLLBACK EMERGENCY
+        ═══════════════════════════════════════════════════════════════ */
+        .rollback-emergency { background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), var(--bg-card)); border: 2px solid var(--danger-red); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); position: relative; }
+        .rollback-emergency::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: repeating-linear-gradient(90deg, var(--danger-red) 0px, var(--danger-red) 20px, var(--warning-yellow) 20px, var(--warning-yellow) 40px); }
+        
+        .rollback-header { padding: var(--space-lg); background: rgba(239, 68, 68, 0.1); border-bottom: 1px solid rgba(239, 68, 68, 0.3); display: flex; align-items: center; gap: var(--space-lg); }
+        .rollback-header-icon { font-size: 36px; }
+        .rollback-header-content { flex: 1; }
+        .rollback-header-title { font-size: var(--font-lg); font-weight: 700; color: var(--danger-red); }
+        .rollback-header-subtitle { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-xs); }
+        .rollback-rto { text-align: center; padding: var(--space-md) var(--space-lg); background: rgba(239, 68, 68, 0.1); border-radius: var(--radius-lg); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .rollback-rto-value { font-size: var(--font-2xl); font-weight: 700; color: var(--danger-red); font-family: 'Monaco', monospace; }
+        .rollback-rto-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .rollback-body { padding: var(--space-lg); }
+        .rollback-intro { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        
+        .rollback-triggers { margin-bottom: var(--space-xl); }
+        .rollback-triggers-title { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-md); display: flex; align-items: center; gap: var(--space-sm); }
+        .rollback-trigger-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .rollback-trigger { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .rollback-trigger:hover { border-color: var(--danger-red); }
+        .rollback-trigger-icon { font-size: 28px; margin-bottom: var(--space-sm); }
+        .rollback-trigger-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .rollback-trigger-threshold { font-size: 10px; color: var(--danger-red); background: rgba(239, 68, 68, 0.1); padding: 4px 10px; border-radius: var(--radius-sm); display: inline-block; font-family: 'Monaco', monospace; }
+        .rollback-trigger-desc { font-size: 10px; color: var(--text-muted); margin-top: var(--space-sm); }
+        
+        .rollback-procedure { }
+        .rollback-procedure-title { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-md); }
+        .rollback-steps { display: flex; gap: var(--space-xs); align-items: stretch; }
+        .rollback-step { flex: 1; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); position: relative; display: flex; flex-direction: column; }
+        .rollback-step::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: var(--danger-red); font-weight: bold; z-index: 1; }
+        .rollback-step:last-child::after { display: none; }
+        .rollback-step-num { width: 24px; height: 24px; background: var(--danger-red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; margin-bottom: var(--space-sm); }
+        .rollback-step-name { font-size: var(--font-xs); font-weight: 600; margin-bottom: var(--space-xs); }
+        .rollback-step-desc { font-size: 10px; color: var(--text-muted); flex: 1; }
+        .rollback-step-time { font-size: 10px; color: var(--cat-light); margin-top: var(--space-sm); font-family: 'Monaco', monospace; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CHECKLIST
+        ═══════════════════════════════════════════════════════════════ */
+        .checklist-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .checklist-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .checklist-card-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-sm); }
+        .checklist-card-icon { font-size: 18px; }
+        .checklist-card-title { font-size: var(--font-sm); font-weight: 600; flex: 1; }
+        .checklist-card-progress { font-size: 10px; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 600; }
+        .checklist-card-progress.complete { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .checklist-card-progress.pending { background: rgba(139, 148, 158, 0.2); color: var(--text-muted); }
+        .checklist-card-body { padding: var(--space-md); }
+        .checklist-item { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-xs) 0; font-size: var(--font-xs); }
+        .checklist-check { width: 16px; height: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 1px; }
+        .checklist-check.done { background: var(--success-green); color: white; }
+        .checklist-check.pending { background: var(--border-color); }
+        .checklist-text { color: var(--text-secondary); flex: 1; line-height: 1.4; }
+        .checklist-owner { color: var(--cat-light); font-size: 10px; flex-shrink: 0; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COMMUNICATIONS
+        ═══════════════════════════════════════════════════════════════ */
+        .comm-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .comm-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .comm-title { font-size: var(--font-sm); font-weight: 600; }
+        .comm-body { padding: var(--space-lg); }
+        .comm-intro { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        
+        .comm-timeline { display: flex; gap: 0; position: relative; padding-top: 40px; }
+        .comm-timeline::before { content: ''; position: absolute; top: 58px; left: 40px; right: 40px; height: 2px; background: var(--border-color); }
+        .comm-item { flex: 1; text-align: center; position: relative; z-index: 1; }
+        .comm-item-dot { width: 36px; height: 36px; margin: 0 auto var(--space-sm); background: var(--bg-card); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .comm-item-time { font-size: 10px; color: var(--cat-light); font-family: 'Monaco', monospace; margin-bottom: var(--space-xs); }
+        .comm-item-audience { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .comm-item-channel { font-size: 10px; color: var(--text-muted); }
+        .comm-item-msg { font-size: 10px; color: var(--text-secondary); margin-top: var(--space-xs); padding: 0 var(--space-xs); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HYPERCARE
+        ═══════════════════════════════════════════════════════════════ */
+        .hypercare-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .hypercare-header { padding: var(--space-md) var(--space-lg); background: linear-gradient(90deg, rgba(6, 182, 212, 0.15), transparent); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .hypercare-header-icon { font-size: 20px; }
+        .hypercare-header-title { font-size: var(--font-sm); font-weight: 600; }
+        .hypercare-header-duration { margin-left: auto; font-size: var(--font-xs); color: var(--cyan); }
+        .hypercare-body { padding: var(--space-lg); }
+        .hypercare-intro { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .hypercare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .hypercare-item { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .hypercare-item-icon { font-size: 24px; margin-bottom: var(--space-sm); }
+        .hypercare-item-title { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .hypercare-item-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(124,58,237,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 400px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-comment { color: #6A737D; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .gonogo-container { grid-template-columns: 1fr; }
+            .gonogo-center { order: -1; flex-direction: row; gap: var(--space-xl); padding: var(--space-lg); background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-color); margin-bottom: var(--space-lg); }
+            .warroom-grid { grid-template-columns: repeat(2, 1fr); }
+            .rollback-trigger-grid { grid-template-columns: repeat(2, 1fr); }
+            .rollback-steps { flex-direction: column; }
+            .rollback-step::after { display: none; }
+            .checklist-row { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .mission-stats { grid-template-columns: repeat(2, 1fr); }
+            .countdown-display { flex-wrap: wrap; justify-content: center; }
+            .hypercare-grid { grid-template-columns: 1fr; }
+            .overview-intro { grid-template-columns: 1fr; }
+            .overview-highlights { padding-left: 0; border-left: none; border-top: 1px solid var(--border-color); padding-top: var(--space-lg); flex-direction: row; flex-wrap: wrap; }
+            .comm-timeline { flex-wrap: wrap; gap: var(--space-md); padding-top: 0; }
+            .comm-timeline::before { display: none; }
+            .comm-item { flex: 0 0 calc(25% - var(--space-md)); }
+        }
+        @media (max-width: 640px) {
+            .mission-stats { grid-template-columns: 1fr; }
+            .warroom-grid { grid-template-columns: 1fr; }
+            .rollback-trigger-grid { grid-template-columns: 1fr; }
+            .comm-item { flex: 0 0 calc(50% - var(--space-md)); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat13-migration-factory-overview.html">Migration Factory</a>
+        <span class="sep">/</span>
+        <span class="current">Cutover</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔄 Category 13</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat13-migration-factory-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat13-p1-assessment.html"><span class="nav-icon">📋</span> 13.1 Assessment</a></li>
+            <li><a href="cat13-p2-conversion.html"><span class="nav-icon">🔀</span> 13.2 Conversion</a></li>
+            <li><a href="cat13-p3-validation.html"><span class="nav-icon">✅</span> 13.3 Validation</a></li>
+            <li><a href="cat13-p4-cutover.html" class="active"><span class="nav-icon">🚀</span> 13.4 Cutover</a></li>
+            <li><a href="cat13-p5-wave-planning.html"><span class="nav-icon">📊</span> 13.5 Wave Planning</a></li>
+            <li><a href="cat13-p6-tooling.html"><span class="nav-icon">🛠️</span> 13.6 Tooling</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#mission"><span class="nav-icon">🎯</span> Mission Control</a></li>
+            <li><a href="#warroom"><span class="nav-icon">🎖️</span> War Room</a></li>
+            <li><a href="#timeline"><span class="nav-icon">⏱️</span> Timeline</a></li>
+            <li><a href="#gonogo"><span class="nav-icon">🚦</span> Go/No-Go</a></li>
+            <li><a href="#runbook"><span class="nav-icon">💻</span> Runbook</a></li>
+            <li><a href="#rollback"><span class="nav-icon">🚨</span> Rollback</a></li>
+            <li><a href="#checklist"><span class="nav-icon">✅</span> Checklist</a></li>
+            <li><a href="#comms"><span class="nav-icon">📢</span> Communications</a></li>
+            <li><a href="#hypercare"><span class="nav-icon">🩺</span> Hypercare</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- MISSION CONTROL -->
+        <section class="mission-control" id="mission">
+            <div class="mission-header">
+                <div class="mission-title-area">
+                    <div class="mission-badge"><span class="mission-badge-dot"></span> LIVE CUTOVER</div>
+                    <span class="mission-label">Mission Control</span>
+                </div>
+                <div class="mission-date">📅 January 15, 2026 • Saturday 10:00 PM PST</div>
+            </div>
+            <div class="mission-body">
+                <div class="countdown-section">
+                    <div class="countdown-label">Time Until Go-Live</div>
+                    <div class="countdown-display">
+                        <div class="countdown-unit">
+                            <div class="countdown-value" id="days">14</div>
+                            <div class="countdown-text">Days</div>
+                        </div>
+                        <span class="countdown-colon">:</span>
+                        <div class="countdown-unit">
+                            <div class="countdown-value" id="hours">08</div>
+                            <div class="countdown-text">Hours</div>
+                        </div>
+                        <span class="countdown-colon">:</span>
+                        <div class="countdown-unit">
+                            <div class="countdown-value" id="mins">32</div>
+                            <div class="countdown-text">Minutes</div>
+                        </div>
+                        <span class="countdown-colon">:</span>
+                        <div class="countdown-unit">
+                            <div class="countdown-value" id="secs">47</div>
+                            <div class="countdown-text">Seconds</div>
+                        </div>
+                    </div>
+                    <div class="mission-actions">
+                        <button class="btn-launch">🚀 Initiate Cutover</button>
+                        <button class="btn-abort">⛔ Abort Mission</button>
+                    </div>
+                </div>
+                <div class="mission-stats">
+                    <div class="mission-stat">
+                        <div class="mission-stat-value green">4 hrs</div>
+                        <div class="mission-stat-label">Planned Cutover Window</div>
+                    </div>
+                    <div class="mission-stat">
+                        <div class="mission-stat-value yellow">45 min</div>
+                        <div class="mission-stat-label">Rollback Recovery Time</div>
+                    </div>
+                    <div class="mission-stat">
+                        <div class="mission-stat-value blue">99.9%</div>
+                        <div class="mission-stat-label">Target Success Rate</div>
+                    </div>
+                    <div class="mission-stat">
+                        <div class="mission-stat-value purple">3x</div>
+                        <div class="mission-stat-label">Dry Runs Completed</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Cutover Overview</h2>
+                    <p>Orchestrated transition from legacy to modern platform</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p><strong>Cutover</strong> is the carefully orchestrated transition from the source data platform to the target Databricks environment. This is the culmination of weeks of assessment, conversion, and validation work—the moment when the new platform goes live and business operations switch over.</p>
+                    <p>Success requires meticulous planning, clear communication, and extensively tested rollback procedures. Every step is documented in the runbook, and a dedicated war room monitors execution in real-time. The goal is <strong>zero unplanned downtime</strong> and seamless business continuity.</p>
+                    <p>The cutover follows a <strong>blue-green deployment</strong> strategy: the target environment runs in parallel during final sync, then traffic is switched atomically. If issues arise, we can instantly revert to the source system within the rollback window.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📅</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">Weekend</span>
+                            <span class="highlight-label">Low-Traffic Window</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">👥</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">24/7</span>
+                            <span class="highlight-label">War Room Coverage</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔙</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">< 1 hr</span>
+                            <span class="highlight-label">Rollback RTO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- WAR ROOM -->
+        <section class="module" id="warroom">
+            <div class="module-header">
+                <div class="module-icon">🎖️</div>
+                <div class="module-info">
+                    <h2>War Room Command Team</h2>
+                    <p>Key personnel for cutover execution</p>
+                </div>
+            </div>
+            
+            <div class="warroom-container">
+                <div class="warroom-header">
+                    <span class="warroom-header-icon">🎖️</span>
+                    <span class="warroom-header-title">Command Center</span>
+                    <span class="warroom-header-status">All Systems Operational</span>
+                </div>
+                <div class="warroom-body">
+                    <p class="warroom-intro">The war room is staffed continuously from T-2 hours through post-cutover validation. Each lead has clear responsibilities and escalation authority. The Cutover Lead has final go/no-go authority, while each functional lead owns their domain's readiness and execution.</p>
+                    <div class="warroom-grid">
+                        <div class="warroom-member">
+                            <div class="warroom-avatar lead">👔</div>
+                            <div class="warroom-info">
+                                <div class="warroom-role">Cutover Lead</div>
+                                <div class="warroom-name">Sarah Chen</div>
+                                <div class="warroom-resp">Go/No-Go authority, escalation</div>
+                            </div>
+                            <div class="warroom-status"></div>
+                        </div>
+                        <div class="warroom-member">
+                            <div class="warroom-avatar platform">🔧</div>
+                            <div class="warroom-info">
+                                <div class="warroom-role">Platform Lead</div>
+                                <div class="warroom-name">Mike Rodriguez</div>
+                                <div class="warroom-resp">Databricks infra, DNS, clusters</div>
+                            </div>
+                            <div class="warroom-status"></div>
+                        </div>
+                        <div class="warroom-member">
+                            <div class="warroom-avatar data">📊</div>
+                            <div class="warroom-info">
+                                <div class="warroom-role">Data Lead</div>
+                                <div class="warroom-name">Priya Patel</div>
+                                <div class="warroom-resp">CDC sync, validation, recon</div>
+                            </div>
+                            <div class="warroom-status"></div>
+                        </div>
+                        <div class="warroom-member">
+                            <div class="warroom-avatar business">💼</div>
+                            <div class="warroom-info">
+                                <div class="warroom-role">Business Lead</div>
+                                <div class="warroom-name">James Wilson</div>
+                                <div class="warroom-resp">UAT sign-off, stakeholder comms</div>
+                            </div>
+                            <div class="warroom-status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TIMELINE -->
+        <section class="module" id="timeline">
+            <div class="module-header">
+                <div class="module-icon">⏱️</div>
+                <div class="module-info">
+                    <h2>Cutover Timeline</h2>
+                    <p>Hour-by-hour execution schedule</p>
+                </div>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <div class="timeline-title">📅 Execution Timeline</div>
+                    <div class="timeline-date">Saturday Jan 15 → Sunday Jan 16, 2026</div>
+                </div>
+                <div class="timeline-body">
+                    <p class="timeline-intro">The cutover is scheduled during the lowest-traffic weekend window. The war room opens 2 hours before cutover start for final preparations. Each phase has specific entry/exit criteria, and the timeline includes 30-minute buffer for unexpected issues. All times are PST.</p>
+                    <div class="timeline-track">
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">8:00 PM</div>
+                            <div class="timeline-phase-dot complete">✓</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">War Room Opens</div>
+                                <div class="timeline-phase-duration">Team assembly</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">10:00 PM</div>
+                            <div class="timeline-phase-dot active">●</div>
+                            <div class="timeline-phase-card active">
+                                <div class="timeline-phase-name">Go/No-Go</div>
+                                <div class="timeline-phase-duration">15 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">10:15 PM</div>
+                            <div class="timeline-phase-dot pending">○</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">Source Freeze</div>
+                                <div class="timeline-phase-duration">15 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">10:30 PM</div>
+                            <div class="timeline-phase-dot pending">○</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">Final CDC Sync</div>
+                                <div class="timeline-phase-duration">60 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">11:30 PM</div>
+                            <div class="timeline-phase-dot pending">○</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">Validation</div>
+                                <div class="timeline-phase-duration">60 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">12:30 AM</div>
+                            <div class="timeline-phase-dot pending">○</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">DNS Switch</div>
+                                <div class="timeline-phase-duration">15 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">12:45 AM</div>
+                            <div class="timeline-phase-dot pending">○</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">Smoke Tests</div>
+                                <div class="timeline-phase-duration">45 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-phase">
+                            <div class="timeline-phase-time">1:30 AM</div>
+                            <div class="timeline-phase-dot pending">○</div>
+                            <div class="timeline-phase-card">
+                                <div class="timeline-phase-name">Complete ✓</div>
+                                <div class="timeline-phase-duration">Hypercare begins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- GO/NO-GO -->
+        <section class="module" id="gonogo">
+            <div class="module-header">
+                <div class="module-icon">🚦</div>
+                <div class="module-info">
+                    <h2>Go/No-Go Decision</h2>
+                    <p>Criteria evaluation for cutover approval</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The go/no-go decision is made at T-0 (cutover start time) based on objective criteria. <strong>All "Go" criteria must be met</strong> to proceed. If any single "No-Go" condition exists, cutover is postponed to the next available window (typically 1 week later).</p>
+                    <p>The Cutover Lead has final authority but must document any decision to override criteria with explicit risk acceptance. Escalation to the Steering Committee is required if there's disagreement among leads or if proceeding with known risks.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">✅</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">12/12</span>
+                            <span class="highlight-label">Go Criteria Met</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🚫</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">0</span>
+                            <span class="highlight-label">No-Go Blockers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gonogo-container">
+                <div class="gonogo-panel go">
+                    <div class="gonogo-panel-header">
+                        <span>✅</span>
+                        <span class="gonogo-panel-title">GO Criteria (All Required)</span>
+                    </div>
+                    <div class="gonogo-panel-body">
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Validation test suite passing at 99.5%+ threshold with zero critical failures</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Zero open P0/P1 defects; all P2 defects have documented workarounds</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Data reconciliation shows 100% match on row counts and checksums</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Performance benchmarks meet or exceed baseline SLAs (p95 latency)</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Rollback procedure tested successfully within last 48 hours</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">All war room team members present and confirmed available</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Business sign-off obtained from all stakeholder groups</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Source system stable with no active incidents in past 24 hours</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Target Databricks clusters healthy with adequate capacity provisioned</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Stakeholder notification sent and acknowledged</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">Pre-cutover backup/snapshot completed and verified</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">✓</span><span class="gonogo-item-text">On-call support confirmed for 72-hour hypercare period</span></div>
+                    </div>
+                </div>
+                
+                <div class="gonogo-center">
+                    <div class="gonogo-gauge">
+                        <div class="gonogo-gauge-ring">
+                            <div class="gonogo-gauge-inner">
+                                <div class="gonogo-gauge-value">12/12</div>
+                                <div class="gonogo-gauge-label">Criteria Met</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gonogo-decision">✓ GO</div>
+                </div>
+                
+                <div class="gonogo-panel nogo">
+                    <div class="gonogo-panel-header">
+                        <span>🚫</span>
+                        <span class="gonogo-panel-title">NO-GO Triggers (Any Blocks)</span>
+                    </div>
+                    <div class="gonogo-panel-body">
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Any P0 (critical) or P1 (high) severity defect remains unresolved</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Data variance exceeds 0.01% on any critical table reconciliation</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Active P1+ incident on source or target platform</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Any key war room team member unavailable without qualified backup</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Rollback procedure not tested within the last 48 hours</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Business stakeholder explicitly withholds sign-off</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Critical external dependency (network, cloud, third-party) unavailable</span></div>
+                        <div class="gonogo-item"><span class="gonogo-item-icon">⚠️</span><span class="gonogo-item-text">Infrastructure concerns: weather events, power issues at data center</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RUNBOOK -->
+        <section class="module" id="runbook">
+            <div class="module-header">
+                <div class="module-icon">💻</div>
+                <div class="module-info">
+                    <h2>Execution Runbook</h2>
+                    <p>Step-by-step commands with real-time status</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The runbook provides <strong>exact commands and verification steps</strong> for each phase of cutover. Every step has an assigned owner, expected duration, and explicit success criteria. The runbook is version-controlled and requires review before each execution.</p>
+                    <p>Deviations from the runbook require approval from the Cutover Lead. Any command that fails should trigger the issue escalation process before proceeding. All commands are idempotent where possible, allowing safe retry.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📄</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">v3.2</span>
+                            <span class="highlight-label">Runbook Version</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🧪</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">3x</span>
+                            <span class="highlight-label">Dry Runs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="runbook-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                    <div class="terminal-title">cutover-runbook.sh</div>
+                    <div class="terminal-version">v3.2 | Last updated: Jan 10, 2026</div>
+                </div>
+                <div class="terminal-intro">
+                    <p>Execute each step in sequence. Verify success criteria before proceeding. If any step fails, halt and escalate to Cutover Lead before continuing. Use Ctrl+C to abort current operation if needed.</p>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-phase">
+                        <div class="terminal-phase-header">
+                            <span class="terminal-phase-num">[PHASE 1]</span>
+                            <span class="terminal-phase-name">Preparation</span>
+                            <span class="terminal-phase-duration">~30 min</span>
+                            <span class="terminal-phase-status complete">COMPLETE</span>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status">✓</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Verify all Databricks clusters are running and healthy</div>
+                                <div class="terminal-step-cmd">databricks clusters list --output json | jq '.[] | select(.state=="RUNNING")'</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@platform</span><span class="terminal-step-time">~2 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status">✓</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Create pre-cutover snapshot with timestamp tag for rollback</div>
+                                <div class="terminal-step-cmd">./scripts/snapshot.sh --tag "pre-cutover-$(date +%Y%m%d-%H%M)" --verify</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@dba</span><span class="terminal-step-time">~15 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status">✓</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Broadcast cutover start notification to all stakeholders</div>
+                                <div class="terminal-step-cmd">./scripts/notify.sh --template cutover_start --channels "slack,email,pagerduty"</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@pm</span><span class="terminal-step-time">~1 min</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-phase">
+                        <div class="terminal-phase-header">
+                            <span class="terminal-phase-num">[PHASE 2]</span>
+                            <span class="terminal-phase-name">Source Freeze & Sync</span>
+                            <span class="terminal-phase-duration">~75 min</span>
+                            <span class="terminal-phase-status active">IN PROGRESS</span>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Drain active connections and freeze source system writes</div>
+                                <div class="terminal-step-cmd">./scripts/freeze_source.sh --drain-timeout 300 --block-new --verify</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@dba</span><span class="terminal-step-time">~10 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Capture final CDC timestamp and execute last delta sync</div>
+                                <div class="terminal-step-cmd">./scripts/cdc_sync.sh --mode final --verify-checksum --parallel 8</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@data</span><span class="terminal-step-time">~45 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Verify row counts match between source and target</div>
+                                <div class="terminal-step-cmd">./scripts/recon.sh --mode rowcount --threshold 0 --output json</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@data</span><span class="terminal-step-time">~10 min</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-phase">
+                        <div class="terminal-phase-header">
+                            <span class="terminal-phase-num">[PHASE 3]</span>
+                            <span class="terminal-phase-name">Validation</span>
+                            <span class="terminal-phase-duration">~60 min</span>
+                            <span class="terminal-phase-status pending">PENDING</span>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Execute critical path validation test suite</div>
+                                <div class="terminal-step-cmd">pytest tests/cutover/critical/ -v --tb=short --junit-xml=results/cutover.xml</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@qa</span><span class="terminal-step-time">~30 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Run full data reconciliation with checksum verification</div>
+                                <div class="terminal-step-cmd">./scripts/recon.sh --mode full --checksum --threshold 0.001 --critical-tables</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@data</span><span class="terminal-step-time">~20 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Verify critical business reports generate correctly</div>
+                                <div class="terminal-step-cmd">./scripts/verify_reports.sh --manifest reports/critical.yaml --compare-baseline</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@business</span><span class="terminal-step-time">~10 min</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-phase">
+                        <div class="terminal-phase-header">
+                            <span class="terminal-phase-num">[PHASE 4]</span>
+                            <span class="terminal-phase-name">Traffic Switch</span>
+                            <span class="terminal-phase-duration">~30 min</span>
+                            <span class="terminal-phase-status pending">PENDING</span>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Update DNS records to point to Databricks endpoints</div>
+                                <div class="terminal-step-cmd">./scripts/dns_switch.sh --target databricks-prod --ttl 60 --verify-propagation</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@platform</span><span class="terminal-step-time">~10 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Execute production smoke tests on live system</div>
+                                <div class="terminal-step-cmd">./scripts/smoke_tests.sh --env production --critical-only --timeout 300</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@qa</span><span class="terminal-step-time">~15 min</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-phase">
+                        <div class="terminal-phase-header">
+                            <span class="terminal-phase-num">[PHASE 5]</span>
+                            <span class="terminal-phase-name">Completion</span>
+                            <span class="terminal-phase-duration">~15 min</span>
+                            <span class="terminal-phase-status pending">PENDING</span>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Declare cutover success and notify all stakeholders</div>
+                                <div class="terminal-step-cmd">./scripts/notify.sh --template cutover_success --channels "slack,email,pagerduty"</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@lead</span><span class="terminal-step-time">~2 min</span></div>
+                            </div>
+                        </div>
+                        <div class="terminal-step">
+                            <span class="terminal-step-status pending">○</span>
+                            <div class="terminal-step-content">
+                                <div class="terminal-step-desc">Enable hypercare monitoring with elevated alert thresholds</div>
+                                <div class="terminal-step-cmd">./scripts/hypercare.sh --enable --duration 72h --escalation critical</div>
+                                <div class="terminal-step-meta"><span class="terminal-step-owner">@ops</span><span class="terminal-step-time">~5 min</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ROLLBACK -->
+        <section class="module" id="rollback">
+            <div class="module-header">
+                <div class="module-icon">🚨</div>
+                <div class="module-info">
+                    <h2>Rollback Plan</h2>
+                    <p>Emergency recovery procedures</p>
+                </div>
+            </div>
+            
+            <div class="rollback-emergency">
+                <div class="rollback-header">
+                    <div class="rollback-header-icon">⚠️</div>
+                    <div class="rollback-header-content">
+                        <div class="rollback-header-title">Emergency Rollback Procedure</div>
+                        <div class="rollback-header-subtitle">Tested 3x in staging environment • Last successful test: January 10, 2026 • Avg execution: 42 minutes</div>
+                    </div>
+                    <div class="rollback-rto">
+                        <div class="rollback-rto-value">45:00</div>
+                        <div class="rollback-rto-label">Max Recovery Time</div>
+                    </div>
+                </div>
+                <div class="rollback-body">
+                    <p class="rollback-intro">Rollback is the safety net that allows instant reversion to the source system if critical issues are discovered during or after cutover. The rollback window extends until Monday 6 AM (business hours start). After this window, rollback requires extended downtime and data reconciliation. Any team member can raise a rollback concern, but the Cutover Lead makes the final decision within 15 minutes of issue detection.</p>
+                    
+                    <div class="rollback-triggers">
+                        <div class="rollback-triggers-title">🚨 Automatic Rollback Triggers</div>
+                        <div class="rollback-trigger-grid">
+                            <div class="rollback-trigger">
+                                <div class="rollback-trigger-icon">📊</div>
+                                <div class="rollback-trigger-name">Data Variance</div>
+                                <div class="rollback-trigger-threshold">> 0.1%</div>
+                                <div class="rollback-trigger-desc">Row count or checksum mismatch on critical tables</div>
+                            </div>
+                            <div class="rollback-trigger">
+                                <div class="rollback-trigger-icon">🐛</div>
+                                <div class="rollback-trigger-name">Critical Defect</div>
+                                <div class="rollback-trigger-threshold">Any P0</div>
+                                <div class="rollback-trigger-desc">Data corruption, wrong results, or security issue</div>
+                            </div>
+                            <div class="rollback-trigger">
+                                <div class="rollback-trigger-icon">⏱️</div>
+                                <div class="rollback-trigger-name">Performance</div>
+                                <div class="rollback-trigger-threshold">> 3x baseline</div>
+                                <div class="rollback-trigger-desc">Query latency exceeds 3x source system p95</div>
+                            </div>
+                            <div class="rollback-trigger">
+                                <div class="rollback-trigger-icon">💥</div>
+                                <div class="rollback-trigger-name">System Failure</div>
+                                <div class="rollback-trigger-threshold">Unresponsive</div>
+                                <div class="rollback-trigger-desc">Cluster crash, network partition, or total outage</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rollback-procedure">
+                        <div class="rollback-procedure-title">🔄 Rollback Execution Steps</div>
+                        <div class="rollback-steps">
+                            <div class="rollback-step">
+                                <div class="rollback-step-num">1</div>
+                                <div class="rollback-step-name">Declare Rollback</div>
+                                <div class="rollback-step-desc">Lead announces decision, notifies war room and stakeholders immediately</div>
+                                <div class="rollback-step-time">~2 min</div>
+                            </div>
+                            <div class="rollback-step">
+                                <div class="rollback-step-num">2</div>
+                                <div class="rollback-step-name">Revert DNS</div>
+                                <div class="rollback-step-desc">Switch traffic back to source system, drain target connections</div>
+                                <div class="rollback-step-time">~5 min</div>
+                            </div>
+                            <div class="rollback-step">
+                                <div class="rollback-step-num">3</div>
+                                <div class="rollback-step-name">Unfreeze Source</div>
+                                <div class="rollback-step-desc">Re-enable write operations on source database</div>
+                                <div class="rollback-step-time">~5 min</div>
+                            </div>
+                            <div class="rollback-step">
+                                <div class="rollback-step-num">4</div>
+                                <div class="rollback-step-name">Smoke Test</div>
+                                <div class="rollback-step-desc">Verify source system operational, critical queries working</div>
+                                <div class="rollback-step-time">~15 min</div>
+                            </div>
+                            <div class="rollback-step">
+                                <div class="rollback-step-num">5</div>
+                                <div class="rollback-step-name">RCA & Plan</div>
+                                <div class="rollback-step-desc">Root cause analysis, remediation plan, reschedule cutover</div>
+                                <div class="rollback-step-time">~30+ min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CHECKLIST -->
+        <section class="module" id="checklist">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Cutover Checklist</h2>
+                    <p>Pre, during, and post-cutover task tracking</p>
+                </div>
+            </div>
+            
+            <div class="checklist-row">
+                <div class="checklist-card">
+                    <div class="checklist-card-header">
+                        <span class="checklist-card-icon">📋</span>
+                        <span class="checklist-card-title">Pre-Cutover (T-24h)</span>
+                        <span class="checklist-card-progress complete">12/12</span>
+                    </div>
+                    <div class="checklist-card-body">
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">Final validation test suite passed with 99.7% success rate</span><span class="checklist-owner">QA</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">Runbook v3.2 reviewed and approved by all leads</span><span class="checklist-owner">Lead</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">Rollback procedure tested successfully in staging (42 min)</span><span class="checklist-owner">Platform</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">War room bridge scheduled and calendar invites sent</span><span class="checklist-owner">PM</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">T-7 day stakeholder communication sent and acknowledged</span><span class="checklist-owner">PM</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">On-call roster confirmed for 72-hour hypercare period</span><span class="checklist-owner">Ops</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">Databricks clusters pre-scaled for cutover load</span><span class="checklist-owner">Platform</span></div>
+                        <div class="checklist-item"><span class="checklist-check done">✓</span><span class="checklist-text">Business sign-off documents collected from all stakeholders</span><span class="checklist-owner">Business</span></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-card">
+                    <div class="checklist-card-header">
+                        <span class="checklist-card-icon">🔄</span>
+                        <span class="checklist-card-title">During Cutover</span>
+                        <span class="checklist-card-progress pending">0/12</span>
+                    </div>
+                    <div class="checklist-card-body">
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Go/No-Go decision documented with all criteria verified</span><span class="checklist-owner">Lead</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Pre-cutover snapshot created and verified recoverable</span><span class="checklist-owner">DBA</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Source system frozen, all connections drained</span><span class="checklist-owner">DBA</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Final CDC sync completed with verification</span><span class="checklist-owner">Data</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Row count reconciliation shows 100% match</span><span class="checklist-owner">Data</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Checksum validation passed on all critical tables</span><span class="checklist-owner">Data</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Post-sync validation test suite passed</span><span class="checklist-owner">QA</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">DNS switched to target, propagation verified</span><span class="checklist-owner">Platform</span></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-card">
+                    <div class="checklist-card-header">
+                        <span class="checklist-card-icon">🎯</span>
+                        <span class="checklist-card-title">Post-Cutover</span>
+                        <span class="checklist-card-progress pending">0/10</span>
+                    </div>
+                    <div class="checklist-card-body">
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Production smoke tests passed on live system</span><span class="checklist-owner">QA</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Cutover success notification sent to all stakeholders</span><span class="checklist-owner">PM</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Hypercare monitoring enabled with elevated alerts</span><span class="checklist-owner">Ops</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Monday AM business validation completed successfully</span><span class="checklist-owner">Business</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Business users confirm reports and dashboards working</span><span class="checklist-owner">Business</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">72-hour hypercare period completed without P0/P1</span><span class="checklist-owner">Ops</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Source system decommission plan scheduled</span><span class="checklist-owner">DBA</span></div>
+                        <div class="checklist-item"><span class="checklist-check pending"></span><span class="checklist-text">Post-mortem/retrospective meeting scheduled</span><span class="checklist-owner">PM</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- COMMUNICATIONS -->
+        <section class="module" id="comms">
+            <div class="module-header">
+                <div class="module-icon">📢</div>
+                <div class="module-info">
+                    <h2>Communication Plan</h2>
+                    <p>Stakeholder notifications throughout cutover</p>
+                </div>
+            </div>
+            
+            <div class="comm-container">
+                <div class="comm-header">
+                    <div class="comm-title">📢 Communication Timeline</div>
+                </div>
+                <div class="comm-body">
+                    <p class="comm-intro">Clear, timely communication is critical for cutover success. Each notification has a predefined template, distribution list, and delivery channel. The PM owns communication execution, but the Cutover Lead approves all messages before sending. Stakeholders should acknowledge receipt of critical notifications.</p>
+                    <div class="comm-timeline">
+                        <div class="comm-item">
+                            <div class="comm-item-dot">📅</div>
+                            <div class="comm-item-time">T-7 days</div>
+                            <div class="comm-item-audience">All Stakeholders</div>
+                            <div class="comm-item-channel">Email + Slack</div>
+                            <div class="comm-item-msg">Cutover scheduled, maintenance window</div>
+                        </div>
+                        <div class="comm-item">
+                            <div class="comm-item-dot">⚙️</div>
+                            <div class="comm-item-time">T-24h</div>
+                            <div class="comm-item-audience">Technical Teams</div>
+                            <div class="comm-item-channel">Slack #cutover</div>
+                            <div class="comm-item-msg">Final checklist, war room details</div>
+                        </div>
+                        <div class="comm-item">
+                            <div class="comm-item-dot">👥</div>
+                            <div class="comm-item-time">T-2h</div>
+                            <div class="comm-item-audience">War Room</div>
+                            <div class="comm-item-channel">Zoom Bridge</div>
+                            <div class="comm-item-msg">Team assembly, final prep</div>
+                        </div>
+                        <div class="comm-item">
+                            <div class="comm-item-dot">🚀</div>
+                            <div class="comm-item-time">T-0</div>
+                            <div class="comm-item-audience">All Stakeholders</div>
+                            <div class="comm-item-channel">Email + Slack</div>
+                            <div class="comm-item-msg">Cutover started, system in maintenance</div>
+                        </div>
+                        <div class="comm-item">
+                            <div class="comm-item-dot">📊</div>
+                            <div class="comm-item-time">T+2h</div>
+                            <div class="comm-item-audience">Executives</div>
+                            <div class="comm-item-channel">Email</div>
+                            <div class="comm-item-msg">Status update, validation progress</div>
+                        </div>
+                        <div class="comm-item">
+                            <div class="comm-item-dot">✅</div>
+                            <div class="comm-item-time">T+4h</div>
+                            <div class="comm-item-audience">All Stakeholders</div>
+                            <div class="comm-item-channel">Email + Slack</div>
+                            <div class="comm-item-msg">Cutover complete, system live</div>
+                        </div>
+                        <div class="comm-item">
+                            <div class="comm-item-dot">☀️</div>
+                            <div class="comm-item-time">Mon AM</div>
+                            <div class="comm-item-audience">Business Users</div>
+                            <div class="comm-item-channel">Email</div>
+                            <div class="comm-item-msg">New system live, support contacts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- HYPERCARE -->
+        <section class="module" id="hypercare">
+            <div class="module-header">
+                <div class="module-icon">🩺</div>
+                <div class="module-info">
+                    <h2>Hypercare Period</h2>
+                    <p>Enhanced monitoring and support post-cutover</p>
+                </div>
+            </div>
+            
+            <div class="hypercare-container">
+                <div class="hypercare-header">
+                    <span class="hypercare-header-icon">🩺</span>
+                    <span class="hypercare-header-title">72-Hour Hypercare</span>
+                    <span class="hypercare-header-duration">Sun 2 AM → Wed 2 AM</span>
+                </div>
+                <div class="hypercare-body">
+                    <p class="hypercare-intro">Hypercare is the 72-hour period immediately following cutover with elevated monitoring, faster SLAs, and dedicated support coverage. During this period, alert thresholds are lowered, response times are accelerated, and the migration team remains on-call for immediate issue resolution. Rollback remains possible during the first 24 hours with minimal data loss.</p>
+                    <div class="hypercare-grid">
+                        <div class="hypercare-item">
+                            <div class="hypercare-item-icon">📊</div>
+                            <div class="hypercare-item-title">Enhanced Monitoring</div>
+                            <div class="hypercare-item-desc">Query latency, error rates, and resource utilization tracked at 1-minute intervals with 50% lower alert thresholds than normal operations.</div>
+                        </div>
+                        <div class="hypercare-item">
+                            <div class="hypercare-item-icon">⚡</div>
+                            <div class="hypercare-item-title">Accelerated Response</div>
+                            <div class="hypercare-item-desc">P0 response in 5 minutes (vs 15 min normal), P1 in 15 minutes (vs 1 hour normal). On-call engineer responds immediately to any alert.</div>
+                        </div>
+                        <div class="hypercare-item">
+                            <div class="hypercare-item-icon">👥</div>
+                            <div class="hypercare-item-title">Dedicated Support</div>
+                            <div class="hypercare-item-desc">Migration team on-call 24/7 with 15-minute response commitment. Daily standup at 9 AM to review overnight issues and metrics.</div>
+                        </div>
+                        <div class="hypercare-item">
+                            <div class="hypercare-item-icon">📝</div>
+                            <div class="hypercare-item-title">Issue Tracking</div>
+                            <div class="hypercare-item-desc">All issues logged in dedicated tracker with root cause analysis. Daily summary report sent to stakeholders at 6 PM.</div>
+                        </div>
+                        <div class="hypercare-item">
+                            <div class="hypercare-item-icon">🔙</div>
+                            <div class="hypercare-item-title">Rollback Window</div>
+                            <div class="hypercare-item-desc">Full rollback possible in first 24 hours with < 1 hour of data loss. After 24 hours, rollback requires extended maintenance window.</div>
+                        </div>
+                        <div class="hypercare-item">
+                            <div class="hypercare-item-icon">✅</div>
+                            <div class="hypercare-item-title">Exit Criteria</div>
+                            <div class="hypercare-item-desc">Hypercare ends when: zero P0/P1 in 48 hours, all SLAs met, business validation complete, and stakeholders sign off.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered cutover orchestration</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🚀</div>
+                    <div class="agent-name">CutoverAgent</div>
+                    <div class="agent-role">Orchestration & Monitoring</div>
+                    <p class="agent-desc">Orchestrates cutover execution by automating runbook steps, monitoring system health in real-time, validating success criteria at each checkpoint, and triggering automated rollback if predefined thresholds are exceeded. Provides continuous status updates to the war room and stakeholders.</p>
+                    <ul class="agent-capabilities">
+                        <li>Runbook step orchestration with dependency tracking</li>
+                        <li>Real-time health monitoring across source and target</li>
+                        <li>Automated validation checkpoint execution</li>
+                        <li>Rollback trigger detection and automated initiation</li>
+                        <li>Stakeholder notification via Slack, email, PagerDuty</li>
+                        <li>Timeline tracking with ETA updates</li>
+                        <li>Post-cutover metrics collection and reporting</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">cutover_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Cutover Orchestration Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Tool
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> databricks.sdk <span class="code-keyword">import</span> WorkspaceClient
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+dbx = WorkspaceClient()
+
+<span class="code-comment"># Runbook step executor with validation</span>
+runbook_executor = Tool(
+    name=<span class="code-string">"runbook_executor"</span>,
+    description=<span class="code-string">"Executes runbook steps in sequence,
+    validates success criteria before proceeding"</span>,
+    func=execute_runbook_step
+)
+
+<span class="code-comment"># Real-time system health monitor</span>
+health_monitor = Tool(
+    name=<span class="code-string">"health_monitor"</span>,
+    description=<span class="code-string">"Monitors cluster health, query 
+    latency, error rates, and resource metrics"</span>,
+    func=monitor_system_health
+)
+
+<span class="code-comment"># Automated rollback trigger</span>
+rollback_trigger = Tool(
+    name=<span class="code-string">"rollback_trigger"</span>,
+    description=<span class="code-string">"Evaluates rollback conditions and
+    initiates automated recovery if needed"</span>,
+    func=evaluate_and_rollback
+)
+
+<span class="code-comment"># Multi-channel notification system</span>
+notifier = Tool(
+    name=<span class="code-string">"notifier"</span>,
+    description=<span class="code-string">"Sends status updates via Slack,
+    email, and PagerDuty based on severity"</span>,
+    func=send_notification
+)
+
+cutover_agent = Agent(
+    role=<span class="code-string">"Cutover Orchestration Specialist"</span>,
+    goal=<span class="code-string">"Execute zero-downtime migration with
+    automated monitoring and instant rollback"</span>,
+    backstory=<span class="code-string">"""Expert DevOps engineer with 
+    extensive experience in zero-downtime 
+    migrations and automated recovery."""</span>,
+    llm=llm,
+    tools=[runbook_executor, health_monitor, 
+           rollback_trigger, notifier],
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat13-p3-validation.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">13.3: Validation</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 13</div>
+        <a href="cat13-p5-wave-planning.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">13.5: Wave Planning</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+<script>
+// Countdown Timer
+function updateCountdown() {
+    const targetDate = new Date('2026-01-15T22:00:00-08:00');
+    const now = new Date();
+    const diff = targetDate - now;
+    
+    if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('mins').textContent = String(mins).padStart(2, '0');
+        document.getElementById('secs').textContent = String(secs).padStart(2, '0');
+    }
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// Button interactions
+document.querySelector('.btn-abort').addEventListener('click', function() {
+    if (confirm('⚠️ ABORT MISSION?\n\nThis will cancel the cutover and notify all stakeholders.\n\nAre you sure you want to abort?')) {
+        alert('Mission aborted. All stakeholders will be notified.');
+    }
+});
+
+document.querySelector('.btn-launch').addEventListener('click', function() {
+    alert('🚀 Cutover sequence initiated!\n\nProceeding with Phase 1: Preparation');
+});
+</script>
+
+</body>
+</html>

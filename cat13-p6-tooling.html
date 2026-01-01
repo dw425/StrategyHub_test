@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tooling | Migration Factory | Category 13 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #7C3AED;
+            --cat-light: #A78BFA;
+            --cat-dark: #6D28D9;
+            --cat-glow: rgba(124, 58, 237, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px; --font-3xl: 48px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: var(--space-2xl) var(--space-xl); }
+        
+        .module { margin-bottom: var(--space-3xl); }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Hero */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+
+        /* Section Intro */
+        .section-intro { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .section-intro p { color: var(--text-secondary); line-height: 1.8; margin-bottom: var(--space-md); }
+        .section-intro p:last-child { margin-bottom: 0; }
+
+        /* Overview Intro */
+        .overview-intro { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); }
+        .overview-text p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; }
+        .overview-text p:last-child { margin-bottom: 0; }
+        .overview-highlights { display: flex; flex-direction: column; gap: var(--space-md); padding-left: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .highlight-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); background: var(--bg-card-alt); border-radius: var(--radius-lg); }
+        .highlight-icon { font-size: 24px; }
+        .highlight-value { font-size: var(--font-lg); font-weight: 700; color: var(--cat-light); display: block; }
+        .highlight-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOL STACK OVERVIEW
+        ═══════════════════════════════════════════════════════════════ */
+        .stack-diagram { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .stack-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .stack-title { font-size: var(--font-sm); font-weight: 600; }
+        .stack-body { padding: var(--space-lg); }
+        
+        .stack-layers { display: flex; flex-direction: column; gap: var(--space-md); }
+        .stack-layer { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .stack-layer-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .stack-layer-icon { font-size: 18px; }
+        .stack-layer-name { font-size: var(--font-sm); font-weight: 600; }
+        .stack-layer-desc { font-size: var(--font-xs); color: var(--text-muted); margin-left: auto; }
+        .stack-layer-tools { padding: var(--space-md); display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+        .stack-tool { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: var(--font-xs); transition: all 0.2s; }
+        .stack-tool:hover { border-color: var(--cat-primary); }
+        .stack-tool-logo { width: 20px; height: 20px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; }
+        .stack-tool-logo.databricks { background: #FF3621; }
+        .stack-tool-logo.python { background: #3776AB; }
+        .stack-tool-logo.spark { background: #E25A1C; }
+        .stack-tool-logo.delta { background: #00ADD8; }
+        .stack-tool-logo.unity { background: #7C3AED; }
+        .stack-tool-logo.git { background: #F05032; }
+        .stack-tool-logo.terraform { background: #7B42BC; }
+        .stack-tool-logo.jenkins { background: #D24939; }
+        .stack-tool-logo.pytest { background: #0A9EDC; }
+        .stack-tool-logo.dbt { background: #FF694B; }
+        .stack-tool-logo.airflow { background: #017CEE; }
+        .stack-tool-logo.slack { background: #4A154B; }
+        .stack-tool-logo.jira { background: #0052CC; }
+        .stack-tool-logo.confluence { background: #172B4D; }
+        .stack-tool-logo.grafana { background: #F46800; }
+        .stack-tool-logo.custom { background: var(--cat-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOL CARDS - EXPANDED
+        ═══════════════════════════════════════════════════════════════ */
+        .tool-detail { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .tool-detail-header { padding: var(--space-lg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-lg); }
+        .tool-detail-logo { width: 56px; height: 56px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; }
+        .tool-detail-info { flex: 1; }
+        .tool-detail-name { font-size: var(--font-lg); font-weight: 600; }
+        .tool-detail-category { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .tool-detail-badges { display: flex; gap: var(--space-sm); }
+        .tool-detail-badge { font-size: 10px; padding: 4px 12px; border-radius: var(--radius-full); }
+        .tool-detail-badge.primary { background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .tool-detail-badge.core { background: rgba(16, 185, 129, 0.1); color: var(--success-green); border: 1px solid var(--success-green); }
+        
+        .tool-detail-body { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); padding: var(--space-lg); }
+        .tool-detail-content { }
+        .tool-detail-section { margin-bottom: var(--space-lg); }
+        .tool-detail-section:last-child { margin-bottom: 0; }
+        .tool-detail-section-title { font-size: var(--font-xs); font-weight: 600; color: var(--cat-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .tool-detail-section p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        
+        .tool-detail-sidebar { background: var(--bg-dark); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .tool-sidebar-section { margin-bottom: var(--space-lg); }
+        .tool-sidebar-section:last-child { margin-bottom: 0; }
+        .tool-sidebar-title { font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); margin-bottom: var(--space-sm); }
+        .tool-sidebar-list { }
+        .tool-sidebar-item { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); padding: var(--space-xs) 0; }
+        .tool-sidebar-item::before { content: '✓'; color: var(--success-green); font-size: 10px; }
+        .tool-sidebar-stat { display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) 0; border-bottom: 1px dashed var(--border-color); }
+        .tool-sidebar-stat:last-child { border-bottom: none; }
+        .tool-sidebar-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .tool-sidebar-stat-value { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SCORECARD / COMPARISON TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .scorecard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .scorecard-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .scorecard-title { font-size: var(--font-sm); font-weight: 600; }
+        .scorecard-subtitle { font-size: var(--font-xs); color: var(--text-muted); }
+        .scorecard-body { padding: 0; overflow-x: auto; }
+        
+        .scorecard-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .scorecard-table th, .scorecard-table td { padding: var(--space-md); text-align: left; border-bottom: 1px solid var(--border-color); font-size: var(--font-sm); }
+        .scorecard-table th { background: var(--bg-dark); font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; position: sticky; top: 0; }
+        .scorecard-table tr:last-child td { border-bottom: none; }
+        .scorecard-table tr:hover td { background: rgba(124, 58, 237, 0.05); }
+        .scorecard-table td:first-child { font-weight: 600; }
+        
+        .score-bar { display: flex; align-items: center; gap: var(--space-sm); }
+        .score-bar-fill { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--cat-primary), var(--cat-light)); }
+        .score-bar-value { font-size: var(--font-xs); color: var(--text-muted); min-width: 30px; }
+        
+        .score-rating { display: flex; gap: 2px; }
+        .score-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-color); }
+        .score-dot.filled { background: var(--cat-light); }
+        .score-dot.filled.green { background: var(--success-green); }
+        .score-dot.filled.yellow { background: var(--warning-yellow); }
+        
+        .score-badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-full); }
+        .score-badge.excellent { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .score-badge.good { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .score-badge.moderate { background: rgba(245, 158, 11, 0.2); color: var(--warning-yellow); }
+        .score-badge.limited { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CUSTOM ACCELERATORS - EXPANDED
+        ═══════════════════════════════════════════════════════════════ */
+        .accelerator-detail { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .accelerator-detail-header { padding: var(--space-lg); background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), transparent); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-lg); }
+        .accelerator-detail-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .accelerator-detail-info { flex: 1; }
+        .accelerator-detail-name { font-size: var(--font-lg); font-weight: 600; }
+        .accelerator-detail-tagline { font-size: var(--font-xs); color: var(--cat-light); margin-top: 2px; }
+        .accelerator-detail-stats { display: flex; gap: var(--space-lg); }
+        .accelerator-mini-stat { text-align: center; }
+        .accelerator-mini-stat-value { font-size: var(--font-lg); font-weight: 700; color: var(--cat-light); display: block; }
+        .accelerator-mini-stat-label { font-size: 10px; color: var(--text-muted); }
+        
+        .accelerator-detail-body { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); padding: var(--space-lg); }
+        .accelerator-detail-left { }
+        .accelerator-detail-right { background: var(--bg-dark); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        
+        .accel-section { margin-bottom: var(--space-lg); }
+        .accel-section:last-child { margin-bottom: 0; }
+        .accel-section-title { font-size: var(--font-xs); font-weight: 600; color: var(--cat-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .accel-section p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-sm); }
+        .accel-section p:last-child { margin-bottom: 0; }
+        
+        .accel-feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
+        .accel-feature { display: flex; align-items: flex-start; gap: var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); padding: var(--space-sm); background: var(--bg-card); border-radius: var(--radius-md); }
+        .accel-feature::before { content: '◆'; color: var(--cat-light); font-size: 8px; margin-top: 3px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           INTEGRATION FLOW
+        ═══════════════════════════════════════════════════════════════ */
+        .integration-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .integration-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .integration-title { font-size: var(--font-sm); font-weight: 600; }
+        .integration-body { padding: var(--space-lg); }
+        
+        .integration-flow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding: var(--space-xl) 0; position: relative; }
+        .integration-flow::before { content: ''; position: absolute; top: 50%; left: 100px; right: 100px; height: 2px; background: linear-gradient(90deg, var(--cat-primary), var(--success-green)); z-index: 0; }
+        .integration-node { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; min-width: 140px; position: relative; z-index: 1; transition: all 0.3s; }
+        .integration-node:hover { border-color: var(--cat-primary); transform: scale(1.05); }
+        .integration-node-icon { font-size: 28px; margin-bottom: var(--space-sm); }
+        .integration-node-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .integration-node-type { font-size: 10px; color: var(--text-muted); }
+        .integration-arrow { font-size: 20px; color: var(--cat-light); z-index: 1; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PIPELINE
+        ═══════════════════════════════════════════════════════════════ */
+        .pipeline-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .pipeline-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .pipeline-title { font-size: var(--font-sm); font-weight: 600; }
+        .pipeline-status { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--success-green); }
+        .pipeline-status::before { content: ''; width: 8px; height: 8px; background: var(--success-green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pipeline-body { padding: var(--space-lg); }
+        
+        .pipeline-stages { display: flex; gap: 0; }
+        .pipeline-stage { flex: 1; position: relative; }
+        .pipeline-stage::after { content: ''; position: absolute; top: 20px; right: 0; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 10px solid var(--bg-card-alt); z-index: 1; }
+        .pipeline-stage:last-child::after { display: none; }
+        .pipeline-stage-content { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-md); margin-right: 10px; height: 100%; }
+        .pipeline-stage-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+        .pipeline-stage-num { width: 24px; height: 24px; background: var(--cat-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .pipeline-stage-name { font-size: var(--font-xs); font-weight: 600; }
+        .pipeline-stage-tasks { }
+        .pipeline-task { display: flex; align-items: center; gap: var(--space-xs); font-size: 10px; color: var(--text-muted); padding: 2px 0; }
+        .pipeline-task::before { content: '→'; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MONITORING GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .monitoring-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .monitoring-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; }
+        .monitoring-card-icon { font-size: 32px; margin-bottom: var(--space-sm); }
+        .monitoring-card-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .monitoring-card-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ENVIRONMENT TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .env-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .env-table th, .env-table td { padding: var(--space-md); text-align: left; border-bottom: 1px solid var(--border-color); font-size: var(--font-sm); }
+        .env-table th { background: var(--bg-card-alt); font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .env-table tr:last-child td { border-bottom: none; }
+        .env-table tr:hover td { background: var(--bg-card-alt); }
+        .env-name { display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; }
+        .env-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .env-dot.dev { background: var(--blue); }
+        .env-dot.staging { background: var(--warning-yellow); }
+        .env-dot.prod { background: var(--success-green); }
+        .env-purpose { font-size: var(--font-xs); color: var(--text-muted); }
+        .env-spec { font-size: var(--font-xs); color: var(--text-secondary); font-family: 'Monaco', monospace; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SECURITY GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .security-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .security-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .security-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .security-card-icon { width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success-green); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .security-card-title { font-size: var(--font-sm); font-weight: 600; }
+        .security-card-items { }
+        .security-item { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); padding: var(--space-xs) 0; }
+        .security-item::before { content: '🔒'; font-size: 10px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(124,58,237,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 400px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-comment { color: #6A737D; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-intro { grid-template-columns: 1fr; }
+            .tool-detail-body { grid-template-columns: 1fr; }
+            .accelerator-detail-body { grid-template-columns: 1fr; }
+            .monitoring-grid { grid-template-columns: repeat(2, 1fr); }
+            .security-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .integration-flow { flex-wrap: wrap; justify-content: center; }
+            .integration-flow::before { display: none; }
+            .pipeline-stages { flex-direction: column; }
+            .pipeline-stage::after { display: none; }
+            .pipeline-stage-content { margin-right: 0; margin-bottom: var(--space-sm); }
+            .accel-feature-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .monitoring-grid { grid-template-columns: 1fr; }
+            .accelerator-detail-stats { flex-direction: column; gap: var(--space-sm); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat13-migration-factory-overview.html">Migration Factory</a>
+        <span class="sep">/</span>
+        <span class="current">Tooling</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔄 Category 13</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat13-migration-factory-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat13-p1-assessment.html"><span class="nav-icon">📋</span> 13.1 Assessment</a></li>
+            <li><a href="cat13-p2-conversion.html"><span class="nav-icon">🔀</span> 13.2 Conversion</a></li>
+            <li><a href="cat13-p3-validation.html"><span class="nav-icon">✅</span> 13.3 Validation</a></li>
+            <li><a href="cat13-p4-cutover.html"><span class="nav-icon">🚀</span> 13.4 Cutover</a></li>
+            <li><a href="cat13-p5-wave-planning.html"><span class="nav-icon">📊</span> 13.5 Wave Planning</a></li>
+            <li><a href="cat13-p6-tooling.html" class="active"><span class="nav-icon">🛠️</span> 13.6 Tooling</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">🛠️</span> Overview</a></li>
+            <li><a href="#stack"><span class="nav-icon">📚</span> Tool Stack</a></li>
+            <li><a href="#platform"><span class="nav-icon">🏗️</span> Platform Tools</a></li>
+            <li><a href="#accelerators"><span class="nav-icon">🚀</span> Accelerators</a></li>
+            <li><a href="#integration"><span class="nav-icon">🔗</span> Integration</a></li>
+            <li><a href="#pipelines"><span class="nav-icon">🔄</span> Pipelines</a></li>
+            <li><a href="#environments"><span class="nav-icon">🌐</span> Environments</a></li>
+            <li><a href="#security"><span class="nav-icon">🔐</span> Security</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🛠️ Page 13.6</span>
+                <h1>Tooling</h1>
+                <p>The technology stack and automation infrastructure powering the Migration Factory.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">15+</div><div class="hero-metric-label">Integrated Tools</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">4</div><div class="hero-metric-label">Custom Accelerators</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Automation Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">3</div><div class="hero-metric-label">Environments</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tooling Overview</h2>
+                    <p>Integrated technology stack for migration automation</p>
+                </div>
+            </div>
+            
+            <div class="overview-intro">
+                <div class="overview-text">
+                    <p>The Migration Factory tooling strategy combines <strong>best-in-class commercial platforms</strong> with custom-built accelerators to achieve maximum automation and repeatability. The tooling stack is organized into layers: infrastructure (Databricks, cloud services), orchestration (Airflow, CI/CD), conversion (custom transpilers), validation (pytest, Great Expectations), and observability (Grafana, custom dashboards).</p>
+                    <p>Our approach prioritizes <strong>automation over manual effort</strong>—targeting 85% automation across all migration phases. The remaining 15% of manual work focuses on complex edge cases, business logic validation, and stakeholder sign-offs that require human judgment. Each tool is selected based on proven enterprise reliability, team expertise, and integration capabilities with the broader stack.</p>
+                    <p>Custom accelerators are built on top of the commercial platform, codifying migration patterns and best practices learned across engagements. These accelerators handle source-specific conversion rules, generate validation test cases automatically, and provide real-time progress dashboards. The tooling is <strong>continuously improved</strong> based on feedback from each wave, with new patterns and fixes deployed within days of discovery.</p>
+                </div>
+                <div class="overview-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-icon">⚡</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">85%</span>
+                            <span class="highlight-label">Automation Target</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">🔄</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">CI/CD</span>
+                            <span class="highlight-label">Continuous Deployment</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="highlight-icon">📈</span>
+                        <div class="highlight-content">
+                            <span class="highlight-value">Real-time</span>
+                            <span class="highlight-label">Observability</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOL STACK -->
+        <section class="module" id="stack">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Tool Stack Architecture</h2>
+                    <p>Layered technology stack from infrastructure to observability</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>The tool stack is organized into <strong>six functional layers</strong>, each with specific responsibilities in the migration lifecycle. The bottom layers provide foundational infrastructure and data processing capabilities, while upper layers handle orchestration, validation, and user interaction. This layered architecture ensures separation of concerns and allows independent scaling of each layer.</p>
+                <p>Tool selection follows strict criteria: <strong>enterprise-grade reliability</strong>, active community/vendor support, team familiarity, and proven integration patterns. We avoid bleeding-edge tools in favor of battle-tested solutions that won't introduce unnecessary risk to the migration program. All tools are deployed using Infrastructure as Code (Terraform) for reproducibility across environments.</p>
+            </div>
+            
+            <div class="stack-diagram">
+                <div class="stack-header">
+                    <div class="stack-title">📚 Technology Stack Layers</div>
+                </div>
+                <div class="stack-body">
+                    <div class="stack-layers">
+                        <div class="stack-layer">
+                            <div class="stack-layer-header">
+                                <span class="stack-layer-icon">👥</span>
+                                <span class="stack-layer-name">Collaboration & Reporting</span>
+                                <span class="stack-layer-desc">Stakeholder communication and project tracking</span>
+                            </div>
+                            <div class="stack-layer-tools">
+                                <div class="stack-tool"><span class="stack-tool-logo slack">S</span> Slack</div>
+                                <div class="stack-tool"><span class="stack-tool-logo jira">J</span> Jira</div>
+                                <div class="stack-tool"><span class="stack-tool-logo confluence">C</span> Confluence</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">📊</span> Migration Dashboard</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stack-layer">
+                            <div class="stack-layer-header">
+                                <span class="stack-layer-icon">📊</span>
+                                <span class="stack-layer-name">Observability</span>
+                                <span class="stack-layer-desc">Monitoring, logging, and alerting</span>
+                            </div>
+                            <div class="stack-layer-tools">
+                                <div class="stack-tool"><span class="stack-tool-logo grafana">G</span> Grafana</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">📈</span> Databricks Dashboards</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">🔔</span> PagerDuty</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">📝</span> CloudWatch Logs</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stack-layer">
+                            <div class="stack-layer-header">
+                                <span class="stack-layer-icon">✅</span>
+                                <span class="stack-layer-name">Validation & Testing</span>
+                                <span class="stack-layer-desc">Data quality and test automation</span>
+                            </div>
+                            <div class="stack-layer-tools">
+                                <div class="stack-tool"><span class="stack-tool-logo pytest">P</span> pytest</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">GE</span> Great Expectations</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">🔍</span> Data Diff</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">📋</span> Validation Framework</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stack-layer">
+                            <div class="stack-layer-header">
+                                <span class="stack-layer-icon">🔄</span>
+                                <span class="stack-layer-name">Orchestration & CI/CD</span>
+                                <span class="stack-layer-desc">Workflow automation and deployment</span>
+                            </div>
+                            <div class="stack-layer-tools">
+                                <div class="stack-tool"><span class="stack-tool-logo airflow">A</span> Apache Airflow</div>
+                                <div class="stack-tool"><span class="stack-tool-logo jenkins">J</span> Jenkins</div>
+                                <div class="stack-tool"><span class="stack-tool-logo git">G</span> GitHub Actions</div>
+                                <div class="stack-tool"><span class="stack-tool-logo terraform">T</span> Terraform</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stack-layer">
+                            <div class="stack-layer-header">
+                                <span class="stack-layer-icon">🔀</span>
+                                <span class="stack-layer-name">Conversion & Transformation</span>
+                                <span class="stack-layer-desc">Code transpilation and data movement</span>
+                            </div>
+                            <div class="stack-layer-tools">
+                                <div class="stack-tool"><span class="stack-tool-logo custom">🔀</span> SQL Transpiler</div>
+                                <div class="stack-tool"><span class="stack-tool-logo dbt">D</span> dbt</div>
+                                <div class="stack-tool"><span class="stack-tool-logo python">P</span> Python Scripts</div>
+                                <div class="stack-tool"><span class="stack-tool-logo custom">📦</span> Schema Converter</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stack-layer">
+                            <div class="stack-layer-header">
+                                <span class="stack-layer-icon">🏗️</span>
+                                <span class="stack-layer-name">Data Platform</span>
+                                <span class="stack-layer-desc">Core infrastructure and compute</span>
+                            </div>
+                            <div class="stack-layer-tools">
+                                <div class="stack-tool"><span class="stack-tool-logo databricks">D</span> Databricks</div>
+                                <div class="stack-tool"><span class="stack-tool-logo spark">S</span> Apache Spark</div>
+                                <div class="stack-tool"><span class="stack-tool-logo delta">Δ</span> Delta Lake</div>
+                                <div class="stack-tool"><span class="stack-tool-logo unity">U</span> Unity Catalog</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PLATFORM TOOLS - EXPANDED -->
+        <section class="module" id="platform">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Platform Tools</h2>
+                    <p>Core tools powering each migration phase with detailed guidance</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>These core tools form the foundation of our migration capability. Each tool is selected for its <strong>specific strengths</strong> in addressing migration challenges. Understanding when and why to use each tool is critical for the migration team—the right tool for the right job ensures efficiency and quality. Below, each tool is detailed with its purpose, ideal use cases, and the value it delivers to the migration program.</p>
+                <p>Tool versions are pinned and tested together to ensure compatibility. The team maintains <strong>runbooks for each tool</strong> covering common operations, troubleshooting steps, and escalation paths. Vendor support contracts are in place for all critical tools with 24/7 SLAs during cutover windows.</p>
+            </div>
+
+            <!-- Databricks -->
+            <div class="tool-detail">
+                <div class="tool-detail-header">
+                    <div class="tool-detail-logo" style="background: #FF3621;">D</div>
+                    <div class="tool-detail-info">
+                        <div class="tool-detail-name">Databricks</div>
+                        <div class="tool-detail-category">Unified Data Platform • Target Environment</div>
+                    </div>
+                    <div class="tool-detail-badges">
+                        <span class="tool-detail-badge primary">Primary Platform</span>
+                        <span class="tool-detail-badge core">Mission Critical</span>
+                    </div>
+                </div>
+                <div class="tool-detail-body">
+                    <div class="tool-detail-content">
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">🎯 Why Databricks?</div>
+                            <p>Databricks is the <strong>target destination</strong> for all migrated workloads. It provides a unified platform combining data engineering, data science, and analytics on a single lakehouse architecture. Unlike traditional data warehouses, Databricks offers the flexibility of a data lake with the performance and governance of a warehouse—eliminating the need for separate systems and data copies.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">⏰ When to Use</div>
+                            <p>Databricks is used for <strong>all migrated workloads</strong> post-conversion. Use Databricks SQL warehouses for BI and reporting queries, Databricks notebooks for data engineering and data science workflows, and Databricks Workflows for orchestrating jobs. The Unity Catalog provides centralized governance—use it for all access control, data lineage, and audit requirements.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">💎 Value Delivered</div>
+                            <p>Databricks reduces total cost of ownership by <strong>30-50%</strong> compared to legacy warehouses through efficient compute pricing, serverless capabilities, and elimination of data silos. The Photon engine accelerates SQL queries by 3-8x over traditional Spark. Unity Catalog simplifies compliance with centralized governance across all data assets.</p>
+                        </div>
+                    </div>
+                    <div class="tool-detail-sidebar">
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Key Capabilities</div>
+                            <div class="tool-sidebar-list">
+                                <div class="tool-sidebar-item">Unity Catalog governance</div>
+                                <div class="tool-sidebar-item">Photon SQL acceleration</div>
+                                <div class="tool-sidebar-item">Serverless SQL warehouses</div>
+                                <div class="tool-sidebar-item">Delta Lake ACID transactions</div>
+                                <div class="tool-sidebar-item">Auto-scaling compute</div>
+                                <div class="tool-sidebar-item">Built-in ML capabilities</div>
+                            </div>
+                        </div>
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Migration Stats</div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Workspaces</span><span class="tool-sidebar-stat-value">3</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">DBU/day</span><span class="tool-sidebar-stat-value">2,000</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Query Speedup</span><span class="tool-sidebar-stat-value">4.2x</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Cost Reduction</span><span class="tool-sidebar-stat-value">38%</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- dbt -->
+            <div class="tool-detail">
+                <div class="tool-detail-header">
+                    <div class="tool-detail-logo" style="background: #FF694B;">D</div>
+                    <div class="tool-detail-info">
+                        <div class="tool-detail-name">dbt (Data Build Tool)</div>
+                        <div class="tool-detail-category">SQL Transformation Framework • Conversion Target</div>
+                    </div>
+                    <div class="tool-detail-badges">
+                        <span class="tool-detail-badge primary">Core Tooling</span>
+                    </div>
+                </div>
+                <div class="tool-detail-body">
+                    <div class="tool-detail-content">
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">🎯 Why dbt?</div>
+                            <p>dbt transforms stored procedures and ETL jobs into <strong>modular, testable, documented SQL models</strong>. Instead of monolithic procedures with embedded business logic, dbt encourages a modern pattern: small, focused models that can be tested independently and composed together. This dramatically improves maintainability, reduces debugging time, and enables confident refactoring.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">⏰ When to Use</div>
+                            <p>Use dbt for <strong>all SQL-based transformations</strong> that run on a schedule or as part of data pipelines. Convert source stored procedures to dbt models when they primarily transform data (SELECT/INSERT patterns). Keep dbt for batch ELT—use Python/Spark notebooks for streaming or ML workloads. dbt is ideal for the 70% of procedures that are pure SQL logic.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">💎 Value Delivered</div>
+                            <p>dbt reduces development time by <strong>40%</strong> through code reuse (ref() macros), automatic dependency management, and built-in testing. Documentation is generated automatically from model definitions, eliminating stale documentation. Incremental models process only changed data, reducing job runtime by 60-80% for large tables.</p>
+                        </div>
+                    </div>
+                    <div class="tool-detail-sidebar">
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Key Capabilities</div>
+                            <div class="tool-sidebar-list">
+                                <div class="tool-sidebar-item">Modular SQL models</div>
+                                <div class="tool-sidebar-item">Built-in testing (unique, not null)</div>
+                                <div class="tool-sidebar-item">Auto-generated documentation</div>
+                                <div class="tool-sidebar-item">Incremental processing</div>
+                                <div class="tool-sidebar-item">Jinja templating</div>
+                                <div class="tool-sidebar-item">Dependency management</div>
+                            </div>
+                        </div>
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Migration Stats</div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Models Created</span><span class="tool-sidebar-stat-value">1,247</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Test Coverage</span><span class="tool-sidebar-stat-value">94%</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Avg Build Time</span><span class="tool-sidebar-stat-value">12 min</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Great Expectations -->
+            <div class="tool-detail">
+                <div class="tool-detail-header">
+                    <div class="tool-detail-logo" style="background: #0A9EDC;">GE</div>
+                    <div class="tool-detail-info">
+                        <div class="tool-detail-name">Great Expectations</div>
+                        <div class="tool-detail-category">Data Quality Framework • Validation Engine</div>
+                    </div>
+                    <div class="tool-detail-badges">
+                        <span class="tool-detail-badge primary">Validation Core</span>
+                    </div>
+                </div>
+                <div class="tool-detail-body">
+                    <div class="tool-detail-content">
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">🎯 Why Great Expectations?</div>
+                            <p>Great Expectations provides a <strong>declarative framework for data quality</strong>—defining what "good data" looks like through expectations rather than imperative checks. This approach makes tests readable by non-technical stakeholders, self-documenting, and easy to version control. The framework integrates seamlessly with Spark/Databricks for large-scale validation.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">⏰ When to Use</div>
+                            <p>Use Great Expectations for <strong>data validation at every stage</strong>: source profiling (discover expectations), post-conversion validation (source vs target comparison), and production monitoring (ongoing data quality). Deploy expectations as CI/CD gates—failing expectations block deployment. Use for tables with defined quality SLAs.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">💎 Value Delivered</div>
+                            <p>Great Expectations catches <strong>95% of data issues before they reach production</strong>. The data docs feature generates beautiful HTML reports that stakeholders can review—reducing back-and-forth on data quality concerns. Profiling automatically suggests expectations, accelerating test creation by 5x compared to manual test writing.</p>
+                        </div>
+                    </div>
+                    <div class="tool-detail-sidebar">
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Key Capabilities</div>
+                            <div class="tool-sidebar-list">
+                                <div class="tool-sidebar-item">Declarative expectations</div>
+                                <div class="tool-sidebar-item">Automatic data profiling</div>
+                                <div class="tool-sidebar-item">HTML validation reports</div>
+                                <div class="tool-sidebar-item">Spark/Databricks native</div>
+                                <div class="tool-sidebar-item">CI/CD integration</div>
+                                <div class="tool-sidebar-item">Checkpoint orchestration</div>
+                            </div>
+                        </div>
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Migration Stats</div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Expectations</span><span class="tool-sidebar-stat-value">12,847</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Pass Rate</span><span class="tool-sidebar-stat-value">99.2%</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Issues Caught</span><span class="tool-sidebar-stat-value">342</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apache Airflow -->
+            <div class="tool-detail">
+                <div class="tool-detail-header">
+                    <div class="tool-detail-logo" style="background: #017CEE;">A</div>
+                    <div class="tool-detail-info">
+                        <div class="tool-detail-name">Apache Airflow</div>
+                        <div class="tool-detail-category">Workflow Orchestration • Pipeline Management</div>
+                    </div>
+                    <div class="tool-detail-badges">
+                        <span class="tool-detail-badge primary">Orchestration</span>
+                    </div>
+                </div>
+                <div class="tool-detail-body">
+                    <div class="tool-detail-content">
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">🎯 Why Airflow?</div>
+                            <p>Airflow orchestrates complex workflows as <strong>Directed Acyclic Graphs (DAGs)</strong>, providing clear visibility into task dependencies, execution status, and failure handling. Unlike simple schedulers, Airflow understands task relationships—if an upstream task fails, dependent tasks are automatically skipped. This is critical for migration pipelines where conversion must complete before validation.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">⏰ When to Use</div>
+                            <p>Use Airflow for <strong>any multi-step workflow</strong> with dependencies: nightly migration runs, wave processing pipelines, validation orchestration, and cutover sequences. Airflow excels when tasks have complex dependencies (A must complete before B and C can run in parallel). For simple single-task schedules, Databricks Workflows may suffice.</p>
+                        </div>
+                        <div class="tool-detail-section">
+                            <div class="tool-detail-section-title">💎 Value Delivered</div>
+                            <p>Airflow provides <strong>complete visibility into pipeline execution</strong>—operators can see exactly which tasks succeeded, failed, or are running at any moment. Built-in retry logic and alerting reduces on-call burden by 60%. The Databricks operator enables seamless integration, triggering jobs and notebooks directly from DAGs.</p>
+                        </div>
+                    </div>
+                    <div class="tool-detail-sidebar">
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Key Capabilities</div>
+                            <div class="tool-sidebar-list">
+                                <div class="tool-sidebar-item">DAG-based workflows</div>
+                                <div class="tool-sidebar-item">Rich operator library</div>
+                                <div class="tool-sidebar-item">Databricks provider</div>
+                                <div class="tool-sidebar-item">Alerting and retry logic</div>
+                                <div class="tool-sidebar-item">Backfill processing</div>
+                                <div class="tool-sidebar-item">Web UI monitoring</div>
+                            </div>
+                        </div>
+                        <div class="tool-sidebar-section">
+                            <div class="tool-sidebar-title">Migration Stats</div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">DAGs</span><span class="tool-sidebar-stat-value">47</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Daily Runs</span><span class="tool-sidebar-stat-value">156</span></div>
+                            <div class="tool-sidebar-stat"><span class="tool-sidebar-stat-label">Success Rate</span><span class="tool-sidebar-stat-value">98.7%</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLATFORM TOOLS SCORECARD -->
+            <div class="scorecard">
+                <div class="scorecard-header">
+                    <div class="scorecard-title">📊 Platform Tools Comparison Scorecard</div>
+                    <div class="scorecard-subtitle">Comparative analysis across key dimensions</div>
+                </div>
+                <div class="scorecard-body">
+                    <table class="scorecard-table">
+                        <thead>
+                            <tr>
+                                <th>Tool</th>
+                                <th>Migration Phase</th>
+                                <th>Learning Curve</th>
+                                <th>Automation Capability</th>
+                                <th>Databricks Integration</th>
+                                <th>Enterprise Readiness</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Databricks</td>
+                                <td>All Phases</td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td><span class="score-badge excellent">Native</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>dbt</td>
+                                <td>Conversion</td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Great Expectations</td>
+                                <td>Validation</td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge good">Good</span></td>
+                                <td><span class="score-badge good">Good</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Apache Airflow</td>
+                                <td>Orchestration</td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Terraform</td>
+                                <td>Infrastructure</td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot filled yellow"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td><span class="score-badge excellent">Excellent</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Grafana</td>
+                                <td>Monitoring</td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge good">Good</span></td>
+                                <td><span class="score-badge good">Good</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CUSTOM ACCELERATORS - EXPANDED -->
+        <section class="module" id="accelerators">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Custom Accelerators</h2>
+                    <p>Purpose-built tools for migration automation with detailed usage guidance</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>Our custom accelerators are the <strong>competitive advantage</strong> of the Migration Factory. These tools codify years of migration experience into repeatable automation, handling the nuances of specific source platforms that commercial tools miss. Each accelerator is continuously improved based on patterns discovered in production migrations—every issue becomes a new rule, every edge case becomes a test.</p>
+                <p>The accelerators are built on open standards (Python, SQL, REST APIs) for maintainability and extensibility. Source code is version-controlled with comprehensive test coverage. The team follows a <strong>"fix forward"</strong> approach—issues discovered in migration are immediately converted to accelerator improvements, benefiting all subsequent waves and future engagements.</p>
+            </div>
+
+            <!-- Assessment Crawler -->
+            <div class="accelerator-detail">
+                <div class="accelerator-detail-header">
+                    <div class="accelerator-detail-icon">🔍</div>
+                    <div class="accelerator-detail-info">
+                        <div class="accelerator-detail-name">Assessment Crawler</div>
+                        <div class="accelerator-detail-tagline">Automated inventory discovery and complexity analysis</div>
+                    </div>
+                    <div class="accelerator-detail-stats">
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">4,231</span><span class="accelerator-mini-stat-label">Objects Crawled</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">2 hrs</span><span class="accelerator-mini-stat-label">Full Scan</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">100%</span><span class="accelerator-mini-stat-label">Coverage</span></div>
+                    </div>
+                </div>
+                <div class="accelerator-detail-body">
+                    <div class="accelerator-detail-left">
+                        <div class="accel-section">
+                            <div class="accel-section-title">🎯 Why This Accelerator?</div>
+                            <p>Manual assessment of thousands of database objects is time-consuming, error-prone, and inevitably incomplete. The Assessment Crawler <strong>automates 100% of inventory discovery</strong>—connecting directly to source system catalogs to extract every table, view, stored procedure, and function. It doesn't just list objects; it analyzes them, building dependency graphs and calculating complexity scores that drive wave planning decisions.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">⏰ When to Use</div>
+                            <p>Run the Crawler at <strong>project kickoff</strong> to generate the initial inventory and baseline assessment report. Re-run weekly during active migration to detect schema changes in the source system (new objects, dropped objects, modified DDL). Use the dependency graph output to validate wave boundaries and identify objects that may have been miscategorized.</p>
+                            <p>The Crawler is also valuable for <strong>scope change analysis</strong>—when stakeholders request adding objects to the migration, the Crawler instantly shows the downstream impact and additional dependencies that would need to be included.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">💎 Value Delivered</div>
+                            <p>The Crawler <strong>eliminates 3-4 weeks of manual assessment work</strong> and ensures no objects are missed (a common issue with manual inventory). The complexity scoring algorithm, trained on 50+ migrations, accurately predicts conversion difficulty with 87% correlation to actual effort. The dependency graph has prevented 23 wave boundary violations that would have caused production failures.</p>
+                        </div>
+                    </div>
+                    <div class="accelerator-detail-right">
+                        <div class="accel-section">
+                            <div class="accel-section-title">Key Capabilities</div>
+                            <div class="accel-feature-grid">
+                                <div class="accel-feature">Multi-source: Redshift, Teradata, Snowflake, Oracle, SQL Server</div>
+                                <div class="accel-feature">Automatic DDL extraction and parsing</div>
+                                <div class="accel-feature">Dependency graph generation (NetworkX)</div>
+                                <div class="accel-feature">ML-based complexity scoring</div>
+                                <div class="accel-feature">Wave assignment recommendations</div>
+                                <div class="accel-feature">Interactive HTML reports</div>
+                                <div class="accel-feature">Schema drift detection</div>
+                                <div class="accel-feature">Delta reports (new/changed/dropped)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL Transpiler -->
+            <div class="accelerator-detail">
+                <div class="accelerator-detail-header">
+                    <div class="accelerator-detail-icon">🔀</div>
+                    <div class="accelerator-detail-info">
+                        <div class="accelerator-detail-name">SQL Transpiler</div>
+                        <div class="accelerator-detail-tagline">Intelligent dialect conversion with semantic understanding</div>
+                    </div>
+                    <div class="accelerator-detail-stats">
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">92%</span><span class="accelerator-mini-stat-label">Auto-Convert</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">500+</span><span class="accelerator-mini-stat-label">Rules</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">8</span><span class="accelerator-mini-stat-label">Dialects</span></div>
+                    </div>
+                </div>
+                <div class="accelerator-detail-body">
+                    <div class="accelerator-detail-left">
+                        <div class="accel-section">
+                            <div class="accel-section-title">🎯 Why This Accelerator?</div>
+                            <p>Commercial transpilers handle simple syntax conversion but fail on <strong>platform-specific features</strong>—Redshift's DISTKEY/SORTKEY, Teradata's QUALIFY, Oracle's CONNECT BY. Our SQL Transpiler parses source code into an Abstract Syntax Tree (AST), enabling deep semantic understanding rather than surface-level text substitution. This allows complex transformations that preserve business logic while optimizing for Databricks/Spark execution patterns.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">⏰ When to Use</div>
+                            <p>Feed every SQL object through the Transpiler as <strong>the first conversion step</strong>. The output includes: converted Spark SQL, a confidence score, a list of manual review items, and automatically generated test cases. Objects with confidence >85% can proceed to automated testing; objects with lower confidence are queued for developer review.</p>
+                            <p>Use the Transpiler in <strong>"diff mode"</strong> when modifying converted code—it highlights where changes deviate from the original logic, catching unintended behavioral changes.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">💎 Value Delivered</div>
+                            <p>The Transpiler achieves <strong>92% automatic conversion rate</strong>—the remaining 8% requires human intervention for complex procedural logic or unsupported features. This translates to 10-15 developer hours saved per 100 objects. The automatic test generation ensures every converted object has baseline tests, catching regressions that would otherwise reach production.</p>
+                        </div>
+                    </div>
+                    <div class="accelerator-detail-right">
+                        <div class="accel-section">
+                            <div class="accel-section-title">Key Capabilities</div>
+                            <div class="accel-feature-grid">
+                                <div class="accel-feature">AST-based parsing (not regex)</div>
+                                <div class="accel-feature">Platform-specific optimizations</div>
+                                <div class="accel-feature">Stored procedure → dbt/notebook</div>
+                                <div class="accel-feature">Side-by-side diff view</div>
+                                <div class="accel-feature">Automatic test case generation</div>
+                                <div class="accel-feature">Confidence scoring</div>
+                                <div class="accel-feature">Manual review item flagging</div>
+                                <div class="accel-feature">Photon optimization hints</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Framework -->
+            <div class="accelerator-detail">
+                <div class="accelerator-detail-header">
+                    <div class="accelerator-detail-icon">✅</div>
+                    <div class="accelerator-detail-info">
+                        <div class="accelerator-detail-name">Validation Framework</div>
+                        <div class="accelerator-detail-tagline">Comprehensive data and logic verification at scale</div>
+                    </div>
+                    <div class="accelerator-detail-stats">
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">50K+</span><span class="accelerator-mini-stat-label">Test Cases</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">99.5%</span><span class="accelerator-mini-stat-label">Pass Rate</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">4 hrs</span><span class="accelerator-mini-stat-label">Full Suite</span></div>
+                    </div>
+                </div>
+                <div class="accelerator-detail-body">
+                    <div class="accelerator-detail-left">
+                        <div class="accel-section">
+                            <div class="accel-section-title">🎯 Why This Accelerator?</div>
+                            <p>Validating migration accuracy across billions of rows requires more than spot-checking. The Validation Framework provides <strong>systematic, automated comparison</strong> at row, column, and aggregate levels. It handles the complexity of large-scale validation: intelligent sampling strategies, tolerance thresholds for floating-point comparisons, and handling of schema differences between source and target platforms.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">⏰ When to Use</div>
+                            <p>Run validation <strong>continuously throughout conversion</strong>—as each object is converted, its tests are added to the suite. Execute the full suite nightly in staging and before any cutover. Use "targeted mode" to re-validate specific tables after fixes. The Framework integrates with CI/CD, blocking deployments when validation fails.</p>
+                            <p>For billion-row tables, use <strong>stratified sampling</strong> to achieve statistically significant coverage without full-table scans. Configure sampling rates based on data criticality—financial data may require 100% validation, while log tables can use 1% sampling.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">💎 Value Delivered</div>
+                            <p>The Framework has <strong>caught 342 data issues</strong> before they reached production—issues that would have caused incorrect reports, broken dashboards, or compliance violations. The reconciliation reports provide auditable evidence for stakeholders, and the historical trend tracking shows validation improvement over time (95% → 99.5% pass rate across waves).</p>
+                        </div>
+                    </div>
+                    <div class="accelerator-detail-right">
+                        <div class="accel-section">
+                            <div class="accel-section-title">Key Capabilities</div>
+                            <div class="accel-feature-grid">
+                                <div class="accel-feature">Row count verification</div>
+                                <div class="accel-feature">Checksum comparison</div>
+                                <div class="accel-feature">Statistical validation</div>
+                                <div class="accel-feature">Intelligent sampling (stratified, random)</div>
+                                <div class="accel-feature">Floating-point tolerances</div>
+                                <div class="accel-feature">Business rule validation</div>
+                                <div class="accel-feature">Historical trend tracking</div>
+                                <div class="accel-feature">HTML reconciliation reports</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Migration Dashboard -->
+            <div class="accelerator-detail">
+                <div class="accelerator-detail-header">
+                    <div class="accelerator-detail-icon">📊</div>
+                    <div class="accelerator-detail-info">
+                        <div class="accelerator-detail-name">Migration Dashboard</div>
+                        <div class="accelerator-detail-tagline">Real-time progress visibility and health monitoring</div>
+                    </div>
+                    <div class="accelerator-detail-stats">
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">Real-time</span><span class="accelerator-mini-stat-label">Updates</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">50+</span><span class="accelerator-mini-stat-label">Metrics</span></div>
+                        <div class="accelerator-mini-stat"><span class="accelerator-mini-stat-value">24/7</span><span class="accelerator-mini-stat-label">Availability</span></div>
+                    </div>
+                </div>
+                <div class="accelerator-detail-body">
+                    <div class="accelerator-detail-left">
+                        <div class="accel-section">
+                            <div class="accel-section-title">🎯 Why This Accelerator?</div>
+                            <p>Migrations fail when stakeholders lack visibility into progress and problems. The Migration Dashboard provides a <strong>single source of truth</strong> for all project participants—from engineers tracking object-level status to executives reviewing wave completion. Unlike generic project management tools, the Dashboard understands migration-specific concepts: conversion rates, validation pass rates, cutover readiness.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">⏰ When to Use</div>
+                            <p>The Dashboard is <strong>always on</strong>—it's the first thing the team checks each morning and the last thing reviewed in standups. Use the executive summary view for steering committee updates (5-minute status review). Use the object-level drill-down for debugging specific issues. Switch to the War Room view during cutovers for real-time monitoring with 1-second refresh.</p>
+                            <p>Configure <strong>Slack/email alerts</strong> for critical thresholds: validation rate drops below 95%, conversion queue grows beyond capacity, or blockers are unresolved for 24+ hours.</p>
+                        </div>
+                        <div class="accel-section">
+                            <div class="accel-section-title">💎 Value Delivered</div>
+                            <p>The Dashboard has <strong>reduced status meeting time by 70%</strong>—stakeholders self-serve status instead of waiting for updates. Early warning alerts have prevented 12 schedule slips by surfacing issues before they cascaded. The historical burndown charts provide evidence for capacity planning in future engagements.</p>
+                        </div>
+                    </div>
+                    <div class="accelerator-detail-right">
+                        <div class="accel-section">
+                            <div class="accel-section-title">Key Capabilities</div>
+                            <div class="accel-feature-grid">
+                                <div class="accel-feature">Executive summary view</div>
+                                <div class="accel-feature">Wave completion tracking</div>
+                                <div class="accel-feature">Object-level drill-down</div>
+                                <div class="accel-feature">Blocker/risk alerting</div>
+                                <div class="accel-feature">Slack/email integration</div>
+                                <div class="accel-feature">Burndown & velocity charts</div>
+                                <div class="accel-feature">Cutover war room view</div>
+                                <div class="accel-feature">Role-based access</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCELERATORS SCORECARD -->
+            <div class="scorecard">
+                <div class="scorecard-header">
+                    <div class="scorecard-title">📊 Custom Accelerators Comparison Scorecard</div>
+                    <div class="scorecard-subtitle">Comparative analysis of Blueprint accelerator capabilities</div>
+                </div>
+                <div class="scorecard-body">
+                    <table class="scorecard-table">
+                        <thead>
+                            <tr>
+                                <th>Accelerator</th>
+                                <th>Time Saved</th>
+                                <th>Accuracy</th>
+                                <th>Automation Level</th>
+                                <th>Maintenance Burden</th>
+                                <th>Business Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Assessment Crawler</td>
+                                <td>
+                                    <div class="score-bar"><div class="score-bar-fill" style="width: 95%;"></div><span class="score-bar-value">95%</span></div>
+                                </td>
+                                <td><span class="score-badge excellent">100%</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge good">Low</span></td>
+                                <td><span class="score-badge excellent">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td>SQL Transpiler</td>
+                                <td>
+                                    <div class="score-bar"><div class="score-bar-fill" style="width: 85%;"></div><span class="score-bar-value">85%</span></div>
+                                </td>
+                                <td><span class="score-badge excellent">92%</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge moderate">Medium</span></td>
+                                <td><span class="score-badge excellent">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td>Validation Framework</td>
+                                <td>
+                                    <div class="score-bar"><div class="score-bar-fill" style="width: 80%;"></div><span class="score-bar-value">80%</span></div>
+                                </td>
+                                <td><span class="score-badge excellent">99.5%</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge good">Low</span></td>
+                                <td><span class="score-badge excellent">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td>Migration Dashboard</td>
+                                <td>
+                                    <div class="score-bar"><div class="score-bar-fill" style="width: 70%;"></div><span class="score-bar-value">70%</span></div>
+                                </td>
+                                <td><span class="score-badge excellent">Real-time</span></td>
+                                <td>
+                                    <div class="score-rating">
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                        <span class="score-dot filled green"></span>
+                                    </div>
+                                </td>
+                                <td><span class="score-badge good">Low</span></td>
+                                <td><span class="score-badge good">High</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- INTEGRATION ARCHITECTURE -->
+        <section class="module" id="integration">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Integration Architecture</h2>
+                    <p>How tools connect and data flows through the pipeline</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>The tooling ecosystem is integrated through <strong>well-defined APIs and data contracts</strong>. Source metadata flows from the Assessment Crawler through conversion, validation, and deployment stages. Each tool publishes status events to a central message bus, enabling real-time dashboard updates and automated orchestration decisions.</p>
+                <p>Integration follows the <strong>"loose coupling, high cohesion"</strong> principle—tools communicate through standard formats (JSON, Parquet) rather than direct dependencies. This architecture allows individual tools to be upgraded or replaced without disrupting the overall pipeline. All integrations are tested in CI before deployment to production.</p>
+            </div>
+            
+            <div class="integration-container">
+                <div class="integration-header">
+                    <div class="integration-title">🔗 End-to-End Data Flow</div>
+                </div>
+                <div class="integration-body">
+                    <div class="integration-flow">
+                        <div class="integration-node">
+                            <div class="integration-node-icon">🗄️</div>
+                            <div class="integration-node-name">Source DB</div>
+                            <div class="integration-node-type">Redshift/Teradata</div>
+                        </div>
+                        <span class="integration-arrow">→</span>
+                        <div class="integration-node">
+                            <div class="integration-node-icon">🔍</div>
+                            <div class="integration-node-name">Crawler</div>
+                            <div class="integration-node-type">Assessment</div>
+                        </div>
+                        <span class="integration-arrow">→</span>
+                        <div class="integration-node">
+                            <div class="integration-node-icon">🔀</div>
+                            <div class="integration-node-name">Transpiler</div>
+                            <div class="integration-node-type">Conversion</div>
+                        </div>
+                        <span class="integration-arrow">→</span>
+                        <div class="integration-node">
+                            <div class="integration-node-icon">✅</div>
+                            <div class="integration-node-name">Validator</div>
+                            <div class="integration-node-type">Testing</div>
+                        </div>
+                        <span class="integration-arrow">→</span>
+                        <div class="integration-node">
+                            <div class="integration-node-icon">🚀</div>
+                            <div class="integration-node-name">Databricks</div>
+                            <div class="integration-node-type">Target</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AUTOMATION PIPELINES -->
+        <section class="module" id="pipelines">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Automation Pipelines</h2>
+                    <p>CI/CD workflows for continuous migration</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>Migration automation is implemented as <strong>CI/CD pipelines</strong> triggered by code commits and scheduled jobs. The conversion pipeline runs nightly to process queued objects, while validation pipelines run continuously to catch regressions. Deployment pipelines promote tested code through dev → staging → production environments with automated gates.</p>
+                <p>Pipelines are defined as code (Jenkins, GitHub Actions) and version-controlled alongside the migration artifacts. Each pipeline includes <strong>quality gates</strong>—conversion must pass syntax validation, validation must meet threshold requirements, and deployment requires human approval for production. Failed pipelines trigger automatic notifications to the responsible team.</p>
+            </div>
+            
+            <div class="pipeline-container">
+                <div class="pipeline-header">
+                    <div class="pipeline-title">🔄 Migration CI/CD Pipeline</div>
+                    <div class="pipeline-status">Pipeline Healthy</div>
+                </div>
+                <div class="pipeline-body">
+                    <div class="pipeline-stages">
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-content">
+                                <div class="pipeline-stage-header">
+                                    <span class="pipeline-stage-num">1</span>
+                                    <span class="pipeline-stage-name">Source Scan</span>
+                                </div>
+                                <div class="pipeline-stage-tasks">
+                                    <div class="pipeline-task">Connect to source catalog</div>
+                                    <div class="pipeline-task">Extract DDL and metadata</div>
+                                    <div class="pipeline-task">Build dependency graph</div>
+                                    <div class="pipeline-task">Generate complexity scores</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-content">
+                                <div class="pipeline-stage-header">
+                                    <span class="pipeline-stage-num">2</span>
+                                    <span class="pipeline-stage-name">Conversion</span>
+                                </div>
+                                <div class="pipeline-stage-tasks">
+                                    <div class="pipeline-task">Parse source SQL to AST</div>
+                                    <div class="pipeline-task">Apply transformation rules</div>
+                                    <div class="pipeline-task">Generate Spark SQL</div>
+                                    <div class="pipeline-task">Syntax validation</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-content">
+                                <div class="pipeline-stage-header">
+                                    <span class="pipeline-stage-num">3</span>
+                                    <span class="pipeline-stage-name">Testing</span>
+                                </div>
+                                <div class="pipeline-stage-tasks">
+                                    <div class="pipeline-task">Unit test execution</div>
+                                    <div class="pipeline-task">Data validation (sample)</div>
+                                    <div class="pipeline-task">Performance benchmarks</div>
+                                    <div class="pipeline-task">Quality gate check</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-content">
+                                <div class="pipeline-stage-header">
+                                    <span class="pipeline-stage-num">4</span>
+                                    <span class="pipeline-stage-name">Deploy Dev</span>
+                                </div>
+                                <div class="pipeline-stage-tasks">
+                                    <div class="pipeline-task">Deploy to dev workspace</div>
+                                    <div class="pipeline-task">Integration tests</div>
+                                    <div class="pipeline-task">Full data validation</div>
+                                    <div class="pipeline-task">Regression check</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-content">
+                                <div class="pipeline-stage-header">
+                                    <span class="pipeline-stage-num">5</span>
+                                    <span class="pipeline-stage-name">Promote</span>
+                                </div>
+                                <div class="pipeline-stage-tasks">
+                                    <div class="pipeline-task">Manual approval gate</div>
+                                    <div class="pipeline-task">Deploy to staging</div>
+                                    <div class="pipeline-task">UAT validation</div>
+                                    <div class="pipeline-task">Production release</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ENVIRONMENTS -->
+        <section class="module" id="environments">
+            <div class="module-header">
+                <div class="module-icon">🌐</div>
+                <div class="module-info">
+                    <h2>Environment Matrix</h2>
+                    <p>Development, staging, and production configurations</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>The migration uses a <strong>three-environment model</strong> to ensure quality and stability. Development provides a sandbox for rapid iteration with synthetic data. Staging mirrors production configuration with production-like data volumes for realistic testing. Production is the final target environment with full governance and access controls.</p>
+                <p>Environments are provisioned using identical Terraform configurations with environment-specific variables. This <strong>"infrastructure as code"</strong> approach ensures consistency and enables rapid environment recreation if needed. Data in non-production environments is either synthetic or anonymized to comply with data privacy requirements.</p>
+            </div>
+            
+            <table class="env-table">
+                <thead>
+                    <tr>
+                        <th>Environment</th>
+                        <th>Purpose</th>
+                        <th>Data</th>
+                        <th>Compute</th>
+                        <th>Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="env-name"><span class="env-dot dev"></span> Development</div></td>
+                        <td class="env-purpose">Rapid iteration, initial conversion testing, debugging</td>
+                        <td class="env-spec">Synthetic + sampled (1%)</td>
+                        <td class="env-spec">2x i3.xlarge clusters</td>
+                        <td class="env-spec">All engineers</td>
+                    </tr>
+                    <tr>
+                        <td><div class="env-name"><span class="env-dot staging"></span> Staging</div></td>
+                        <td class="env-purpose">Integration testing, UAT, performance validation</td>
+                        <td class="env-spec">Anonymized production (100%)</td>
+                        <td class="env-spec">Prod-equivalent clusters</td>
+                        <td class="env-spec">Migration team + QA</td>
+                    </tr>
+                    <tr>
+                        <td><div class="env-name"><span class="env-dot prod"></span> Production</div></td>
+                        <td class="env-purpose">Live workloads, business operations, reporting</td>
+                        <td class="env-spec">Full production data</td>
+                        <td class="env-spec">Auto-scaling SQL warehouse</td>
+                        <td class="env-spec">Role-based (Unity Catalog)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SECURITY -->
+        <section class="module" id="security">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Security & Compliance</h2>
+                    <p>Data protection and access governance</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>Security is embedded throughout the tooling stack, not bolted on as an afterthought. <strong>Unity Catalog</strong> provides centralized governance with fine-grained access controls, column-level security, and comprehensive audit logging. All data in transit is encrypted using TLS 1.3, and data at rest uses AWS KMS encryption with customer-managed keys.</p>
+                <p>The migration process itself follows <strong>least-privilege principles</strong>—automation service accounts have only the permissions required for their specific tasks. Sensitive operations (production deployment, data access) require MFA and manager approval. All actions are logged for audit compliance with SOC 2 and GDPR requirements.</p>
+            </div>
+            
+            <div class="security-grid">
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">🔑</div>
+                        <div class="security-card-title">Access Control</div>
+                    </div>
+                    <div class="security-card-items">
+                        <div class="security-item">Unity Catalog role-based access</div>
+                        <div class="security-item">SSO with Okta integration</div>
+                        <div class="security-item">MFA for production access</div>
+                        <div class="security-item">Service account rotation</div>
+                        <div class="security-item">Just-in-time privilege elevation</div>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">🛡️</div>
+                        <div class="security-card-title">Data Protection</div>
+                    </div>
+                    <div class="security-card-items">
+                        <div class="security-item">TLS 1.3 encryption in transit</div>
+                        <div class="security-item">AES-256 encryption at rest</div>
+                        <div class="security-item">Customer-managed KMS keys</div>
+                        <div class="security-item">Column-level masking for PII</div>
+                        <div class="security-item">Data anonymization in non-prod</div>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">📋</div>
+                        <div class="security-card-title">Compliance</div>
+                    </div>
+                    <div class="security-card-items">
+                        <div class="security-item">SOC 2 Type II certified</div>
+                        <div class="security-item">GDPR compliant processing</div>
+                        <div class="security-item">Comprehensive audit logging</div>
+                        <div class="security-item">90-day log retention</div>
+                        <div class="security-item">Quarterly access reviews</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered tooling orchestration</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>The ToolingAgent serves as the <strong>intelligent coordinator</strong> across all migration tools. It monitors pipeline health, predicts resource needs, and automatically triggers remediation actions when issues are detected. The agent learns from historical patterns to optimize tool configurations and suggest process improvements.</p>
+                <p>Beyond reactive monitoring, the agent provides <strong>proactive recommendations</strong>: identifying conversion patterns that could benefit from new transpiler rules, flagging validation tests that are flaky and need refactoring, and suggesting cluster sizing adjustments based on upcoming workload predictions.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🛠️</div>
+                    <div class="agent-name">ToolingAgent</div>
+                    <div class="agent-role">Infrastructure & Orchestration</div>
+                    <p class="agent-desc">Monitors and optimizes the entire migration tooling stack. Coordinates between accelerators, manages resource allocation, and provides intelligent recommendations for process improvements based on historical patterns and real-time telemetry.</p>
+                    <ul class="agent-capabilities">
+                        <li>Pipeline health monitoring and auto-remediation</li>
+                        <li>Resource utilization prediction and scaling</li>
+                        <li>Cross-tool coordination and sequencing</li>
+                        <li>Pattern recognition for new transpiler rules</li>
+                        <li>Anomaly detection and alerting</li>
+                        <li>Configuration drift detection</li>
+                        <li>Cost optimization recommendations</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">tooling_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Tooling Orchestration Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Tool
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> databricks.sdk <span class="code-keyword">import</span> WorkspaceClient
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+dbx = WorkspaceClient()
+
+<span class="code-comment"># Pipeline health monitor</span>
+pipeline_monitor = Tool(
+    name=<span class="code-string">"pipeline_monitor"</span>,
+    description=<span class="code-string">"Monitors CI/CD pipeline health,
+    detects failures, triggers remediation"</span>,
+    func=monitor_pipelines
+)
+
+<span class="code-comment"># Resource optimizer</span>
+resource_optimizer = Tool(
+    name=<span class="code-string">"resource_optimizer"</span>,
+    description=<span class="code-string">"Analyzes cluster utilization,
+    recommends scaling adjustments"</span>,
+    func=optimize_resources
+)
+
+<span class="code-comment"># Tool coordinator</span>
+tool_coordinator = Tool(
+    name=<span class="code-string">"tool_coordinator"</span>,
+    description=<span class="code-string">"Orchestrates actions across
+    crawler, transpiler, validator"</span>,
+    func=coordinate_tools
+)
+
+tooling_agent = Agent(
+    role=<span class="code-string">"Migration Infrastructure Specialist"</span>,
+    goal=<span class="code-string">"Ensure tooling operates at peak
+    efficiency with minimal intervention"</span>,
+    backstory=<span class="code-string">"""Expert DevOps engineer with deep
+    experience in data platform automation
+    and CI/CD optimization."""</span>,
+    llm=llm,
+    tools=[pipeline_monitor, resource_optimizer,
+           tool_coordinator],
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat13-p5-wave-planning.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">13.5: Wave Planning</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 13</div>
+        <a href="cat13-migration-factory-overview.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

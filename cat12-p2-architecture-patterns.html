@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Patterns | Cloud Platforms | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #0EA5E9;
+            --cat-light: #38BDF8;
+            --cat-dark: #0284C7;
+            --cat-glow: rgba(14, 165, 233, 0.15);
+            --page-primary: #8B5CF6;
+            --page-light: #A78BFA;
+            --page-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Architecture Pattern Cards */
+        .pattern-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .pattern-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 16px; padding: 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .pattern-card:hover { border-color: var(--page-primary); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(139, 92, 246, 0.15); }
+        .pattern-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--pattern-color), transparent); }
+        .pattern-icon { font-size: 40px; margin-bottom: 16px; }
+        .pattern-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+        .pattern-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .pattern-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .pattern-tag { padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; font-size: 10px; color: var(--text-muted); }
+        .pattern-usecases { font-size: 11px; color: var(--text-muted); }
+        .pattern-usecases strong { color: var(--page-light); }
+
+        /* Architecture Diagram */
+        .arch-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+        .arch-diagram-title { font-size: 14px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 16px; }
+        .arch-layer { display: flex; align-items: center; gap: 16px; }
+        .arch-layer-label { width: 120px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; text-align: right; flex-shrink: 0; }
+        .arch-layer-content { flex: 1; display: flex; gap: 12px; }
+        .arch-box { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; text-align: center; transition: all 0.2s; }
+        .arch-box:hover { border-color: var(--page-primary); background: var(--bg-card-alt); }
+        .arch-box-icon { font-size: 20px; margin-bottom: 4px; }
+        .arch-box-name { font-size: 12px; font-weight: 600; }
+        .arch-box-detail { font-size: 10px; color: var(--text-muted); }
+        .arch-connector { width: 100%; height: 24px; display: flex; justify-content: center; align-items: center; }
+        .arch-connector::before { content: ''; width: 2px; height: 100%; background: linear-gradient(180deg, var(--page-primary), var(--border-color)); }
+
+        /* Well-Architected Pillars */
+        .pillars-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+        .pillar-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 16px; text-align: center; transition: all 0.3s; }
+        .pillar-card:hover { border-color: var(--pillar-color); transform: translateY(-4px); }
+        .pillar-icon { font-size: 32px; margin-bottom: 12px; }
+        .pillar-name { font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--pillar-color); }
+        .pillar-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Pattern Deep Dive */
+        .pattern-deep { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .pattern-deep-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .pattern-deep-icon { font-size: 32px; }
+        .pattern-deep-title { font-size: 18px; font-weight: 600; }
+        .pattern-deep-subtitle { font-size: 12px; color: var(--text-muted); }
+        .pattern-deep-body { padding: 24px; }
+        .pattern-deep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .pattern-section h4 { font-size: 13px; font-weight: 600; color: var(--page-light); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .pattern-section ul { list-style: none; }
+        .pattern-section li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; padding-left: 16px; position: relative; line-height: 1.5; }
+        .pattern-section li::before { content: '→'; position: absolute; left: 0; color: var(--page-light); }
+
+        /* Comparison Table */
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .check { color: var(--green); }
+        .partial { color: var(--yellow); }
+        .cross { color: var(--red); }
+
+        /* Decision Tree */
+        .decision-tree { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .decision-title { font-size: 14px; font-weight: 600; color: var(--page-light); text-align: center; margin-bottom: 24px; }
+        .decision-flow { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .decision-node { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 16px 24px; text-align: center; max-width: 300px; }
+        .decision-node.question { border-color: var(--page-primary); }
+        .decision-node.answer { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+        .decision-question { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .decision-answer { font-size: 12px; color: var(--green); font-weight: 600; }
+        .decision-branches { display: flex; gap: 32px; }
+        .decision-branch { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .branch-label { font-size: 11px; color: var(--text-muted); padding: 4px 12px; background: var(--bg-card-alt); border-radius: 20px; }
+        .branch-arrow { color: var(--border-color); font-size: 20px; }
+
+        /* Agent Grid */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .agent-grid, .pattern-deep-grid { grid-template-columns: 1fr; }
+            .pattern-grid { grid-template-columns: 1fr; }
+            .pillars-grid { grid-template-columns: repeat(3, 1fr); }
+            .related-grid { grid-template-columns: 1fr; }
+            .decision-branches { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">☁️ Cloud Platforms</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat12-cloud-platforms-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat12-p1-cloud-providers.html"><span class="nav-icon">🏢</span> 12.1 Cloud Providers</a></li>
+            <li><a href="cat12-p2-architecture-patterns.html" class="active"><span class="nav-icon">🏗️</span> 12.2 Architecture Patterns</a></li>
+            <li><a href="cat12-p3-migration-strategies.html"><span class="nav-icon">🚀</span> 12.3 Migration Strategies</a></li>
+            <li><a href="cat12-p4-compute-containers.html"><span class="nav-icon">📦</span> 12.4 Compute & Containers</a></li>
+            <li><a href="cat12-p5-storage-databases.html"><span class="nav-icon">💾</span> 12.5 Storage & Databases</a></li>
+            <li><a href="cat12-p6-networking-security.html"><span class="nav-icon">🌐</span> 12.6 Networking & Security</a></li>
+            <li><a href="cat12-p7-cost-optimization.html"><span class="nav-icon">💰</span> 12.7 Cost Optimization</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#patterns"><span class="nav-icon">🏗️</span> Core Patterns</a></li>
+            <li><a href="#well-architected"><span class="nav-icon">🏛️</span> Well-Architected</a></li>
+            <li><a href="#multiregion"><span class="nav-icon">🌍</span> Multi-Region</a></li>
+            <li><a href="#microservices"><span class="nav-icon">🔲</span> Microservices</a></li>
+            <li><a href="#serverless"><span class="nav-icon">⚡</span> Serverless</a></li>
+            <li><a href="#decision"><span class="nav-icon">🎯</span> Decision Guide</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🏗️ Page 12.2</span>
+                <h1>Architecture Patterns</h1>
+                <p>Design scalable, resilient, and cost-effective cloud architectures. From multi-region deployments to serverless event-driven systems, master the patterns that power modern cloud applications.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">6</div><div class="hero-metric-label">Core Patterns</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.99%</div><div class="hero-metric-label">Multi-Region SLA</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">60%</div><div class="hero-metric-label">Cost Savings Possible</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5</div><div class="hero-metric-label">Well-Architected Pillars</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding Cloud Architecture</h2>
+                    <p>Foundational concepts for building in the cloud</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>Why Patterns Matter</h3>
+                    <p>Cloud architecture patterns are proven solutions to common challenges. They encode best practices from thousands of implementations, helping teams avoid pitfalls and build systems that scale.</p>
+                    <p>The right pattern depends on your requirements: availability needs, data consistency, latency sensitivity, cost constraints, and team expertise.</p>
+                </div>
+                <div>
+                    <h3>Key Principles</h3>
+                    <p><strong>Design for Failure:</strong> Assume everything fails. Build redundancy and automatic recovery into every layer.</p>
+                    <p><strong>Decouple Components:</strong> Use queues, events, and APIs to reduce dependencies between services.</p>
+                    <p><strong>Automate Everything:</strong> Infrastructure as code, CI/CD, auto-scaling—remove manual steps.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Patterns -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Core Architecture Patterns</h2>
+                    <p>Six fundamental patterns for cloud-native systems</p>
+                </div>
+            </div>
+
+            <div class="pattern-grid">
+                <div class="pattern-card" style="--pattern-color: #3B82F6;">
+                    <div class="pattern-icon">🌍</div>
+                    <div class="pattern-name">Multi-Region</div>
+                    <div class="pattern-desc">Deploy across multiple geographic regions for high availability, disaster recovery, and reduced latency for global users.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Active-Active</span>
+                        <span class="pattern-tag">Active-Passive</span>
+                        <span class="pattern-tag">Global Load Balancing</span>
+                    </div>
+                    <div class="pattern-usecases"><strong>Use cases:</strong> Global apps, DR, compliance</div>
+                </div>
+
+                <div class="pattern-card" style="--pattern-color: #10B981;">
+                    <div class="pattern-icon">🔲</div>
+                    <div class="pattern-name">Microservices</div>
+                    <div class="pattern-desc">Decompose applications into small, independently deployable services that communicate via APIs or messaging.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Service Mesh</span>
+                        <span class="pattern-tag">API Gateway</span>
+                        <span class="pattern-tag">Containers</span>
+                    </div>
+                    <div class="pattern-usecases"><strong>Use cases:</strong> Complex domains, team scaling</div>
+                </div>
+
+                <div class="pattern-card" style="--pattern-color: #F59E0B;">
+                    <div class="pattern-icon">⚡</div>
+                    <div class="pattern-name">Serverless</div>
+                    <div class="pattern-desc">Run code without managing servers. Pay only for execution time. Auto-scales from zero to massive throughput.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Functions</span>
+                        <span class="pattern-tag">Event-Driven</span>
+                        <span class="pattern-tag">Pay-per-Use</span>
+                    </div>
+                    <div class="pattern-usecases"><strong>Use cases:</strong> APIs, automation, ETL</div>
+                </div>
+
+                <div class="pattern-card" style="--pattern-color: #EC4899;">
+                    <div class="pattern-icon">📨</div>
+                    <div class="pattern-name">Event-Driven</div>
+                    <div class="pattern-desc">Components communicate through events via message brokers. Enables loose coupling and async processing.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Pub/Sub</span>
+                        <span class="pattern-tag">Event Sourcing</span>
+                        <span class="pattern-tag">CQRS</span>
+                    </div>
+                    <div class="pattern-usecases"><strong>Use cases:</strong> Real-time, integrations</div>
+                </div>
+
+                <div class="pattern-card" style="--pattern-color: #8B5CF6;">
+                    <div class="pattern-icon">🔄</div>
+                    <div class="pattern-name">Hybrid Cloud</div>
+                    <div class="pattern-desc">Connect on-premises infrastructure with public cloud. Enables gradual migration and data residency compliance.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">VPN/Direct Connect</span>
+                        <span class="pattern-tag">Azure Arc</span>
+                        <span class="pattern-tag">Anthos</span>
+                    </div>
+                    <div class="pattern-usecases"><strong>Use cases:</strong> Migration, compliance, legacy</div>
+                </div>
+
+                <div class="pattern-card" style="--pattern-color: #06B6D4;">
+                    <div class="pattern-icon">🏠</div>
+                    <div class="pattern-name">Data Lakehouse</div>
+                    <div class="pattern-desc">Combine data lake flexibility with data warehouse performance. Single platform for all analytics workloads.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Delta Lake</span>
+                        <span class="pattern-tag">Iceberg</span>
+                        <span class="pattern-tag">Unity Catalog</span>
+                    </div>
+                    <div class="pattern-usecases"><strong>Use cases:</strong> Analytics, ML, BI</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Well-Architected Framework -->
+        <section class="module" id="well-architected">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Well-Architected Framework</h2>
+                    <p>Six pillars for building excellent cloud systems</p>
+                </div>
+            </div>
+
+            <div class="pillars-grid">
+                <div class="pillar-card" style="--pillar-color: #EF4444;">
+                    <div class="pillar-icon">🔐</div>
+                    <div class="pillar-name">Security</div>
+                    <div class="pillar-desc">Protect data, systems, and assets through risk assessment and mitigation strategies</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #F59E0B;">
+                    <div class="pillar-icon">⚡</div>
+                    <div class="pillar-name">Reliability</div>
+                    <div class="pillar-desc">Recover from failures and meet demand through distributed design</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #10B981;">
+                    <div class="pillar-icon">🚀</div>
+                    <div class="pillar-name">Performance</div>
+                    <div class="pillar-desc">Use resources efficiently and maintain performance as demand changes</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #3B82F6;">
+                    <div class="pillar-icon">💰</div>
+                    <div class="pillar-name">Cost Optimization</div>
+                    <div class="pillar-desc">Avoid unnecessary costs and maximize value from cloud spend</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #8B5CF6;">
+                    <div class="pillar-icon">⚙️</div>
+                    <div class="pillar-name">Operations</div>
+                    <div class="pillar-desc">Run and monitor systems to deliver business value continuously</div>
+                </div>
+                <div class="pillar-card" style="--pillar-color: #06B6D4;">
+                    <div class="pillar-icon">🌱</div>
+                    <div class="pillar-name">Sustainability</div>
+                    <div class="pillar-desc">Minimize environmental impact and maximize resource efficiency</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div class="overview-full">
+                    <h3>Framework Alignment by Provider</h3>
+                    <p><strong>AWS:</strong> AWS Well-Architected Framework with Tool in console, lens for specific workloads (Serverless, SaaS, ML). <strong>Azure:</strong> Azure Well-Architected Framework with Assessment tool, integrated into Azure Advisor. <strong>GCP:</strong> Google Cloud Architecture Framework with Architecture Center and best practice guides.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Multi-Region Deep Dive -->
+        <section class="module" id="multiregion">
+            <div class="module-header">
+                <div class="module-icon">🌍</div>
+                <div class="module-info">
+                    <h2>Multi-Region Architecture</h2>
+                    <p>Design for global scale and high availability</p>
+                </div>
+            </div>
+
+            <div class="pattern-deep">
+                <div class="pattern-deep-header">
+                    <div class="pattern-deep-icon">🌐</div>
+                    <div>
+                        <div class="pattern-deep-title">Active-Active vs Active-Passive</div>
+                        <div class="pattern-deep-subtitle">Choosing the right multi-region strategy</div>
+                    </div>
+                </div>
+                <div class="pattern-deep-body">
+                    <div class="pattern-deep-grid">
+                        <div class="pattern-section">
+                            <h4>🟢 Active-Active</h4>
+                            <ul>
+                                <li>All regions serve traffic simultaneously</li>
+                                <li>Global load balancing routes to nearest region</li>
+                                <li>Data synchronization required (conflict resolution)</li>
+                                <li>Higher cost but lowest RTO (near-zero)</li>
+                                <li>Complex: requires eventual consistency handling</li>
+                                <li>Best for: Global apps, real-time requirements</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>🔵 Active-Passive</h4>
+                            <ul>
+                                <li>Primary region handles all traffic</li>
+                                <li>Secondary region on standby for failover</li>
+                                <li>Async replication to DR region</li>
+                                <li>Lower cost, simpler operations</li>
+                                <li>RTO depends on failover automation</li>
+                                <li>Best for: DR requirements, cost-sensitive</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-diagram">
+                <div class="arch-diagram-title">Multi-Region Reference Architecture</div>
+                <div class="arch-layers">
+                    <div class="arch-layer">
+                        <div class="arch-layer-label">Global</div>
+                        <div class="arch-layer-content">
+                            <div class="arch-box"><div class="arch-box-icon">🌐</div><div class="arch-box-name">Global Load Balancer</div><div class="arch-box-detail">Route 53 / Traffic Manager / Cloud DNS</div></div>
+                            <div class="arch-box"><div class="arch-box-icon">🛡️</div><div class="arch-box-name">Global WAF / CDN</div><div class="arch-box-detail">CloudFront / Front Door / Cloud CDN</div></div>
+                        </div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-label">Region A</div>
+                        <div class="arch-layer-content">
+                            <div class="arch-box"><div class="arch-box-icon">⚖️</div><div class="arch-box-name">Regional LB</div><div class="arch-box-detail">ALB / App Gateway</div></div>
+                            <div class="arch-box"><div class="arch-box-icon">📦</div><div class="arch-box-name">Compute</div><div class="arch-box-detail">EKS / AKS / GKE</div></div>
+                            <div class="arch-box"><div class="arch-box-icon">🗄️</div><div class="arch-box-name">Database</div><div class="arch-box-detail">Primary Write</div></div>
+                        </div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-label">Region B</div>
+                        <div class="arch-layer-content">
+                            <div class="arch-box"><div class="arch-box-icon">⚖️</div><div class="arch-box-name">Regional LB</div><div class="arch-box-detail">ALB / App Gateway</div></div>
+                            <div class="arch-box"><div class="arch-box-icon">📦</div><div class="arch-box-name">Compute</div><div class="arch-box-detail">EKS / AKS / GKE</div></div>
+                            <div class="arch-box"><div class="arch-box-icon">🗄️</div><div class="arch-box-name">Database</div><div class="arch-box-detail">Read Replica / Standby</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Microservices Deep Dive -->
+        <section class="module" id="microservices">
+            <div class="module-header">
+                <div class="module-icon">🔲</div>
+                <div class="module-info">
+                    <h2>Microservices Architecture</h2>
+                    <p>Build independently deployable services</p>
+                </div>
+            </div>
+
+            <div class="pattern-deep">
+                <div class="pattern-deep-header">
+                    <div class="pattern-deep-icon">🔲</div>
+                    <div>
+                        <div class="pattern-deep-title">Microservices Components</div>
+                        <div class="pattern-deep-subtitle">Essential building blocks for microservices success</div>
+                    </div>
+                </div>
+                <div class="pattern-deep-body">
+                    <div class="pattern-deep-grid">
+                        <div class="pattern-section">
+                            <h4>🚪 API Gateway</h4>
+                            <ul>
+                                <li>Single entry point for all client requests</li>
+                                <li>Authentication, rate limiting, routing</li>
+                                <li>Request/response transformation</li>
+                                <li>AWS: API Gateway, Azure: APIM, GCP: Apigee</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>🕸️ Service Mesh</h4>
+                            <ul>
+                                <li>Service-to-service communication management</li>
+                                <li>mTLS, load balancing, observability</li>
+                                <li>Circuit breakers, retries, timeouts</li>
+                                <li>Tools: Istio, Linkerd, AWS App Mesh</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>🔍 Service Discovery</h4>
+                            <ul>
+                                <li>Dynamic service registration and lookup</li>
+                                <li>Health checking and load balancing</li>
+                                <li>Built into Kubernetes (kube-dns)</li>
+                                <li>Tools: Consul, AWS Cloud Map, Eureka</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>📊 Observability</h4>
+                            <ul>
+                                <li>Distributed tracing across services</li>
+                                <li>Centralized logging with correlation IDs</li>
+                                <li>Metrics aggregation and alerting</li>
+                                <li>Tools: Jaeger, Zipkin, Datadog, Grafana</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Monolith</th>
+                        <th>Microservices</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Deployment</strong></td><td>All-or-nothing</td><td>Independent per service</td></tr>
+                    <tr><td><strong>Scaling</strong></td><td>Scale entire app</td><td>Scale individual services</td></tr>
+                    <tr><td><strong>Technology</strong></td><td>Single stack</td><td>Polyglot (best tool per service)</td></tr>
+                    <tr><td><strong>Data</strong></td><td>Shared database</td><td>Database per service</td></tr>
+                    <tr><td><strong>Team Structure</strong></td><td>Functional silos</td><td>Cross-functional product teams</td></tr>
+                    <tr><td><strong>Complexity</strong></td><td>In the codebase</td><td>In the infrastructure</td></tr>
+                    <tr><td><strong>Testing</strong></td><td>Easier E2E testing</td><td>Requires contract testing</td></tr>
+                    <tr><td><strong>Best For</strong></td><td>Small teams, simple domains</td><td>Large teams, complex domains</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Serverless Deep Dive -->
+        <section class="module" id="serverless">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Serverless Architecture</h2>
+                    <p>Event-driven, pay-per-execution computing</p>
+                </div>
+            </div>
+
+            <div class="pattern-deep">
+                <div class="pattern-deep-header">
+                    <div class="pattern-deep-icon">⚡</div>
+                    <div>
+                        <div class="pattern-deep-title">Serverless Patterns</div>
+                        <div class="pattern-deep-subtitle">Common serverless architecture patterns</div>
+                    </div>
+                </div>
+                <div class="pattern-deep-body">
+                    <div class="pattern-deep-grid">
+                        <div class="pattern-section">
+                            <h4>🌐 API Backend</h4>
+                            <ul>
+                                <li>API Gateway + Lambda/Functions + DynamoDB</li>
+                                <li>Auto-scales from 0 to millions of requests</li>
+                                <li>Pay only for actual API calls</li>
+                                <li>Great for: REST APIs, GraphQL, webhooks</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>📊 Data Processing</h4>
+                            <ul>
+                                <li>Event triggers from S3, Kinesis, Pub/Sub</li>
+                                <li>Transform, validate, enrich data in flight</li>
+                                <li>Fan-out to multiple destinations</li>
+                                <li>Great for: ETL, real-time analytics, IoT</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>⏰ Scheduled Tasks</h4>
+                            <ul>
+                                <li>CloudWatch Events / Cloud Scheduler triggers</li>
+                                <li>Replace always-on cron servers</li>
+                                <li>Run only when needed, pay only then</li>
+                                <li>Great for: Reports, cleanup, sync jobs</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-section">
+                            <h4>🤖 Event Automation</h4>
+                            <ul>
+                                <li>React to cloud events (new file, DB change)</li>
+                                <li>Orchestrate with Step Functions/Workflows</li>
+                                <li>Build complex workflows without servers</li>
+                                <li>Great for: Approvals, notifications, ops</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Serverless Benefits</h3>
+                    <p><strong>No Server Management:</strong> Focus on code, not infrastructure. No patching, no capacity planning.</p>
+                    <p><strong>Auto-Scaling:</strong> From zero to massive scale automatically. Handle traffic spikes without pre-provisioning.</p>
+                    <p><strong>Pay-per-Use:</strong> Pay only for execution time (often in 100ms increments). Idle time is free.</p>
+                </div>
+                <div>
+                    <h3>Serverless Limitations</h3>
+                    <p><strong>Cold Starts:</strong> First invocation after idle period can have latency (100ms-3s depending on runtime).</p>
+                    <p><strong>Execution Limits:</strong> Timeout limits (15 min Lambda), memory limits, payload size limits.</p>
+                    <p><strong>Vendor Lock-in:</strong> Function code portable, but event integrations are provider-specific.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decision Guide -->
+        <section class="module" id="decision">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Pattern Decision Guide</h2>
+                    <p>Choose the right architecture pattern</p>
+                </div>
+            </div>
+
+            <div class="decision-tree">
+                <div class="decision-title">Architecture Pattern Selection</div>
+                <div class="decision-flow">
+                    <div class="decision-node question">
+                        <div class="decision-question">Do you need global availability?</div>
+                    </div>
+                    <div class="decision-branches">
+                        <div class="decision-branch">
+                            <div class="branch-label">Yes</div>
+                            <div class="branch-arrow">↓</div>
+                            <div class="decision-node answer">
+                                <div class="decision-answer">→ Multi-Region Architecture</div>
+                            </div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch-label">No → Next Question</div>
+                            <div class="branch-arrow">↓</div>
+                            <div class="decision-node question">
+                                <div class="decision-question">Unpredictable or spiky traffic?</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>If You Need...</th>
+                        <th>Consider</th>
+                        <th>Because</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Global users, low latency</strong></td><td>Multi-Region Active-Active</td><td>Serve users from nearest region</td></tr>
+                    <tr><td><strong>Disaster recovery</strong></td><td>Multi-Region Active-Passive</td><td>Failover capability, lower cost</td></tr>
+                    <tr><td><strong>Independent team scaling</strong></td><td>Microservices</td><td>Teams deploy independently</td></tr>
+                    <tr><td><strong>Rapid feature iteration</strong></td><td>Microservices + CI/CD</td><td>Deploy without coordinating</td></tr>
+                    <tr><td><strong>Variable/spiky traffic</strong></td><td>Serverless</td><td>Auto-scale to zero, pay-per-use</td></tr>
+                    <tr><td><strong>Event processing</strong></td><td>Event-Driven + Serverless</td><td>React to events, loose coupling</td></tr>
+                    <tr><td><strong>Legacy integration</strong></td><td>Hybrid Cloud</td><td>Connect on-prem to cloud</td></tr>
+                    <tr><td><strong>Unified analytics</strong></td><td>Data Lakehouse</td><td>BI + ML on same platform</td></tr>
+                    <tr><td><strong>Simple, small team</strong></td><td>Modular Monolith</td><td>Lower complexity, faster to start</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Agent -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered architecture design</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🏗️ ArchitectAgent</h3>
+                    <p>Analyzes requirements and generates cloud architecture designs. Creates infrastructure diagrams, Terraform code, and cost estimates based on workload characteristics and constraints.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Requirements analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">🎨</span> Architecture diagram generation</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Terraform/IaC code generation</div>
+                        <div class="agent-capability"><span class="capability-icon">💰</span> Cost estimation</div>
+                        <div class="agent-capability"><span class="capability-icon">✅</span> Well-Architected review</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">architect_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Architecture design tools</span>
+diagram_tool = DiagramGeneratorTool()
+terraform_tool = TerraformGeneratorTool()
+cost_tool = CloudCostEstimatorTool()
+wa_tool = WellArchitectedReviewTool()
+
+<span class="code-comment"># Architect Agent</span>
+architect = Agent(
+    role=<span class="code-string">"Cloud Solutions Architect"</span>,
+    goal=<span class="code-string">"""Design optimal cloud architectures
+    based on requirements, generate IaC code,
+    and ensure Well-Architected compliance."""</span>,
+    tools=[diagram_tool, terraform_tool, 
+           cost_tool, wa_tool],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Architecture Design Task</span>
+design_task = Task(
+    description=<span class="code-string">"""
+    1. Analyze workload requirements
+    2. Select appropriate architecture pattern
+    3. Design component topology
+    4. Generate architecture diagram
+    5. Create Terraform modules
+    6. Estimate monthly costs
+    7. Review against Well-Architected
+    """</span>,
+    agent=architect
+)
+
+crew = Crew(agents=[architect], tasks=[design_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring cloud platforms</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat12-p1-cloud-providers.html" class="related-card">
+                    <div class="related-icon">🏢</div>
+                    <div class="related-title">Cloud Providers</div>
+                    <div class="related-desc">AWS, Azure, GCP services and comparison</div>
+                </a>
+                <a href="cat12-p3-migration-strategies.html" class="related-card">
+                    <div class="related-icon">🚀</div>
+                    <div class="related-title">Migration Strategies</div>
+                    <div class="related-desc">6Rs framework and migration execution</div>
+                </a>
+                <a href="cat12-p4-compute-containers.html" class="related-card">
+                    <div class="related-icon">📦</div>
+                    <div class="related-title">Compute & Containers</div>
+                    <div class="related-desc">Kubernetes, Docker, and serverless compute</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat12-p1-cloud-providers.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">12.1 Cloud Providers</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 12.2</div>
+        <a href="cat12-p3-migration-strategies.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">12.3 Migration Strategies</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>
