@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Pulse | Strategy Hub Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --bg-void: #050508;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --border-glow: #3a3a5e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --cat01: #3B82F6; --cat02: #10B981; --cat03: #8B5CF6; --cat04: #EC4899;
+            --cat05: #06B6D4; --cat06: #F59E0B; --cat07: #14B8A6; --cat08: #EF4444;
+            --cat09: #6366F1; --cat10: #84CC16; --cat11: #F97316; --cat12: #0EA5E9;
+            --cat13: #A855F7; --cat14: #22D3EE; --cat15: #FACC15; --cat16: #FB923C;
+            --cat17: #4ADE80; --cat18: #C084FC; --cat19: #2DD4BF; --cat20: #F472B6;
+            --cat21: #818CF8; --cat22: #FB7185; --cat23: #34D399; --cat24: #A78BFA;
+            --cat25: #FCD34D; --cat26: #67E8F9; --cat27: #86EFAC; --cat28: #FCA5A5;
+            --cat29: #D8B4FE;
+        }
+
+        @keyframes pulse-glow { 
+            0%, 100% { box-shadow: 0 0 20px var(--glow-color, rgba(255,153,0,0.3)); }
+            50% { box-shadow: 0 0 40px var(--glow-color, rgba(255,153,0,0.5)); }
+        }
+        @keyframes pulse-ring-1 {
+            0% { 
+                width: 110px; 
+                height: 110px; 
+                opacity: 0.5;
+                border-color: rgba(255, 153, 0, 0.8);
+            }
+            100% { 
+                width: 1400px; 
+                height: 1400px; 
+                opacity: 0;
+                border-color: rgba(59, 130, 246, 0);
+            }
+        }
+        @keyframes pulse-ring-2 {
+            0% { 
+                width: 110px; 
+                height: 110px; 
+                opacity: 0.5;
+                border-color: rgba(255, 102, 0, 0.8);
+            }
+            100% { 
+                width: 1400px; 
+                height: 1400px; 
+                opacity: 0;
+                border-color: rgba(16, 185, 129, 0);
+            }
+        }
+        @keyframes pulse-ring-3 {
+            0% { 
+                width: 110px; 
+                height: 110px; 
+                opacity: 0.5;
+                border-color: rgba(255, 153, 0, 0.8);
+            }
+            100% { 
+                width: 1400px; 
+                height: 1400px; 
+                opacity: 0;
+                border-color: rgba(168, 85, 247, 0);
+            }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes orbit-1 { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes orbit-2 { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+        @keyframes orbit-3 { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes orbit-4 { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+        @keyframes counter-rotate-1 { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+        @keyframes counter-rotate-2 { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes counter-rotate-3 { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+        @keyframes counter-rotate-4 { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-void);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* PULSE RINGS - emanating from center hub */
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid var(--brand-orange);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+            width: 110px;
+            height: 110px;
+        }
+
+        .pulse-ring-1 { animation: pulse-ring-1 6s ease-out infinite; }
+        .pulse-ring-2 { animation: pulse-ring-2 6s ease-out infinite 2s; }
+        .pulse-ring-3 { animation: pulse-ring-3 6s ease-out infinite 4s; }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255,153,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,153,0,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* HEADER */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .logo-section { display: flex; align-items: center; gap: 24px; }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo span { color: var(--brand-orange); }
+
+        .header-tagline {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .header-stats { display: flex; gap: 32px; }
+        .header-stat { text-align: center; }
+        .header-stat-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--brand-orange);
+        }
+        .header-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 40px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 10;
+        }
+
+        .hero-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 6px;
+            color: var(--brand-orange);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, var(--brand-orange) 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ORBITAL VISUALIZATION */
+        .orbital-container {
+            position: relative;
+            width: 800px;
+            height: 800px;
+            margin: 20px auto;
+            overflow: visible;
+        }
+
+        /* Static visible rings - each with unique color */
+        .orbital-ring {
+            position: absolute;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+        }
+
+        .ring-1 { 
+            width: 260px; height: 260px; margin: -130px 0 0 -130px; 
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.05), inset 0 0 15px rgba(59, 130, 246, 0.03);
+        }
+        .ring-2 { 
+            width: 400px; height: 400px; margin: -200px 0 0 -200px; 
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.05), inset 0 0 15px rgba(16, 185, 129, 0.03);
+        }
+        .ring-3 { 
+            width: 560px; height: 560px; margin: -280px 0 0 -280px; 
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.05), inset 0 0 15px rgba(168, 85, 247, 0.03);
+        }
+        .ring-4 { 
+            width: 720px; height: 720px; margin: -360px 0 0 -360px; 
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.05), inset 0 0 15px rgba(34, 211, 238, 0.03);
+        }
+
+        /* Rotating orbit paths */
+        .orbit-path {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .orbit-1 { width: 260px; height: 260px; margin: -130px 0 0 -130px; animation: orbit-1 35s linear infinite; }
+        .orbit-2 { width: 400px; height: 400px; margin: -200px 0 0 -200px; animation: orbit-2 45s linear infinite; }
+        .orbit-3 { width: 560px; height: 560px; margin: -280px 0 0 -280px; animation: orbit-3 90s linear infinite; }
+        .orbit-4 { width: 720px; height: 720px; margin: -360px 0 0 -360px; animation: orbit-4 55s linear infinite; }
+
+        .orbital-item {
+            position: absolute;
+            width: 52px;
+            height: 52px;
+            margin: -26px 0 0 -26px;
+            background: var(--bg-card);
+            border: 2px solid var(--item-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: box-shadow 0.3s;
+            text-decoration: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5), 0 0 10px var(--item-color);
+            pointer-events: auto;
+        }
+
+        .orbit-1 .orbital-item { animation: counter-rotate-1 35s linear infinite; }
+        .orbit-2 .orbital-item { animation: counter-rotate-2 45s linear infinite; }
+        .orbit-3 .orbital-item { animation: counter-rotate-3 90s linear infinite; }
+        .orbit-4 .orbital-item { animation: counter-rotate-4 55s linear infinite; }
+
+        .orbital-item:hover {
+            box-shadow: 0 0 30px var(--item-color), 0 0 60px var(--item-color);
+            z-index: 100;
+        }
+
+        .orbital-item::after {
+            content: attr(data-name);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-family: 'Orbitron', sans-serif;
+            white-space: nowrap;
+            color: var(--text-primary);
+            opacity: 0;
+            transition: opacity 0.3s;
+            background: rgba(18,18,26,0.95);
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--item-color);
+            pointer-events: none;
+        }
+
+        .orbital-item:hover::after { opacity: 1; }
+
+        /* Ring 1 - 5 items on 260px ring (radius 130px, center at 130,130) */
+        .orbit-1 .item-1 { top: 0px; left: 130px; }
+        .orbit-1 .item-2 { top: 89px; left: 254px; }
+        .orbit-1 .item-3 { top: 235px; left: 207px; }
+        .orbit-1 .item-4 { top: 235px; left: 53px; }
+        .orbit-1 .item-5 { top: 89px; left: 6px; }
+
+        /* Ring 2 - 6 items on 400px ring (radius 200px, center at 200,200) */
+        .orbit-2 .item-1 { top: 0px; left: 200px; }
+        .orbit-2 .item-2 { top: 100px; left: 373px; }
+        .orbit-2 .item-3 { top: 300px; left: 373px; }
+        .orbit-2 .item-4 { top: 400px; left: 200px; }
+        .orbit-2 .item-5 { top: 300px; left: 27px; }
+        .orbit-2 .item-6 { top: 100px; left: 27px; }
+
+        /* Ring 3 - 8 items on 560px ring (radius 280px, center at 280,280) */
+        .orbit-3 .item-1 { top: 0px; left: 280px; }
+        .orbit-3 .item-2 { top: 82px; left: 478px; }
+        .orbit-3 .item-3 { top: 280px; left: 560px; }
+        .orbit-3 .item-4 { top: 478px; left: 478px; }
+        .orbit-3 .item-5 { top: 560px; left: 280px; }
+        .orbit-3 .item-6 { top: 478px; left: 82px; }
+        .orbit-3 .item-7 { top: 280px; left: 0px; }
+        .orbit-3 .item-8 { top: 82px; left: 82px; }
+
+        /* Ring 4 - 10 items on 720px ring (radius 360px, center at 360,360) */
+        .orbit-4 .item-1 { top: 0px; left: 360px; }
+        .orbit-4 .item-2 { top: 69px; left: 572px; }
+        .orbit-4 .item-3 { top: 249px; left: 703px; }
+        .orbit-4 .item-4 { top: 471px; left: 703px; }
+        .orbit-4 .item-5 { top: 651px; left: 572px; }
+        .orbit-4 .item-6 { top: 720px; left: 360px; }
+        .orbit-4 .item-7 { top: 651px; left: 148px; }
+        .orbit-4 .item-8 { top: 471px; left: 17px; }
+        .orbit-4 .item-9 { top: 249px; left: 17px; }
+        .orbit-4 .item-10 { top: 69px; left: 148px; }
+
+        /* Center Hub */
+        .orbital-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--brand-orange), #ff6600);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            animation: pulse-glow 2s ease-in-out infinite;
+            --glow-color: rgba(255,153,0,0.6);
+            z-index: 50;
+            box-shadow: 0 0 40px rgba(255,153,0,0.4), 0 0 80px rgba(255,153,0,0.2);
+        }
+
+        .orbital-center-number {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .orbital-center-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        /* DOMAIN LEGEND */
+        .domain-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-item span { font-weight: 600; }
+
+        /* SCROLL INDICATOR */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .scroll-indicator span {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .scroll-mouse {
+            width: 24px;
+            height: 40px;
+            border: 2px solid var(--border-glow);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .scroll-mouse::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: var(--brand-orange);
+            border-radius: 2px;
+            animation: float 1.5s ease-in-out infinite;
+        }
+
+        /* CATEGORY GRID SECTION */
+        .grid-section {
+            padding: 80px 40px;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: var(--brand-orange);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        /* Domain Groups */
+        .domain-group {
+            max-width: 1600px;
+            margin: 0 auto 60px;
+        }
+
+        .domain-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .domain-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .domain-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .domain-count-badge {
+            background: var(--bg-card-alt);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .category-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .cat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--cat-color);
+        }
+
+        .cat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--cat-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .cat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .cat-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--cat-color), transparent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .cat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: var(--text-muted);
+            background: var(--bg-card-alt);
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-left: auto;
+        }
+
+        .cat-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .cat-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .cat-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .cat-stat {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .cat-stat strong {
+            color: var(--cat-color);
+            font-weight: 700;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .footer-logo span { color: var(--brand-orange); }
+
+        .footer-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .orbital-container { width: 550px; height: 550px; }
+            .ring-1 { width: 180px; height: 180px; margin: -90px 0 0 -90px; }
+            .ring-2 { width: 280px; height: 280px; margin: -140px 0 0 -140px; }
+            .ring-3 { width: 390px; height: 390px; margin: -195px 0 0 -195px; }
+            .ring-4 { width: 500px; height: 500px; margin: -250px 0 0 -250px; }
+            .orbit-1 { width: 180px; height: 180px; margin: -90px 0 0 -90px; }
+            .orbit-2 { width: 280px; height: 280px; margin: -140px 0 0 -140px; }
+            .orbit-3 { width: 390px; height: 390px; margin: -195px 0 0 -195px; }
+            .orbit-4 { width: 500px; height: 500px; margin: -250px 0 0 -250px; }
+            .orbital-item { width: 40px; height: 40px; margin: -20px 0 0 -20px; font-size: 16px; }
+            /* Ring 1 scaled (radius 90px) */
+            .orbit-1 .item-1 { top: 0px; left: 90px; }
+            .orbit-1 .item-2 { top: 62px; left: 176px; }
+            .orbit-1 .item-3 { top: 163px; left: 143px; }
+            .orbit-1 .item-4 { top: 163px; left: 37px; }
+            .orbit-1 .item-5 { top: 62px; left: 4px; }
+            /* Ring 2 scaled (radius 140px) */
+            .orbit-2 .item-1 { top: 0px; left: 140px; }
+            .orbit-2 .item-2 { top: 70px; left: 261px; }
+            .orbit-2 .item-3 { top: 210px; left: 261px; }
+            .orbit-2 .item-4 { top: 280px; left: 140px; }
+            .orbit-2 .item-5 { top: 210px; left: 19px; }
+            .orbit-2 .item-6 { top: 70px; left: 19px; }
+            /* Ring 3 scaled (radius 195px) */
+            .orbit-3 .item-1 { top: 0px; left: 195px; }
+            .orbit-3 .item-2 { top: 57px; left: 333px; }
+            .orbit-3 .item-3 { top: 195px; left: 390px; }
+            .orbit-3 .item-4 { top: 333px; left: 333px; }
+            .orbit-3 .item-5 { top: 390px; left: 195px; }
+            .orbit-3 .item-6 { top: 333px; left: 57px; }
+            .orbit-3 .item-7 { top: 195px; left: 0px; }
+            .orbit-3 .item-8 { top: 57px; left: 57px; }
+            /* Ring 4 scaled (radius 250px) */
+            .orbit-4 .item-1 { top: 0px; left: 250px; }
+            .orbit-4 .item-2 { top: 48px; left: 397px; }
+            .orbit-4 .item-3 { top: 173px; left: 488px; }
+            .orbit-4 .item-4 { top: 327px; left: 488px; }
+            .orbit-4 .item-5 { top: 452px; left: 397px; }
+            .orbit-4 .item-6 { top: 500px; left: 250px; }
+            .orbit-4 .item-7 { top: 452px; left: 103px; }
+            .orbit-4 .item-8 { top: 327px; left: 12px; }
+            .orbit-4 .item-9 { top: 173px; left: 12px; }
+            .orbit-4 .item-10 { top: 48px; left: 103px; }
+            .orbital-center { width: 80px; height: 80px; }
+            .orbital-center-number { font-size: 26px; }
+            .orbital-center-label { font-size: 7px; }
+            .hero-title { font-size: 42px; }
+        }
+
+        @media (max-width: 600px) {
+            .orbital-container { width: 340px; height: 340px; }
+            .ring-1 { width: 110px; height: 110px; margin: -55px 0 0 -55px; }
+            .ring-2 { width: 170px; height: 170px; margin: -85px 0 0 -85px; }
+            .ring-3 { width: 240px; height: 240px; margin: -120px 0 0 -120px; }
+            .ring-4 { width: 310px; height: 310px; margin: -155px 0 0 -155px; }
+            .orbit-1 { width: 110px; height: 110px; margin: -55px 0 0 -55px; }
+            .orbit-2 { width: 170px; height: 170px; margin: -85px 0 0 -85px; }
+            .orbit-3 { width: 240px; height: 240px; margin: -120px 0 0 -120px; }
+            .orbit-4 { width: 310px; height: 310px; margin: -155px 0 0 -155px; }
+            .orbital-item { width: 28px; height: 28px; margin: -14px 0 0 -14px; font-size: 11px; border-radius: 8px; }
+            /* Ring 1 scaled (radius 55px) */
+            .orbit-1 .item-1 { top: 0px; left: 55px; }
+            .orbit-1 .item-2 { top: 38px; left: 107px; }
+            .orbit-1 .item-3 { top: 100px; left: 88px; }
+            .orbit-1 .item-4 { top: 100px; left: 22px; }
+            .orbit-1 .item-5 { top: 38px; left: 3px; }
+            /* Ring 2 scaled (radius 85px) */
+            .orbit-2 .item-1 { top: 0px; left: 85px; }
+            .orbit-2 .item-2 { top: 43px; left: 159px; }
+            .orbit-2 .item-3 { top: 127px; left: 159px; }
+            .orbit-2 .item-4 { top: 170px; left: 85px; }
+            .orbit-2 .item-5 { top: 127px; left: 11px; }
+            .orbit-2 .item-6 { top: 43px; left: 11px; }
+            /* Ring 3 scaled (radius 120px) */
+            .orbit-3 .item-1 { top: 0px; left: 120px; }
+            .orbit-3 .item-2 { top: 35px; left: 205px; }
+            .orbit-3 .item-3 { top: 120px; left: 240px; }
+            .orbit-3 .item-4 { top: 205px; left: 205px; }
+            .orbit-3 .item-5 { top: 240px; left: 120px; }
+            .orbit-3 .item-6 { top: 205px; left: 35px; }
+            .orbit-3 .item-7 { top: 120px; left: 0px; }
+            .orbit-3 .item-8 { top: 35px; left: 35px; }
+            /* Ring 4 scaled (radius 155px) */
+            .orbit-4 .item-1 { top: 0px; left: 155px; }
+            .orbit-4 .item-2 { top: 30px; left: 246px; }
+            .orbit-4 .item-3 { top: 107px; left: 302px; }
+            .orbit-4 .item-4 { top: 203px; left: 302px; }
+            .orbit-4 .item-5 { top: 280px; left: 246px; }
+            .orbit-4 .item-6 { top: 310px; left: 155px; }
+            .orbit-4 .item-7 { top: 280px; left: 64px; }
+            .orbit-4 .item-8 { top: 203px; left: 8px; }
+            .orbit-4 .item-9 { top: 107px; left: 8px; }
+            .orbit-4 .item-10 { top: 30px; left: 64px; }
+            .orbital-center { width: 55px; height: 55px; }
+            .orbital-center-number { font-size: 18px; }
+            .orbital-center-label { font-size: 5px; }
+            .header-stats { display: none; }
+            .hero-title { font-size: 32px; }
+            .domain-legend { gap: 12px; }
+            .legend-item { padding: 6px 12px; font-size: 10px; }
+            footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-section">
+            <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+            <div class="header-tagline">Quick Pulse</div>
+        </div>
+        
+        <div class="header-stats">
+            <div class="header-stat">
+                <div class="header-stat-value">29</div>
+                <div class="header-stat-label">Categories</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value">200+</div>
+                <div class="header-stat-label">Topics</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value">5</div>
+                <div class="header-stat-label">Domains</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-subtitle">Enterprise Technology Command Center</div>
+            <h1 class="hero-title">Quick Pulse</h1>
+            <p class="hero-desc">
+                Navigate 29 categories across 5 domains of enterprise technology. 
+                Your rapid-fire guide to the Strategy Hub ecosystem.
+            </p>
+        </div>
+
+        <!-- ORBITAL VISUALIZATION -->
+        <div class="orbital-container">
+            <!-- Static Rings -->
+            <div class="orbital-ring ring-1"></div>
+            <div class="orbital-ring ring-2"></div>
+            <div class="orbital-ring ring-3"></div>
+            <div class="orbital-ring ring-4"></div>
+
+            <!-- Ring 1: 5 items - Core AI/ML -->
+            <div class="orbit-path orbit-1">
+                <a href="cat01-aiml-foundations.html" class="orbital-item item-1" style="--item-color: var(--cat01)" data-name="AI/ML Foundations">🧠</a>
+                <a href="cat05-generative-ai.html" class="orbital-item item-2" style="--item-color: var(--cat05)" data-name="Generative AI">✨</a>
+                <a href="cat04-data-science.html" class="orbital-item item-3" style="--item-color: var(--cat04)" data-name="Data Science">🔬</a>
+                <a href="cat06-chatbots-agents.html" class="orbital-item item-4" style="--item-color: var(--cat06)" data-name="Chatbots & Agents">🤖</a>
+                <a href="cat23-computer-vision.html" class="orbital-item item-5" style="--item-color: var(--cat23)" data-name="Computer Vision">👁️</a>
+            </div>
+
+            <!-- Ring 2: 6 items - Data -->
+            <div class="orbit-path orbit-2">
+                <a href="cat02-data-engineering.html" class="orbital-item item-1" style="--item-color: var(--cat02)" data-name="Data Engineering">🔄</a>
+                <a href="cat03-analytics-bi.html" class="orbital-item item-2" style="--item-color: var(--cat03)" data-name="Analytics & BI">📊</a>
+                <a href="cat13-migration-factory.html" class="orbital-item item-3" style="--item-color: var(--cat13)" data-name="Migration Factory">🏭</a>
+                <a href="cat25-data-security.html" class="orbital-item item-4" style="--item-color: var(--cat25)" data-name="Data Security">🔐</a>
+                <a href="cat26-governance.html" class="orbital-item item-5" style="--item-color: var(--cat26)" data-name="Governance">📋</a>
+                <a href="cat07-knowledge-management.html" class="orbital-item item-6" style="--item-color: var(--cat07)" data-name="Knowledge Mgmt">📚</a>
+            </div>
+
+            <!-- Ring 3: 8 items - Infrastructure & Operations -->
+            <div class="orbit-path orbit-3">
+                <a href="cat09-sdlc-devops.html" class="orbital-item item-1" style="--item-color: var(--cat09)" data-name="SDLC & DevOps">🔧</a>
+                <a href="cat12-cloud-platforms.html" class="orbital-item item-2" style="--item-color: var(--cat12)" data-name="Cloud Platforms">☁️</a>
+                <a href="cat14-integration-apis.html" class="orbital-item item-3" style="--item-color: var(--cat14)" data-name="Integration & APIs">🔗</a>
+                <a href="cat15-networking.html" class="orbital-item item-4" style="--item-color: var(--cat15)" data-name="Networking">🌐</a>
+                <a href="cat16-monitoring-observability.html" class="orbital-item item-5" style="--item-color: var(--cat16)" data-name="Monitoring">📈</a>
+                <a href="cat11-security-compliance.html" class="orbital-item item-6" style="--item-color: var(--cat11)" data-name="Security">🛡️</a>
+                <a href="cat24-design-patterns.html" class="orbital-item item-7" style="--item-color: var(--cat24)" data-name="Design Patterns">🏗️</a>
+                <a href="cat08-automation-rpa.html" class="orbital-item item-8" style="--item-color: var(--cat08)" data-name="Automation & RPA">⚙️</a>
+            </div>
+
+            <!-- Ring 4: 10 items - Strategy & Business -->
+            <div class="orbit-path orbit-4">
+                <a href="cat10-product-building.html" class="orbital-item item-1" style="--item-color: var(--cat10)" data-name="Product Building">🚀</a>
+                <a href="cat17-change-management.html" class="orbital-item item-2" style="--item-color: var(--cat17)" data-name="Change Mgmt">🔄</a>
+                <a href="cat18-implementation.html" class="orbital-item item-3" style="--item-color: var(--cat18)" data-name="Implementation">📦</a>
+                <a href="cat19-emerging-technologies.html" class="orbital-item item-4" style="--item-color: var(--cat19)" data-name="Emerging Tech">🔮</a>
+                <a href="cat20-industry-forecasts.html" class="orbital-item item-5" style="--item-color: var(--cat20)" data-name="Forecasts">📰</a>
+                <a href="cat21-white-papers-research.html" class="orbital-item item-6" style="--item-color: var(--cat21)" data-name="Research">📄</a>
+                <a href="cat22-competitive-intelligence.html" class="orbital-item item-7" style="--item-color: var(--cat22)" data-name="Competitive Intel">🎯</a>
+                <a href="cat27-finops.html" class="orbital-item item-8" style="--item-color: var(--cat27)" data-name="FinOps">💰</a>
+                <a href="cat28-industry-verticals.html" class="orbital-item item-9" style="--item-color: var(--cat28)" data-name="Verticals">🏢</a>
+                <a href="cat29-methodologies.html" class="orbital-item item-10" style="--item-color: var(--cat29)" data-name="Methodologies">📐</a>
+            </div>
+
+            <!-- PULSE RINGS - Quick Pulse radiating from center -->
+            <div class="pulse-ring pulse-ring-1"></div>
+            <div class="pulse-ring pulse-ring-2"></div>
+            <div class="pulse-ring pulse-ring-3"></div>
+
+            <!-- Center Hub -->
+            <div class="orbital-center">
+                <div class="orbital-center-number">29</div>
+                <div class="orbital-center-label">CATEGORIES</div>
+            </div>
+        </div>
+
+        <!-- Domain Legend -->
+        <div class="domain-legend">
+            <div class="legend-item">
+                <div class="legend-dot" style="background: var(--cat01)"></div>
+                <span>AI & ML</span> (5)
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: var(--cat02)"></div>
+                <span>Data</span> (6)
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: var(--cat12)"></div>
+                <span>Infrastructure</span> (8)
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: var(--cat10)"></div>
+                <span>Strategy</span> (10)
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"></div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- CATEGORY GRID BY DOMAIN -->
+    <section class="grid-section" id="categories">
+        <div class="section-header">
+            <div class="section-tag">All Categories</div>
+            <h2 class="section-title">Browse by Domain</h2>
+        </div>
+
+        <!-- AI & ML Domain -->
+        <div class="domain-group">
+            <div class="domain-header">
+                <div class="domain-icon">🧠</div>
+                <div class="domain-name">AI & Machine Learning</div>
+                <div class="domain-count-badge">5 Categories</div>
+            </div>
+            <div class="category-row">
+                <a href="cat01-aiml-foundations.html" class="cat-card" style="--cat-color: var(--cat01)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🧠</div>
+                        <span class="cat-number">01</span>
+                    </div>
+                    <div class="cat-name">AI/ML Foundations</div>
+                    <div class="cat-desc">Core ML concepts, neural networks, and model training fundamentals</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>8</strong> Pages</span><span class="cat-stat"><strong>12</strong> Tools</span></div>
+                </a>
+                <a href="cat04-data-science.html" class="cat-card" style="--cat-color: var(--cat04)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔬</div>
+                        <span class="cat-number">04</span>
+                    </div>
+                    <div class="cat-name">Data Science</div>
+                    <div class="cat-desc">Statistical modeling, experimentation, and predictive analytics</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>8</strong> Tools</span></div>
+                </a>
+                <a href="cat05-generative-ai.html" class="cat-card" style="--cat-color: var(--cat05)">
+                    <div class="cat-header">
+                        <div class="cat-icon">✨</div>
+                        <span class="cat-number">05</span>
+                    </div>
+                    <div class="cat-name">Generative AI</div>
+                    <div class="cat-desc">LLMs, prompt engineering, RAG, and AI application development</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>8</strong> Pages</span><span class="cat-stat"><strong>14</strong> Tools</span></div>
+                </a>
+                <a href="cat06-chatbots-agents.html" class="cat-card" style="--cat-color: var(--cat06)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🤖</div>
+                        <span class="cat-number">06</span>
+                    </div>
+                    <div class="cat-name">Chatbots & Agents</div>
+                    <div class="cat-desc">Conversational AI, virtual assistants, and autonomous agents</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>9</strong> Tools</span></div>
+                </a>
+                <a href="cat23-computer-vision.html" class="cat-card" style="--cat-color: var(--cat23)">
+                    <div class="cat-header">
+                        <div class="cat-icon">👁️</div>
+                        <span class="cat-number">23</span>
+                    </div>
+                    <div class="cat-name">Computer Vision</div>
+                    <div class="cat-desc">Image recognition, video analytics, and visual AI applications</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>10</strong> Tools</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Data Domain -->
+        <div class="domain-group">
+            <div class="domain-header">
+                <div class="domain-icon">📊</div>
+                <div class="domain-name">Data Platform & Analytics</div>
+                <div class="domain-count-badge">6 Categories</div>
+            </div>
+            <div class="category-row">
+                <a href="cat02-data-engineering.html" class="cat-card" style="--cat-color: var(--cat02)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔄</div>
+                        <span class="cat-number">02</span>
+                    </div>
+                    <div class="cat-name">Data Engineering</div>
+                    <div class="cat-desc">Data pipelines, ETL/ELT, and modern data architectures</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>9</strong> Pages</span><span class="cat-stat"><strong>15</strong> Tools</span></div>
+                </a>
+                <a href="cat03-analytics-bi.html" class="cat-card" style="--cat-color: var(--cat03)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📊</div>
+                        <span class="cat-number">03</span>
+                    </div>
+                    <div class="cat-name">Analytics & BI</div>
+                    <div class="cat-desc">Dashboards, visualization, and self-service analytics</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>7</strong> Pages</span><span class="cat-stat"><strong>10</strong> Tools</span></div>
+                </a>
+                <a href="cat07-knowledge-management.html" class="cat-card" style="--cat-color: var(--cat07)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📚</div>
+                        <span class="cat-number">07</span>
+                    </div>
+                    <div class="cat-name">Knowledge Management</div>
+                    <div class="cat-desc">Enterprise knowledge bases and information architecture</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>7</strong> Tools</span></div>
+                </a>
+                <a href="cat13-migration-factory.html" class="cat-card" style="--cat-color: var(--cat13)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🏭</div>
+                        <span class="cat-number">13</span>
+                    </div>
+                    <div class="cat-name">Migration Factory</div>
+                    <div class="cat-desc">Legacy modernization and data platform transitions</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>7</strong> Pages</span><span class="cat-stat"><strong>8</strong> Tools</span></div>
+                </a>
+                <a href="cat25-data-security.html" class="cat-card" style="--cat-color: var(--cat25)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔐</div>
+                        <span class="cat-number">25</span>
+                    </div>
+                    <div class="cat-name">Data Security</div>
+                    <div class="cat-desc">Encryption, privacy frameworks, and data protection</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>8</strong> Tools</span></div>
+                </a>
+                <a href="cat26-governance.html" class="cat-card" style="--cat-color: var(--cat26)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📋</div>
+                        <span class="cat-number">26</span>
+                    </div>
+                    <div class="cat-name">Governance</div>
+                    <div class="cat-desc">Data governance, metadata management, and data quality</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>7</strong> Tools</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Infrastructure Domain -->
+        <div class="domain-group">
+            <div class="domain-header">
+                <div class="domain-icon">☁️</div>
+                <div class="domain-name">Infrastructure & Operations</div>
+                <div class="domain-count-badge">8 Categories</div>
+            </div>
+            <div class="category-row">
+                <a href="cat08-automation-rpa.html" class="cat-card" style="--cat-color: var(--cat08)">
+                    <div class="cat-header">
+                        <div class="cat-icon">⚙️</div>
+                        <span class="cat-number">08</span>
+                    </div>
+                    <div class="cat-name">Automation & RPA</div>
+                    <div class="cat-desc">Process automation and robotic process automation</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>11</strong> Tools</span></div>
+                </a>
+                <a href="cat09-sdlc-devops.html" class="cat-card" style="--cat-color: var(--cat09)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔧</div>
+                        <span class="cat-number">09</span>
+                    </div>
+                    <div class="cat-name">SDLC & DevOps</div>
+                    <div class="cat-desc">CI/CD pipelines, GitOps, and infrastructure as code</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>7</strong> Pages</span><span class="cat-stat"><strong>13</strong> Tools</span></div>
+                </a>
+                <a href="cat11-security-compliance.html" class="cat-card" style="--cat-color: var(--cat11)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🛡️</div>
+                        <span class="cat-number">11</span>
+                    </div>
+                    <div class="cat-name">Security & Compliance</div>
+                    <div class="cat-desc">Cybersecurity frameworks and compliance standards</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>10</strong> Tools</span></div>
+                </a>
+                <a href="cat12-cloud-platforms.html" class="cat-card" style="--cat-color: var(--cat12)">
+                    <div class="cat-header">
+                        <div class="cat-icon">☁️</div>
+                        <span class="cat-number">12</span>
+                    </div>
+                    <div class="cat-name">Cloud Platforms</div>
+                    <div class="cat-desc">AWS, Azure, GCP, and multi-cloud strategies</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>9</strong> Pages</span><span class="cat-stat"><strong>16</strong> Tools</span></div>
+                </a>
+                <a href="cat14-integration-apis.html" class="cat-card" style="--cat-color: var(--cat14)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔗</div>
+                        <span class="cat-number">14</span>
+                    </div>
+                    <div class="cat-name">Integration & APIs</div>
+                    <div class="cat-desc">API design, iPaaS, and event-driven architectures</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>9</strong> Tools</span></div>
+                </a>
+                <a href="cat15-networking.html" class="cat-card" style="--cat-color: var(--cat15)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🌐</div>
+                        <span class="cat-number">15</span>
+                    </div>
+                    <div class="cat-name">Networking</div>
+                    <div class="cat-desc">CDN, DNS, load balancing, and edge computing</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>4</strong> Pages</span><span class="cat-stat"><strong>7</strong> Tools</span></div>
+                </a>
+                <a href="cat16-monitoring-observability.html" class="cat-card" style="--cat-color: var(--cat16)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📈</div>
+                        <span class="cat-number">16</span>
+                    </div>
+                    <div class="cat-name">Monitoring & Observability</div>
+                    <div class="cat-desc">APM, logging, tracing, and system visibility</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>12</strong> Tools</span></div>
+                </a>
+                <a href="cat24-design-patterns.html" class="cat-card" style="--cat-color: var(--cat24)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🏗️</div>
+                        <span class="cat-number">24</span>
+                    </div>
+                    <div class="cat-name">Design Patterns</div>
+                    <div class="cat-desc">Software architecture and microservices patterns</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>7</strong> Pages</span><span class="cat-stat"><strong>5</strong> Tools</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Strategy Domain -->
+        <div class="domain-group">
+            <div class="domain-header">
+                <div class="domain-icon">🚀</div>
+                <div class="domain-name">Strategy & Business</div>
+                <div class="domain-count-badge">10 Categories</div>
+            </div>
+            <div class="category-row">
+                <a href="cat10-product-building.html" class="cat-card" style="--cat-color: var(--cat10)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🚀</div>
+                        <span class="cat-number">10</span>
+                    </div>
+                    <div class="cat-name">Product Building</div>
+                    <div class="cat-desc">Product management and go-to-market strategies</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>8</strong> Pages</span><span class="cat-stat"><strong>6</strong> Tools</span></div>
+                </a>
+                <a href="cat17-change-management.html" class="cat-card" style="--cat-color: var(--cat17)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔄</div>
+                        <span class="cat-number">17</span>
+                    </div>
+                    <div class="cat-name">Change Management</div>
+                    <div class="cat-desc">Organizational change and adoption frameworks</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>5</strong> Tools</span></div>
+                </a>
+                <a href="cat18-implementation.html" class="cat-card" style="--cat-color: var(--cat18)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📦</div>
+                        <span class="cat-number">18</span>
+                    </div>
+                    <div class="cat-name">Implementation</div>
+                    <div class="cat-desc">Project delivery and deployment strategies</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>6</strong> Pages</span><span class="cat-stat"><strong>6</strong> Tools</span></div>
+                </a>
+                <a href="cat19-emerging-technologies.html" class="cat-card" style="--cat-color: var(--cat19)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🔮</div>
+                        <span class="cat-number">19</span>
+                    </div>
+                    <div class="cat-name">Emerging Technologies</div>
+                    <div class="cat-desc">Blockchain, IoT, AR/VR, and quantum computing</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>7</strong> Pages</span><span class="cat-stat"><strong>8</strong> Tools</span></div>
+                </a>
+                <a href="cat20-industry-forecasts.html" class="cat-card" style="--cat-color: var(--cat20)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📰</div>
+                        <span class="cat-number">20</span>
+                    </div>
+                    <div class="cat-name">Industry Forecasts</div>
+                    <div class="cat-desc">Market analysis and technology trend reports</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>4</strong> Pages</span><span class="cat-stat"><strong>3</strong> Tools</span></div>
+                </a>
+                <a href="cat21-white-papers-research.html" class="cat-card" style="--cat-color: var(--cat21)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📄</div>
+                        <span class="cat-number">21</span>
+                    </div>
+                    <div class="cat-name">White Papers & Research</div>
+                    <div class="cat-desc">Research papers, case studies, and thought leadership</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>4</strong> Tools</span></div>
+                </a>
+                <a href="cat22-competitive-intelligence.html" class="cat-card" style="--cat-color: var(--cat22)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🎯</div>
+                        <span class="cat-number">22</span>
+                    </div>
+                    <div class="cat-name">Competitive Intelligence</div>
+                    <div class="cat-desc">Competitor analysis and strategic benchmarking</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>8</strong> Pages</span><span class="cat-stat"><strong>9</strong> Tools</span></div>
+                </a>
+                <a href="cat27-finops.html" class="cat-card" style="--cat-color: var(--cat27)">
+                    <div class="cat-header">
+                        <div class="cat-icon">💰</div>
+                        <span class="cat-number">27</span>
+                    </div>
+                    <div class="cat-name">FinOps</div>
+                    <div class="cat-desc">Cloud cost optimization and financial operations</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>5</strong> Pages</span><span class="cat-stat"><strong>8</strong> Tools</span></div>
+                </a>
+                <a href="cat28-industry-verticals.html" class="cat-card" style="--cat-color: var(--cat28)">
+                    <div class="cat-header">
+                        <div class="cat-icon">🏢</div>
+                        <span class="cat-number">28</span>
+                    </div>
+                    <div class="cat-name">Industry Verticals</div>
+                    <div class="cat-desc">Healthcare, finance, retail, and manufacturing</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>9</strong> Pages</span><span class="cat-stat"><strong>6</strong> Tools</span></div>
+                </a>
+                <a href="cat29-methodologies.html" class="cat-card" style="--cat-color: var(--cat29)">
+                    <div class="cat-header">
+                        <div class="cat-icon">📐</div>
+                        <span class="cat-number">29</span>
+                    </div>
+                    <div class="cat-name">Methodologies</div>
+                    <div class="cat-desc">Project management and delivery frameworks</div>
+                    <div class="cat-stats"><span class="cat-stat"><strong>8</strong> Pages</span><span class="cat-stat"><strong>5</strong> Tools</span></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-logo">
+            <span>STRATEGY</span>HUB
+        </div>
+        <div class="footer-info">Quick Pulse • 29 Categories • 200+ Topics</div>
+    </footer>
+</body>
+</html>

@@ -3,947 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Implementation | Category 18 | Strategy Hub</title>
+    <title>Implementation | Quick Pulse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* CATEGORY 18 - IMPLEMENTATION AMBER */
-            --brand-orange: #FF9900;
-            --cat-primary: #F59E0B;
-            --cat-light: #FBBF24;
-            --cat-dark: #D97706;
-            --cat-glow: rgba(245, 158, 11, 0.15);
-            
-            /* BACKGROUNDS */
+            --cat-primary: #C084FC;
+            --cat-light: #D8B4FE;
+            --cat-dark: #A855F7;
+            --cat-glow: rgba(192, 132, 252, 0.15);
             --bg-dark: #0a0a0f;
             --bg-card: #12121a;
             --bg-card-alt: #1a1a2e;
-            --bg-hover: #252538;
             --border-color: #2a2a3e;
-            
-            /* TEXT */
             --text-primary: #ffffff;
             --text-secondary: #a0a0b0;
             --text-muted: #6a6a7a;
-            
-            /* ACCENTS */
-            --success-green: #10B981;
-            --warning-yellow: #F59E0B;
-            --danger-red: #EF4444;
-            --blue: #3B82F6;
-            --cyan: #06B6D4;
-            --pink: #EC4899;
-            --teal: #14B8A6;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
             --violet: #8B5CF6;
-            
-            /* LAYOUT */
-            --sidebar-width: 260px;
-            --header-height: 60px;
-            
-            /* SPACING */
-            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
-            
-            /* TYPOGRAPHY */
-            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
-            
-            /* RADIUS */
-            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text-primary); 
+            min-height: 100vh; 
+            padding: 20px; 
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        .dashboard { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            display: grid; 
+            grid-template-columns: 280px 1fr 1fr 280px; 
+            gap: 16px; 
+        }
         
-        /* HEADER */
-        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
-        .logo span { color: var(--brand-orange); }
-        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
-        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-        .breadcrumb a:hover { color: var(--brand-orange); }
-        .breadcrumb .sep { color: var(--text-muted); }
-        .breadcrumb .current { color: var(--text-primary); }
-        
-        /* SIDEBAR */
-        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
-        .sidebar-section { margin-bottom: var(--space-lg); }
-        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
-        .sidebar-nav { list-style: none; }
-        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
-        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
-        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
-        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
-        
-        /* MAIN CONTENT */
-        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
-        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
-        
-        /* HERO */
-        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
-        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
-        .hero-left { display: flex; flex-direction: column; justify-content: center; }
-        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
-        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
-        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
-        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
-        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
-        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
-        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
-        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
-        
-        /* MODULES */
-        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
-        .module:first-of-type { border-top: none; padding-top: 0; }
-        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
-        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
-        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
-        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
-        
-        .description-block { margin-bottom: var(--space-xl); }
-        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
-        
-        /* VIZ CONTAINERS */
-        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
-        .viz-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .viz-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
-        .viz-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); }
-        .viz-canvas { padding: var(--space-lg); background: var(--bg-dark); }
-        .viz-svg { width: 100%; height: auto; }
-        
-        /* TOOL CARDS */
-        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
-        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
-        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
-        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
-        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
-        
-        /* AGENT + CODE */
-        .agent-section { margin-bottom: var(--space-xl); }
-        .agent-section-header { margin-bottom: var(--space-lg); }
-        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
-        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
-        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
-        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
-        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
-        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
-        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
-        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
-        .agent-capabilities { list-style: none; }
-        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
-        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
-        
-        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
-        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
-        .code-tabs { display: flex; }
-        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
-        .code-tab:hover { color: var(--text-secondary); }
-        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
-        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
-        .code-content { padding: var(--space-lg); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
-        .code-content pre { margin: 0; white-space: pre; }
-        .code-comment { color: #6A737D; }
-        .code-keyword { color: #FF7B72; }
-        .code-string { color: #A5D6FF; }
-        .code-function { color: #D2A8FF; }
-        
-        /* DIVIDER */
-        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
-        
-        /* FOOTER */
-        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-xl); margin-left: var(--sidebar-width); }
-        .footer-content { display: flex; justify-content: space-between; align-items: center; }
-        .footer-brand { font-size: var(--font-base); font-weight: 600; }
-        .footer-brand span { color: var(--brand-orange); }
-        .footer-meta { font-size: var(--font-sm); color: var(--text-muted); }
-        
-        /* RESPONSIVE */
-        @media (max-width: 1024px) {
-            .sidebar { display: none; }
-            .main-wrapper { margin-left: 0; }
-            footer { margin-left: 0; }
-            .hero-compact { grid-template-columns: 1fr; }
-            .tools-grid { grid-template-columns: repeat(2, 1fr); }
-            .agent-grid { grid-template-columns: 1fr; }
+        .header { 
+            grid-column: 1 / -1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 16px 24px; 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .cat-badge { 
+            background: var(--cat-glow); 
+            border: 1px solid var(--cat-dark); 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            color: var(--cat-light); 
+            font-weight: 600; 
+        }
+        .cat-badge span { 
+            background: var(--cat-primary); 
+            color: var(--bg-dark); 
+            padding: 2px 8px; 
+            border-radius: 10px; 
+            margin-right: 8px; 
+            font-family: 'Orbitron', sans-serif; 
+        }
+        .title { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 700; }
+        .nav-btn { 
+            padding: 8px 16px; 
+            background: var(--bg-card-alt); 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            color: var(--text-secondary); 
+            text-decoration: none; 
+            font-size: 12px; 
+            font-weight: 600; 
+            transition: all 0.3s; 
+        }
+        .nav-btn:hover { border-color: var(--cat-primary); color: var(--cat-light); }
+
+        .card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 16px; 
+            position: relative; 
+        }
+        .card::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; left: 0; right: 0; 
+            height: 2px; 
+            background: var(--cat-primary); 
+            border-radius: 12px 12px 0 0; 
+        }
+        .card-title { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 11px; 
+            font-weight: 600; 
+            color: var(--cat-light); 
+            margin-bottom: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+
+        .hero-stats { 
+            grid-column: 1; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+        }
+        .stat-box { 
+            background: var(--bg-card-alt); 
+            border-radius: 8px; 
+            padding: 12px; 
+            text-align: center; 
+        }
+        .stat-value { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--cat-light); 
+        }
+        .stat-label { 
+            font-size: 9px; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+
+        .description { grid-column: 2 / 4; }
+        .desc-text { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+            line-height: 1.6; 
+            margin-bottom: 12px; 
+        }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag { 
+            font-size: 10px; 
+            padding: 4px 10px; 
+            background: var(--bg-card-alt); 
+            border-radius: 12px; 
+            color: var(--text-muted); 
+        }
+
+        .value-analysis { grid-column: 4; }
+        .value-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            margin-bottom: 8px; 
+        }
+        .value-label { font-size: 10px; color: var(--text-muted); width: 50px; }
+        .value-bar-bg { 
+            flex: 1; 
+            height: 6px; 
+            background: var(--bg-card-alt); 
+            border-radius: 3px; 
+            overflow: hidden; 
+        }
+        .value-bar { height: 100%; border-radius: 3px; }
+        .value-bar.v1 { width: 75%; background: var(--green); }
+        .value-bar.v2 { width: 58%; background: var(--yellow); }
+        .value-bar.v3 { width: 94%; background: var(--cat-primary); }
+        .value-bar.v4 { width: 60%; background: var(--red); }
+        .value-bar.v5 { width: 82%; background: var(--violet); }
+        .value-score { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 11px; 
+            color: var(--text-primary); 
+            width: 25px; 
+            text-align: right; 
+        }
+
+        .concepts { grid-column: 1 / 3; }
+        .concept-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 8px; 
+        }
+        .concept-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 10px; 
+            background: var(--bg-card-alt); 
+            border-radius: 8px; 
+        }
+        .concept-icon { font-size: 18px; }
+        .concept-text { font-size: 12px; font-weight: 600; }
+        .concept-sub { font-size: 10px; color: var(--text-muted); }
+
+        .tools { grid-column: 3 / 5; }
+        .tools-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; 
+        }
+        .tool-item { 
+            text-align: center; 
+            padding: 10px 6px; 
+            background: var(--bg-card-alt); 
+            border-radius: 8px; 
+        }
+        .tool-icon { font-size: 20px; margin-bottom: 4px; }
+        .tool-name { font-size: 10px; font-weight: 600; }
+        .tool-type { font-size: 8px; color: var(--text-muted); }
+
+        .pros-cons { grid-column: 1 / 3; }
+        .pc-container { 
+            display: flex; 
+            gap: 12px; 
+        }
+        .pros, .cons { 
+            flex: 1; 
+            padding: 12px; 
+            background: var(--bg-card-alt); 
+            border-radius: 8px; 
+        }
+        .pros { border-left: 3px solid var(--green); }
+        .cons { border-left: 3px solid var(--red); }
+        .pc-title { 
+            font-size: 10px; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+        .pros .pc-title { color: var(--green); }
+        .cons .pc-title { color: var(--red); }
+        .pc-list { list-style: none; }
+        .pc-list li { 
+            font-size: 10px; 
+            color: var(--text-secondary); 
+            padding: 3px 0; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 6px; 
+        }
+        .pc-list li::before { 
+            content: '→'; 
+            color: var(--cat-light); 
+            font-size: 10px; 
+        }
+
+        .comparison { grid-column: 3 / 5; }
+        .comp-table { width: 100%; font-size: 11px; }
+        .comp-table th { 
+            text-align: left; 
+            padding: 6px; 
+            color: var(--text-muted); 
+            font-size: 9px; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .comp-table td { 
+            padding: 8px 6px; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .comp-name { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-weight: 600; 
+        }
+        .comp-icon { font-size: 14px; }
+        .dots { display: flex; gap: 3px; }
+        .dot { 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            background: var(--border-color); 
+        }
+        .dot.on { background: var(--cat-primary); }
+
+        .cta { 
+            grid-column: 1 / -1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 16px 24px; 
+            background: linear-gradient(135deg, var(--cat-glow), var(--bg-card)); 
+            border: 1px solid var(--cat-dark); 
+            border-radius: 12px; 
+        }
+        .cta-text { font-family: 'Orbitron', sans-serif; font-size: 14px; }
+        .cta-btn { 
+            padding: 10px 24px; 
+            background: var(--cat-primary); 
+            border: none; 
+            border-radius: 8px; 
+            color: var(--bg-dark); 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            text-decoration: none; 
+        }
+        .cta-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 20px var(--cat-glow); 
         }
     </style>
 </head>
 <body>
+    <div class="dashboard">
+        <header class="header">
+            <div class="header-left">
+                <div class="cat-badge"><span>18</span> Strategy</div>
+                <h1 class="title">Implementation</h1>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <a href="cat17-change-management.html" class="nav-btn">← Prev</a>
+                <a href="cat19-emerging-technologies.html" class="nav-btn">Next →</a>
+            </div>
+        </header>
 
-<header>
-    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
-    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
-</header>
+        <div class="card hero-stats">
+            <div class="card-title">📊 Overview</div>
+            <div class="stat-box"><div class="stat-value">6</div><div class="stat-label">Pages</div></div>
+            <div class="stat-box"><div class="stat-value">6</div><div class="stat-label">Tools</div></div>
+            <div class="stat-box"><div class="stat-value">12</div><div class="stat-label">Use Cases</div></div>
+            <div class="stat-box"><div class="stat-value">9m</div><div class="stat-label">Read</div></div>
+        </div>
 
-<aside class="sidebar">
-    <div class="sidebar-section">
-        <div class="sidebar-title">🚀 Category 18</div>
-        <ul class="sidebar-nav">
-            <li><a href="cat18-implementation.html" class="active"><span class="nav-icon">📄</span> cat18-implementation.html</a></li>
-        </ul>
+        <div class="card description">
+            <div class="card-title">🎯 Executive Summary</div>
+            <p class="desc-text">Project delivery, implementation methodologies, and deployment strategies for successful execution. Execute technology initiatives successfully with structured approaches that manage risk and deliver value predictably. Balance agile flexibility with governance requirements through hybrid approaches tailored to your context. Build delivery capability through repeatable patterns, lessons learned, and continuous improvement of your implementation processes.</p>
+            <div class="tags"><span class="tag">Project Management</span><span class="tag">Agile</span><span class="tag">Waterfall</span><span class="tag">PMO</span><span class="tag">Risk Management</span><span class="tag">Go-Live</span></div>
+        </div>
+
+        <div class="card value-analysis">
+            <div class="card-title">📈 Value Analysis</div>
+            <div class="value-row"><span class="value-label">Speed</span><div class="value-bar-bg"><div class="value-bar v1"></div></div><span class="value-score">7.5</span></div>
+            <div class="value-row"><span class="value-label">Effort</span><div class="value-bar-bg"><div class="value-bar v2"></div></div><span class="value-score">5.8</span></div>
+            <div class="value-row"><span class="value-label">Impact</span><div class="value-bar-bg"><div class="value-bar v3"></div></div><span class="value-score">9.4</span></div>
+            <div class="value-row"><span class="value-label">Cost</span><div class="value-bar-bg"><div class="value-bar v4"></div></div><span class="value-score">6.0</span></div>
+            <div class="value-row"><span class="value-label">Scale</span><div class="value-bar-bg"><div class="value-bar v5"></div></div><span class="value-score">8.2</span></div>
+        </div>
+
+        <div class="card concepts">
+            <div class="card-title">🧠 Key Concepts</div>
+            <div class="concept-grid"><div class="concept-item"><span class="concept-icon">📋</span><div><div class="concept-text">Project Planning</div><div class="concept-sub">Scope & schedule</div></div></div><div class="concept-item"><span class="concept-icon">🔄</span><div><div class="concept-text">Agile Delivery</div><div class="concept-sub">Iterative approach</div></div></div><div class="concept-item"><span class="concept-icon">📊</span><div><div class="concept-text">Risk Management</div><div class="concept-sub">Mitigation strategies</div></div></div><div class="concept-item"><span class="concept-icon">🎯</span><div><div class="concept-text">Milestone Tracking</div><div class="concept-sub">Progress monitoring</div></div></div><div class="concept-item"><span class="concept-icon">👥</span><div><div class="concept-text">Resource Management</div><div class="concept-sub">Team allocation</div></div></div><div class="concept-item"><span class="concept-icon">🚀</span><div><div class="concept-text">Go-Live Planning</div><div class="concept-sub">Cutover strategy</div></div></div></div>
+        </div>
+
+        <div class="card tools">
+            <div class="card-title">🛠️ Essential Tools</div>
+            <div class="tools-grid"><div class="tool-item"><div class="tool-icon">📋</div><div class="tool-name">Jira</div><div class="tool-type">Issue Tracking</div></div><div class="tool-item"><div class="tool-icon">📊</div><div class="tool-name">MS Project</div><div class="tool-type">Traditional PM</div></div><div class="tool-item"><div class="tool-icon">🔄</div><div class="tool-name">Monday.com</div><div class="tool-type">Work OS</div></div><div class="tool-item"><div class="tool-icon">🎯</div><div class="tool-name">Smartsheet</div><div class="tool-type">Collaboration</div></div><div class="tool-item"><div class="tool-icon">📈</div><div class="tool-name">Asana</div><div class="tool-type">Task Management</div></div><div class="tool-item"><div class="tool-icon">💼</div><div class="tool-name">Wrike</div><div class="tool-type">Enterprise</div></div><div class="tool-item"><div class="tool-icon">🔷</div><div class="tool-name">Azure DevOps</div><div class="tool-type">Microsoft</div></div><div class="tool-item"><div class="tool-icon">📝</div><div class="tool-name">Notion</div><div class="tool-type">Documentation</div></div></div>
+        </div>
+
+        <div class="card pros-cons">
+            <div class="card-title">⚖️ Pros & Cons</div>
+            <div class="pc-container">
+                <div class="pros">
+                    <div class="pc-title">✓ Advantages</div>
+                    <ul class="pc-list"><li><strong>Structure</strong> - Clear methodology</li><li><strong>Visibility</strong> - Progress tracking</li><li><strong>Risk Mitigation</strong> - Proactive management</li><li><strong>Resource Optimization</strong> - Efficient allocation</li><li><strong>Stakeholder Alignment</strong> - Shared understanding</li><li><strong>Quality Delivery</strong> - Defined standards</li></ul>
+                </div>
+                <div class="cons">
+                    <div class="pc-title">✗ Challenges</div>
+                    <ul class="pc-list"><li><strong>Overhead</strong> - Administrative burden</li><li><strong>Rigidity</strong> - Process constraints</li><li><strong>Scope Changes</strong> - Change control friction</li><li><strong>Estimation</strong> - Inaccurate forecasts</li><li><strong>Dependencies</strong> - External factors</li><li><strong>Communication</strong> - Information gaps</li></ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card comparison">
+            <div class="card-title">📋 Methodology Comparison</div>
+            <table class="comp-table">
+                <thead>
+                    <tr><th>Methodology</th><th>Ease</th><th>Flexibility</th><th>Governance</th><th>Cost</th><th>Best For</th></tr>
+                </thead>
+                <tbody><tr><td><div class="comp-name"><span class="comp-icon">🔄</span>Agile</div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td>$$</td><td>Flexibility</td></tr><tr><td><div class="comp-name"><span class="comp-icon">📋</span>Waterfall</div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td>$$</td><td>Predictability</td></tr><tr><td><div class="comp-name"><span class="comp-icon">🎯</span>Hybrid</div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div></td><td>$$</td><td>Balance</td></tr><tr><td><div class="comp-name"><span class="comp-icon">📊</span>SAFe</div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div></td><td><div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div></td><td>$$$</td><td>Scale</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="cta">
+            <div class="cta-text">📚 Ready for the deep dive? Explore all 6 comprehensive pages</div>
+            <a href="#" class="cta-btn">View Full Category →</a>
+        </div>
     </div>
-</aside>
-
-<div class="main-wrapper">
-    <div class="main-content">
-        
-        <!-- HERO -->
-        <section class="hero-compact">
-            <div class="hero-left">
-                <span class="hero-tag">🚀 Category 18</span>
-                <h1>Implementation</h1>
-                <p>Execute flawless go-lives with structured rollout planning, mission control monitoring, and hypercare support frameworks.</p>
-            </div>
-            <div class="hero-metrics">
-                <div class="hero-metric"><div class="hero-metric-value">70%</div><div class="hero-metric-label">Projects Fail at Go-Live</div></div>
-                <div class="hero-metric"><div class="hero-metric-value">4-6 wks</div><div class="hero-metric-label">Avg Hypercare Period</div></div>
-                <div class="hero-metric"><div class="hero-metric-value">3x</div><div class="hero-metric-label">Risk with Big Bang</div></div>
-                <div class="hero-metric"><div class="hero-metric-value">94%</div><div class="hero-metric-label">Success w/ Phased Rollout</div></div>
-            </div>
-        </section>
-
-        <!-- MODULE 1: ROAD TO GO-LIVE -->
-        <section class="module" id="runway">
-            <div class="module-header">
-                <div class="module-icon">🛤️</div>
-                <div class="module-info">
-                    <h2>Road to Go-Live</h2>
-                    <p>Navigate the journey from preparation to successful launch</p>
-                </div>
-            </div>
-            
-            <div class="description-block">
-                <p>The road to go-live is a journey with distinct milestones. Each phase brings you closer to the destination—a successful launch. Track your progress, overcome obstacles, and keep your eyes on the finish line.</p>
-            </div>
-            
-            <!-- Road to Go-Live Visualization -->
-            <div class="viz-container">
-                <div class="viz-header">
-                    <div class="viz-title">🛤️ Road to Go-Live</div>
-                    <div class="viz-badge">Journey Tracker</div>
-                </div>
-                <div class="viz-canvas">
-                    <svg viewBox="0 0 800 420" class="viz-svg">
-                        <defs>
-                            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" style="stop-color:#1a1a2e"/>
-                                <stop offset="100%" style="stop-color:#0a0a0f"/>
-                            </linearGradient>
-                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                            </filter>
-                            <!-- Path for the road -->
-                            <path id="roadPath" d="M 30,380 
-                                     C 60,380 80,350 100,320
-                                     C 120,290 140,270 170,270
-                                     C 200,270 220,240 240,210
-                                     C 260,180 280,160 310,160
-                                     C 340,160 360,130 380,100
-                                     C 400,70 420,50 460,50"/>
-                        </defs>
-                        
-                        <!-- Background -->
-                        <rect width="100%" height="100%" fill="url(#skyGrad)"/>
-                        
-                        <!-- ========== LEFT SIDE: ROAD ========== -->
-                        
-                        <!-- Winding road path -->
-                        <use href="#roadPath" fill="none" stroke="#3a3a4e" stroke-width="24" stroke-linecap="round"/>
-                        <use href="#roadPath" fill="none" stroke="#F59E0B" stroke-width="2" stroke-dasharray="8,5" stroke-linecap="round"/>
-                        
-                        <!-- START -->
-                        <g transform="translate(30, 380)">
-                            <rect x="-22" y="8" width="44" height="18" rx="3" fill="#1a1a2e" stroke="#6B7280"/>
-                            <text x="0" y="20" text-anchor="middle" fill="#9CA3AF" font-size="8" font-weight="600">🏁 START</text>
-                        </g>
-                        
-                        <!-- Phase 1: PREP - Sign BELOW road -->
-                        <g transform="translate(100, 320)">
-                            <!-- Connector line -->
-                            <line x1="0" y1="0" x2="0" y2="40" stroke="#3B82F6" stroke-width="2" stroke-dasharray="3,2"/>
-                            <!-- Number circle below road -->
-                            <circle cy="40" r="12" fill="#3B82F6" stroke="#60A5FA" stroke-width="2"/>
-                            <text x="0" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">1</text>
-                            <!-- Sign box below -->
-                            <g transform="translate(0, 58)">
-                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#3B82F6" stroke-width="2"/>
-                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#3B82F6"/>
-                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">📋 PREPARE</text>
-                                <circle cx="40" cy="8" r="5" fill="#10B981"/>
-                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="6">✓</text>
-                                <text x="-45" y="26" fill="#60A5FA" font-size="7">• Requirements finalized</text>
-                                <text x="-45" y="36" fill="#60A5FA" font-size="7">• Environment ready</text>
-                            </g>
-                        </g>
-                        
-                        <!-- Phase 2: BUILD - Sign ABOVE road -->
-                        <g transform="translate(170, 270)">
-                            <line x1="0" y1="0" x2="0" y2="-40" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="3,2"/>
-                            <circle cy="-40" r="12" fill="#8B5CF6" stroke="#A78BFA" stroke-width="2"/>
-                            <text x="0" y="-36" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">2</text>
-                            <g transform="translate(0, -95)">
-                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#8B5CF6" stroke-width="2"/>
-                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#8B5CF6"/>
-                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🔨 BUILD</text>
-                                <circle cx="40" cy="8" r="5" fill="#10B981"/>
-                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="6">✓</text>
-                                <text x="-45" y="26" fill="#A78BFA" font-size="7">• Configure systems</text>
-                                <text x="-45" y="36" fill="#A78BFA" font-size="7">• Build integrations</text>
-                            </g>
-                        </g>
-                        
-                        <!-- Phase 3: REVIEW - Sign BELOW road -->
-                        <g transform="translate(240, 210)">
-                            <line x1="0" y1="0" x2="0" y2="40" stroke="#06B6D4" stroke-width="2" stroke-dasharray="3,2"/>
-                            <circle cy="40" r="12" fill="#06B6D4" stroke="#22D3EE" stroke-width="2"/>
-                            <text x="0" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">3</text>
-                            <g transform="translate(0, 58)">
-                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#06B6D4" stroke-width="2"/>
-                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#06B6D4"/>
-                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🔍 REVIEW</text>
-                                <circle cx="40" cy="8" r="5" fill="#10B981"/>
-                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="6">✓</text>
-                                <text x="-45" y="26" fill="#22D3EE" font-size="7">• UAT sign-off</text>
-                                <text x="-45" y="36" fill="#22D3EE" font-size="7">• Go/No-Go decision</text>
-                            </g>
-                        </g>
-                        
-                        <!-- Phase 4: DEPLOY - Sign ABOVE road (CURRENT) -->
-                        <g transform="translate(310, 160)">
-                            <line x1="0" y1="0" x2="0" y2="-40" stroke="#F59E0B" stroke-width="2" stroke-dasharray="3,2"/>
-                            <circle cy="-40" r="14" fill="#F59E0B" stroke="#FBBF24" stroke-width="3">
-                                <animate attributeName="r" values="14;16;14" dur="1.5s" repeatCount="indefinite"/>
-                            </circle>
-                            <text x="0" y="-36" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">4</text>
-                            <g transform="translate(0, -105)">
-                                <rect x="-52" y="0" width="104" height="48" rx="5" fill="#12121a" stroke="#F59E0B" stroke-width="3">
-                                    <animate attributeName="stroke-opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
-                                </rect>
-                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#F59E0B"/>
-                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🚀 DEPLOY</text>
-                                <circle cx="40" cy="8" r="5" fill="#F59E0B">
-                                    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
-                                </circle>
-                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="5">⟳</text>
-                                <text x="-45" y="26" fill="#FBBF24" font-size="7">• Execute cutover</text>
-                                <text x="-45" y="36" fill="#FBBF24" font-size="7">• Go live activation</text>
-                                <text x="-45" y="46" fill="#F59E0B" font-size="6" font-weight="600">Day 3 of 10</text>
-                            </g>
-                        </g>
-                        
-                        <!-- Phase 5: STABILIZE - Sign BELOW road -->
-                        <g transform="translate(380, 100)">
-                            <line x1="0" y1="0" x2="0" y2="40" stroke="#10B981" stroke-width="2" stroke-dasharray="3,2" opacity="0.5"/>
-                            <circle cy="40" r="12" fill="#10B981" stroke="#34D399" stroke-width="2" opacity="0.5"/>
-                            <text x="0" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" opacity="0.5">5</text>
-                            <g transform="translate(0, 58)" opacity="0.5">
-                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#10B981" stroke-width="2"/>
-                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#10B981"/>
-                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🩺 STABILIZE</text>
-                                <circle cx="40" cy="8" r="5" fill="#2a2a3e" stroke="#3a3a4e"/>
-                                <text x="40" y="11" text-anchor="middle" fill="#6a6a7a" font-size="6">○</text>
-                                <text x="-45" y="26" fill="#34D399" font-size="7">• Hypercare 24/7</text>
-                                <text x="-45" y="36" fill="#34D399" font-size="7">• Issue resolution</text>
-                            </g>
-                        </g>
-                        
-                        <!-- SUCCESS destination -->
-                        <g transform="translate(460, 50)" filter="url(#glow)">
-                            <rect x="-30" y="-18" width="60" height="36" rx="6" fill="#12121a" stroke="#8B5CF6" stroke-width="2"/>
-                            <text x="0" y="-2" text-anchor="middle" fill="#A78BFA" font-size="9" font-weight="700">🏆 SUCCESS</text>
-                            <text x="0" y="12" text-anchor="middle" fill="#6a6a7a" font-size="7">GO-LIVE</text>
-                            <polygon points="25,-25 40,-18 25,-11" fill="#8B5CF6"/>
-                            <rect x="22" y="-25" width="3" height="16" fill="#8B5CF6"/>
-                        </g>
-                        
-                        <!-- ANIMATED CAR on road -->
-                        <g>
-                            <g transform="translate(-12, -6)">
-                                <rect x="0" y="2" width="22" height="10" rx="3" fill="#F59E0B"/>
-                                <rect x="3" y="-3" width="12" height="8" rx="2" fill="#FBBF24"/>
-                                <rect x="5" y="-1" width="4" height="5" rx="1" fill="#1a1a2e"/>
-                                <rect x="10" y="-1" width="4" height="5" rx="1" fill="#1a1a2e"/>
-                                <circle cx="5" cy="12" r="3" fill="#1a1a2e" stroke="#6B7280" stroke-width="1"/>
-                                <circle cx="17" cy="12" r="3" fill="#1a1a2e" stroke="#6B7280" stroke-width="1"/>
-                                <rect x="20" y="5" width="3" height="3" rx="1" fill="#FEF3C7"/>
-                            </g>
-                            <animateMotion dur="12s" repeatCount="indefinite">
-                                <mpath href="#roadPath"/>
-                            </animateMotion>
-                        </g>
-                        
-                        <!-- ========== RIGHT SIDE: DETAIL PANEL ========== -->
-                        <g transform="translate(505, 15)">
-                            <rect width="280" height="390" rx="10" fill="#12121a" stroke="#2a2a3e" stroke-width="2"/>
-                            
-                            <!-- Panel header -->
-                            <rect width="280" height="35" rx="10" fill="#1a1a2e"/>
-                            <text x="140" y="23" text-anchor="middle" fill="#F59E0B" font-size="11" font-weight="700">📋 IMPLEMENTATION PHASES</text>
-                            
-                            <!-- Phase 1: PREP -->
-                            <g transform="translate(15, 50)">
-                                <circle cx="12" cy="12" r="12" fill="#3B82F6"/>
-                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">1</text>
-                                <text x="32" y="16" fill="#60A5FA" font-size="11" font-weight="600">PREPARE</text>
-                                <circle cx="250" cy="12" r="10" fill="#10B981"/>
-                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="9">✓</text>
-                                <text x="32" y="34" fill="#6a6a7a" font-size="8">• Finalize requirements & scope</text>
-                                <text x="32" y="48" fill="#6a6a7a" font-size="8">• Setup environments</text>
-                                <text x="32" y="62" fill="#6a6a7a" font-size="8">• Complete data migration dry-run</text>
-                            </g>
-                            
-                            <!-- Phase 2: BUILD -->
-                            <g transform="translate(15, 120)">
-                                <circle cx="12" cy="12" r="12" fill="#8B5CF6"/>
-                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">2</text>
-                                <text x="32" y="16" fill="#A78BFA" font-size="11" font-weight="600">BUILD</text>
-                                <circle cx="250" cy="12" r="10" fill="#10B981"/>
-                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="9">✓</text>
-                                <text x="32" y="34" fill="#6a6a7a" font-size="8">• Configure production systems</text>
-                                <text x="32" y="48" fill="#6a6a7a" font-size="8">• Build integrations & workflows</text>
-                                <text x="32" y="62" fill="#6a6a7a" font-size="8">• Develop training materials</text>
-                            </g>
-                            
-                            <!-- Phase 3: REVIEW -->
-                            <g transform="translate(15, 190)">
-                                <circle cx="12" cy="12" r="12" fill="#06B6D4"/>
-                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">3</text>
-                                <text x="32" y="16" fill="#22D3EE" font-size="11" font-weight="600">REVIEW</text>
-                                <circle cx="250" cy="12" r="10" fill="#10B981"/>
-                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="9">✓</text>
-                                <text x="32" y="34" fill="#6a6a7a" font-size="8">• UAT sign-off from stakeholders</text>
-                                <text x="32" y="48" fill="#6a6a7a" font-size="8">• Security & compliance review</text>
-                                <text x="32" y="62" fill="#6a6a7a" font-size="8">• Go/No-Go decision checkpoint</text>
-                            </g>
-                            
-                            <!-- Phase 4: DEPLOY (current) -->
-                            <g transform="translate(15, 260)">
-                                <circle cx="12" cy="12" r="12" fill="#F59E0B"/>
-                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">4</text>
-                                <text x="32" y="16" fill="#FBBF24" font-size="11" font-weight="600">DEPLOY</text>
-                                <text x="85" y="16" fill="#F59E0B" font-size="8">← CURRENT</text>
-                                <circle cx="250" cy="12" r="10" fill="#F59E0B">
-                                    <animate attributeName="opacity" values="1;0.4;1" dur="1s" repeatCount="indefinite"/>
-                                </circle>
-                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="8">⟳</text>
-                                <text x="32" y="34" fill="#FBBF24" font-size="8">• Execute cutover runbook</text>
-                                <text x="32" y="48" fill="#FBBF24" font-size="8">• Activate production systems</text>
-                                <text x="32" y="62" fill="#FBBF24" font-size="8">• Enable users & go live</text>
-                            </g>
-                            
-                            <!-- Phase 5: STABILIZE -->
-                            <g transform="translate(15, 330)">
-                                <circle cx="12" cy="12" r="12" fill="#10B981" opacity="0.4"/>
-                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" opacity="0.5">5</text>
-                                <text x="32" y="16" fill="#34D399" font-size="11" font-weight="600" opacity="0.5">STABILIZE</text>
-                                <circle cx="250" cy="12" r="10" fill="#2a2a3e" stroke="#3a3a4e"/>
-                                <text x="250" y="16" text-anchor="middle" fill="#6a6a7a" font-size="9">○</text>
-                                <text x="32" y="34" fill="#6a6a7a" font-size="8" opacity="0.5">• Hypercare support (24/7)</text>
-                                <text x="32" y="48" fill="#6a6a7a" font-size="8" opacity="0.5">• Issue triage & resolution</text>
-                                <text x="32" y="62" fill="#6a6a7a" font-size="8" opacity="0.5">• Knowledge transfer to ops</text>
-                            </g>
-                        </g>
-                        
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-        <div class="module-divider"></div>
-
-        <!-- MODULE 2: GO-LIVE MISSION CONTROL -->
-        <section class="module" id="mission">
-            <div class="module-header">
-                <div class="module-icon">🎮</div>
-                <div class="module-info">
-                    <h2>Go-Live Mission Control</h2>
-                    <p>Real-time monitoring dashboard for go-live execution</p>
-                </div>
-            </div>
-            
-            <div class="description-block">
-                <p>Mission Control provides a centralized view of all go-live activities, system health, and readiness indicators. Teams can monitor progress, identify blockers, and make real-time decisions during the critical go-live window.</p>
-            </div>
-            
-            <!-- Mission Control Dashboard -->
-            <div class="viz-container">
-                <div class="viz-header">
-                    <div class="viz-title">🎮 Mission Control Dashboard</div>
-                    <div class="viz-badge">LIVE</div>
-                </div>
-                <div class="viz-canvas">
-                    <svg viewBox="0 0 800 380" class="viz-svg">
-                        <defs>
-                            <pattern id="missionGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                <rect width="20" height="20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
-                            </pattern>
-                        </defs>
-                        
-                        <rect width="100%" height="100%" fill="url(#missionGrid)"/>
-                        
-                        <!-- Main frame -->
-                        <rect x="10" y="10" width="780" height="360" rx="12" fill="#12121a" stroke="#2a2a3e" stroke-width="2"/>
-                        
-                        <!-- Top status bar -->
-                        <rect x="10" y="10" width="780" height="45" rx="12" fill="#1a1a2e"/>
-                        <circle cx="35" cy="32" r="8" fill="#10B981">
-                            <animate attributeName="opacity" values="1;0.4;1" dur="1s" repeatCount="indefinite"/>
-                        </circle>
-                        <text x="55" y="37" fill="#34D399" font-size="12" font-weight="600">GO-LIVE IN PROGRESS</text>
-                        
-                        <!-- Countdown timer -->
-                        <g transform="translate(620, 18)">
-                            <rect width="160" height="30" rx="4" fill="#12121a" stroke="#F59E0B"/>
-                            <text x="15" y="20" fill="#6a6a7a" font-size="9">T+ </text>
-                            <text x="35" y="20" fill="#FBBF24" font-size="14" font-weight="700">04:23:17</text>
-                            <text x="105" y="20" fill="#6a6a7a" font-size="9">elapsed</text>
-                        </g>
-                        
-                        <!-- Left column - Readiness Gauges -->
-                        <g transform="translate(25, 70)">
-                            <text x="0" y="15" fill="#F59E0B" font-size="10" font-weight="600">READINESS INDICATORS</text>
-                            
-                            <!-- Gauge 1: Systems -->
-                            <g transform="translate(0, 30)">
-                                <rect width="180" height="50" rx="6" fill="#1a1a2e" stroke="#2a2a3e"/>
-                                <text x="10" y="20" fill="#6a6a7a" font-size="8">SYSTEMS</text>
-                                <rect x="10" y="28" width="120" height="12" rx="3" fill="#12121a"/>
-                                <rect x="10" y="28" width="114" height="12" rx="3" fill="#10B981"/>
-                                <text x="140" y="38" fill="#34D399" font-size="10" font-weight="600">95%</text>
-                                <circle cx="165" cy="33" r="6" fill="#10B981"/>
-                            </g>
-                            
-                            <!-- Gauge 2: Data -->
-                            <g transform="translate(0, 90)">
-                                <rect width="180" height="50" rx="6" fill="#1a1a2e" stroke="#2a2a3e"/>
-                                <text x="10" y="20" fill="#6a6a7a" font-size="8">DATA MIGRATION</text>
-                                <rect x="10" y="28" width="120" height="12" rx="3" fill="#12121a"/>
-                                <rect x="10" y="28" width="120" height="12" rx="3" fill="#10B981"/>
-                                <text x="140" y="38" fill="#34D399" font-size="10" font-weight="600">100%</text>
-                                <circle cx="165" cy="33" r="6" fill="#10B981"/>
-                            </g>
-                            
-                            <!-- Gauge 3: Integrations -->
-                            <g transform="translate(0, 150)">
-                                <rect width="180" height="50" rx="6" fill="#1a1a2e" stroke="#2a2a3e"/>
-                                <text x="10" y="20" fill="#6a6a7a" font-size="8">INTEGRATIONS</text>
-                                <rect x="10" y="28" width="120" height="12" rx="3" fill="#12121a"/>
-                                <rect x="10" y="28" width="96" height="12" rx="3" fill="#FBBF24"/>
-                                <text x="140" y="38" fill="#FBBF24" font-size="10" font-weight="600">80%</text>
-                                <circle cx="165" cy="33" r="6" fill="#FBBF24"/>
-                            </g>
-                            
-                            <!-- Gauge 4: Users -->
-                            <g transform="translate(0, 210)">
-                                <rect width="180" height="50" rx="6" fill="#1a1a2e" stroke="#2a2a3e"/>
-                                <text x="10" y="20" fill="#6a6a7a" font-size="8">USER ADOPTION</text>
-                                <rect x="10" y="28" width="120" height="12" rx="3" fill="#12121a"/>
-                                <rect x="10" y="28" width="78" height="12" rx="3" fill="#3B82F6"/>
-                                <text x="140" y="38" fill="#60A5FA" font-size="10" font-weight="600">65%</text>
-                                <circle cx="165" cy="33" r="6" fill="#3B82F6"/>
-                            </g>
-                        </g>
-                        
-                        <!-- Center - Live Activity Feed -->
-                        <g transform="translate(220, 70)">
-                            <text x="0" y="15" fill="#F59E0B" font-size="10" font-weight="600">LIVE ACTIVITY FEED</text>
-                            
-                            <g transform="translate(0, 25)">
-                                <rect width="350" height="240" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
-                                
-                                <!-- Activity items -->
-                                <g transform="translate(10, 15)">
-                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:23:12</text>
-                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ Production database cutover complete</text>
-                                </g>
-                                <g transform="translate(10, 45)">
-                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:18:45</text>
-                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ API gateway switched to production</text>
-                                </g>
-                                <g transform="translate(10, 75)">
-                                    <circle cx="8" cy="8" r="4" fill="#FBBF24">
-                                        <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:15:22</text>
-                                    <text x="20" y="15" fill="#FBBF24" font-size="8">◐ SSO integration verification in progress</text>
-                                </g>
-                                <g transform="translate(10, 105)">
-                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:10:03</text>
-                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ User accounts migrated (2,847 users)</text>
-                                </g>
-                                <g transform="translate(10, 135)">
-                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:05:18</text>
-                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ Legacy system read-only mode activated</text>
-                                </g>
-                                <g transform="translate(10, 165)">
-                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">03:58:41</text>
-                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ DNS propagation verified (all regions)</text>
-                                </g>
-                                <g transform="translate(10, 195)">
-                                    <circle cx="8" cy="8" r="4" fill="#EF4444"/>
-                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">03:45:12</text>
-                                    <text x="20" y="15" fill="#F87171" font-size="8">✗ Cache warmup timeout - RESOLVED</text>
-                                </g>
-                                <g transform="translate(10, 220)">
-                                    <text x="160" y="10" text-anchor="middle" fill="#6a6a7a" font-size="8">↓ 47 more events</text>
-                                </g>
-                            </g>
-                        </g>
-                        
-                        <!-- Right column - Key Metrics -->
-                        <g transform="translate(585, 70)">
-                            <text x="0" y="15" fill="#F59E0B" font-size="10" font-weight="600">KEY METRICS</text>
-                            
-                            <!-- Metric boxes -->
-                            <g transform="translate(0, 25)">
-                                <rect width="190" height="55" rx="6" fill="#1a1a2e" stroke="#10B981"/>
-                                <text x="15" y="22" fill="#6a6a7a" font-size="8">TASKS COMPLETE</text>
-                                <text x="15" y="42" fill="#34D399" font-size="20" font-weight="700">47</text>
-                                <text x="60" y="42" fill="#6a6a7a" font-size="12">/ 52</text>
-                                <text x="120" y="42" fill="#34D399" font-size="12" font-weight="600">90%</text>
-                            </g>
-                            
-                            <g transform="translate(0, 90)">
-                                <rect width="190" height="55" rx="6" fill="#1a1a2e" stroke="#FBBF24"/>
-                                <text x="15" y="22" fill="#6a6a7a" font-size="8">BLOCKERS</text>
-                                <text x="15" y="42" fill="#FBBF24" font-size="20" font-weight="700">1</text>
-                                <text x="55" y="38" fill="#6a6a7a" font-size="8">SSO timeout</text>
-                                <text x="55" y="48" fill="#FBBF24" font-size="8">Team investigating</text>
-                            </g>
-                            
-                            <g transform="translate(0, 155)">
-                                <rect width="190" height="55" rx="6" fill="#1a1a2e" stroke="#3B82F6"/>
-                                <text x="15" y="22" fill="#6a6a7a" font-size="8">USERS ONLINE</text>
-                                <text x="15" y="42" fill="#60A5FA" font-size="20" font-weight="700">1,847</text>
-                                <text x="90" y="42" fill="#6a6a7a" font-size="10">/ 2,847</text>
-                            </g>
-                            
-                            <g transform="translate(0, 220)">
-                                <rect width="190" height="55" rx="6" fill="#1a1a2e" stroke="#8B5CF6"/>
-                                <text x="15" y="22" fill="#6a6a7a" font-size="8">SYSTEM HEALTH</text>
-                                <text x="15" y="42" fill="#A78BFA" font-size="14" font-weight="700">NOMINAL</text>
-                                <text x="100" y="42" fill="#34D399" font-size="10">All green ✓</text>
-                            </g>
-                        </g>
-                        
-                        <!-- Bottom status bar -->
-                        <g transform="translate(25, 340)">
-                            <rect width="750" height="25" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
-                            <text x="15" y="17" fill="#6a6a7a" font-size="8">WAR ROOM:</text>
-                            <text x="75" y="17" fill="#34D399" font-size="8">12 members online</text>
-                            <text x="200" y="17" fill="#6a6a7a" font-size="8">|</text>
-                            <text x="220" y="17" fill="#6a6a7a" font-size="8">NEXT CHECKPOINT:</text>
-                            <text x="320" y="17" fill="#FBBF24" font-size="8">User validation (T+05:00:00)</text>
-                            <text x="500" y="17" fill="#6a6a7a" font-size="8">|</text>
-                            <text x="520" y="17" fill="#6a6a7a" font-size="8">ROLLBACK STATUS:</text>
-                            <text x="620" y="17" fill="#34D399" font-size="8">Ready - 15 min RTO</text>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-        <div class="module-divider"></div>
-
-        <!-- MODULE 3: WAVE ROLLOUT -->
-        <section class="module" id="waves">
-            <div class="module-header">
-                <div class="module-icon">🌊</div>
-                <div class="module-info">
-                    <h2>Wave Rollout Planning</h2>
-                    <p>Phased deployment strategy across regions and business units</p>
-                </div>
-            </div>
-            
-            <div class="description-block">
-                <p>Wave-based rollouts reduce risk by deploying to smaller groups first, learning from each wave, and progressively expanding. This approach allows teams to refine processes, address issues, and build confidence before full-scale deployment.</p>
-            </div>
-            
-            <!-- Wave Rollout Timeline -->
-            <div class="viz-container">
-                <div class="viz-header">
-                    <div class="viz-title">🌊 Phased Rollout Timeline</div>
-                    <div class="viz-badge">4 Waves</div>
-                </div>
-                <div class="viz-canvas">
-                    <svg viewBox="0 0 800 300" class="viz-svg">
-                        <defs>
-                            <pattern id="waveGrid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <circle cx="20" cy="20" r="1" fill="#1a1a2e"/>
-                            </pattern>
-                        </defs>
-                        
-                        <rect width="100%" height="100%" fill="url(#waveGrid)"/>
-                        
-                        <!-- Timeline axis -->
-                        <line x1="50" y1="250" x2="750" y2="250" stroke="#3a3a4e" stroke-width="2"/>
-                        
-                        <!-- Month markers -->
-                        <g fill="#6a6a7a" font-size="9">
-                            <text x="100" y="270" text-anchor="middle">JAN</text>
-                            <text x="200" y="270" text-anchor="middle">FEB</text>
-                            <text x="300" y="270" text-anchor="middle">MAR</text>
-                            <text x="400" y="270" text-anchor="middle">APR</text>
-                            <text x="500" y="270" text-anchor="middle">MAY</text>
-                            <text x="600" y="270" text-anchor="middle">JUN</text>
-                            <text x="700" y="270" text-anchor="middle">JUL</text>
-                        </g>
-                        
-                        <!-- Wave 1: Pilot -->
-                        <g transform="translate(80, 30)">
-                            <rect width="120" height="70" rx="8" fill="#12121a" stroke="#3B82F6" stroke-width="2"/>
-                            <rect x="0" y="0" width="120" height="22" rx="8" fill="#3B82F6"/>
-                            <text x="60" y="15" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">🔬 WAVE 1: PILOT</text>
-                            <text x="10" y="38" fill="#60A5FA" font-size="8">• HQ Finance Team</text>
-                            <text x="10" y="50" fill="#60A5FA" font-size="8">• 50 users</text>
-                            <text x="10" y="62" fill="#34D399" font-size="8">✓ Complete</text>
-                        </g>
-                        <!-- Wave 1 bar -->
-                        <rect x="80" y="110" width="120" height="20" rx="4" fill="#3B82F6" opacity="0.8"/>
-                        <line x1="140" y1="100" x2="140" y2="130" stroke="#3B82F6" stroke-width="2"/>
-                        <line x1="140" y1="130" x2="140" y2="250" stroke="#3B82F6" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
-                        
-                        <!-- Wave 2: Early Adopters -->
-                        <g transform="translate(220, 30)">
-                            <rect width="140" height="70" rx="8" fill="#12121a" stroke="#F59E0B" stroke-width="2"/>
-                            <rect x="0" y="0" width="140" height="22" rx="8" fill="#F59E0B"/>
-                            <text x="70" y="15" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">⭐ WAVE 2: EARLY ADOPT</text>
-                            <text x="10" y="38" fill="#FBBF24" font-size="8">• North America Region</text>
-                            <text x="10" y="50" fill="#FBBF24" font-size="8">• 500 users</text>
-                            <text x="10" y="62" fill="#FBBF24" font-size="8">◐ In Progress</text>
-                        </g>
-                        <!-- Wave 2 bar -->
-                        <rect x="220" y="140" width="140" height="20" rx="4" fill="#F59E0B" opacity="0.8">
-                            <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2s" repeatCount="indefinite"/>
-                        </rect>
-                        <line x1="290" y1="100" x2="290" y2="160" stroke="#F59E0B" stroke-width="2"/>
-                        <line x1="290" y1="160" x2="290" y2="250" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
-                        
-                        <!-- Wave 3: Expansion -->
-                        <g transform="translate(400, 30)">
-                            <rect width="140" height="70" rx="8" fill="#12121a" stroke="#10B981" stroke-width="2"/>
-                            <rect x="0" y="0" width="140" height="22" rx="8" fill="#10B981"/>
-                            <text x="70" y="15" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">🌍 WAVE 3: EXPANSION</text>
-                            <text x="10" y="38" fill="#34D399" font-size="8">• EMEA + APAC</text>
-                            <text x="10" y="50" fill="#34D399" font-size="8">• 1,500 users</text>
-                            <text x="10" y="62" fill="#6a6a7a" font-size="8">○ Scheduled: Apr</text>
-                        </g>
-                        <!-- Wave 3 bar -->
-                        <rect x="400" y="170" width="140" height="20" rx="4" fill="#10B981" opacity="0.3"/>
-                        <line x1="470" y1="100" x2="470" y2="180" stroke="#10B981" stroke-width="2"/>
-                        <line x1="470" y1="180" x2="470" y2="250" stroke="#10B981" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
-                        
-                        <!-- Wave 4: Full Rollout -->
-                        <g transform="translate(580, 30)">
-                            <rect width="160" height="70" rx="8" fill="#12121a" stroke="#8B5CF6" stroke-width="2"/>
-                            <rect x="0" y="0" width="160" height="22" rx="8" fill="#8B5CF6"/>
-                            <text x="80" y="15" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">🚀 WAVE 4: FULL ROLLOUT</text>
-                            <text x="10" y="38" fill="#A78BFA" font-size="8">• All Remaining</text>
-                            <text x="10" y="50" fill="#A78BFA" font-size="8">• 2,847 total users</text>
-                            <text x="10" y="62" fill="#6a6a7a" font-size="8">○ Scheduled: Jun</text>
-                        </g>
-                        <!-- Wave 4 bar -->
-                        <rect x="580" y="200" width="160" height="20" rx="4" fill="#8B5CF6" opacity="0.3"/>
-                        <line x1="660" y1="100" x2="660" y2="210" stroke="#8B5CF6" stroke-width="2"/>
-                        <line x1="660" y1="210" x2="660" y2="250" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
-                        
-                        <!-- Current position marker -->
-                        <g transform="translate(290, 245)">
-                            <polygon points="0,-8 -6,0 6,0" fill="#F59E0B"/>
-                            <text x="0" y="20" text-anchor="middle" fill="#FBBF24" font-size="8" font-weight="600">TODAY</text>
-                        </g>
-                        
-                        <!-- Legend -->
-                        <g transform="translate(50, 285)">
-                            <rect width="12" height="12" rx="2" fill="#3B82F6"/>
-                            <text x="18" y="10" fill="#6a6a7a" font-size="8">Complete</text>
-                            <rect x="80" width="12" height="12" rx="2" fill="#F59E0B"/>
-                            <text x="98" y="10" fill="#6a6a7a" font-size="8">In Progress</text>
-                            <rect x="175" width="12" height="12" rx="2" fill="#10B981" opacity="0.3"/>
-                            <text x="193" y="10" fill="#6a6a7a" font-size="8">Scheduled</text>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-        <div class="module-divider"></div>
-
-        <!-- MODULE 4: IMPLEMENTATION CREW -->
-        <section class="module" id="agents">
-            <div class="module-header">
-                <div class="module-icon">🤖</div>
-                <div class="module-info">
-                    <h2>Implementation Command Team</h2>
-                    <p>AI agents orchestrating go-live execution and hypercare</p>
-                </div>
-            </div>
-            
-            <div class="description-block">
-                <p>The Implementation Crew coordinates all aspects of go-live execution, from cutover sequencing to hypercare support. These agents monitor system health, track user adoption, and automate issue escalation during the critical implementation window.</p>
-            </div>
-            
-            <!-- Agent + Code Section -->
-            <div class="agent-section">
-                <div class="agent-section-header">
-                    <div class="agent-section-tag">Agent This</div>
-                    <div class="agent-section-title">Implementation Orchestration System</div>
-                </div>
-                <div class="agent-grid">
-                    <div class="agent-info">
-                        <div class="agent-avatar">🚀</div>
-                        <div class="agent-name">ImplementationCrew</div>
-                        <div class="agent-role">Go-Live Execution & Hypercare</div>
-                        <p class="agent-desc">Orchestrates cutover activities, monitors system health during go-live, manages hypercare support queues, and tracks adoption metrics to ensure successful implementation.</p>
-                        <ul class="agent-capabilities">
-                            <li>Cutover task sequencing & execution</li>
-                            <li>Real-time health monitoring</li>
-                            <li>Automated rollback triggers</li>
-                            <li>Hypercare ticket routing</li>
-                            <li>User adoption tracking</li>
-                            <li>Escalation management</li>
-                            <li>Post-go-live reporting</li>
-                        </ul>
-                    </div>
-                    <div class="code-panel">
-                        <div class="code-header">
-                            <div class="code-tabs">
-                                <div class="code-tab active">Python</div>
-                                <div class="code-tab">YAML</div>
-                            </div>
-                            <div class="code-filename">implementation_crew.py</div>
-                        </div>
-                        <div class="code-content">
-                            <pre><span class="code-comment"># Implementation Command Center Crew</span>
-<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
-<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
-
-<span class="code-comment"># Initialize LLM</span>
-llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
-
-<span class="code-comment"># Define Implementation Agents</span>
-cutover_agent = Agent(
-    role=<span class="code-string">"Cutover Coordinator"</span>,
-    goal=<span class="code-string">"Execute cutover tasks in precise sequence"</span>,
-    backstory=<span class="code-string">"""Expert in coordinating complex cutovers 
-    with multiple dependencies and rollback points."""</span>,
-    llm=llm,
-    tools=[task_sequencer, dependency_checker, rollback_tool]
-)
-
-health_agent = Agent(
-    role=<span class="code-string">"System Health Monitor"</span>,
-    goal=<span class="code-string">"Monitor all systems during go-live window"</span>,
-    backstory=<span class="code-string">"""Specialist in real-time monitoring, detecting
-    anomalies and triggering alerts before issues escalate."""</span>,
-    llm=llm,
-    tools=[health_monitor, alert_manager, metrics_collector]
-)
-
-hypercare_agent = Agent(
-    role=<span class="code-string">"Hypercare Support Lead"</span>,
-    goal=<span class="code-string">"Manage support queue and ensure rapid resolution"</span>,
-    backstory=<span class="code-string">"""Experienced in high-volume support during
-    critical periods, prioritizing and routing issues."""</span>,
-    llm=llm,
-    tools=[ticket_router, knowledge_base, escalation_tool]
-)
-
-adoption_agent = Agent(
-    role=<span class="code-string">"Adoption Tracker"</span>,
-    goal=<span class="code-string">"Monitor and improve user adoption metrics"</span>,
-    backstory=<span class="code-string">"""Data-driven analyst tracking user behavior,
-    identifying adoption blockers and success patterns."""</span>,
-    llm=llm,
-    tools=[usage_analytics, sentiment_analyzer, training_recommender]
-)
-
-<span class="code-comment"># Create Implementation Crew</span>
-implementation_crew = Crew(
-    agents=[cutover_agent, health_agent, 
-            hypercare_agent, adoption_agent],
-    process=Process.hierarchical,
-    manager_llm=llm,
-    verbose=<span class="code-keyword">True</span>
-)
-
-<span class="code-keyword">async def</span> <span class="code-function">execute_go_live</span>(wave: <span class="code-keyword">int</span>):
-    <span class="code-string">"""Execute go-live for specified wave."""</span>
-    tasks = [
-        Task(description=<span class="code-string">f"Execute Wave {wave} cutover"</span>, 
-             agent=cutover_agent),
-        Task(description=<span class="code-string">"Monitor system health"</span>, 
-             agent=health_agent),
-        Task(description=<span class="code-string">"Manage hypercare queue"</span>, 
-             agent=hypercare_agent),
-        Task(description=<span class="code-string">"Track adoption metrics"</span>, 
-             agent=adoption_agent)
-    ]
-    <span class="code-keyword">return await</span> implementation_crew.kickoff_async(tasks=tasks)</pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="module-divider"></div>
-
-        <!-- TOOLS SECTION -->
-        <section class="module" id="tools">
-            <div class="module-header">
-                <div class="module-icon">🛠️</div>
-                <div class="module-info">
-                    <h2>Implementation Tools</h2>
-                    <p>Project management, monitoring, and support platforms</p>
-                </div>
-            </div>
-            
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-icon">📊</div>
-                        <div class="tool-card-name">Jira</div>
-                    </div>
-                    <div class="tool-card-desc">Cutover task tracking, sprint management, and issue resolution workflows during implementation.</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-icon">📈</div>
-                        <div class="tool-card-name">Datadog</div>
-                    </div>
-                    <div class="tool-card-desc">Real-time infrastructure monitoring, APM, and alerting for go-live system health.</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-icon">🎫</div>
-                        <div class="tool-card-name">ServiceNow</div>
-                    </div>
-                    <div class="tool-card-desc">Hypercare ticket management, knowledge base, and SLA tracking for support teams.</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-icon">📱</div>
-                        <div class="tool-card-name">WalkMe</div>
-                    </div>
-                    <div class="tool-card-desc">Digital adoption platform with in-app guidance, analytics, and user training.</div>
-                </div>
-            </div>
-        </section>
-
-    </div>
-</div>
-
-<footer>
-    <div class="footer-content">
-        <div class="footer-brand"><span>STRATEGY</span>HUB</div>
-        <div class="footer-meta">Category 18: Implementation | Strategy Hub</div>
-    </div>
-</footer>
-
 </body>
 </html>
