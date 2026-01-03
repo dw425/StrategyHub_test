@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Architecture | 14.2 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --violet: #7C3AED;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 56px; height: 56px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Subsections */
+        .subsection { margin-top: var(--space-xl); }
+        .subsection-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-lg); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           EVENT FLOW VISUALIZATION - REDESIGNED
+        ═══════════════════════════════════════════════════════════════ */
+        .event-flow-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .event-flow-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .event-flow-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .event-flow-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .event-flow-canvas { padding: var(--space-2xl) var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; min-height: 400px; }
+        .event-flow-canvas::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px); background-size: 30px 30px; }
+        
+        .event-flow-scene { position: relative; display: flex; align-items: center; justify-content: space-between; height: 320px; z-index: 1; }
+        
+        /* Stage Columns */
+        .flow-column { display: flex; flex-direction: column; align-items: center; gap: var(--space-lg); width: 200px; }
+        
+        /* Main Stage Boxes */
+        .flow-main-box { width: 180px; height: 140px; background: var(--bg-card); border: 3px solid var(--border-color); border-radius: var(--radius-xl); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s; position: relative; z-index: 10; }
+        .flow-main-box:hover { transform: scale(1.05); }
+        .flow-main-box.producers { border-color: var(--blue); box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        .flow-main-box.broker { border-color: var(--cat-primary); box-shadow: 0 0 40px rgba(6, 182, 212, 0.4); background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%); }
+        .flow-main-box.consumers { border-color: var(--success-green); box-shadow: 0 0 30px rgba(16, 185, 129, 0.3); }
+        
+        .flow-box-icon { font-size: 42px; margin-bottom: var(--space-sm); filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+        .flow-box-title { font-size: var(--font-base); font-weight: 700; margin-bottom: 2px; }
+        .flow-box-subtitle { font-size: var(--font-xs); color: var(--text-muted); }
+        .flow-main-box.producers .flow-box-title { color: var(--blue); }
+        .flow-main-box.broker .flow-box-title { color: var(--cat-light); }
+        .flow-main-box.consumers .flow-box-title { color: var(--success-green); }
+        
+        /* Event Items */
+        .flow-items { display: flex; flex-direction: column; gap: var(--space-sm); width: 100%; }
+        .flow-item { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); font-size: var(--font-xs); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-sm); transition: all 0.2s; }
+        .flow-item:hover { border-color: var(--cat-dark); background: var(--bg-hover); }
+        .flow-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .flow-column:first-child .flow-item-dot { background: var(--blue); box-shadow: 0 0 8px var(--blue); }
+        .flow-column:nth-child(3) .flow-item-dot { background: var(--cat-primary); box-shadow: 0 0 8px var(--cat-primary); }
+        .flow-column:last-child .flow-item-dot { background: var(--success-green); box-shadow: 0 0 8px var(--success-green); }
+        
+        /* Connection Lines & Animated Packets */
+        .flow-connection { position: relative; width: 140px; height: 100%; display: flex; align-items: center; justify-content: center; }
+        
+        .connection-track { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; height: 4px; background: linear-gradient(90deg, var(--track-start), var(--track-end)); border-radius: 2px; }
+        .flow-connection.left-track .connection-track { --track-start: var(--blue); --track-end: var(--cat-primary); }
+        .flow-connection.right-track .connection-track { --track-start: var(--cat-primary); --track-end: var(--success-green); }
+        
+        /* Animated Event Packets */
+        .event-packet { position: absolute; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        
+        .flow-connection.left-track .event-packet { background: var(--blue); box-shadow: 0 0 15px var(--blue); animation: packet-flow-right 2s linear infinite; }
+        .flow-connection.left-track .event-packet:nth-child(2) { animation-delay: -0.7s; }
+        .flow-connection.left-track .event-packet:nth-child(3) { animation-delay: -1.4s; }
+        
+        .flow-connection.right-track .event-packet { background: var(--cat-light); box-shadow: 0 0 15px var(--cat-primary); animation: packet-flow-right 2s linear infinite; }
+        .flow-connection.right-track .event-packet:nth-child(2) { animation-delay: -0.5s; background: var(--success-green); box-shadow: 0 0 15px var(--success-green); }
+        .flow-connection.right-track .event-packet:nth-child(3) { animation-delay: -1s; }
+        .flow-connection.right-track .event-packet:nth-child(4) { animation-delay: -1.5s; background: var(--success-green); box-shadow: 0 0 15px var(--success-green); }
+        
+        @keyframes packet-flow-right {
+            0% { left: 0; opacity: 0; transform: translateY(-50%) scale(0.5); }
+            10% { opacity: 1; transform: translateY(-50%) scale(1); }
+            90% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { left: calc(100% - 16px); opacity: 0; transform: translateY(-50%) scale(0.5); }
+        }
+        
+        /* Arrow Indicators */
+        .connection-arrow { position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-size: 20px; }
+        .flow-connection.left-track .connection-arrow { color: var(--cat-primary); }
+        .flow-connection.right-track .connection-arrow { color: var(--success-green); }
+        
+        /* Flow Stats Bar */
+        .flow-stats { display: flex; justify-content: center; gap: var(--space-xl); margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--border-color); }
+        .flow-stat { text-align: center; }
+        .flow-stat-value { font-size: var(--font-lg); font-weight: 700; }
+        .flow-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .flow-stat:nth-child(1) .flow-stat-value { color: var(--blue); }
+        .flow-stat:nth-child(2) .flow-stat-value { color: var(--cat-light); }
+        .flow-stat:nth-child(3) .flow-stat-value { color: var(--success-green); }
+        .flow-stat:nth-child(4) .flow-stat-value { color: var(--warning-yellow); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PATTERNS GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .patterns-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .pattern-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); transition: all 0.3s; position: relative; overflow: hidden; }
+        .pattern-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--pattern-color, var(--cat-primary)); }
+        .pattern-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .pattern-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .pattern-card-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .pattern-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .pattern-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-lg); }
+        .pattern-use-cases { list-style: none; }
+        .pattern-use-cases li { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .pattern-use-cases li::before { content: '→'; color: var(--cat-light); }
+        
+        .pattern-card.pubsub { --pattern-color: var(--blue); }
+        .pattern-card.sourcing { --pattern-color: var(--violet); }
+        .pattern-card.cqrs { --pattern-color: var(--teal); }
+        .pattern-card.saga { --pattern-color: var(--orange); }
+        .pattern-card.streaming { --pattern-color: var(--pink); }
+        .pattern-card.choreography { --pattern-color: var(--success-green); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MESSAGE BROKERS COMPARISON
+        ═══════════════════════════════════════════════════════════════ */
+        .broker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .broker-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .broker-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); }
+        .broker-card-header { padding: var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); text-align: center; }
+        .broker-card-icon { font-size: 40px; margin-bottom: var(--space-sm); }
+        .broker-card-name { font-size: var(--font-lg); font-weight: 600; }
+        .broker-card-tagline { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-xs); }
+        .broker-card-body { padding: var(--space-lg); }
+        .broker-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+        .broker-stat { text-align: center; padding: var(--space-sm); background: var(--bg-card-alt); border-radius: var(--radius-md); }
+        .broker-stat-value { font-size: var(--font-base); font-weight: 700; color: var(--cat-light); }
+        .broker-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .broker-features { list-style: none; }
+        .broker-features li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-sm); }
+        .broker-features li::before { content: '✓'; color: var(--success-green); font-weight: bold; font-size: 12px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DELIVERY GUARANTEES
+        ═══════════════════════════════════════════════════════════════ */
+        .guarantees-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .guarantees-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .guarantees-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-color); }
+        .guarantee-card { background: var(--bg-card); padding: var(--space-xl); }
+        .guarantee-icon { font-size: 36px; margin-bottom: var(--space-md); }
+        .guarantee-name { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-sm); }
+        .guarantee-name.at-most { color: var(--warning-yellow); }
+        .guarantee-name.at-least { color: var(--blue); }
+        .guarantee-name.exactly { color: var(--success-green); }
+        .guarantee-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.6; }
+        .guarantee-traits { list-style: none; }
+        .guarantee-traits li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-muted); display: flex; align-items: center; gap: var(--space-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           EVENT SCHEMA
+        ═══════════════════════════════════════════════════════════════ */
+        .schema-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .schema-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .schema-title { font-size: var(--font-sm); font-weight: 600; }
+        .schema-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .schema-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+        .schema-content pre { margin: 0; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #79C0FF; }
+        .code-type { color: #D2A8FF; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-dark); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-base); margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ERROR HANDLING
+        ═══════════════════════════════════════════════════════════════ */
+        .error-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .error-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .error-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .error-card-icon { width: 44px; height: 44px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .error-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .error-card-content { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .error-card-content ul { list-style: none; margin-top: var(--space-md); }
+        .error-card-content li { padding: var(--space-xs) 0; display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .error-card-content li::before { content: '→'; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           OBSERVABILITY
+        ═══════════════════════════════════════════════════════════════ */
+        .observability-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .observability-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-lg); }
+        .observability-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .observability-icon { font-size: 24px; }
+        .observability-title { font-size: var(--font-lg); font-weight: 600; color: var(--cat-light); }
+        .observability-list { list-style: none; }
+        .observability-list li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.5; }
+        .observability-list li strong { color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-panel-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-panel-title { font-size: var(--font-sm); font-weight: 600; }
+        .code-panel-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .code-panel-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+
+        /* Use Case Grid */
+        .use-case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .use-case-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .use-case-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .use-case-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .use-case-content h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); color: var(--cat-light); }
+        .use-case-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .tools-table-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table { width: 100%; border-collapse: collapse; }
+        .tools-table th { padding: var(--space-md); text-align: left; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table td { padding: var(--space-md); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .tools-table tr:last-child td { border-bottom: none; }
+        .tools-table tr:hover td { background: var(--bg-hover); }
+        .tool-name { display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-primary); }
+        .tool-icon { font-size: 20px; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); }
+        .badge-oss { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .badge-commercial { background: rgba(124, 58, 237, 0.2); color: var(--violet); }
+        .badge-cloud { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .patterns-grid { grid-template-columns: 1fr; }
+            .broker-grid { grid-template-columns: 1fr; }
+            .guarantees-grid { grid-template-columns: 1fr; }
+            .error-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .observability-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .use-case-grid { grid-template-columns: 1fr; }
+            .flow-stats { flex-wrap: wrap; gap: var(--space-md); }
+        }
+        @media (max-width: 768px) {
+            .event-flow-scene { flex-direction: column; height: auto; gap: var(--space-lg); }
+            .flow-connection { width: 100%; height: 60px; transform: rotate(90deg); }
+            .flow-column { width: 100%; }
+            .flow-main-box { width: 100%; max-width: 250px; }
+            .flow-items { max-width: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat14-integration-apis-overview.html">Integration & APIs</a>
+        <span class="sep">/</span>
+        <span class="current">Event Architecture</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔗 Category 14</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat14-integration-apis-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat14-p1-api-gateway.html"><span class="nav-icon">🚪</span> 14.1 API Gateway</a></li>
+            <li><a href="cat14-p2-event-architecture.html" class="active"><span class="nav-icon">📡</span> 14.2 Event Architecture</a></li>
+            <li><a href="cat14-p3-connectors.html"><span class="nav-icon">🔌</span> 14.3 Connectors</a></li>
+            <li><a href="cat14-p4-api-lifecycle.html"><span class="nav-icon">🔄</span> 14.4 API Lifecycle</a></li>
+            <li><a href="cat14-p5-webhooks.html"><span class="nav-icon">🪝</span> 14.5 Webhooks</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#concepts"><span class="nav-icon">💡</span> Core Concepts</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📐</span> Event Patterns</a></li>
+            <li><a href="#brokers"><span class="nav-icon">📬</span> Message Brokers</a></li>
+            <li><a href="#delivery"><span class="nav-icon">📦</span> Delivery Guarantees</a></li>
+            <li><a href="#schema"><span class="nav-icon">📋</span> Event Schema</a></li>
+            <li><a href="#errors"><span class="nav-icon">⚠️</span> Error Handling</a></li>
+            <li><a href="#observability"><span class="nav-icon">📊</span> Observability</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📡 Page 14.2</span>
+                <h1>Event Architecture</h1>
+                <p>Build loosely coupled, scalable systems with asynchronous event-driven communication patterns and reliable message delivery.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">1M+</div><div class="hero-metric-label">Events/Second</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;10ms</div><div class="hero-metric-label">Publish Latency</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.99%</div><div class="hero-metric-label">Delivery Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">7 Days</div><div class="hero-metric-label">Event Retention</div></div>
+            </div>
+        </section>
+
+        <!-- CORE CONCEPTS -->
+        <section class="module" id="concepts">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Core Concepts</h2>
+                    <p>Understanding event-driven architecture fundamentals</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Event-driven architecture (EDA) is a design paradigm where the flow of the program is determined by events—significant changes in state that components broadcast for others to react to. Unlike request-response patterns where services directly call each other, EDA enables <strong>loose coupling</strong>: producers emit events without knowing who consumes them, and consumers react to events without knowing who produced them.</p>
+                <p>This decoupling provides profound benefits for complex systems. Teams can develop and deploy services independently. Systems scale naturally because consumers can be added without modifying producers. Failures are isolated—if a consumer goes down, the producer continues operating, and events queue until the consumer recovers. The temporal decoupling means systems can handle traffic bursts by buffering events rather than dropping requests.</p>
+                <p>However, EDA introduces complexity around <strong>eventual consistency</strong>, <strong>event ordering</strong>, <strong>idempotency</strong>, and <strong>debugging distributed flows</strong>. Success requires careful attention to event schema design, delivery guarantees, error handling strategies, and comprehensive observability. The patterns and practices on this page help you navigate these challenges.</p>
+            </div>
+            
+            <div class="event-flow-container">
+                <div class="event-flow-header">
+                    <div class="event-flow-title">📡 Event Flow Architecture</div>
+                    <div class="event-flow-badge">Asynchronous</div>
+                </div>
+                <div class="event-flow-canvas">
+                    <div class="event-flow-scene">
+                        <!-- Producers Column -->
+                        <div class="flow-column">
+                            <div class="flow-main-box producers">
+                                <div class="flow-box-icon">🏭</div>
+                                <div class="flow-box-title">Producers</div>
+                                <div class="flow-box-subtitle">Emit Events</div>
+                            </div>
+                            <div class="flow-items">
+                                <div class="flow-item"><span class="flow-item-dot"></span> OrderCreated</div>
+                                <div class="flow-item"><span class="flow-item-dot"></span> PaymentProcessed</div>
+                                <div class="flow-item"><span class="flow-item-dot"></span> UserRegistered</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Left Connection (Producers → Broker) -->
+                        <div class="flow-connection left-track">
+                            <div class="connection-track"></div>
+                            <div class="event-packet">📨</div>
+                            <div class="event-packet">📨</div>
+                            <div class="event-packet">📨</div>
+                            <span class="connection-arrow">▶</span>
+                        </div>
+                        
+                        <!-- Broker Column -->
+                        <div class="flow-column">
+                            <div class="flow-main-box broker">
+                                <div class="flow-box-icon">📬</div>
+                                <div class="flow-box-title">Message Broker</div>
+                                <div class="flow-box-subtitle">Route & Store</div>
+                            </div>
+                            <div class="flow-items">
+                                <div class="flow-item"><span class="flow-item-dot"></span> Topics / Queues</div>
+                                <div class="flow-item"><span class="flow-item-dot"></span> Partitions</div>
+                                <div class="flow-item"><span class="flow-item-dot"></span> Retention</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Connection (Broker → Consumers) -->
+                        <div class="flow-connection right-track">
+                            <div class="connection-track"></div>
+                            <div class="event-packet">📨</div>
+                            <div class="event-packet">📨</div>
+                            <div class="event-packet">📨</div>
+                            <div class="event-packet">📨</div>
+                            <span class="connection-arrow">▶</span>
+                        </div>
+                        
+                        <!-- Consumers Column -->
+                        <div class="flow-column">
+                            <div class="flow-main-box consumers">
+                                <div class="flow-box-icon">⚙️</div>
+                                <div class="flow-box-title">Consumers</div>
+                                <div class="flow-box-subtitle">React & Process</div>
+                            </div>
+                            <div class="flow-items">
+                                <div class="flow-item"><span class="flow-item-dot"></span> Inventory Service</div>
+                                <div class="flow-item"><span class="flow-item-dot"></span> Notification Service</div>
+                                <div class="flow-item"><span class="flow-item-dot"></span> Analytics Pipeline</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Bar -->
+                    <div class="flow-stats">
+                        <div class="flow-stat"><div class="flow-stat-value">12</div><div class="flow-stat-label">Producers</div></div>
+                        <div class="flow-stat"><div class="flow-stat-value">48</div><div class="flow-stat-label">Topics</div></div>
+                        <div class="flow-stat"><div class="flow-stat-value">36</div><div class="flow-stat-label">Consumers</div></div>
+                        <div class="flow-stat"><div class="flow-stat-value">1.2M</div><div class="flow-stat-label">Events/Hour</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- EVENT PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Event Patterns</h2>
+                    <p>Architectural patterns for event-driven systems</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Event-driven architecture encompasses several patterns, each suited to different problems. Understanding when to apply each pattern—and when to combine them—is essential for building robust distributed systems. These patterns aren't mutually exclusive; production systems often layer multiple patterns together.</p>
+                <p>The choice between patterns depends on your requirements for consistency, complexity tolerance, scalability needs, and team expertise. <strong>Pub/Sub</strong> is the simplest and most common starting point. <strong>Event Sourcing</strong> provides complete auditability but adds complexity. <strong>CQRS</strong> optimizes read-heavy workloads. <strong>Saga</strong> coordinates distributed transactions. Consider starting simple and evolving toward more sophisticated patterns as needs arise.</p>
+            </div>
+            
+            <div class="patterns-grid">
+                <div class="pattern-card pubsub">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">📢</div>
+                        <div class="pattern-card-title">Publish-Subscribe</div>
+                    </div>
+                    <p class="pattern-card-desc">Producers publish events to topics without knowing subscribers. Consumers subscribe to topics of interest and receive all published events. Enables fan-out to multiple consumers and complete decoupling.</p>
+                    <ul class="pattern-use-cases">
+                        <li>Notification broadcasting</li>
+                        <li>Real-time updates to multiple services</li>
+                        <li>Analytics event collection</li>
+                        <li>Cache invalidation</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card sourcing">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">📚</div>
+                        <div class="pattern-card-title">Event Sourcing</div>
+                    </div>
+                    <p class="pattern-card-desc">Store state as a sequence of events rather than current state. Reconstruct state by replaying events. Provides complete audit trail, temporal queries, and the ability to rebuild read models.</p>
+                    <ul class="pattern-use-cases">
+                        <li>Financial transactions requiring audit</li>
+                        <li>Systems needing complete history</li>
+                        <li>Temporal queries ("state at time X")</li>
+                        <li>Debugging production issues</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card cqrs">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">⚡</div>
+                        <div class="pattern-card-title">CQRS</div>
+                    </div>
+                    <p class="pattern-card-desc">Command Query Responsibility Segregation separates read and write models. Commands modify state through events; queries read from optimized projections. Enables independent scaling and optimization.</p>
+                    <ul class="pattern-use-cases">
+                        <li>Read-heavy applications</li>
+                        <li>Complex domain models</li>
+                        <li>Different read/write scaling needs</li>
+                        <li>Polyglot persistence</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card saga">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">🔗</div>
+                        <div class="pattern-card-title">Saga Pattern</div>
+                    </div>
+                    <p class="pattern-card-desc">Coordinate distributed transactions through a sequence of local transactions. Each step publishes events triggering the next. Compensating transactions handle failures and rollbacks.</p>
+                    <ul class="pattern-use-cases">
+                        <li>Order fulfillment workflows</li>
+                        <li>Multi-service transactions</li>
+                        <li>Long-running business processes</li>
+                        <li>Distributed rollback scenarios</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card streaming">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">🌊</div>
+                        <div class="pattern-card-title">Event Streaming</div>
+                    </div>
+                    <p class="pattern-card-desc">Continuous flow of events processed in real-time. Events are immutable, ordered, and replayable. Enables stream processing, windowed aggregations, and real-time analytics.</p>
+                    <ul class="pattern-use-cases">
+                        <li>Real-time analytics dashboards</li>
+                        <li>Fraud detection</li>
+                        <li>IoT sensor data processing</li>
+                        <li>Log aggregation pipelines</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card choreography">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">💃</div>
+                        <div class="pattern-card-title">Choreography</div>
+                    </div>
+                    <p class="pattern-card-desc">Services react to events autonomously without central coordination. Each service knows its responsibilities and triggers. Highly decoupled but harder to visualize end-to-end flows.</p>
+                    <ul class="pattern-use-cases">
+                        <li>Loosely coupled microservices</li>
+                        <li>Simple event chains</li>
+                        <li>High autonomy requirements</li>
+                        <li>Avoiding single points of failure</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MESSAGE BROKERS -->
+        <section class="module" id="brokers">
+            <div class="module-header">
+                <div class="module-icon">📬</div>
+                <div class="module-info">
+                    <h2>Message Brokers</h2>
+                    <p>Infrastructure for reliable event delivery</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Message brokers are the backbone of event-driven systems, providing reliable storage and delivery of events between producers and consumers. The choice of broker significantly impacts your system's throughput, latency, durability, and operational complexity. Each broker makes different trade-offs suited to different use cases.</p>
+                <p><strong>Apache Kafka</strong> dominates high-throughput streaming scenarios with its distributed log architecture. <strong>RabbitMQ</strong> excels at traditional message queuing with flexible routing. <strong>AWS SQS/SNS</strong> provides serverless simplicity for AWS-native architectures. <strong>Redis Streams</strong> offers low-latency messaging when you're already using Redis. Consider your throughput needs, durability requirements, operational expertise, and cloud strategy when choosing.</p>
+            </div>
+            
+            <div class="broker-grid">
+                <div class="broker-card">
+                    <div class="broker-card-header">
+                        <div class="broker-card-icon">🦊</div>
+                        <div class="broker-card-name">Apache Kafka</div>
+                        <div class="broker-card-tagline">Distributed Event Streaming</div>
+                    </div>
+                    <div class="broker-card-body">
+                        <div class="broker-stats">
+                            <div class="broker-stat"><div class="broker-stat-value">1M+</div><div class="broker-stat-label">msg/sec</div></div>
+                            <div class="broker-stat"><div class="broker-stat-value">&lt;5ms</div><div class="broker-stat-label">latency</div></div>
+                        </div>
+                        <ul class="broker-features">
+                            <li>Distributed commit log</li>
+                            <li>Exactly-once semantics</li>
+                            <li>Stream processing (KStreams)</li>
+                            <li>Infinite retention possible</li>
+                            <li>Consumer groups</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="broker-card">
+                    <div class="broker-card-header">
+                        <div class="broker-card-icon">🐰</div>
+                        <div class="broker-card-name">RabbitMQ</div>
+                        <div class="broker-card-tagline">Traditional Message Queue</div>
+                    </div>
+                    <div class="broker-card-body">
+                        <div class="broker-stats">
+                            <div class="broker-stat"><div class="broker-stat-value">50K</div><div class="broker-stat-label">msg/sec</div></div>
+                            <div class="broker-stat"><div class="broker-stat-value">&lt;1ms</div><div class="broker-stat-label">latency</div></div>
+                        </div>
+                        <ul class="broker-features">
+                            <li>AMQP protocol</li>
+                            <li>Flexible routing (exchanges)</li>
+                            <li>Message acknowledgments</li>
+                            <li>Priority queues</li>
+                            <li>Dead letter exchanges</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="broker-card">
+                    <div class="broker-card-header">
+                        <div class="broker-card-icon">☁️</div>
+                        <div class="broker-card-name">AWS SQS/SNS</div>
+                        <div class="broker-card-tagline">Serverless Messaging</div>
+                    </div>
+                    <div class="broker-card-body">
+                        <div class="broker-stats">
+                            <div class="broker-stat"><div class="broker-stat-value">∞</div><div class="broker-stat-label">scale</div></div>
+                            <div class="broker-stat"><div class="broker-stat-value">4 days</div><div class="broker-stat-label">retention</div></div>
+                        </div>
+                        <ul class="broker-features">
+                            <li>Fully managed</li>
+                            <li>FIFO queues available</li>
+                            <li>Lambda integration</li>
+                            <li>Pay per message</li>
+                            <li>Dead letter queues</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Brokers Table -->
+            <div class="tools-table-container">
+                <div class="tools-table-header">
+                    <h3>🔍 More Message Brokers</h3>
+                </div>
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Broker</th>
+                            <th>Type</th>
+                            <th>Best For</th>
+                            <th>Protocol</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔴</span> Redis Streams</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Low-latency, existing Redis users</td>
+                            <td>Redis Protocol</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🟣</span> Apache Pulsar</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Multi-tenancy, geo-replication</td>
+                            <td>Pulsar Protocol</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔵</span> Azure Event Hubs</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Azure-native, Kafka compatibility</td>
+                            <td>AMQP, Kafka</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🟢</span> Google Pub/Sub</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>GCP-native, global messaging</td>
+                            <td>gRPC, REST</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">⚫</span> NATS</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Lightweight, edge computing</td>
+                            <td>NATS Protocol</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🟠</span> Amazon Kinesis</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Real-time streaming on AWS</td>
+                            <td>AWS SDK</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- DELIVERY GUARANTEES -->
+        <section class="module" id="delivery">
+            <div class="module-header">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                    <h2>Delivery Guarantees</h2>
+                    <p>Understanding message delivery semantics</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Message delivery guarantees define what happens when things go wrong—network partitions, consumer crashes, broker failures. The guarantees you choose impact both reliability and performance. Understanding these trade-offs is essential for building systems that behave correctly under failure conditions.</p>
+                <p>Most production systems target <strong>at-least-once delivery</strong> combined with <strong>idempotent consumers</strong>. This provides reliable delivery without the complexity and performance overhead of exactly-once semantics. Consumers must be designed to handle duplicate messages gracefully—typically through idempotency keys or deduplication logic.</p>
+            </div>
+            
+            <div class="guarantees-container">
+                <div class="guarantees-header">
+                    <h3>📦 Delivery Semantics</h3>
+                </div>
+                <div class="guarantees-grid">
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">⚡</div>
+                        <div class="guarantee-name at-most">At-Most-Once</div>
+                        <p class="guarantee-desc">Messages may be lost but never duplicated. Fire-and-forget semantics. Fastest but least reliable—suitable when occasional data loss is acceptable.</p>
+                        <ul class="guarantee-traits">
+                            <li>✓ Lowest latency</li>
+                            <li>✓ Simplest implementation</li>
+                            <li>✗ Messages can be lost</li>
+                            <li>→ Use for: metrics, logs, non-critical events</li>
+                        </ul>
+                    </div>
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">🔄</div>
+                        <div class="guarantee-name at-least">At-Least-Once</div>
+                        <p class="guarantee-desc">Messages are never lost but may be delivered multiple times. Requires acknowledgments and retries. Consumers must handle duplicates idempotently.</p>
+                        <ul class="guarantee-traits">
+                            <li>✓ No message loss</li>
+                            <li>✓ Good performance</li>
+                            <li>✗ Requires idempotent consumers</li>
+                            <li>→ Use for: most business events</li>
+                        </ul>
+                    </div>
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">✅</div>
+                        <div class="guarantee-name exactly">Exactly-Once</div>
+                        <p class="guarantee-desc">Messages delivered exactly once—never lost, never duplicated. Requires distributed transactions or deduplication. Most complex and highest latency.</p>
+                        <ul class="guarantee-traits">
+                            <li>✓ Perfect delivery</li>
+                            <li>✗ Highest complexity</li>
+                            <li>✗ Performance overhead</li>
+                            <li>→ Use for: financial transactions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- EVENT SCHEMA -->
+        <section class="module" id="schema">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Event Schema Design</h2>
+                    <p>Structuring events for evolvability and clarity</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Well-designed event schemas are crucial for maintainable event-driven systems. Events are contracts between producers and consumers—poor schema design leads to tight coupling, breaking changes, and versioning nightmares. Good schemas are <strong>self-describing</strong>, <strong>evolvable</strong>, and contain all information consumers need without requiring additional lookups.</p>
+                <p>Follow the <strong>CloudEvents specification</strong> for standard metadata fields. Include <strong>event type</strong>, <strong>source</strong>, <strong>timestamp</strong>, and <strong>unique ID</strong> in every event. Design for <strong>forward compatibility</strong>—consumers should ignore unknown fields, and new required fields need default values. Consider using <strong>schema registries</strong> (like Confluent Schema Registry) to enforce compatibility and enable schema evolution.</p>
+            </div>
+            
+            <div class="schema-container">
+                <div class="schema-header">
+                    <span class="schema-title">CloudEvents Specification Example</span>
+                    <span class="schema-lang">JSON</span>
+                </div>
+                <div class="schema-content">
+                    <pre>{
+  <span class="code-comment">// CloudEvents Standard Attributes</span>
+  <span class="code-property">"specversion"</span>: <span class="code-string">"1.0"</span>,
+  <span class="code-property">"type"</span>: <span class="code-string">"com.example.order.created"</span>,
+  <span class="code-property">"source"</span>: <span class="code-string">"/orders/service"</span>,
+  <span class="code-property">"id"</span>: <span class="code-string">"A234-1234-1234"</span>,
+  <span class="code-property">"time"</span>: <span class="code-string">"2024-01-15T17:31:00Z"</span>,
+  <span class="code-property">"datacontenttype"</span>: <span class="code-string">"application/json"</span>,
+  
+  <span class="code-comment">// Extension Attributes</span>
+  <span class="code-property">"correlationid"</span>: <span class="code-string">"req-abc-123"</span>,
+  <span class="code-property">"causationid"</span>: <span class="code-string">"evt-xyz-789"</span>,
+  <span class="code-property">"schemaversion"</span>: <span class="code-string">"1.2.0"</span>,
+  
+  <span class="code-comment">// Event Payload</span>
+  <span class="code-property">"data"</span>: {
+    <span class="code-property">"orderId"</span>: <span class="code-string">"ORD-2024-001234"</span>,
+    <span class="code-property">"customerId"</span>: <span class="code-string">"CUST-5678"</span>,
+    <span class="code-property">"items"</span>: [
+      {
+        <span class="code-property">"sku"</span>: <span class="code-string">"PROD-ABC"</span>,
+        <span class="code-property">"quantity"</span>: 2,
+        <span class="code-property">"unitPrice"</span>: 29.99
+      }
+    ],
+    <span class="code-property">"totalAmount"</span>: 59.98,
+    <span class="code-property">"currency"</span>: <span class="code-string">"USD"</span>,
+    <span class="code-property">"shippingAddress"</span>: {
+      <span class="code-property">"street"</span>: <span class="code-string">"123 Main St"</span>,
+      <span class="code-property">"city"</span>: <span class="code-string">"Seattle"</span>,
+      <span class="code-property">"state"</span>: <span class="code-string">"WA"</span>,
+      <span class="code-property">"zip"</span>: <span class="code-string">"98101"</span>
+    }
+  }
+}</pre>
+                </div>
+            </div>
+            
+            <!-- Schema Best Practices -->
+            <div class="subsection">
+                <h3 class="subsection-title">📝 Schema Design Principles</h3>
+                <div class="practices-grid">
+                    <div class="practice-card">
+                        <div class="practice-num">1</div>
+                        <div class="practice-content">
+                            <h4>Use Past Tense for Event Names</h4>
+                            <p>Events represent facts that have already occurred: OrderCreated, PaymentProcessed, UserRegistered—not CreateOrder or ProcessPayment.</p>
+                        </div>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-num">2</div>
+                        <div class="practice-content">
+                            <h4>Include All Relevant Data</h4>
+                            <p>Events should be self-contained. Consumers shouldn't need to make additional API calls to get context. Include denormalized data when needed.</p>
+                        </div>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-num">3</div>
+                        <div class="practice-content">
+                            <h4>Version Your Schemas</h4>
+                            <p>Include schema version in events. Use semantic versioning. Maintain backward compatibility within major versions.</p>
+                        </div>
+                    </div>
+                    <div class="practice-card">
+                        <div class="practice-num">4</div>
+                        <div class="practice-content">
+                            <h4>Add Correlation IDs</h4>
+                            <p>Include correlation and causation IDs to trace event chains across services. Essential for debugging distributed flows.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ERROR HANDLING -->
+        <section class="module" id="errors">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Error Handling</h2>
+                    <p>Managing failures in event-driven systems</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Error handling in event-driven systems is fundamentally different from synchronous request-response patterns. When a consumer fails to process an event, you can't simply return an error to the caller—the producer has long since moved on. Instead, you need strategies for <strong>retrying</strong>, <strong>dead-lettering</strong>, and <strong>alerting</strong> that maintain system reliability without losing events.</p>
+                <p>The key principle is <strong>separating transient from permanent failures</strong>. Transient failures (network timeouts, temporary unavailability) should trigger retries with exponential backoff. Permanent failures (malformed events, business rule violations) should route to dead letter queues for investigation. Never silently drop events—every failure should be visible and actionable.</p>
+            </div>
+            
+            <div class="error-grid">
+                <div class="error-card">
+                    <div class="error-card-header">
+                        <div class="error-card-icon">🔄</div>
+                        <div class="error-card-title">Retry Strategies</div>
+                    </div>
+                    <div class="error-card-content">
+                        <p>Implement intelligent retry logic that distinguishes between retryable and non-retryable errors.</p>
+                        <ul>
+                            <li><strong>Exponential backoff</strong> — 1s, 2s, 4s, 8s delays</li>
+                            <li><strong>Jitter</strong> — Randomize delays to prevent thundering herd</li>
+                            <li><strong>Max retries</strong> — Limit attempts before dead-lettering</li>
+                            <li><strong>Retry budgets</strong> — Cap total retry rate</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="error-card">
+                    <div class="error-card-header">
+                        <div class="error-card-icon">💀</div>
+                        <div class="error-card-title">Dead Letter Queues</div>
+                    </div>
+                    <div class="error-card-content">
+                        <p>Route failed events to DLQs for investigation and potential reprocessing.</p>
+                        <ul>
+                            <li><strong>Preserve original event</strong> — Don't lose data</li>
+                            <li><strong>Add failure metadata</strong> — Error message, stack trace, attempt count</li>
+                            <li><strong>Alerting</strong> — Notify on DLQ growth</li>
+                            <li><strong>Reprocessing tools</strong> — Ability to replay from DLQ</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="error-card">
+                    <div class="error-card-header">
+                        <div class="error-card-icon">🔌</div>
+                        <div class="error-card-title">Circuit Breakers</div>
+                    </div>
+                    <div class="error-card-content">
+                        <p>Prevent cascade failures when downstream dependencies are unhealthy.</p>
+                        <ul>
+                            <li><strong>Closed</strong> — Normal operation, monitor failures</li>
+                            <li><strong>Open</strong> — Stop processing, fail fast</li>
+                            <li><strong>Half-open</strong> — Test recovery with limited traffic</li>
+                            <li><strong>Threshold config</strong> — Error rate or count triggers</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="error-card">
+                    <div class="error-card-header">
+                        <div class="error-card-icon">🔀</div>
+                        <div class="error-card-title">Poison Pill Handling</div>
+                    </div>
+                    <div class="error-card-content">
+                        <p>Handle malformed events that would block processing indefinitely.</p>
+                        <ul>
+                            <li><strong>Schema validation</strong> — Reject invalid events early</li>
+                            <li><strong>Deserialization guards</strong> — Catch parsing failures</li>
+                            <li><strong>Immediate DLQ routing</strong> — Don't retry unfixable errors</li>
+                            <li><strong>Consumer isolation</strong> — One bad event shouldn't block others</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- OBSERVABILITY -->
+        <section class="module" id="observability">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Observability</h2>
+                    <p>Monitoring and debugging event flows</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Observability in event-driven systems is challenging because requests don't have clear start and end points—events flow through multiple services asynchronously. Traditional request tracing doesn't capture the full picture. You need <strong>event-centric observability</strong> that tracks events through their entire lifecycle across all consumers.</p>
+                <p>The key is <strong>correlation IDs</strong> that link related events together. When an OrderCreated event triggers InventoryReserved, PaymentProcessed, and NotificationSent events, the correlation ID lets you trace the entire saga. Combine this with broker-level metrics, consumer lag monitoring, and distributed tracing for complete visibility.</p>
+            </div>
+            
+            <div class="observability-grid">
+                <div class="observability-card">
+                    <div class="observability-header">
+                        <span class="observability-icon">📈</span>
+                        <span class="observability-title">Broker Metrics</span>
+                    </div>
+                    <ul class="observability-list">
+                        <li><strong>Throughput</strong> — Messages/sec per topic</li>
+                        <li><strong>Consumer Lag</strong> — Messages behind head</li>
+                        <li><strong>Partition Balance</strong> — Even distribution</li>
+                        <li><strong>Replication Health</strong> — In-sync replicas</li>
+                        <li><strong>Storage Usage</strong> — Disk consumption</li>
+                        <li><strong>Connection Count</strong> — Active clients</li>
+                    </ul>
+                </div>
+                
+                <div class="observability-card">
+                    <div class="observability-header">
+                        <span class="observability-icon">⚙️</span>
+                        <span class="observability-title">Consumer Metrics</span>
+                    </div>
+                    <ul class="observability-list">
+                        <li><strong>Processing Rate</strong> — Events/sec consumed</li>
+                        <li><strong>Processing Time</strong> — P50/P95/P99 latency</li>
+                        <li><strong>Error Rate</strong> — Failed processing %</li>
+                        <li><strong>Retry Rate</strong> — Retries per event</li>
+                        <li><strong>DLQ Rate</strong> — Events dead-lettered</li>
+                        <li><strong>Commit Lag</strong> — Uncommitted offset gap</li>
+                    </ul>
+                </div>
+                
+                <div class="observability-card">
+                    <div class="observability-header">
+                        <span class="observability-icon">🔍</span>
+                        <span class="observability-title">Tracing & Debug</span>
+                    </div>
+                    <ul class="observability-list">
+                        <li><strong>Correlation Tracking</strong> — Event chain visualization</li>
+                        <li><strong>Event Timeline</strong> — Ordered event history</li>
+                        <li><strong>Consumer Group State</strong> — Offset positions</li>
+                        <li><strong>Event Replay</strong> — Reprocess from offset</li>
+                        <li><strong>Schema History</strong> — Version evolution</li>
+                        <li><strong>DLQ Browser</strong> — Inspect failed events</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Frameworks</h2>
+                    <p>Technologies for building event-driven systems</p>
+                </div>
+            </div>
+            
+            <div class="tools-table-container">
+                <div class="tools-table-header">
+                    <h3>🔧 Event Processing & Streaming</h3>
+                </div>
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Type</th>
+                            <th>Use Case</th>
+                            <th>Key Feature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">⚡</span> Apache Flink</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Stream processing at scale</td>
+                            <td>Exactly-once, event time</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🌀</span> Kafka Streams</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Lightweight stream processing</td>
+                            <td>Library, no cluster needed</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">✨</span> Apache Spark</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Batch + streaming unified</td>
+                            <td>Structured Streaming</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔷</span> AWS EventBridge</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Serverless event routing</td>
+                            <td>Schema registry, rules</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">📊</span> Confluent</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>Managed Kafka platform</td>
+                            <td>Schema registry, ksqlDB</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🎯</span> Temporal</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Durable execution workflows</td>
+                            <td>Saga orchestration</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for production event systems</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Design for Idempotency</h4>
+                        <p>Consumers must handle duplicate events gracefully. Use idempotency keys and check for already-processed events before applying side effects.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Events Are Immutable</h4>
+                        <p>Never modify published events. If you need to correct data, publish a new compensating event. This preserves audit trails and enables replay.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Use Consumer Groups</h4>
+                        <p>Scale consumers horizontally with consumer groups. Each partition is consumed by one consumer, enabling parallel processing.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Monitor Consumer Lag</h4>
+                        <p>Alert when consumers fall behind. Growing lag indicates capacity issues or stuck consumers that need investigation.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Partition Wisely</h4>
+                        <p>Choose partition keys that ensure ordering where needed while distributing load evenly. Don't over-partition or under-partition.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Keep Events Small</h4>
+                        <p>Large events impact throughput and storage. For big payloads, store in object storage and include references in events.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Plan for Schema Evolution</h4>
+                        <p>Use schema registries. Add fields with defaults. Remove fields gracefully. Test compatibility before deploying changes.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Test with Chaos</h4>
+                        <p>Simulate broker failures, network partitions, and consumer crashes. Verify your system recovers correctly and doesn't lose events.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered event system management</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The <strong>EventOps Crew</strong> brings AI-powered automation to event-driven architecture management. These specialized agents monitor event flows, detect anomalies, optimize consumer performance, and help debug complex distributed sagas—turning reactive firefighting into proactive system governance.</p>
+                <p>Event-driven systems generate massive amounts of telemetry that humans struggle to correlate. AI agents excel at pattern recognition across this data: identifying consumer lag trends before they become outages, detecting schema compatibility issues before deployment, and tracing event chains through complex choreographies. The EventOps Crew augments your team's capabilities, handling routine monitoring while surfacing insights that require human judgment.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📡</div>
+                    <div class="agent-name">EventOps Crew</div>
+                    <div class="agent-role">Event System Management & Optimization</div>
+                    <p class="agent-desc">A coordinated team of specialized agents that monitor event flows, optimize consumer performance, detect anomalies, and help debug distributed systems. Each agent focuses on a specific domain while sharing context for holistic event governance.</p>
+                    <ul class="agent-capabilities">
+                        <li>Consumer lag monitoring and auto-scaling triggers</li>
+                        <li>Schema compatibility validation pre-deployment</li>
+                        <li>Dead letter queue analysis and root cause identification</li>
+                        <li>Event chain tracing and saga visualization</li>
+                        <li>Partition rebalancing recommendations</li>
+                        <li>Throughput anomaly detection</li>
+                        <li>Consumer performance optimization suggestions</li>
+                        <li>Broker health monitoring and capacity planning</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header">
+                        <span class="code-panel-title">event_ops_crew.py</span>
+                        <span class="code-panel-lang">Python</span>
+                    </div>
+                    <div class="code-panel-content">
+                        <pre><span class="code-comment"># EventOps Crew - AI-Powered Event Management</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Consumer Health Agent</span>
+consumer_agent = Agent(
+    role=<span class="code-string">"Consumer Health Monitor"</span>,
+    goal=<span class="code-string">"Monitor consumer lag and processing health"</span>,
+    backstory=<span class="code-string">"""Expert at analyzing consumer group metrics,
+    detecting lag patterns, and recommending scaling
+    actions before backlogs impact users."""</span>,
+    llm=llm,
+    tools=[kafka_metrics, consumer_lag_analyzer, scaling_recommender]
+)
+
+<span class="code-comment"># Schema Guardian Agent</span>
+schema_agent = Agent(
+    role=<span class="code-string">"Schema Compatibility Guardian"</span>,
+    goal=<span class="code-string">"Ensure schema changes are backward compatible"</span>,
+    backstory=<span class="code-string">"""Schema evolution expert who validates
+    changes against compatibility rules and prevents
+    breaking changes from reaching production."""</span>,
+    llm=llm,
+    tools=[schema_registry, compatibility_checker, diff_analyzer]
+)
+
+<span class="code-comment"># DLQ Investigator Agent</span>
+dlq_agent = Agent(
+    role=<span class="code-string">"Dead Letter Queue Investigator"</span>,
+    goal=<span class="code-string">"Analyze failed events and identify root causes"</span>,
+    backstory=<span class="code-string">"""Debugging specialist who analyzes DLQ events,
+    correlates failures across services, and identifies
+    patterns in processing errors."""</span>,
+    llm=llm,
+    tools=[dlq_browser, error_analyzer, event_correlator]
+)
+
+<span class="code-comment"># Event Tracer Agent</span>
+tracer_agent = Agent(
+    role=<span class="code-string">"Event Chain Tracer"</span>,
+    goal=<span class="code-string">"Trace events through distributed systems"</span>,
+    backstory=<span class="code-string">"""Distributed systems expert who traces
+    event flows, visualizes sagas, and identifies
+    bottlenecks in event processing chains."""</span>,
+    llm=llm,
+    tools=[trace_analyzer, saga_visualizer, latency_profiler]
+)
+
+<span class="code-comment"># Create EventOps Crew</span>
+event_ops_crew = Crew(
+    agents=[consumer_agent, schema_agent, 
+            dlq_agent, tracer_agent],
+    tasks=[
+        Task(description=<span class="code-string">"Check consumer health"</span>,
+             agent=consumer_agent),
+        Task(description=<span class="code-string">"Validate pending schemas"</span>,
+             agent=schema_agent),
+        Task(description=<span class="code-string">"Analyze DLQ patterns"</span>,
+             agent=dlq_agent),
+        Task(description=<span class="code-string">"Trace slow event chains"</span>,
+             agent=tracer_agent),
+    ],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Use Cases -->
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Agent Use Cases</h3>
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📈</div>
+                        <div class="use-case-content">
+                            <h4>Consumer Lag Prediction</h4>
+                            <p>Agent analyzes lag trends, correlates with traffic patterns, and predicts when consumers will fall critically behind—triggering proactive scaling before users are impacted.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔍</div>
+                        <div class="use-case-content">
+                            <h4>DLQ Pattern Analysis</h4>
+                            <p>DLQ agent identifies common failure patterns (schema mismatches, timeout clusters, specific error codes) and surfaces root causes with remediation recommendations.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📋</div>
+                        <div class="use-case-content">
+                            <h4>Schema Change Validation</h4>
+                            <p>Schema agent validates proposed changes against all consumer versions, identifies breaking changes, and suggests compatible evolution paths before deployment.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔗</div>
+                        <div class="use-case-content">
+                            <h4>Saga Debugging</h4>
+                            <p>Tracer agent follows correlation IDs through complex event chains, visualizes the complete saga flow, and identifies where failures or latency issues occur.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat14-p1-api-gateway.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">14.1 API Gateway</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 14.2</div>
+        <a href="cat14-p3-connectors.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">14.3 Connectors</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

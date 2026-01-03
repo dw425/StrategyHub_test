@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking | Category 15 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 15 - NETWORKING BLUE */
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --violet: #8B5CF6;
+            
+            /* CLOUD COLORS */
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           NETWORK TOPOLOGY - DYNAMIC MULTI-PATH FLOW
+        ═══════════════════════════════════════════════════════════════ */
+        .topology-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); margin-left: calc(-1 * var(--space-xl)); margin-right: calc(-1 * var(--space-xl)); width: calc(100% + var(--space-xl) * 2); }
+        .topology-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .topology-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .topology-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .topology-canvas { padding: var(--space-xl) var(--space-lg); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; min-height: 380px; }
+        .topology-canvas::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 10% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 30%), radial-gradient(circle at 90% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 30%); pointer-events: none; }
+        
+        /* SVG Connections Layer */
+        .topology-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .connection-path { fill: none; stroke-width: 2; opacity: 0.4; }
+        .connection-path.active { opacity: 0.7; filter: drop-shadow(0 0 3px var(--path-color)); }
+        
+        /* Animated Particles on Paths */
+        .flow-particle { r: 4; filter: drop-shadow(0 0 4px var(--particle-color)); }
+        
+        /* Horizontal Flow Layout */
+        .network-flow { position: relative; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-xs); padding: var(--space-md) 0; }
+        
+        .flow-zone { display: flex; flex-direction: column; align-items: center; gap: var(--space-sm); flex: 1; max-width: 160px; }
+        .zone-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--zone-color, var(--text-muted)); margin-bottom: var(--space-xs); padding: 3px var(--space-sm); background: color-mix(in srgb, var(--zone-color, var(--cat-primary)) 15%, transparent); border-radius: var(--radius-full); white-space: nowrap; }
+        
+        .zone-nodes { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        
+        .zone-node { display: flex; align-items: center; gap: var(--space-sm); padding: 8px 12px; background: var(--bg-card); border: 2px solid var(--node-color, var(--border-color)); border-radius: var(--radius-md); cursor: pointer; transition: all 0.3s; position: relative; }
+        .zone-node:hover { transform: scale(1.05); border-color: var(--node-color); box-shadow: 0 0 25px color-mix(in srgb, var(--node-color) 50%, transparent); z-index: 10; }
+        .zone-node-icon { width: 32px; height: 32px; background: color-mix(in srgb, var(--node-color, var(--cat-primary)) 15%, transparent); border: 1px solid var(--node-color, var(--cat-primary)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .zone-node-label { font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+        
+        /* Pulse animation for active nodes */
+        .zone-node::after { content: ''; position: absolute; inset: -4px; border: 2px solid var(--node-color); border-radius: var(--radius-lg); opacity: 0; animation: node-pulse 3s ease-in-out infinite; }
+        .zone-node:nth-child(1)::after { animation-delay: 0s; }
+        .zone-node:nth-child(2)::after { animation-delay: 1s; }
+        .zone-node:nth-child(3)::after { animation-delay: 2s; }
+        @keyframes node-pulse { 0%, 100% { opacity: 0; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.02); } }
+        
+        .zone-node.aws { --node-color: var(--aws-orange); }
+        .zone-node.azure { --node-color: var(--azure-blue); }
+        .zone-node.gcp { --node-color: var(--gcp-blue); }
+        .zone-node.security { --node-color: var(--danger-red); }
+        .zone-node.onprem { --node-color: var(--violet); }
+        .zone-node.neutral { --node-color: var(--cat-primary); }
+        
+        .flow-zone.users { --zone-color: var(--success-green); }
+        .flow-zone.edge { --zone-color: var(--cyan); }
+        .flow-zone.security { --zone-color: var(--danger-red); }
+        .flow-zone.loadbalance { --zone-color: var(--warning-yellow); }
+        .flow-zone.transit { --zone-color: var(--violet); }
+        .flow-zone.compute { --zone-color: var(--cat-primary); }
+
+        /* Topology Stats */
+        .topology-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-md); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .topology-stat { text-align: center; }
+        .topology-stat-value { font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); }
+        .topology-stat-label { font-size: 10px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           KEY CONCEPTS GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .concepts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); transition: all 0.3s; }
+        .concept-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .concept-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .concept-card-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .concept-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .concept-card-content { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .concept-card-content p { margin-bottom: var(--space-sm); }
+        .concept-card-content p:last-child { margin-bottom: 0; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           NETWORKING DOMAINS GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .domains-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .domain-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .domain-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: var(--domain-color, var(--cat-primary)); }
+        .domain-header { padding: var(--space-lg); border-bottom: 3px solid var(--domain-color, var(--cat-primary)); display: flex; justify-content: space-between; align-items: center; }
+        .domain-icon { font-size: 32px; }
+        .domain-badge { font-size: var(--font-xs); color: var(--text-muted); background: var(--bg-card-alt); padding: 4px 10px; border-radius: var(--radius-full); }
+        .domain-body { padding: var(--space-lg); }
+        .domain-title { font-size: var(--font-lg); font-weight: 700; margin-bottom: var(--space-sm); }
+        .domain-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .domain-tech { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+        .tech-tag { padding: 4px 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; background: color-mix(in srgb, var(--domain-color, var(--cat-primary)) 15%, transparent); color: var(--domain-color, var(--cat-primary)); }
+        
+        .domain-card.infrastructure { --domain-color: #3B82F6; }
+        .domain-card.security { --domain-color: #EF4444; }
+        .domain-card.connectivity { --domain-color: #8B5CF6; }
+        .domain-card.edge { --domain-color: #06B6D4; }
+        .domain-card.automation { --domain-color: #10B981; }
+        .domain-card.observability { --domain-color: #F59E0B; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CLOUD COMPARISON TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .comparison-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .comparison-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .comparison-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .comparison-table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { padding: var(--space-md); text-align: left; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td { padding: var(--space-md); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .comparison-table .service-name { font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+        .cloud-badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600; }
+        .cloud-badge.aws { background: rgba(255, 153, 0, 0.2); color: var(--aws-orange); }
+        .cloud-badge.azure { background: rgba(0, 120, 212, 0.2); color: var(--azure-blue); }
+        .cloud-badge.gcp { background: rgba(66, 133, 244, 0.2); color: var(--gcp-blue); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CAPABILITIES SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .capabilities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .capability-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .capability-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .capability-icon { font-size: 32px; margin-bottom: var(--space-sm); }
+        .capability-title { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .capability-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PROTOCOLS SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .protocols-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .protocol-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; transition: all 0.3s; }
+        .protocol-card:hover { border-color: var(--cat-primary); }
+        .protocol-name { font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .protocol-port { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+        .tool-card-icon { width: 40px; height: 40px; background: var(--cat-glow); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .tool-card-name { font-size: var(--font-sm); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-xs); color: var(--text-secondary); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-dark); }
+        .practice-num { width: 40px; height: 40px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-base); margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PAGES GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .pages-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .page-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); text-decoration: none; color: inherit; transition: all 0.3s; position: relative; overflow: hidden; }
+        .page-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary)); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .page-card:hover::before { transform: scaleX(1); }
+        .page-num { font-size: var(--font-xs); color: var(--cat-light); font-weight: 600; margin-bottom: var(--space-xs); }
+        .page-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-sm); }
+        .page-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        .page-arrow { position: absolute; right: var(--space-xl); top: 50%; transform: translateY(-50%); font-size: var(--font-xl); color: var(--cat-primary); opacity: 0; transition: all 0.3s; }
+        .page-card:hover .page-arrow { opacity: 1; right: var(--space-lg); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .topology-stats { grid-template-columns: repeat(3, 1fr); }
+            .topology-container { margin-left: 0; margin-right: 0; width: 100%; }
+            .network-flow { flex-wrap: wrap; justify-content: center; gap: var(--space-lg); }
+            .flow-zone { flex: 0 0 auto; max-width: 180px; }
+            .flow-arrow { display: none; }
+        }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .domains-grid { grid-template-columns: 1fr; }
+            .capabilities-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .pages-grid { grid-template-columns: 1fr; }
+            .concepts-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .protocols-grid { grid-template-columns: repeat(3, 1fr); }
+            .topology-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <span class="current">Networking</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🌐 Category 15</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat15-networking-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat15-p1-network-architecture.html"><span class="nav-icon">🏗️</span> 15.1 Network Architecture</a></li>
+            <li><a href="cat15-p2-load-balancing.html"><span class="nav-icon">⚖️</span> 15.2 Load Balancing</a></li>
+            <li><a href="cat15-p3-dns-cdn.html"><span class="nav-icon">🌍</span> 15.3 DNS & CDN</a></li>
+            <li><a href="cat15-p4-vpn-connectivity.html"><span class="nav-icon">🔒</span> 15.4 VPN & Connectivity</a></li>
+            <li><a href="cat15-p5-network-security.html"><span class="nav-icon">🛡️</span> 15.5 Network Security</a></li>
+            <li><a href="cat15-p6-service-mesh.html"><span class="nav-icon">🕸️</span> 15.6 Service Mesh</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#topology"><span class="nav-icon">🗺️</span> Traffic Flow</a></li>
+            <li><a href="#concepts"><span class="nav-icon">📚</span> Key Concepts</a></li>
+            <li><a href="#domains"><span class="nav-icon">📦</span> Domains</a></li>
+            <li><a href="#comparison"><span class="nav-icon">☁️</span> Cloud Services</a></li>
+            <li><a href="#capabilities"><span class="nav-icon">⚡</span> Capabilities</a></li>
+            <li><a href="#protocols"><span class="nav-icon">📡</span> Protocols</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#pages"><span class="nav-icon">📑</span> Explore</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🌐 Category 15</span>
+                <h1>Networking</h1>
+                <p>Enterprise network architecture, connectivity, and software-defined infrastructure for modern multi-cloud organizations.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">6</div><div class="hero-metric-label">Deep Dives</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">50+</div><div class="hero-metric-label">Technologies</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.99%</div><div class="hero-metric-label">Availability Target</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;10ms</div><div class="hero-metric-label">Latency Goal</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Category Overview</h2>
+                    <p>Modern enterprise networking foundations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Modern enterprise networking spans multi-cloud environments, hybrid connectivity, and software-defined infrastructure. Networks are no longer just pipes—they're <strong>programmable</strong>, <strong>observable</strong>, and deeply integrated with application architectures. This category covers the full spectrum from foundational network design to advanced service mesh implementations, providing the knowledge needed to build resilient, high-performance infrastructure.</p>
+                <p>The shift to cloud has fundamentally transformed networking. Traditional hub-and-spoke topologies give way to <strong>mesh architectures</strong> with direct cloud interconnects. Perimeter-based security evolves into <strong>zero-trust models</strong> with identity-based access at every layer. Manual configuration yields to <strong>infrastructure as code</strong> with GitOps workflows and policy-driven automation. Understanding these patterns is essential for architects building systems that scale globally while maintaining security and compliance.</p>
+                <p>Network performance directly impacts user experience and business outcomes. <strong>Latency</strong> affects conversion rates in e-commerce, user engagement in SaaS applications, and trading outcomes in financial systems. <strong>Availability</strong> determines whether your services are accessible during peak demand or regional outages. <strong>Security</strong> protects against increasingly sophisticated threats that target network infrastructure. Modern network architects must balance all three while managing costs and operational complexity.</p>
+                <p>Each page in this category provides deep dives into specific networking domains—from VPC design patterns and load balancing algorithms to VPN configurations and service mesh traffic policies. You'll find reference architectures from production deployments, tool comparisons across vendors, implementation guides with Terraform and CloudFormation examples, and AI agents to accelerate your networking initiatives across AWS, Azure, GCP, and on-premises environments.</p>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- NETWORK TOPOLOGY -->
+        <section class="module" id="topology">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Network Traffic Flow</h2>
+                    <p>Request journey from users to compute</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Understanding how traffic flows through your network stack is fundamental to designing resilient systems. Every request traverses multiple layers—each providing specific functionality from content delivery and security filtering to load distribution and service routing. The visualization below shows the typical path from end users to your compute resources, highlighting key components at each stage.</p>
+            </div>
+            
+            <div class="topology-container">
+                <div class="topology-header">
+                    <div class="topology-title">🔄 Enterprise Traffic Flow</div>
+                    <div class="topology-badge">Live Animation</div>
+                </div>
+                <div class="topology-canvas" id="topologyCanvas">
+                    <!-- SVG Connection Layer -->
+                    <svg class="topology-svg" id="connectionSvg">
+                        <defs>
+                            <!-- Gradient definitions for paths -->
+                            <linearGradient id="grad-users-edge" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#10B981"/>
+                                <stop offset="100%" style="stop-color:#06B6D4"/>
+                            </linearGradient>
+                            <linearGradient id="grad-edge-security" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#06B6D4"/>
+                                <stop offset="100%" style="stop-color:#EF4444"/>
+                            </linearGradient>
+                            <linearGradient id="grad-security-lb" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#EF4444"/>
+                                <stop offset="100%" style="stop-color:#F59E0B"/>
+                            </linearGradient>
+                            <linearGradient id="grad-lb-transit" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#F59E0B"/>
+                                <stop offset="100%" style="stop-color:#8B5CF6"/>
+                            </linearGradient>
+                            <linearGradient id="grad-transit-compute" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#8B5CF6"/>
+                                <stop offset="100%" style="stop-color:#3B82F6"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Connection paths will be drawn by JS -->
+                        <g id="connectionPaths"></g>
+                        <!-- Animated particles -->
+                        <g id="particles"></g>
+                    </svg>
+                    
+                    <div class="network-flow">
+                        <!-- Users -->
+                        <div class="flow-zone users">
+                            <div class="zone-label">Users</div>
+                            <div class="zone-nodes">
+                                <div class="zone-node neutral" data-node="user-web">
+                                    <div class="zone-node-icon">👤</div>
+                                    <div class="zone-node-label">Web Users</div>
+                                </div>
+                                <div class="zone-node neutral" data-node="user-mobile">
+                                    <div class="zone-node-icon">📱</div>
+                                    <div class="zone-node-label">Mobile Apps</div>
+                                </div>
+                                <div class="zone-node neutral" data-node="user-api">
+                                    <div class="zone-node-icon">🔌</div>
+                                    <div class="zone-node-label">API Clients</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Edge -->
+                        <div class="flow-zone edge">
+                            <div class="zone-label">Edge / CDN</div>
+                            <div class="zone-nodes">
+                                <div class="zone-node aws" data-node="edge-cf">
+                                    <div class="zone-node-icon">☁️</div>
+                                    <div class="zone-node-label">CloudFront</div>
+                                </div>
+                                <div class="zone-node neutral" data-node="edge-cloudflare">
+                                    <div class="zone-node-icon">🌐</div>
+                                    <div class="zone-node-label">Cloudflare</div>
+                                </div>
+                                <div class="zone-node neutral" data-node="edge-fastly">
+                                    <div class="zone-node-icon">🚀</div>
+                                    <div class="zone-node-label">Fastly</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security -->
+                        <div class="flow-zone security">
+                            <div class="zone-label">Security</div>
+                            <div class="zone-nodes">
+                                <div class="zone-node security" data-node="sec-waf">
+                                    <div class="zone-node-icon">🛡️</div>
+                                    <div class="zone-node-label">WAF</div>
+                                </div>
+                                <div class="zone-node security" data-node="sec-fw">
+                                    <div class="zone-node-icon">🔥</div>
+                                    <div class="zone-node-label">Firewall</div>
+                                </div>
+                                <div class="zone-node security" data-node="sec-ddos">
+                                    <div class="zone-node-icon">🎯</div>
+                                    <div class="zone-node-label">DDoS Shield</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Load Balancing -->
+                        <div class="flow-zone loadbalance">
+                            <div class="zone-label">Load Balance</div>
+                            <div class="zone-nodes">
+                                <div class="zone-node aws" data-node="lb-alb">
+                                    <div class="zone-node-icon">⚖️</div>
+                                    <div class="zone-node-label">ALB / NLB</div>
+                                </div>
+                                <div class="zone-node azure" data-node="lb-appgw">
+                                    <div class="zone-node-icon">⚖️</div>
+                                    <div class="zone-node-label">App Gateway</div>
+                                </div>
+                                <div class="zone-node neutral" data-node="lb-nginx">
+                                    <div class="zone-node-icon">🔄</div>
+                                    <div class="zone-node-label">NGINX</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Transit -->
+                        <div class="flow-zone transit">
+                            <div class="zone-label">Transit</div>
+                            <div class="zone-nodes">
+                                <div class="zone-node aws" data-node="transit-tgw">
+                                    <div class="zone-node-icon">🔗</div>
+                                    <div class="zone-node-label">Transit GW</div>
+                                </div>
+                                <div class="zone-node azure" data-node="transit-vwan">
+                                    <div class="zone-node-icon">🔗</div>
+                                    <div class="zone-node-label">Virtual WAN</div>
+                                </div>
+                                <div class="zone-node onprem" data-node="transit-mpls">
+                                    <div class="zone-node-icon">🏢</div>
+                                    <div class="zone-node-label">MPLS</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Compute -->
+                        <div class="flow-zone compute">
+                            <div class="zone-label">Compute</div>
+                            <div class="zone-nodes">
+                                <div class="zone-node aws" data-node="compute-eks">
+                                    <div class="zone-node-icon">📦</div>
+                                    <div class="zone-node-label">EKS / EC2</div>
+                                </div>
+                                <div class="zone-node azure" data-node="compute-aks">
+                                    <div class="zone-node-icon">📦</div>
+                                    <div class="zone-node-label">AKS / VMs</div>
+                                </div>
+                                <div class="zone-node gcp" data-node="compute-gke">
+                                    <div class="zone-node-icon">📦</div>
+                                    <div class="zone-node-label">GKE / GCE</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="topology-stats">
+                    <div class="topology-stat">
+                        <div class="topology-stat-value">6</div>
+                        <div class="topology-stat-label">Traffic Stages</div>
+                    </div>
+                    <div class="topology-stat">
+                        <div class="topology-stat-value">3</div>
+                        <div class="topology-stat-label">Cloud Providers</div>
+                    </div>
+                    <div class="topology-stat">
+                        <div class="topology-stat-value">18</div>
+                        <div class="topology-stat-label">Components</div>
+                    </div>
+                    <div class="topology-stat">
+                        <div class="topology-stat-value">&lt;50ms</div>
+                        <div class="topology-stat-label">Total Latency</div>
+                    </div>
+                    <div class="topology-stat">
+                        <div class="topology-stat-value">Multi-AZ</div>
+                        <div class="topology-stat-label">Deployment</div>
+                    </div>
+                    <div class="topology-stat">
+                        <div class="topology-stat-value">Zero Trust</div>
+                        <div class="topology-stat-label">Security Model</div>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+            // Dynamic Connection Drawing
+            (function() {
+                const connections = [
+                    // User to Edge connections
+                    { from: 'user-web', to: 'edge-cf', gradient: 'url(#grad-users-edge)', speed: 2.5 },
+                    { from: 'user-mobile', to: 'edge-cloudflare', gradient: 'url(#grad-users-edge)', speed: 3 },
+                    { from: 'user-api', to: 'edge-fastly', gradient: 'url(#grad-users-edge)', speed: 2.8 },
+                    // Edge to Security
+                    { from: 'edge-cf', to: 'sec-waf', gradient: 'url(#grad-edge-security)', speed: 2 },
+                    { from: 'edge-cloudflare', to: 'sec-fw', gradient: 'url(#grad-edge-security)', speed: 2.2 },
+                    { from: 'edge-fastly', to: 'sec-ddos', gradient: 'url(#grad-edge-security)', speed: 1.8 },
+                    // Security to LB
+                    { from: 'sec-waf', to: 'lb-alb', gradient: 'url(#grad-security-lb)', speed: 2.5 },
+                    { from: 'sec-fw', to: 'lb-appgw', gradient: 'url(#grad-security-lb)', speed: 2.3 },
+                    { from: 'sec-ddos', to: 'lb-nginx', gradient: 'url(#grad-security-lb)', speed: 2.7 },
+                    // LB to Transit
+                    { from: 'lb-alb', to: 'transit-tgw', gradient: 'url(#grad-lb-transit)', speed: 2.2 },
+                    { from: 'lb-appgw', to: 'transit-vwan', gradient: 'url(#grad-lb-transit)', speed: 2.4 },
+                    { from: 'lb-nginx', to: 'transit-mpls', gradient: 'url(#grad-lb-transit)', speed: 2.6 },
+                    // Transit to Compute
+                    { from: 'transit-tgw', to: 'compute-eks', gradient: 'url(#grad-transit-compute)', speed: 2 },
+                    { from: 'transit-vwan', to: 'compute-aks', gradient: 'url(#grad-transit-compute)', speed: 2.3 },
+                    { from: 'transit-mpls', to: 'compute-gke', gradient: 'url(#grad-transit-compute)', speed: 2.1 },
+                ];
+                
+                const canvas = document.getElementById('topologyCanvas');
+                const svg = document.getElementById('connectionSvg');
+                const pathsGroup = document.getElementById('connectionPaths');
+                const particlesGroup = document.getElementById('particles');
+                
+                function getNodeCenter(nodeId) {
+                    const node = document.querySelector(`[data-node="${nodeId}"]`);
+                    if (!node || !canvas) return null;
+                    const nodeRect = node.getBoundingClientRect();
+                    const canvasRect = canvas.getBoundingClientRect();
+                    return {
+                        x: nodeRect.left - canvasRect.left + nodeRect.width / 2,
+                        y: nodeRect.top - canvasRect.top + nodeRect.height / 2
+                    };
+                }
+                
+                function createPath(from, to, gradient) {
+                    const fromPos = getNodeCenter(from);
+                    const toPos = getNodeCenter(to);
+                    if (!fromPos || !toPos) return null;
+                    
+                    // Create curved path
+                    const midX = (fromPos.x + toPos.x) / 2;
+                    const controlY = Math.min(fromPos.y, toPos.y) - 20;
+                    
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const d = `M ${fromPos.x} ${fromPos.y} Q ${midX} ${controlY} ${toPos.x} ${toPos.y}`;
+                    path.setAttribute('d', d);
+                    path.setAttribute('stroke', gradient);
+                    path.setAttribute('class', 'connection-path active');
+                    path.setAttribute('stroke-dasharray', '6 4');
+                    
+                    return { path, fromPos, toPos, midX, controlY };
+                }
+                
+                function createParticle(pathData, gradient, speed) {
+                    const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    particle.setAttribute('r', '4');
+                    particle.setAttribute('fill', gradient.includes('users-edge') ? '#10B981' : 
+                                                  gradient.includes('edge-security') ? '#06B6D4' :
+                                                  gradient.includes('security-lb') ? '#EF4444' :
+                                                  gradient.includes('lb-transit') ? '#F59E0B' : '#8B5CF6');
+                    particle.style.filter = 'drop-shadow(0 0 6px currentColor)';
+                    
+                    // Animate along path
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+                    animate.setAttribute('dur', `${speed}s`);
+                    animate.setAttribute('repeatCount', 'indefinite');
+                    animate.setAttribute('path', pathData.path.getAttribute('d'));
+                    
+                    particle.appendChild(animate);
+                    return particle;
+                }
+                
+                function drawConnections() {
+                    pathsGroup.innerHTML = '';
+                    particlesGroup.innerHTML = '';
+                    
+                    connections.forEach((conn, index) => {
+                        const pathData = createPath(conn.from, conn.to, conn.gradient);
+                        if (pathData) {
+                            pathsGroup.appendChild(pathData.path);
+                            
+                            // Add particle with staggered start
+                            setTimeout(() => {
+                                const particle = createParticle(pathData, conn.gradient, conn.speed);
+                                particlesGroup.appendChild(particle);
+                            }, index * 150);
+                        }
+                    });
+                }
+                
+                // Initial draw and redraw on resize
+                setTimeout(drawConnections, 100);
+                window.addEventListener('resize', () => {
+                    clearTimeout(window.resizeTimer);
+                    window.resizeTimer = setTimeout(drawConnections, 100);
+                });
+            })();
+            </script>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- KEY CONCEPTS -->
+        <section class="module" id="concepts">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Key Concepts</h2>
+                    <p>Foundational networking principles</p>
+                </div>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-card-header">
+                        <div class="concept-card-icon">🏗️</div>
+                        <div class="concept-card-title">Network Segmentation</div>
+                    </div>
+                    <div class="concept-card-content">
+                        <p>Dividing networks into isolated segments limits blast radius during security incidents and simplifies compliance. VPCs provide cloud-native segmentation, while subnets create further isolation within regions.</p>
+                        <p>Public subnets host internet-facing resources; private subnets contain databases and internal services. Network ACLs and security groups enforce traffic rules at segment boundaries.</p>
+                    </div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="concept-card-header">
+                        <div class="concept-card-icon">🔐</div>
+                        <div class="concept-card-title">Zero Trust Architecture</div>
+                    </div>
+                    <div class="concept-card-content">
+                        <p>Zero trust assumes no implicit trust based on network location. Every request must be authenticated, authorized, and encrypted—whether from inside or outside the network perimeter.</p>
+                        <p>Implementation includes identity-aware proxies, mutual TLS between services, continuous verification, and least-privilege access policies enforced at every layer.</p>
+                    </div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="concept-card-header">
+                        <div class="concept-card-icon">⚖️</div>
+                        <div class="concept-card-title">Traffic Distribution</div>
+                    </div>
+                    <div class="concept-card-content">
+                        <p>Load balancers distribute traffic across healthy instances using algorithms like round-robin, least connections, or weighted distribution. Layer 4 balancers route by IP/port; Layer 7 balancers inspect HTTP headers.</p>
+                        <p>Global load balancing routes users to the nearest region. Health checks automatically remove unhealthy targets. Connection draining ensures graceful scale-down.</p>
+                    </div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="concept-card-header">
+                        <div class="concept-card-icon">🌐</div>
+                        <div class="concept-card-title">DNS & Service Discovery</div>
+                    </div>
+                    <div class="concept-card-content">
+                        <p>DNS translates domain names to IP addresses, enabling location-independent service access. GeoDNS routes users to nearby endpoints. Weighted routing enables blue-green deployments.</p>
+                        <p>Service discovery in Kubernetes uses CoreDNS and service objects. Service meshes like Istio provide advanced routing with traffic splitting and fault injection capabilities.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- NETWORKING DOMAINS -->
+        <section class="module" id="domains">
+            <div class="module-header">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                    <h2>Networking Domains</h2>
+                    <p>Core disciplines in enterprise networking</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Enterprise networking encompasses multiple specialized domains, each requiring deep expertise. These domains intersect and overlap—security affects every layer, automation touches all components, and observability provides visibility across the stack. Understanding each domain's scope and how they integrate is essential for designing cohesive network architectures.</p>
+            </div>
+            
+            <div class="domains-grid">
+                <div class="domain-card infrastructure">
+                    <div class="domain-header">
+                        <div class="domain-icon">🏗️</div>
+                        <div class="domain-badge">Foundation</div>
+                    </div>
+                    <div class="domain-body">
+                        <div class="domain-title">Network Architecture</div>
+                        <div class="domain-desc">VPCs, subnets, routing tables, and network segmentation across multi-cloud environments. Design patterns for high availability and disaster recovery.</div>
+                        <div class="domain-tech">
+                            <span class="tech-tag">VPC</span>
+                            <span class="tech-tag">Subnets</span>
+                            <span class="tech-tag">Route Tables</span>
+                            <span class="tech-tag">NAT Gateway</span>
+                            <span class="tech-tag">IGW</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="domain-card security">
+                    <div class="domain-header">
+                        <div class="domain-icon">🛡️</div>
+                        <div class="domain-badge">Critical</div>
+                    </div>
+                    <div class="domain-body">
+                        <div class="domain-title">Network Security</div>
+                        <div class="domain-desc">Firewalls, WAF, DDoS protection, micro-segmentation, and zero-trust networking. Defense-in-depth strategies for modern threats.</div>
+                        <div class="domain-tech">
+                            <span class="tech-tag">WAF</span>
+                            <span class="tech-tag">Firewall</span>
+                            <span class="tech-tag">Zero Trust</span>
+                            <span class="tech-tag">ZTNA</span>
+                            <span class="tech-tag">IDS/IPS</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="domain-card connectivity">
+                    <div class="domain-header">
+                        <div class="domain-icon">🔌</div>
+                        <div class="domain-badge">Hybrid</div>
+                    </div>
+                    <div class="domain-body">
+                        <div class="domain-title">Connectivity</div>
+                        <div class="domain-desc">VPN tunnels, Direct Connect, ExpressRoute, private peering, and SD-WAN for hybrid and multi-cloud connectivity.</div>
+                        <div class="domain-tech">
+                            <span class="tech-tag">Site-to-Site VPN</span>
+                            <span class="tech-tag">Direct Connect</span>
+                            <span class="tech-tag">ExpressRoute</span>
+                            <span class="tech-tag">SD-WAN</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="domain-card edge">
+                    <div class="domain-header">
+                        <div class="domain-icon">🌍</div>
+                        <div class="domain-badge">Performance</div>
+                    </div>
+                    <div class="domain-body">
+                        <div class="domain-title">DNS & CDN</div>
+                        <div class="domain-desc">Global DNS management, content delivery, edge caching, and intelligent traffic routing for optimal performance.</div>
+                        <div class="domain-tech">
+                            <span class="tech-tag">Route 53</span>
+                            <span class="tech-tag">CloudFront</span>
+                            <span class="tech-tag">Cloudflare</span>
+                            <span class="tech-tag">Fastly</span>
+                            <span class="tech-tag">Akamai</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="domain-card automation">
+                    <div class="domain-header">
+                        <div class="domain-icon">🕸️</div>
+                        <div class="domain-badge">Modern</div>
+                    </div>
+                    <div class="domain-body">
+                        <div class="domain-title">Service Mesh</div>
+                        <div class="domain-desc">Sidecar proxies, traffic management, observability, and mTLS for microservices communication.</div>
+                        <div class="domain-tech">
+                            <span class="tech-tag">Istio</span>
+                            <span class="tech-tag">Linkerd</span>
+                            <span class="tech-tag">Consul</span>
+                            <span class="tech-tag">Envoy</span>
+                            <span class="tech-tag">Cilium</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="domain-card observability">
+                    <div class="domain-header">
+                        <div class="domain-icon">⚖️</div>
+                        <div class="domain-badge">Traffic</div>
+                    </div>
+                    <div class="domain-body">
+                        <div class="domain-title">Load Balancing</div>
+                        <div class="domain-desc">L4/L7 load balancing, health checks, SSL termination, and traffic distribution algorithms.</div>
+                        <div class="domain-tech">
+                            <span class="tech-tag">ALB/NLB</span>
+                            <span class="tech-tag">NGINX</span>
+                            <span class="tech-tag">HAProxy</span>
+                            <span class="tech-tag">Envoy</span>
+                            <span class="tech-tag">Traefik</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CLOUD SERVICES COMPARISON -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">☁️</div>
+                <div class="module-info">
+                    <h2>Cloud Networking Services</h2>
+                    <p>Comparing AWS, Azure, and GCP offerings</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Each major cloud provider offers comprehensive networking services, but with different naming conventions and implementation details. Understanding the equivalents across clouds is essential for multi-cloud architectures and migration planning. The table below maps common networking functions to their provider-specific services.</p>
+            </div>
+            
+            <div class="comparison-container">
+                <div class="comparison-header">
+                    <div class="comparison-title">📊 Service Comparison Matrix</div>
+                </div>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>AWS</th>
+                            <th>Azure</th>
+                            <th>GCP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="service-name">🏗️ Virtual Network</span></td>
+                            <td><span class="cloud-badge aws">VPC</span></td>
+                            <td><span class="cloud-badge azure">VNet</span></td>
+                            <td><span class="cloud-badge gcp">VPC</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">⚖️ L7 Load Balancer</span></td>
+                            <td><span class="cloud-badge aws">ALB</span></td>
+                            <td><span class="cloud-badge azure">Application Gateway</span></td>
+                            <td><span class="cloud-badge gcp">HTTP(S) Load Balancer</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">⚖️ L4 Load Balancer</span></td>
+                            <td><span class="cloud-badge aws">NLB</span></td>
+                            <td><span class="cloud-badge azure">Load Balancer</span></td>
+                            <td><span class="cloud-badge gcp">TCP/UDP Load Balancer</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🌐 DNS</span></td>
+                            <td><span class="cloud-badge aws">Route 53</span></td>
+                            <td><span class="cloud-badge azure">Azure DNS</span></td>
+                            <td><span class="cloud-badge gcp">Cloud DNS</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🚀 CDN</span></td>
+                            <td><span class="cloud-badge aws">CloudFront</span></td>
+                            <td><span class="cloud-badge azure">Azure CDN</span></td>
+                            <td><span class="cloud-badge gcp">Cloud CDN</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🔒 Private Link</span></td>
+                            <td><span class="cloud-badge aws">PrivateLink</span></td>
+                            <td><span class="cloud-badge azure">Private Link</span></td>
+                            <td><span class="cloud-badge gcp">Private Service Connect</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🔗 Transit Hub</span></td>
+                            <td><span class="cloud-badge aws">Transit Gateway</span></td>
+                            <td><span class="cloud-badge azure">Virtual WAN</span></td>
+                            <td><span class="cloud-badge gcp">NCC</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🔌 Dedicated Connect</span></td>
+                            <td><span class="cloud-badge aws">Direct Connect</span></td>
+                            <td><span class="cloud-badge azure">ExpressRoute</span></td>
+                            <td><span class="cloud-badge gcp">Cloud Interconnect</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🛡️ WAF</span></td>
+                            <td><span class="cloud-badge aws">AWS WAF</span></td>
+                            <td><span class="cloud-badge azure">Azure WAF</span></td>
+                            <td><span class="cloud-badge gcp">Cloud Armor</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="service-name">🔥 Firewall</span></td>
+                            <td><span class="cloud-badge aws">Network Firewall</span></td>
+                            <td><span class="cloud-badge azure">Azure Firewall</span></td>
+                            <td><span class="cloud-badge gcp">Cloud Firewall</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CAPABILITIES -->
+        <section class="module" id="capabilities">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Key Capabilities</h2>
+                    <p>What modern networks deliver</p>
+                </div>
+            </div>
+            
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <div class="capability-icon">🔄</div>
+                    <div class="capability-title">High Availability</div>
+                    <div class="capability-desc">Multi-AZ deployments, failover automation, and redundant paths</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">📈</div>
+                    <div class="capability-title">Auto Scaling</div>
+                    <div class="capability-desc">Dynamic capacity adjustment based on traffic patterns</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔐</div>
+                    <div class="capability-title">Zero Trust</div>
+                    <div class="capability-desc">Identity-based access with continuous verification</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">📊</div>
+                    <div class="capability-title">Observability</div>
+                    <div class="capability-desc">Flow logs, packet capture, and distributed tracing</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">⚡</div>
+                    <div class="capability-title">Low Latency</div>
+                    <div class="capability-desc">Edge computing, PoP optimization, and traffic steering</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔗</div>
+                    <div class="capability-title">Hybrid Connect</div>
+                    <div class="capability-desc">Seamless on-prem to cloud connectivity</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">📜</div>
+                    <div class="capability-title">Policy as Code</div>
+                    <div class="capability-desc">GitOps workflows for network configuration</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🛡️</div>
+                    <div class="capability-title">DDoS Protection</div>
+                    <div class="capability-desc">Always-on attack mitigation at the edge</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🌍</div>
+                    <div class="capability-title">Global Reach</div>
+                    <div class="capability-desc">Multi-region presence with anycast routing</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔒</div>
+                    <div class="capability-title">Encryption</div>
+                    <div class="capability-desc">TLS everywhere, in-transit and at-rest protection</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">📋</div>
+                    <div class="capability-title">Compliance</div>
+                    <div class="capability-desc">SOC2, PCI-DSS, HIPAA network controls</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔧</div>
+                    <div class="capability-title">Self-Healing</div>
+                    <div class="capability-desc">Automatic recovery from failures and anomalies</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PROTOCOLS -->
+        <section class="module" id="protocols">
+            <div class="module-header">
+                <div class="module-icon">📡</div>
+                <div class="module-info">
+                    <h2>Network Protocols</h2>
+                    <p>Essential protocols and their ports</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Network engineers must understand the protocols that power modern infrastructure. From basic HTTP/HTTPS for web traffic to specialized protocols for routing, security, and service communication, each serves specific purposes in the network stack.</p>
+            </div>
+            
+            <div class="protocols-grid">
+                <div class="protocol-card">
+                    <div class="protocol-name">HTTP</div>
+                    <div class="protocol-port">Port 80</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">HTTPS</div>
+                    <div class="protocol-port">Port 443</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">SSH</div>
+                    <div class="protocol-port">Port 22</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">DNS</div>
+                    <div class="protocol-port">Port 53</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">gRPC</div>
+                    <div class="protocol-port">Port 443</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">BGP</div>
+                    <div class="protocol-port">Port 179</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">QUIC</div>
+                    <div class="protocol-port">Port 443/UDP</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">IPSec</div>
+                    <div class="protocol-port">Port 500/4500</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">WireGuard</div>
+                    <div class="protocol-port">Port 51820</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">SNMP</div>
+                    <div class="protocol-port">Port 161</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">NTP</div>
+                    <div class="protocol-port">Port 123</div>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-name">LDAP</div>
+                    <div class="protocol-port">Port 389</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Essential Tools</h2>
+                    <p>Industry-standard networking technologies</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📝</div>
+                        <div class="tool-card-name">Terraform</div>
+                    </div>
+                    <div class="tool-card-desc">Infrastructure as code for multi-cloud network provisioning.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔄</div>
+                        <div class="tool-card-name">NGINX</div>
+                    </div>
+                    <div class="tool-card-desc">High-performance load balancer, reverse proxy, and web server.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🕸️</div>
+                        <div class="tool-card-name">Istio</div>
+                    </div>
+                    <div class="tool-card-desc">Service mesh for traffic management, security, and observability.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🌐</div>
+                        <div class="tool-card-name">Cloudflare</div>
+                    </div>
+                    <div class="tool-card-desc">Global CDN, DNS, DDoS protection, and edge computing.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔍</div>
+                        <div class="tool-card-name">Wireshark</div>
+                    </div>
+                    <div class="tool-card-desc">Network protocol analyzer for deep packet inspection.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📊</div>
+                        <div class="tool-card-name">Datadog NPM</div>
+                    </div>
+                    <div class="tool-card-desc">Network performance monitoring with flow visualization.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔐</div>
+                        <div class="tool-card-name">HashiCorp Consul</div>
+                    </div>
+                    <div class="tool-card-desc">Service discovery, mesh, and network automation.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🚀</div>
+                        <div class="tool-card-name">Envoy</div>
+                    </div>
+                    <div class="tool-card-desc">High-performance edge and service proxy.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">⚖️</div>
+                        <div class="tool-card-name">HAProxy</div>
+                    </div>
+                    <div class="tool-card-desc">Reliable, high-performance TCP/HTTP load balancer.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔗</div>
+                        <div class="tool-card-name">Cilium</div>
+                    </div>
+                    <div class="tool-card-desc">eBPF-based networking and security for Kubernetes.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🛡️</div>
+                        <div class="tool-card-name">pfSense</div>
+                    </div>
+                    <div class="tool-card-desc">Open-source firewall and router distribution.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📈</div>
+                        <div class="tool-card-name">Prometheus</div>
+                    </div>
+                    <div class="tool-card-desc">Monitoring and alerting with powerful query language.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔧</div>
+                        <div class="tool-card-name">Ansible</div>
+                    </div>
+                    <div class="tool-card-desc">Network automation and configuration management.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🌊</div>
+                        <div class="tool-card-name">Traefik</div>
+                    </div>
+                    <div class="tool-card-desc">Cloud-native edge router and ingress controller.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔒</div>
+                        <div class="tool-card-name">WireGuard</div>
+                    </div>
+                    <div class="tool-card-desc">Modern, fast, and secure VPN protocol.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📡</div>
+                        <div class="tool-card-name">Netcat</div>
+                    </div>
+                    <div class="tool-card-desc">Swiss army knife for network debugging.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for robust network design</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Design for Failure</h4>
+                        <p>Assume components will fail. Use multi-AZ deployments, redundant paths, and automatic failover.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Implement Defense in Depth</h4>
+                        <p>Layer security controls at edge, perimeter, network, and application. No single boundary.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Use Infrastructure as Code</h4>
+                        <p>Define networks in Terraform or CloudFormation. Enable version control and peer review.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Monitor Everything</h4>
+                        <p>Enable VPC flow logs, packet mirroring, and distributed tracing. You can't fix what you can't see.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Encrypt All Traffic</h4>
+                        <p>Use TLS 1.3 for external traffic, mTLS for service-to-service. Assume network is hostile.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Plan IP Address Space</h4>
+                        <p>Design CIDR ranges for growth. Avoid overlapping with on-prem and future acquisitions.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Minimize Blast Radius</h4>
+                        <p>Segment networks into isolated zones. Use security groups to limit lateral movement.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Automate Security Responses</h4>
+                        <p>Use WAF rules, rate limiting, and automated blocking. Human response is too slow for DDoS.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- EXPLORE PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Explore This Category</h2>
+                    <p>Deep dives into networking topics</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat15-p1-network-architecture.html" class="page-card">
+                    <div class="page-num">Page 15.1</div>
+                    <div class="page-title">Network Architecture</div>
+                    <div class="page-desc">VPC design patterns, subnet strategies, routing tables, network segmentation, and multi-cloud topology reference architectures</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat15-p2-load-balancing.html" class="page-card">
+                    <div class="page-num">Page 15.2</div>
+                    <div class="page-title">Load Balancing</div>
+                    <div class="page-desc">L4/L7 load balancers, routing algorithms, health checks, SSL termination, and global traffic management</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat15-p3-dns-cdn.html" class="page-card">
+                    <div class="page-num">Page 15.3</div>
+                    <div class="page-title">DNS & CDN</div>
+                    <div class="page-desc">DNS architecture, GeoDNS routing, content delivery networks, edge caching, and origin protection</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat15-p4-vpn-connectivity.html" class="page-card">
+                    <div class="page-num">Page 15.4</div>
+                    <div class="page-title">VPN & Connectivity</div>
+                    <div class="page-desc">Site-to-site VPN, Direct Connect, ExpressRoute, private peering, SD-WAN, and hybrid architectures</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat15-p5-network-security.html" class="page-card">
+                    <div class="page-num">Page 15.5</div>
+                    <div class="page-title">Network Security</div>
+                    <div class="page-desc">Firewalls, WAF, DDoS protection, micro-segmentation, IDS/IPS, and zero-trust architecture</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat15-p6-service-mesh.html" class="page-card">
+                    <div class="page-num">Page 15.6</div>
+                    <div class="page-title">Service Mesh</div>
+                    <div class="page-desc">Istio, Linkerd, Consul Connect, traffic policies, mTLS, circuit breaking, and observability</div>
+                    <div class="page-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat14-integration-apis-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">14: Integration & APIs</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 15 of 29</div>
+        <a href="cat15-p1-network-architecture.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Start Learning</div>
+                <div class="footer-link-title">15.1 Network Architecture</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

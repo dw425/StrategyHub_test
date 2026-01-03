@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Safety & Governance | Emerging Technologies | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --page-primary: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content ul { list-style: none; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); padding: 4px 0; padding-left: 20px; position: relative; }
+        .overview-content li::before { content: '•'; position: absolute; left: 0; color: var(--page-light); }
+        .overview-content strong { color: var(--text-primary); }
+        .overview-full { grid-column: 1 / -1; }
+
+        .comparison-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .comparison-table th, .comparison-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        .comparison-table th { background: var(--bg-dark); color: var(--text-primary); font-weight: 600; }
+        .comparison-table td { color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .table-highlight { color: var(--page-light) !important; font-weight: 600; }
+
+        .do-dont-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .do-card, .dont-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .do-card { border-color: rgba(16, 185, 129, 0.4); }
+        .dont-card { border-color: rgba(239, 68, 68, 0.4); }
+        .do-header, .dont-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 18px; font-weight: 700; }
+        .do-header { color: var(--green); }
+        .dont-header { color: var(--red); }
+        .do-list, .dont-list { list-style: none; }
+        .do-list li, .dont-list li { font-size: 13px; color: var(--text-secondary); padding: 10px 0; padding-left: 28px; position: relative; border-bottom: 1px solid var(--border-color); }
+        .do-list li:last-child, .dont-list li:last-child { border-bottom: none; }
+        .do-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+        .dont-list li::before { content: '✕'; position: absolute; left: 0; color: var(--red); font-weight: 700; }
+
+        .sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .sw-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .sw-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .sw-title.green { color: var(--green); }
+        .sw-title.yellow { color: var(--yellow); }
+        .sw-list { list-style: none; }
+        .sw-list li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; padding-left: 16px; position: relative; }
+        .sw-card.strengths .sw-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); }
+        .sw-card.weaknesses .sw-list li::before { content: '⚠'; position: absolute; left: 0; color: var(--yellow); font-size: 11px; }
+
+        .deep-dive { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+        .deep-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .deep-icon { font-size: 28px; }
+        .deep-title { font-size: 18px; font-weight: 600; }
+        .deep-subtitle { font-size: 12px; color: var(--text-muted); }
+        .deep-body { padding: 24px; }
+        .deep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .deep-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .deep-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .deep-section ul { list-style: none; }
+        .deep-section li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; padding-left: 20px; position: relative; }
+        .deep-section li::before { content: '→'; position: absolute; left: 0; color: var(--page-light); }
+
+        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); }
+        .tool-card.featured { border-color: var(--page-primary); background: linear-gradient(135deg, var(--bg-dark), var(--page-glow)); }
+        .tool-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .tool-name { font-size: 15px; font-weight: 600; }
+        .tool-vendor { font-size: 11px; color: var(--text-muted); }
+        .tool-badge { padding: 4px 10px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 9999px; font-size: 11px; color: var(--page-light); font-weight: 600; }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+        .tool-features { font-size: 11px; color: var(--text-muted); }
+
+        .risk-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .risk-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; gap: 16px; }
+        .risk-icon { width: 48px; height: 48px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .risk-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
+        .risk-level { font-size: 11px; font-weight: 600; }
+        .risk-high { color: var(--red); }
+        .risk-medium { color: var(--yellow); }
+
+        .checklist { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .checklist-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--page-light); }
+        .checklist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .checklist-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); }
+        .checklist-items { list-style: none; }
+        .checklist-items li { font-size: 13px; color: var(--text-secondary); padding: 8px 0; padding-left: 28px; position: relative; border-bottom: 1px solid var(--border-color); }
+        .checklist-items li:last-child { border-bottom: none; }
+        .checklist-items li::before { content: '☐'; position: absolute; left: 0; color: var(--page-light); }
+
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 16px; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .practice-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        .reg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .reg-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .reg-card.eu { border-color: rgba(59, 130, 246, 0.4); }
+        .reg-card.us { border-color: rgba(239, 68, 68, 0.4); }
+        .reg-card.uk { border-color: rgba(139, 92, 246, 0.4); }
+        .reg-card.china { border-color: rgba(245, 158, 11, 0.4); }
+        .reg-header { padding: 20px; display: flex; align-items: center; gap: 16px; }
+        .reg-flag { font-size: 32px; }
+        .reg-name { font-size: 16px; font-weight: 700; }
+        .reg-status { font-size: 12px; color: var(--text-muted); }
+        .reg-body { padding: 0 20px 20px; }
+        .reg-features { list-style: none; }
+        .reg-features li { font-size: 13px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .reg-features li:last-child { border-bottom: none; }
+
+        .framework-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .framework-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .framework-icon { font-size: 24px; margin-bottom: 12px; }
+        .framework-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .framework-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .framework-items { font-size: 12px; color: var(--text-muted); }
+
+        .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .principle-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .principle-icon { font-size: 28px; margin-bottom: 12px; }
+        .principle-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .principle-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .ck { color: #FF7B72; }
+        .cs { color: #A5D6FF; }
+        .cf { color: #79C0FF; }
+
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .sw-grid, .deep-grid, .agent-grid, .do-dont-grid, .checklist-grid { grid-template-columns: 1fr; }
+            .principle-grid, .reg-grid, .risk-grid, .tool-grid, .framework-grid, .practices-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 19</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat19-emerging-technologies-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat19-p1-foundation-models.html"><span class="nav-icon">🧠</span> 19.1 Foundation Models</a></li>
+            <li><a href="cat19-p2-agentic-ai.html"><span class="nav-icon">🤖</span> 19.2 Agentic AI</a></li>
+            <li><a href="cat19-p3-multimodal-ai.html"><span class="nav-icon">🎨</span> 19.3 Multimodal AI</a></li>
+            <li><a href="cat19-p4-ai-coding.html"><span class="nav-icon">💻</span> 19.4 AI Coding Tools</a></li>
+            <li><a href="cat19-p5-edge-ai.html"><span class="nav-icon">📱</span> 19.5 Edge & On-Device</a></li>
+            <li><a href="cat19-p6-ai-infrastructure.html"><span class="nav-icon">🖥️</span> 19.6 AI Infrastructure</a></li>
+            <li><a href="cat19-p7-ai-safety.html" class="active"><span class="nav-icon">🛡️</span> 19.7 AI Safety & Governance</a></li>
+            <li><a href="cat19-p8-rag-knowledge.html"><span class="nav-icon">📚</span> 19.8 RAG & Knowledge</a></li>
+            <li><a href="cat19-p9-observability.html"><span class="nav-icon">📊</span> 19.9 Observability & Evals</a></li>
+            <li><a href="cat19-p10-enterprise-adoption.html"><span class="nav-icon">🏢</span> 19.10 Enterprise Adoption</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#principles"><span class="nav-icon">⚖️</span> Core Principles</a></li>
+            <li><a href="#dos-donts"><span class="nav-icon">✅</span> Do's & Don'ts</a></li>
+            <li><a href="#regulations"><span class="nav-icon">📜</span> Regulations</a></li>
+            <li><a href="#safety"><span class="nav-icon">🔒</span> Model Safety</a></li>
+            <li><a href="#security"><span class="nav-icon">🔐</span> Security Tools</a></li>
+            <li><a href="#guardrails"><span class="nav-icon">🚧</span> Guardrails</a></li>
+            <li><a href="#risks"><span class="nav-icon">⚠️</span> AI Risks</a></li>
+            <li><a href="#governance"><span class="nav-icon">🏛️</span> Governance</a></li>
+            <li><a href="#incident"><span class="nav-icon">🚨</span> Incident Response</a></li>
+            <li><a href="#checklist"><span class="nav-icon">📋</span> Safety Checklist</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🛡️ Page 19.7</span>
+                <h1>AI Safety & Governance</h1>
+                <p>Ensuring AI systems are safe, fair, transparent, and accountable. From technical alignment techniques to regulatory compliance frameworks—everything enterprises need to deploy AI responsibly, securely, and in compliance with emerging regulations.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">EU AI Act</div><div class="hero-metric-label">First Major AI Law (2024)</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">€35M</div><div class="hero-metric-label">Max EU AI Act Fine</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">78%</div><div class="hero-metric-label">Orgs Concerned About AI Risk</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">~200</div><div class="hero-metric-label">AI Policy Initiatives Globally</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Understanding AI safety and governance</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is AI Safety?</h3>
+                    <p><strong>AI Safety</strong> encompasses technical and organizational measures to ensure AI systems behave as intended without causing harm. This includes alignment research (making AI do what we want), robustness (handling edge cases gracefully), and security (preventing misuse and attacks).</p>
+                    <p>As AI systems become more capable, safety becomes more critical. A chatbot that occasionally hallucinates is manageable; an autonomous agent that makes financial decisions or controls infrastructure requires much higher reliability standards. Safety isn't just about preventing harm—it's about building systems users can trust and that organizations can deploy with confidence.</p>
+                </div>
+                <div>
+                    <h3>What is AI Governance?</h3>
+                    <p><strong>AI Governance</strong> refers to policies, processes, and structures that ensure responsible AI development and deployment. This includes internal policies (acceptable use, review processes), external compliance (regulations, standards), and accountability mechanisms (audit trails, oversight boards).</p>
+                    <p>Effective governance balances innovation speed with risk management—enabling AI adoption while maintaining control, transparency, and ethical standards. Without governance, AI becomes a liability; with excessive governance, innovation stalls. The key is right-sizing governance to risk level.</p>
+                </div>
+            </div>
+
+            <div class="sw-grid">
+                <div class="sw-card strengths">
+                    <div class="sw-title green">✓ Why Safety & Governance Matter</div>
+                    <ul class="sw-list">
+                        <li><strong>Regulatory compliance:</strong> EU AI Act, state laws coming into force with significant fines</li>
+                        <li><strong>Reputational protection:</strong> AI failures make headlines and damage brand trust</li>
+                        <li><strong>Legal liability:</strong> Decisions made by AI may be legally contested in court</li>
+                        <li><strong>Customer trust:</strong> Users expect responsible AI practices as table stakes</li>
+                        <li><strong>Operational reliability:</strong> Safe AI is more predictable and maintainable</li>
+                        <li><strong>Competitive advantage:</strong> Responsible AI is becoming a market differentiator</li>
+                        <li><strong>Employee confidence:</strong> Teams need to trust the AI they're building</li>
+                        <li><strong>Insurance & contracts:</strong> Increasingly required for coverage and partnerships</li>
+                    </ul>
+                </div>
+                <div class="sw-card weaknesses">
+                    <div class="sw-title yellow">⚠ Key Challenges</div>
+                    <ul class="sw-list">
+                        <li><strong>Rapidly evolving landscape:</strong> Regulations and best practices changing constantly</li>
+                        <li><strong>Technical difficulty:</strong> Ensuring AI alignment is an unsolved research problem</li>
+                        <li><strong>Speed vs safety:</strong> Pressure to ship can compromise thorough review</li>
+                        <li><strong>Measurement gaps:</strong> Hard to audit AI behavior comprehensively at scale</li>
+                        <li><strong>Global inconsistency:</strong> Different standards and laws across jurisdictions</li>
+                        <li><strong>Talent shortage:</strong> Few experienced AI ethics and safety professionals</li>
+                        <li><strong>Cost of compliance:</strong> Governance programs require investment</li>
+                        <li><strong>Organizational resistance:</strong> Governance can feel like bureaucracy</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Principles -->
+        <section class="module" id="principles">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Responsible AI Principles</h2>
+                    <p>Foundation for ethical AI development</p>
+                </div>
+            </div>
+
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="principle-icon">🎯</div>
+                    <div class="principle-title">Fairness</div>
+                    <div class="principle-desc">AI systems should not discriminate based on protected characteristics. Outcomes should be equitable across demographic groups, and biases in training data should be identified and mitigated before deployment.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🔍</div>
+                    <div class="principle-title">Transparency</div>
+                    <div class="principle-desc">Users should know when they're interacting with AI. Decision-making processes should be explainable, and organizations should disclose AI use in consequential decisions that affect people's lives.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">👤</div>
+                    <div class="principle-title">Privacy</div>
+                    <div class="principle-desc">AI systems should respect data privacy rights. Personal data used for training should be properly consented, and inference shouldn't expose private information from training data or user interactions.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🛡️</div>
+                    <div class="principle-title">Safety</div>
+                    <div class="principle-desc">AI should operate reliably without causing harm. Systems should handle edge cases gracefully, include appropriate safeguards against misuse, and fail safely when uncertain rather than proceeding with errors.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">📋</div>
+                    <div class="principle-title">Accountability</div>
+                    <div class="principle-desc">Organizations deploying AI should be accountable for outcomes. Clear ownership, comprehensive audit trails, and remediation processes should be established for all AI-driven decisions.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🤝</div>
+                    <div class="principle-title">Human Control</div>
+                    <div class="principle-desc">Humans should remain in control of consequential AI decisions. Appropriate human oversight, intervention mechanisms, and escalation paths should be maintained at all times.</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div class="overview-full">
+                    <h3>From Principles to Practice</h3>
+                    <p>Most organizations have adopted responsible AI principles, but implementation remains challenging. The gap between stated principles and operational reality is significant. Effective implementation requires: <strong>concrete metrics</strong> (how do you measure fairness? what thresholds matter?), <strong>technical tools</strong> (bias detection systems, explainability frameworks, audit logging), <strong>governance processes</strong> (review boards, risk assessment templates, approval workflows), and <strong>organizational culture</strong> (training, incentives aligned with responsible practices, psychological safety to raise concerns). Principles without enforcement are just aspirations—you need teeth.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Do's and Don'ts -->
+        <section class="module" id="dos-donts">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>AI Safety Do's & Don'ts</h2>
+                    <p>Practical guidelines for safe AI deployment</p>
+                </div>
+            </div>
+
+            <div class="do-dont-grid">
+                <div class="do-card">
+                    <div class="do-header">✓ DO</div>
+                    <ul class="do-list">
+                        <li><strong>Validate all AI-generated code</strong> before deploying to production—use security scanners like Snyk, SonarQube, Semgrep to catch vulnerabilities</li>
+                        <li><strong>Implement human-in-the-loop</strong> for high-stakes decisions (hiring, lending, medical diagnosis, legal recommendations, content moderation)</li>
+                        <li><strong>Log all AI interactions</strong> with comprehensive audit trails for compliance, debugging, and incident investigation</li>
+                        <li><strong>Set rate limits and usage quotas</strong> to prevent runaway costs, abuse, and denial-of-service scenarios</li>
+                        <li><strong>Test for prompt injection</strong> before deploying any user-facing AI application—assume attackers will try</li>
+                        <li><strong>Use guardrails and content filters</strong> on both inputs and outputs—defense in depth is essential</li>
+                        <li><strong>Disclose AI use</strong> to users when it affects decisions about them—transparency builds trust</li>
+                        <li><strong>Monitor model outputs continuously</strong> for drift, bias, quality degradation, and emerging failure modes</li>
+                        <li><strong>Maintain kill switches</strong> to disable AI features instantly if issues arise—test them regularly</li>
+                        <li><strong>Keep humans accountable</strong>—AI assists, humans decide and own outcomes on consequential matters</li>
+                        <li><strong>Document your AI systems</strong> with model cards, data sheets, risk assessments, and operational runbooks</li>
+                        <li><strong>Train all employees</strong> on responsible AI use, limitations, and how to report concerns</li>
+                        <li><strong>Conduct regular security reviews</strong> of AI systems with the same rigor as other software</li>
+                        <li><strong>Version control prompts and configurations</strong>—treat them as code with change management</li>
+                    </ul>
+                </div>
+                <div class="dont-card">
+                    <div class="dont-header">✕ DON'T</div>
+                    <ul class="dont-list">
+                        <li><strong>Deploy AI-generated code blindly</strong>—it may contain vulnerabilities, backdoors, license violations, or subtle logic errors</li>
+                        <li><strong>Trust LLM outputs without verification</strong>—hallucinations are common, confident-sounding, and can be dangerous</li>
+                        <li><strong>Send sensitive data to third-party AI APIs</strong> without reviewing their data handling, retention, and training policies</li>
+                        <li><strong>Let AI make autonomous decisions</strong> on protected categories (employment, credit, housing, insurance, healthcare)</li>
+                        <li><strong>Ignore prompt injection risks</strong>—they can bypass all your safety measures and cause data exfiltration</li>
+                        <li><strong>Assume AI is unbiased</strong>—all models encode biases from training data, and these can cause real harm</li>
+                        <li><strong>Use AI for prohibited purposes</strong>—social scoring, manipulation, unauthorized surveillance, generating CSAM</li>
+                        <li><strong>Skip security review for AI features</strong>—AI introduces new attack surfaces that traditional reviews miss</li>
+                        <li><strong>Over-rely on AI for critical systems</strong> without fallback mechanisms and graceful degradation</li>
+                        <li><strong>Hide AI involvement</strong> in decisions that affect people's lives—this creates legal and ethical liability</li>
+                        <li><strong>Copy code from AI without license checks</strong>—it may reproduce copyrighted or GPL-licensed code verbatim</li>
+                        <li><strong>Assume one-time testing is sufficient</strong>—AI behavior changes with model updates, prompt changes, and input distribution shifts</li>
+                        <li><strong>Store API keys or secrets in prompts</strong>—AI systems log inputs and these will be exposed</li>
+                        <li><strong>Use AI outputs for legal or medical advice</strong> without professional review and appropriate disclaimers</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">⚠️</div>
+                    <div>
+                        <div class="deep-title">Critical Safety Rules</div>
+                        <div class="deep-subtitle">Non-negotiable guardrails for AI deployment</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>Data Safety Rules</h4>
+                            <ul>
+                                <li><strong>Never send PII to untrusted AI services</strong>—redact SSNs, credit cards, health data before processing</li>
+                                <li><strong>Don't use production data for AI experiments</strong>—use synthetic or properly anonymized data</li>
+                                <li><strong>Encrypt AI training data at rest and in transit</strong>—apply same standards as other sensitive data</li>
+                                <li><strong>Implement data retention policies</strong>—don't keep AI logs indefinitely, define TTLs</li>
+                                <li><strong>Review third-party AI vendor data practices</strong> before integration—read the fine print</li>
+                                <li><strong>Consider data residency</strong>—where is your data processed? Which jurisdiction applies?</li>
+                                <li><strong>Document data lineage</strong>—know where training data came from and its license terms</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>Operational Safety Rules</h4>
+                            <ul>
+                                <li><strong>Always have a human escalation path</strong>—AI can't handle edge cases or angry customers</li>
+                                <li><strong>Implement circuit breakers</strong>—auto-disable on error rate spikes or anomalous behavior</li>
+                                <li><strong>Test AI in staging</strong> before production deployment—with representative data</li>
+                                <li><strong>Monitor for adversarial inputs</strong>—attackers will probe for weaknesses</li>
+                                <li><strong>Have rollback capability</strong>—be able to revert AI changes within minutes</li>
+                                <li><strong>Document incident response procedures</strong> specific to AI failures</li>
+                                <li><strong>Set spending alerts</strong>—AI API costs can explode unexpectedly</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">🔐</div>
+                    <div>
+                        <div class="deep-title">AI Code Security Rules</div>
+                        <div class="deep-subtitle">Validating AI-generated code</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>Why AI Code Needs Extra Scrutiny</h4>
+                            <p>AI-generated code presents unique security challenges that traditional code review may miss. Models are trained on public code including vulnerable examples, deprecated patterns, and copyrighted snippets. They optimize for "looks right" not "is secure." Common issues include:</p>
+                            <ul>
+                                <li><strong>Vulnerable patterns:</strong> SQL injection, XSS, path traversal reproduced from training data</li>
+                                <li><strong>Outdated libraries:</strong> AI suggests deprecated versions with known CVEs</li>
+                                <li><strong>License violations:</strong> Verbatim reproduction of GPL or copyrighted code</li>
+                                <li><strong>Hardcoded secrets:</strong> AI may include example API keys that match real patterns</li>
+                                <li><strong>Logic errors:</strong> Code that looks correct but has subtle bugs AI doesn't catch</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>Mandatory Code Validation Steps</h4>
+                            <ul>
+                                <li><strong>Run SAST tools:</strong> Snyk Code, SonarQube, Semgrep on every AI-generated file</li>
+                                <li><strong>Check for secrets:</strong> GitGuardian, truffleHog, git-secrets before commit</li>
+                                <li><strong>Scan dependencies:</strong> Snyk Open Source, npm audit, pip-audit for vulnerable packages</li>
+                                <li><strong>License compliance:</strong> FOSSA, license-checker to verify no GPL contamination</li>
+                                <li><strong>Human review:</strong> Never auto-merge AI code—require manual approval</li>
+                                <li><strong>Test coverage:</strong> AI code needs tests too—verify behavior matches intent</li>
+                                <li><strong>Integration testing:</strong> AI doesn't understand your system architecture</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Global Regulations -->
+        <section class="module" id="regulations">
+            <div class="module-header">
+                <div class="module-icon">📜</div>
+                <div class="module-info">
+                    <h2>Global AI Regulations</h2>
+                    <p>The emerging regulatory landscape</p>
+                </div>
+            </div>
+
+            <div class="reg-grid">
+                <div class="reg-card eu">
+                    <div class="reg-header">
+                        <div class="reg-flag">🇪🇺</div>
+                        <div>
+                            <div class="reg-name">EU AI Act</div>
+                            <div class="reg-status">In Force (Aug 2024) • Phased Enforcement</div>
+                        </div>
+                    </div>
+                    <div class="reg-body">
+                        <ul class="reg-features">
+                            <li>🔴 <strong>Prohibited AI:</strong> Social scoring, manipulation of vulnerable groups, real-time biometric surveillance in public spaces, emotion recognition in workplace/schools</li>
+                            <li>🟠 <strong>High-Risk:</strong> Employment decisions, credit scoring, education access, healthcare diagnosis, law enforcement—requires conformity assessment, human oversight, documentation</li>
+                            <li>🟡 <strong>Limited Risk:</strong> Chatbots must disclose AI nature, deepfakes must be labeled, emotion recognition disclosed</li>
+                            <li>🟢 <strong>Minimal Risk:</strong> Most AI applications—voluntary codes of conduct</li>
+                            <li>💰 <strong>Fines:</strong> Up to €35M or 7% global revenue for prohibited AI violations</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reg-card us">
+                    <div class="reg-header">
+                        <div class="reg-flag">🇺🇸</div>
+                        <div>
+                            <div class="reg-name">US AI Regulation</div>
+                            <div class="reg-status">Fragmented • Executive Orders + State Laws</div>
+                        </div>
+                    </div>
+                    <div class="reg-body">
+                        <ul class="reg-features">
+                            <li>📋 <strong>Executive Order 14110:</strong> Safety standards for frontier models, red-teaming requirements, reporting thresholds</li>
+                            <li>🏛️ <strong>State Laws:</strong> Colorado AI Act (employment), California SB 1047 (frontier models), NYC Local Law 144 (hiring tools)</li>
+                            <li>⚖️ <strong>Sectoral Rules:</strong> FDA for medical AI, FTC Section 5 for deceptive practices, EEOC for employment discrimination</li>
+                            <li>📊 <strong>NIST AI RMF:</strong> Voluntary risk management framework—becoming de facto standard</li>
+                            <li>🔄 <strong>Status:</strong> No comprehensive federal law yet—patchwork of state and sector rules</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reg-card uk">
+                    <div class="reg-header">
+                        <div class="reg-flag">🇬🇧</div>
+                        <div>
+                            <div class="reg-name">UK AI Framework</div>
+                            <div class="reg-status">Pro-Innovation • Principles-Based</div>
+                        </div>
+                    </div>
+                    <div class="reg-body">
+                        <ul class="reg-features">
+                            <li>🎯 <strong>Approach:</strong> Context-specific, regulator-led, principles-based rather than prescriptive</li>
+                            <li>📋 <strong>5 Principles:</strong> Safety/security, transparency, fairness, accountability, contestability</li>
+                            <li>🏢 <strong>AI Safety Institute:</strong> Government body for frontier AI evaluation and red-teaming</li>
+                            <li>⚖️ <strong>Existing Laws:</strong> UK GDPR, Equality Act 2010, Consumer Rights Act apply to AI</li>
+                            <li>📅 <strong>AI Bill:</strong> Comprehensive legislation expected 2025, may include binding requirements</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reg-card china">
+                    <div class="reg-header">
+                        <div class="reg-flag">🇨🇳</div>
+                        <div>
+                            <div class="reg-name">China AI Rules</div>
+                            <div class="reg-status">Active Regulation • Technology-Specific</div>
+                        </div>
+                    </div>
+                    <div class="reg-body">
+                        <ul class="reg-features">
+                            <li>📝 <strong>Generative AI Rules (2023):</strong> Registration required, content review, training data requirements, no undermining state power</li>
+                            <li>🤖 <strong>Algorithm Rules (2022):</strong> Recommendation systems must be transparent, users can opt out</li>
+                            <li>👤 <strong>Deepfake Rules (2023):</strong> Synthetic media must be labeled, consent required for likeness</li>
+                            <li>🔐 <strong>Data Security:</strong> Data localization for important data, cross-border transfer restrictions</li>
+                            <li>🏛️ <strong>Enforcement:</strong> Cyberspace Administration of China (CAC) with real enforcement actions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Compliance Strategy</h3>
+                    <p>For global enterprises, the <strong>EU AI Act</strong> is becoming the de facto standard—similar to GDPR's influence on global privacy practices. Companies adopting EU-compliant practices will likely meet requirements in other jurisdictions. Key compliance activities include: risk classification of all AI systems, conformity assessments for high-risk AI, comprehensive technical documentation, human oversight mechanisms, and regular audits.</p>
+                </div>
+                <div>
+                    <h3>Compliance Timeline</h3>
+                    <ul>
+                        <li><strong>Feb 2025:</strong> EU prohibited AI practices take effect</li>
+                        <li><strong>Aug 2025:</strong> EU general-purpose AI model rules apply</li>
+                        <li><strong>Aug 2026:</strong> EU high-risk AI requirements fully enforced</li>
+                        <li><strong>2025:</strong> Colorado AI Act takes effect (employment)</li>
+                        <li><strong>2025-2026:</strong> Additional US state laws expected</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Safety -->
+        <section class="module" id="safety">
+            <div class="module-header">
+                <div class="module-icon">🔒</div>
+                <div class="module-info">
+                    <h2>Model Safety Techniques</h2>
+                    <p>How AI labs make models safer</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-bottom: 24px;">
+                <div class="overview-full">
+                    <h3>The Alignment Problem</h3>
+                    <p>Large language models are fundamentally trained to predict text, not to be helpful, harmless, and honest. <strong>Alignment</strong> is the process of steering model behavior toward human values and intentions. Without alignment, models may produce harmful content, lie confidently, manipulate users, or pursue goals misaligned with user intent. Modern frontier models use multiple alignment techniques in combination—no single method is sufficient, and the field is rapidly evolving.</p>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Technique</th>
+                        <th>How It Works</th>
+                        <th>Strengths</th>
+                        <th>Limitations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>RLHF</strong></td>
+                        <td>Human raters rank outputs; model trained to maximize preference via reward model</td>
+                        <td class="table-highlight">Industry standard, proven at scale</td>
+                        <td>Expensive ($1M+), human bias, reward hacking</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Constitutional AI</strong></td>
+                        <td>Model critiques and revises own outputs against explicit principles</td>
+                        <td class="table-highlight">Scalable, less human labor</td>
+                        <td>Principles must be well-specified, can be gamed</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DPO</strong></td>
+                        <td>Direct preference optimization without separate reward model</td>
+                        <td>Simpler training pipeline, stable</td>
+                        <td>Less flexible than RLHF for complex preferences</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Red Teaming</strong></td>
+                        <td>Adversarial testing by humans/AI to find harmful behaviors</td>
+                        <td>Finds real vulnerabilities before deployment</td>
+                        <td>Incomplete coverage, cat-and-mouse dynamic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Safety Fine-Tuning</strong></td>
+                        <td>Train on curated dataset of safe responses</td>
+                        <td>Direct behavioral shaping</td>
+                        <td>Can reduce model capability, data intensive</td>
+                    </tr>
+                    <tr>
+                        <td><strong>System Prompts</strong></td>
+                        <td>Instructions prepended to every conversation</td>
+                        <td>Flexible, no retraining, easy to update</td>
+                        <td>Can be jailbroken, uses context window</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">🧪</div>
+                    <div>
+                        <div class="deep-title">Red Teaming Deep Dive</div>
+                        <div class="deep-subtitle">Adversarial testing for AI safety</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>What Red Teams Test For</h4>
+                            <ul>
+                                <li><strong>Jailbreaks:</strong> Bypassing safety guidelines through clever prompting, roleplay, encoding</li>
+                                <li><strong>Harmful content:</strong> Violence, illegal activities, dangerous information synthesis</li>
+                                <li><strong>Bias & discrimination:</strong> Differential treatment across demographic groups</li>
+                                <li><strong>Privacy leakage:</strong> Extracting training data, PII, or memorized content</li>
+                                <li><strong>Manipulation:</strong> Deception, social engineering, persuasion capabilities</li>
+                                <li><strong>CBRN risks:</strong> Chemical, biological, radiological, nuclear information</li>
+                                <li><strong>Cybersecurity risks:</strong> Malware generation, vulnerability exploitation</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>Red Team Approaches</h4>
+                            <ul>
+                                <li><strong>Human red teams:</strong> Domain experts (security, medicine, law) probe specific risks</li>
+                                <li><strong>Automated red teaming:</strong> AI generates adversarial prompts at scale</li>
+                                <li><strong>Bug bounties:</strong> External researchers incentivized to find vulnerabilities</li>
+                                <li><strong>Structured frameworks:</strong> MITRE ATLAS, NIST AI RMF, OWASP LLM Top 10</li>
+                                <li><strong>Continuous testing:</strong> Ongoing evaluation post-deployment as attacks evolve</li>
+                                <li><strong>Cross-functional teams:</strong> Security + ethics + domain experts together</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Security Tools -->
+        <section class="module" id="security">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>AI Security Tools</h2>
+                    <p>Scanning, validation, and security for AI systems</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-bottom: 24px;">
+                <div class="overview-full">
+                    <h3>Why AI Security Tools Are Essential</h3>
+                    <p>AI-generated code can contain vulnerabilities, license violations, and security flaws that traditional code review often misses. AI systems themselves introduce entirely new attack surfaces—prompt injection, model extraction, data poisoning, adversarial examples. A comprehensive security approach requires specialized tools that understand both traditional application security <em>and</em> AI-specific threats. <strong>Rule: Never deploy AI-generated code without automated security scanning.</strong></p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card featured">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Snyk</div><div class="tool-vendor">Snyk</div></div>
+                        <span class="tool-badge">Essential</span>
+                    </div>
+                    <div class="tool-desc">Developer-first security platform that scans AI-generated code for vulnerabilities, license issues, and security flaws. Integrates directly with IDEs (VS Code, JetBrains), CI/CD pipelines, and git repos. Essential for validating Copilot, Cursor, and Claude Code output. Real-time scanning as you code.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> SAST (Snyk Code), SCA (Snyk Open Source), container scanning, IaC security (Terraform, CloudFormation), license compliance, SBOM generation</div>
+                </div>
+                <div class="tool-card featured">
+                    <div class="tool-header">
+                        <div><div class="tool-name">SonarQube</div><div class="tool-vendor">SonarSource</div></div>
+                        <span class="tool-badge">Essential</span>
+                    </div>
+                    <div class="tool-desc">Continuous code quality and security analysis platform. Catches bugs, vulnerabilities, code smells, and security hotspots in AI-generated code. Self-hosted (SonarQube) or cloud (SonarCloud). Supports 30+ languages with deep analysis rules.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Static analysis, security hotspot detection, quality gates, technical debt tracking, PR decoration, IDE integration</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Semgrep</div><div class="tool-vendor">Semgrep</div></div>
+                        <span class="tool-badge">SAST</span>
+                    </div>
+                    <div class="tool-desc">Fast, lightweight static analysis with powerful custom rules. Write patterns to catch AI-specific anti-patterns and enforce security policies. Open source core with enterprise features. Excellent for creating custom rules for your codebase.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Custom rules (YAML), CI integration, secrets detection, OWASP coverage, auto-fix suggestions</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">CodeQL</div><div class="tool-vendor">GitHub</div></div>
+                        <span class="tool-badge">Semantic Analysis</span>
+                    </div>
+                    <div class="tool-desc">GitHub's code analysis engine using semantic queries for deep vulnerability detection. Tracks data flow through your application to find injection vulnerabilities, taint issues, and complex bugs. Free for open source.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Semantic analysis, CVE detection, custom queries, variant analysis, GitHub integration</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">GitGuardian</div><div class="tool-vendor">GitGuardian</div></div>
+                        <span class="tool-badge">Secrets</span>
+                    </div>
+                    <div class="tool-desc">Detects secrets and credentials in code—critical for AI-generated code which may inadvertently include API keys, passwords, or tokens from training data patterns. Real-time scanning of all commits.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> 350+ secret detectors, real-time scanning, historical scanning, remediation workflows, Slack alerts</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">FOSSA</div><div class="tool-vendor">FOSSA</div></div>
+                        <span class="tool-badge">License</span>
+                    </div>
+                    <div class="tool-desc">Open source license compliance and vulnerability scanning. Essential for AI-generated code that may reproduce copyrighted or GPL-licensed code from training data. Protects against license contamination.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> License detection (100+ types), policy engine, SBOM generation, vulnerability DB, CI/CD integration</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Garak</div><div class="tool-vendor">NVIDIA</div></div>
+                        <span class="tool-badge">LLM Security</span>
+                    </div>
+                    <div class="tool-desc">LLM vulnerability scanner that probes for jailbreaks, prompt injection, data leakage, and other AI-specific vulnerabilities. Open source, extensible. Run against your deployed models to find weaknesses.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Prompt injection probes, jailbreak detection, toxicity testing, data leakage, bias detection</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Robust Intelligence</div><div class="tool-vendor">Robust Intelligence</div></div>
+                        <span class="tool-badge">AI Platform</span>
+                    </div>
+                    <div class="tool-desc">End-to-end AI security platform providing automated red teaming, continuous model validation, and real-time protection. Enterprise-focused with comprehensive AI risk management.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Model validation, adversarial testing, drift detection, AI firewall, compliance reporting</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Checkmarx</div><div class="tool-vendor">Checkmarx</div></div>
+                        <span class="tool-badge">Enterprise</span>
+                    </div>
+                    <div class="tool-desc">Enterprise application security testing platform with comprehensive SAST, SCA, DAST, and API security. AI-assisted remediation suggestions help developers fix issues faster.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> SAST, SCA, DAST, API security, KICS for IaC, compliance reports, developer training</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Trivy</div><div class="tool-vendor">Aqua Security</div></div>
+                        <span class="tool-badge">Open Source</span>
+                    </div>
+                    <div class="tool-desc">Comprehensive open source security scanner for containers, filesystems, git repos, and Kubernetes. Fast, accurate, and widely adopted. Excellent for CI/CD integration.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Container scanning, SBOM, vulnerability DB, misconfig detection, secret scanning</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Dependabot</div><div class="tool-vendor">GitHub</div></div>
+                        <span class="tool-badge">Dependencies</span>
+                    </div>
+                    <div class="tool-desc">Automated dependency updates and security alerts. Creates PRs to update vulnerable dependencies. Free for all GitHub repos. Essential baseline for any project.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> Security alerts, auto-update PRs, version updates, multi-ecosystem support</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Veracode</div><div class="tool-vendor">Veracode</div></div>
+                        <span class="tool-badge">Enterprise</span>
+                    </div>
+                    <div class="tool-desc">Enterprise AppSec platform with static, dynamic, and SCA scanning. Strong compliance focus with detailed reporting for auditors. Pipeline integration and developer IDE plugins.</div>
+                    <div class="tool-features"><strong>Capabilities:</strong> SAST, DAST, SCA, penetration testing, compliance reporting, policy management</div>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">🛡️</div>
+                    <div>
+                        <div class="deep-title">Recommended Security Pipeline</div>
+                        <div class="deep-subtitle">Defense in depth for AI-generated code</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>Pre-Commit Checks (Local)</h4>
+                            <ul>
+                                <li><strong>Secrets scanning:</strong> git-secrets, truffleHog, or GitGuardian pre-commit hook</li>
+                                <li><strong>License check:</strong> license-checker (npm), pip-licenses (Python)</li>
+                                <li><strong>Linting:</strong> ESLint with security plugins, pylint, golangci-lint</li>
+                                <li><strong>Formatting:</strong> Prettier, Black, gofmt for consistent code</li>
+                                <li><strong>Type checking:</strong> TypeScript, mypy, to catch errors early</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>CI/CD Pipeline (Automated)</h4>
+                            <ul>
+                                <li><strong>SAST:</strong> Snyk Code, SonarQube, or Semgrep for vulnerabilities</li>
+                                <li><strong>SCA:</strong> Snyk Open Source, Dependabot for dependency CVEs</li>
+                                <li><strong>Container scanning:</strong> Trivy, Snyk Container before deployment</li>
+                                <li><strong>IaC scanning:</strong> Checkov, tfsec, KICS for Terraform/CloudFormation</li>
+                                <li><strong>Quality gates:</strong> Block merges on high/critical security findings</li>
+                                <li><strong>License compliance:</strong> FOSSA or Snyk to prevent GPL contamination</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guardrails -->
+        <section class="module" id="guardrails">
+            <div class="module-header">
+                <div class="module-icon">🚧</div>
+                <div class="module-info">
+                    <h2>Guardrails & Content Filtering</h2>
+                    <p>Runtime safety controls for AI applications</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-bottom: 24px;">
+                <div class="overview-full">
+                    <h3>Defense in Depth for AI</h3>
+                    <p>Model alignment is necessary but not sufficient for production safety. <strong>Guardrails</strong> provide additional runtime safety layers: input filtering (blocking malicious prompts before they reach the model), output filtering (catching unsafe responses before users see them), and monitoring (detecting anomalous patterns). A robust AI safety architecture combines model-level alignment with application-level guardrails—neither alone is enough. Think of it like a car: the brakes (alignment) are essential, but you also need airbags (guardrails) for when things go wrong.</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">NVIDIA NeMo Guardrails</div><div class="tool-vendor">NVIDIA</div></div>
+                        <span class="tool-badge">Open Source</span>
+                    </div>
+                    <div class="tool-desc">Programmable guardrails using Colang DSL. Define conversational flows, topic restrictions, fact-checking, and safety rules. Integrates with any LLM. Production-ready and actively maintained.</div>
+                    <div class="tool-features"><strong>Features:</strong> Topical rails, fact-checking, jailbreak detection, moderation, custom actions</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Guardrails AI</div><div class="tool-vendor">Guardrails AI</div></div>
+                        <span class="tool-badge">Open Source</span>
+                    </div>
+                    <div class="tool-desc">Pydantic-style validators for LLM outputs. Define expected schemas, run validation, auto-correct failures. Growing hub of community validators for common use cases.</div>
+                    <div class="tool-features"><strong>Features:</strong> Schema validation, PII detection, toxicity filtering, JSON repair, retry logic</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">LlamaGuard</div><div class="tool-vendor">Meta</div></div>
+                        <span class="tool-badge">Model</span>
+                    </div>
+                    <div class="tool-desc">Fine-tuned Llama model for content safety classification. Detects unsafe content in both prompts and responses. Customizable safety taxonomy. Open weights.</div>
+                    <div class="tool-features"><strong>Features:</strong> Multi-category classification, prompt + response checking, low latency, customizable</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Azure AI Content Safety</div><div class="tool-vendor">Microsoft</div></div>
+                        <span class="tool-badge">API</span>
+                    </div>
+                    <div class="tool-desc">Managed content moderation service detecting hate, violence, sexual content, and self-harm. Multi-modal support for text and images. Configurable severity thresholds.</div>
+                    <div class="tool-features"><strong>Features:</strong> Severity levels (0-6), custom blocklists, multi-language, image moderation</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">OpenAI Moderation</div><div class="tool-vendor">OpenAI</div></div>
+                        <span class="tool-badge">Free API</span>
+                    </div>
+                    <div class="tool-desc">Free moderation endpoint for content classification. Detects multiple harm categories (hate, harassment, self-harm, sexual, violence) with confidence scores. Use with any model.</div>
+                    <div class="tool-features"><strong>Features:</strong> Free tier, fast (~50ms), category scores, works with non-OpenAI models</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Rebuff</div><div class="tool-vendor">Open Source</div></div>
+                        <span class="tool-badge">Prompt Injection</span>
+                    </div>
+                    <div class="tool-desc">Specialized prompt injection detection with multi-layer defense. Heuristics, ML detection, and canary tokens. Self-hosted or API. Essential for user-facing apps.</div>
+                    <div class="tool-features"><strong>Features:</strong> Heuristic rules, ML classifier, canary token detection, vector similarity</div>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">🔒</div>
+                    <div>
+                        <div class="deep-title">Guardrail Implementation Patterns</div>
+                        <div class="deep-subtitle">What to filter and how</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>Input Guardrails (Pre-LLM)</h4>
+                            <ul>
+                                <li><strong>Prompt injection detection:</strong> Catch attempts to override system instructions, roleplay attacks</li>
+                                <li><strong>PII filtering:</strong> Redact SSNs, credit cards, emails, phone numbers before processing</li>
+                                <li><strong>Topic blocking:</strong> Reject queries outside permitted scope for your application</li>
+                                <li><strong>Length limits:</strong> Prevent context stuffing and denial-of-wallet attacks</li>
+                                <li><strong>Rate limiting:</strong> Prevent abuse, enumeration, and cost overruns per user/session</li>
+                                <li><strong>Language detection:</strong> Ensure queries are in supported languages</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>Output Guardrails (Post-LLM)</h4>
+                            <ul>
+                                <li><strong>Toxicity detection:</strong> Block harmful, offensive, or inappropriate content</li>
+                                <li><strong>Factuality checking:</strong> Flag potential hallucinations, require citations</li>
+                                <li><strong>PII leakage prevention:</strong> Catch accidentally exposed personal data</li>
+                                <li><strong>Format validation:</strong> Ensure outputs match expected schema (JSON, etc.)</li>
+                                <li><strong>Brand safety:</strong> Prevent off-brand statements, competitor mentions</li>
+                                <li><strong>Consistency checks:</strong> Flag contradictory statements within response</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Risks -->
+        <section class="module" id="risks">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>AI Risk Categories</h2>
+                    <p>Understanding what can go wrong</p>
+                </div>
+            </div>
+
+            <div class="risk-grid">
+                <div class="risk-card">
+                    <div class="risk-icon">🎭</div>
+                    <div>
+                        <div class="risk-title">Hallucination & Misinformation</div>
+                        <div class="risk-desc">LLMs confidently generate false information including fabricated citations, statistics, and facts. In high-stakes domains (medical, legal, financial), hallucinations can cause direct harm. Users often can't distinguish fabricated from real content.</div>
+                        <div class="risk-level risk-high">HIGH RISK • Mitigate with RAG, required citations, human review, confidence thresholds</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">⚖️</div>
+                    <div>
+                        <div class="risk-title">Bias & Discrimination</div>
+                        <div class="risk-desc">AI systems can encode and amplify biases from training data, leading to discriminatory outcomes. Employment, lending, healthcare, and criminal justice AI may treat protected groups unfairly, creating legal liability under civil rights laws.</div>
+                        <div class="risk-level risk-high">HIGH RISK • Mitigate with bias audits, diverse training data, demographic monitoring, third-party testing</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">🔓</div>
+                    <div>
+                        <div class="risk-title">Privacy Leakage</div>
+                        <div class="risk-desc">Models can memorize and regurgitate training data including PII, medical records, and proprietary information. Prompt injection attacks can extract sensitive context. Data sent to AI providers may be logged or used for training.</div>
+                        <div class="risk-level risk-high">HIGH RISK • Mitigate with data filtering, PII redaction, on-prem deployment, DLP tools, vendor agreements</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">🛠️</div>
+                    <div>
+                        <div class="risk-title">Prompt Injection</div>
+                        <div class="risk-desc">Attackers craft malicious inputs that override system instructions, causing AI to ignore safety guidelines, exfiltrate data, or perform unintended actions. Critical vulnerability for AI agents with tool access or database queries.</div>
+                        <div class="risk-level risk-high">HIGH RISK • Mitigate with input validation, sandboxing, guardrails, least privilege, output filtering</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">🤖</div>
+                    <div>
+                        <div class="risk-title">Automation & Agent Risks</div>
+                        <div class="risk-desc">AI agents acting autonomously can make errors at scale before humans notice. Without proper controls, agents may execute harmful actions, make unauthorized decisions, send incorrect communications, or compound mistakes recursively.</div>
+                        <div class="risk-level risk-medium">MEDIUM RISK • Mitigate with human-in-loop for high stakes, action limits, approval workflows, monitoring</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">🧬</div>
+                    <div>
+                        <div class="risk-title">Intellectual Property</div>
+                        <div class="risk-desc">Generated content may infringe copyrights or reproduce proprietary information verbatim. Training on copyrighted data raises legal questions. AI-generated code may include GPL-licensed snippets creating license contamination.</div>
+                        <div class="risk-level risk-medium">MEDIUM RISK • Mitigate with content policies, license scanning (FOSSA), legal review, indemnification clauses</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">🔐</div>
+                    <div>
+                        <div class="risk-title">Security Vulnerabilities</div>
+                        <div class="risk-desc">AI introduces new attack surfaces: model extraction, data poisoning, adversarial examples, API abuse. AI-generated code may contain vulnerabilities, backdoors, or insecure patterns. Traditional security reviews miss AI-specific threats.</div>
+                        <div class="risk-level risk-high">HIGH RISK • Mitigate with security scanning (Snyk, SonarQube), code review, threat modeling, AI security testing</div>
+                    </div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-icon">📉</div>
+                    <div>
+                        <div class="risk-title">Dependency & Reliability</div>
+                        <div class="risk-desc">Over-reliance on AI providers creates operational and strategic risk. API outages affect your service availability. Model deprecations require migration. Price changes impact economics. Single vendor lock-in is dangerous.</div>
+                        <div class="risk-level risk-medium">MEDIUM RISK • Mitigate with multi-provider strategy, fallbacks, local models, SLAs, capacity planning</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Governance Framework -->
+        <section class="module" id="governance">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>AI Governance Framework</h2>
+                    <p>Organizational structures and processes</p>
+                </div>
+            </div>
+
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <div class="framework-icon">👥</div>
+                    <div class="framework-title">AI Ethics Board / Committee</div>
+                    <div class="framework-desc">Cross-functional committee reviewing high-risk AI use cases before deployment. Includes representatives from legal, ethics, technical, business, and affected stakeholder groups. Provides guidance on acceptable applications.</div>
+                    <div class="framework-items"><strong>Responsibilities:</strong> Policy development, use case review, exception handling, incident escalation, external stakeholder engagement</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-icon">📋</div>
+                    <div class="framework-title">AI Risk Assessment Process</div>
+                    <div class="framework-desc">Structured evaluation of AI systems before deployment. Assesses potential harms, regulatory requirements, technical risks, and mitigation measures. Required review for high-risk applications.</div>
+                    <div class="framework-items"><strong>Components:</strong> Risk classification matrix, impact assessment template, control evaluation checklist, approval workflow</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-icon">📜</div>
+                    <div class="framework-title">AI Acceptable Use Policy</div>
+                    <div class="framework-desc">Clear guidelines on acceptable and prohibited AI uses across the organization. Defines approved tools and providers, data handling requirements, human oversight requirements, and escalation procedures.</div>
+                    <div class="framework-items"><strong>Covers:</strong> Approved AI providers, data classification, disclosure requirements, prohibited uses, consequences</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-icon">📊</div>
+                    <div class="framework-title">AI System Inventory</div>
+                    <div class="framework-desc">Comprehensive catalog of all AI systems in use across the organization. Tracks models, use cases, data sources, owners, risk levels, and review dates. Foundation for governance and compliance.</div>
+                    <div class="framework-items"><strong>Tracks:</strong> System name, purpose, data sources, risk level, owner, last review, compliance status, incidents</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-icon">🔍</div>
+                    <div class="framework-title">AI Audit Program</div>
+                    <div class="framework-desc">Regular review of AI systems for compliance, performance, fairness, and safety. Includes bias testing, output quality assessment, and control effectiveness evaluation. May involve third parties for independence.</div>
+                    <div class="framework-items"><strong>Activities:</strong> Bias audits, security reviews, compliance checks, performance monitoring, documentation review</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-icon">📚</div>
+                    <div class="framework-title">AI Training & Awareness</div>
+                    <div class="framework-desc">Education programs ensuring all employees understand AI risks, policies, and responsible use. Role-specific training for developers, users, and leadership. Regular updates as landscape evolves.</div>
+                    <div class="framework-items"><strong>Includes:</strong> Onboarding training, developer security training, user guidelines, leadership briefings</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Standards & Frameworks</h3>
+                    <ul>
+                        <li><strong>NIST AI RMF:</strong> US government AI risk management framework—comprehensive and voluntary</li>
+                        <li><strong>ISO/IEC 42001:</strong> AI management system standard (certification available)</li>
+                        <li><strong>IEEE 7000:</strong> Ethical design process standard for autonomous systems</li>
+                        <li><strong>OECD AI Principles:</strong> International policy guidelines adopted by 40+ countries</li>
+                        <li><strong>MITRE ATLAS:</strong> Adversarial threat landscape for AI systems</li>
+                        <li><strong>OWASP LLM Top 10:</strong> Security risks specific to LLM applications</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Implementation Priorities</h3>
+                    <ul>
+                        <li><strong>Start with inventory:</strong> You can't govern what you don't know exists</li>
+                        <li><strong>Focus on high-risk first:</strong> Prioritize customer-facing and decision-making AI</li>
+                        <li><strong>Embed in existing processes:</strong> Integrate into procurement, security, legal review</li>
+                        <li><strong>Train everyone:</strong> AI literacy is now a core competency</li>
+                        <li><strong>Measure and iterate:</strong> Governance matures with experience and incidents</li>
+                        <li><strong>Get executive sponsorship:</strong> Governance without authority is toothless</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Incident Response -->
+        <section class="module" id="incident">
+            <div class="module-header">
+                <div class="module-icon">🚨</div>
+                <div class="module-info">
+                    <h2>AI Incident Response</h2>
+                    <p>When things go wrong</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-bottom: 24px;">
+                <div class="overview-full">
+                    <h3>AI Incidents Are Different</h3>
+                    <p>AI system failures differ from traditional software bugs. Issues may be probabilistic (happening sometimes, not always), hard to reproduce (dependent on specific inputs), and difficult to diagnose (model behavior is opaque). Incidents can involve harm to users (biased decisions, misinformation), reputational damage (viral screenshots), regulatory violations, or security breaches. Your incident response process needs AI-specific considerations.</p>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">📋</div>
+                    <div>
+                        <div class="deep-title">AI Incident Response Playbook</div>
+                        <div class="deep-subtitle">Step-by-step response process</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>1. Detection & Triage</h4>
+                            <ul>
+                                <li><strong>Identify the incident:</strong> User report, monitoring alert, social media, regulator inquiry</li>
+                                <li><strong>Assess severity:</strong> Harm caused, users affected, regulatory implications, PR risk</li>
+                                <li><strong>Preserve evidence:</strong> Capture logs, inputs, outputs, model version, configurations</li>
+                                <li><strong>Activate response team:</strong> On-call, AI lead, legal, comms as needed</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>2. Containment</h4>
+                            <ul>
+                                <li><strong>Immediate mitigation:</strong> Kill switch, feature flag, rollback, rate limiting</li>
+                                <li><strong>Scope assessment:</strong> How many users affected? What data exposed? What decisions made?</li>
+                                <li><strong>Communication hold:</strong> Coordinate messaging before external statements</li>
+                                <li><strong>Document actions:</strong> Time-stamped log of all containment steps</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>3. Investigation</h4>
+                            <ul>
+                                <li><strong>Root cause analysis:</strong> Model issue, prompt issue, data issue, adversarial attack?</li>
+                                <li><strong>Impact assessment:</strong> Full scope of harm, affected users, data exposure</li>
+                                <li><strong>Similar patterns:</strong> Has this happened before? Are there related issues?</li>
+                                <li><strong>Control failures:</strong> What guardrails failed? Why didn't monitoring catch it?</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>4. Resolution & Communication</h4>
+                            <ul>
+                                <li><strong>Fix deployment:</strong> Model update, prompt change, guardrail addition, feature removal</li>
+                                <li><strong>User notification:</strong> Affected users may need to be informed (GDPR, fairness)</li>
+                                <li><strong>Regulatory notification:</strong> Some incidents require reporting to authorities</li>
+                                <li><strong>Post-mortem:</strong> Blameless review, lessons learned, preventive measures</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Checklist -->
+        <section class="module" id="checklist">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>AI Safety Checklist</h2>
+                    <p>Pre-deployment verification</p>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-title">🚀 Before Deploying AI to Production</div>
+                <div class="checklist-grid">
+                    <div class="checklist-section">
+                        <h4>Security & Code Safety</h4>
+                        <ul class="checklist-items">
+                            <li>Run SAST scan on all AI-generated code (Snyk, SonarQube, Semgrep)</li>
+                            <li>Check for secrets and credentials (GitGuardian, truffleHog)</li>
+                            <li>Verify open source license compliance (FOSSA, Snyk)</li>
+                            <li>Review dependencies for known vulnerabilities (Dependabot, npm audit)</li>
+                            <li>Test for prompt injection vulnerabilities (Garak, manual testing)</li>
+                            <li>Implement rate limiting and abuse prevention</li>
+                            <li>Set up monitoring and alerting for anomalies</li>
+                            <li>Verify API keys and secrets are properly secured</li>
+                        </ul>
+                    </div>
+                    <div class="checklist-section">
+                        <h4>Data & Privacy</h4>
+                        <ul class="checklist-items">
+                            <li>Identify all data sources and verify consent/licensing</li>
+                            <li>Implement PII detection and redaction (input and output)</li>
+                            <li>Review third-party AI vendor data handling policies</li>
+                            <li>Set up data retention and deletion policies</li>
+                            <li>Document data flows for compliance (GDPR, CCPA)</li>
+                            <li>Test for training data leakage</li>
+                            <li>Verify data residency requirements are met</li>
+                            <li>Confirm DPA (Data Processing Agreement) with AI vendors</li>
+                        </ul>
+                    </div>
+                    <div class="checklist-section">
+                        <h4>Safety & Quality</h4>
+                        <ul class="checklist-items">
+                            <li>Implement input and output guardrails</li>
+                            <li>Test for bias across demographic groups</li>
+                            <li>Verify hallucination rate is acceptable for use case</li>
+                            <li>Establish human escalation procedures</li>
+                            <li>Create and test kill switch for emergency disable</li>
+                            <li>Document known limitations for users</li>
+                            <li>Set up feedback collection mechanism</li>
+                            <li>Define SLOs for quality, latency, availability</li>
+                        </ul>
+                    </div>
+                    <div class="checklist-section">
+                        <h4>Governance & Compliance</h4>
+                        <ul class="checklist-items">
+                            <li>Complete AI risk assessment</li>
+                            <li>Obtain required approvals (ethics board, legal, security)</li>
+                            <li>Register system in AI inventory</li>
+                            <li>Create model card / system documentation</li>
+                            <li>Verify regulatory compliance (EU AI Act, state laws)</li>
+                            <li>Establish audit trail and logging</li>
+                            <li>Plan for ongoing monitoring and periodic review</li>
+                            <li>Define incident response procedures</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Actionable guidance for responsible AI</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div>
+                        <div class="practice-title">Classify AI Systems by Risk</div>
+                        <div class="practice-desc">Not all AI needs the same governance. Internal productivity tools differ from customer-facing decision systems. Use risk tiers (high/medium/low) to allocate oversight appropriately—heavy governance for high-risk, light touch for low-risk. Don't create bureaucracy where it isn't needed.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div>
+                        <div class="practice-title">Never Trust AI-Generated Code Blindly</div>
+                        <div class="practice-desc">Always run security scans (Snyk, SonarQube, Semgrep) on AI-generated code. Check for vulnerabilities, license issues, and secrets. Require human review before merging. Test thoroughly—AI doesn't understand your system architecture or edge cases.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div>
+                        <div class="practice-title">Require Human Oversight for Decisions</div>
+                        <div class="practice-desc">AI should inform, not decide, for consequential outcomes. Keep humans in the loop for hiring, lending, medical diagnosis, legal recommendations, and other high-stakes decisions. Define clear escalation triggers and ensure humans have enough context to override.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div>
+                        <div class="practice-title">Implement Defense in Depth</div>
+                        <div class="practice-desc">Don't rely on model alignment alone. Layer input validation, output filtering, monitoring, and access controls. Assume any single control can fail—multiple independent layers provide resilience. Test your guardrails with adversarial inputs.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div>
+                        <div class="practice-title">Test for Bias and Safety Continuously</div>
+                        <div class="practice-desc">Safety isn't a one-time check. Monitor AI outputs across demographic groups over time. Establish fairness metrics, set thresholds, and alert when drift occurs. Re-evaluate after model updates, prompt changes, or input distribution shifts.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div>
+                        <div class="practice-title">Disclose AI Use Transparently</div>
+                        <div class="practice-desc">Tell users when they're interacting with AI or when AI influences decisions about them. Explain how AI is used and its limitations. Provide mechanisms to contest AI-driven outcomes. Transparency builds trust and satisfies emerging regulations.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div>
+                        <div class="practice-title">Prepare for Regulatory Compliance Now</div>
+                        <div class="practice-desc">EU AI Act enforcement begins 2025. Document your AI systems, data sources, and risk assessments now. Build compliance into development processes rather than retrofitting later. Track regulatory developments—the landscape is evolving rapidly.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div>
+                        <div class="practice-title">Train Your Entire Team on AI Safety</div>
+                        <div class="practice-desc">Everyone using AI needs to understand the risks. Train developers on secure AI coding practices, users on responsible use and limitations, and leadership on governance and liability. Create easy ways to report concerns without fear of blame.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent This -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI safety automation agent</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🛡️ SafetyGuard</h3>
+                    <p>An agent that helps organizations assess AI risks, scan AI-generated code for vulnerabilities, evaluate model outputs for safety issues, generate compliance documentation, conduct bias audits, and maintain AI governance records. Automates routine safety checks while escalating complex decisions to humans.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Scan AI-generated code for vulnerabilities (Snyk, SonarQube integration)</div>
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Conduct structured AI risk assessments</div>
+                        <div class="agent-capability"><span class="capability-icon">📄</span> Generate compliance documentation (model cards, risk assessments)</div>
+                        <div class="agent-capability"><span class="capability-icon">⚖️</span> Evaluate model outputs for bias and safety issues</div>
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Track AI inventory and risk levels across organization</div>
+                        <div class="agent-capability"><span class="capability-icon">🚨</span> Alert on governance violations and policy breaches</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">safety_guard.py</div>
+                    <div class="code-content">
+<pre><span class="ck">from</span> crewai <span class="ck">import</span> Agent, Task, Crew
+<span class="ck">from</span> langchain_anthropic <span class="ck">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="cs">"claude-sonnet-4-20250514"</span>)
+
+safety_guard = Agent(
+    role=<span class="cs">"AI Safety & Security Specialist"</span>,
+    goal=<span class="cs">"Ensure AI systems are safe, secure, compliant"</span>,
+    backstory=<span class="cs">"""Expert in AI safety, security scanning,
+    regulations (EU AI Act, NIST RMF), and security tools
+    (Snyk, SonarQube, Semgrep). Deep knowledge of
+    guardrails, bias testing, and incident response."""</span>,
+    tools=[
+        SnykScanner(),
+        SonarQubeAnalyzer(),
+        BiasEvaluator(),
+        RiskAssessmentTool(),
+        ComplianceChecker(),
+        GuardrailValidator()
+    ],
+    llm=llm
+)
+
+<span class="ck">async def</span> <span class="cf">safety_review</span>(code, system_desc, use_case):
+    task = Task(
+        description=<span class="cs">f"""Comprehensive safety review:
+        Code: {code}
+        System: {system_desc}
+        Use case: {use_case}
+        
+        Provide: Security scan results, risk assessment,
+        compliance gaps, recommended guardrails,
+        remediation priorities"""</span>,
+        agent=safety_guard,
+        expected_output=<span class="cs">"Safety review with action items"</span>
+    )
+    crew = Crew(agents=[safety_guard], tasks=[task])
+    <span class="ck">return await</span> crew.kickoff_async()</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Related Topics</h2>
+                    <p>Continue exploring</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat19-p1-foundation-models.html" class="related-card">
+                    <div class="related-icon">🧠</div>
+                    <div class="related-title">Foundation Models</div>
+                    <div class="related-desc">The models these safety measures apply to</div>
+                </a>
+                <a href="cat19-p2-agentic-ai.html" class="related-card">
+                    <div class="related-icon">🤖</div>
+                    <div class="related-title">Agentic AI</div>
+                    <div class="related-desc">Safety considerations for autonomous agents</div>
+                </a>
+                <a href="cat19-p9-observability.html" class="related-card">
+                    <div class="related-icon">📊</div>
+                    <div class="related-title">Observability & Evals</div>
+                    <div class="related-desc">Monitoring AI safety in production</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat19-p6-ai-infrastructure.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">19.6 AI Infrastructure</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 19.7</div>
+        <a href="cat19-p8-rag-knowledge.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">19.8 RAG & Knowledge</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

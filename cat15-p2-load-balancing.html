@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Balancing | Networking | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+        .overview-content ul { margin-left: 20px; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .overview-content strong { color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LOAD BALANCER VISUALIZATION - SVG BASED
+        ═══════════════════════════════════════════════════════════════ */
+        .lb-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; position: relative; }
+        .lb-diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .lb-diagram-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .lb-toggle { display: flex; gap: 8px; }
+        .lb-toggle-btn { padding: 6px 14px; font-size: 11px; font-weight: 600; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .lb-toggle-btn.active { background: var(--page-glow); border-color: var(--page-primary); color: var(--page-light); }
+        
+        .lb-canvas { display: grid; grid-template-columns: 120px 1fr 140px 1fr 140px; align-items: center; gap: 0; padding: 16px 0; }
+        
+        .lb-clients { display: flex; flex-direction: column; gap: 8px; }
+        .lb-client { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; }
+        .lb-client-icon { font-size: 16px; }
+        .lb-client-label { color: var(--text-secondary); }
+        
+        .lb-arrows { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; }
+        .lb-arrow-svg { width: 100%; height: 180px; }
+        .lb-path { fill: none; stroke-width: 2; stroke-dasharray: 8 4; animation: lb-flow 1s linear infinite; }
+        .lb-path.inactive { stroke: var(--text-muted); opacity: 0.3; stroke-dasharray: 4 4; animation: none; }
+        @keyframes lb-flow { to { stroke-dashoffset: -12; } }
+        
+        .lb-balancer { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 20px; background: var(--page-glow); border: 3px solid var(--page-primary); border-radius: 16px; }
+        .lb-balancer-icon { font-size: 32px; }
+        .lb-balancer-label { font-size: 14px; font-weight: 600; color: var(--page-light); }
+        .lb-balancer-type { font-size: 10px; color: var(--text-muted); }
+        
+        .lb-servers { display: flex; flex-direction: column; gap: 8px; }
+        .lb-server { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg-card); border: 2px solid rgba(16, 185, 129, 0.5); border-radius: 8px; }
+        .lb-server.unhealthy { border-color: rgba(239, 68, 68, 0.5); opacity: 0.5; }
+        .lb-server-icon { font-size: 16px; }
+        .lb-server-info { flex: 1; }
+        .lb-server-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .lb-server-ip { font-size: 9px; font-family: monospace; color: var(--text-muted); }
+        .lb-server-status { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .lb-server.unhealthy .lb-server-status { background: var(--red); box-shadow: none; }
+        
+        .lb-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .lb-stat { text-align: center; padding: 8px; background: var(--bg-card); border-radius: 8px; }
+        .lb-stat-value { font-size: 16px; font-weight: 700; color: var(--page-light); }
+        .lb-stat-label { font-size: 10px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ALGORITHM CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .algo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .algo-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .algo-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .algo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .algo-name { font-size: 15px; font-weight: 600; }
+        .algo-badge { font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .algo-badge.common { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .algo-badge.advanced { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
+        .algo-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .algo-visual { display: flex; gap: 4px; align-items: flex-end; height: 40px; margin-bottom: 12px; }
+        .algo-bar { flex: 1; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 3px; }
+        .algo-pros { font-size: 11px; color: var(--green); margin-bottom: 4px; }
+        .algo-cons { font-size: 11px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LAYER COMPARISON
+        ═══════════════════════════════════════════════════════════════ */
+        .layer-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .layer-card { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+        .layer-card:hover { border-color: var(--page-primary); }
+        .layer-card.l4 { --layer-color: var(--cyan); }
+        .layer-card.l7 { --layer-color: var(--purple); }
+        .layer-header { padding: 20px; background: color-mix(in srgb, var(--layer-color) 10%, transparent); border-bottom: 2px solid var(--layer-color); display: flex; align-items: center; justify-content: space-between; }
+        .layer-title { font-size: 18px; font-weight: 700; color: var(--layer-color); }
+        .layer-subtitle { font-size: 12px; color: var(--text-muted); }
+        .layer-body { padding: 20px; }
+        .layer-features { margin-bottom: 16px; }
+        .layer-feature { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary); }
+        .layer-feature:last-child { border-bottom: none; }
+        .layer-feature-icon { color: var(--layer-color); }
+        .layer-services { display: flex; flex-wrap: wrap; gap: 6px; }
+        .layer-service { font-size: 10px; padding: 4px 10px; background: var(--bg-card); border-radius: 4px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HEALTH CHECK SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .health-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .health-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .health-card-icon { width: 36px; height: 36px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .health-card-title { font-size: 15px; font-weight: 600; }
+        .health-params { display: flex; flex-direction: column; gap: 10px; }
+        .health-param { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-card); border-radius: 6px; }
+        .health-param-name { font-size: 12px; color: var(--text-secondary); }
+        .health-param-value { font-size: 12px; font-weight: 600; color: var(--page-light); font-family: monospace; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CLOUD COMPARISON TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .compare-table th { text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { color: var(--text-muted); }
+        .compare-table th.aws { color: var(--aws-orange); }
+        .compare-table th.azure { color: var(--azure-blue); }
+        .compare-table th.gcp { color: var(--gcp-blue); }
+        .compare-table td { padding: 12px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .compare-table .feature { font-weight: 500; color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SSL/TLS SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .ssl-flow { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .ssl-flow-header { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .ssl-steps { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .ssl-step { flex: 1; text-align: center; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; }
+        .ssl-step-num { width: 28px; height: 28px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--page-light); margin: 0 auto 10px; }
+        .ssl-step-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .ssl-step-desc { font-size: 11px; color: var(--text-muted); }
+        .ssl-arrow { font-size: 18px; color: var(--page-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES - EXPANDED
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 18px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .practice-card:hover { border-color: var(--page-primary); }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RELATED PAGES
+        ═══════════════════════════════════════════════════════════════ */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-content { grid-template-columns: 1fr; }
+            .algo-grid { grid-template-columns: 1fr; }
+            .layer-compare { grid-template-columns: 1fr; }
+            .health-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: 1fr; }
+            .ssl-steps { flex-direction: column; }
+            .ssl-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat15-networking-overview.html">Networking</a>
+        <span class="sep">/</span>
+        <span class="current">Load Balancing</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🌐 Category 15</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat15-networking-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat15-p1-network-architecture.html"><span class="nav-icon">🏗️</span> 15.1 Network Architecture</a></li>
+            <li><a href="cat15-p2-load-balancing.html" class="active"><span class="nav-icon">⚖️</span> 15.2 Load Balancing</a></li>
+            <li><a href="cat15-p3-dns-cdn.html"><span class="nav-icon">🌍</span> 15.3 DNS & CDN</a></li>
+            <li><a href="cat15-p4-vpn-connectivity.html"><span class="nav-icon">🔒</span> 15.4 VPN & Connectivity</a></li>
+            <li><a href="cat15-p5-network-security.html"><span class="nav-icon">🛡️</span> 15.5 Network Security</a></li>
+            <li><a href="cat15-p6-service-mesh.html"><span class="nav-icon">🕸️</span> 15.6 Service Mesh</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#how-it-works"><span class="nav-icon">⚖️</span> How It Works</a></li>
+            <li><a href="#layers"><span class="nav-icon">📊</span> L4 vs L7</a></li>
+            <li><a href="#algorithms"><span class="nav-icon">🔄</span> Algorithms</a></li>
+            <li><a href="#health"><span class="nav-icon">💚</span> Health Checks</a></li>
+            <li><a href="#ssl"><span class="nav-icon">🔒</span> SSL/TLS</a></li>
+            <li><a href="#cloud-compare"><span class="nav-icon">☁️</span> Cloud Comparison</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">⚖️ Page 15.2</div>
+                <h1>Load Balancing</h1>
+                <p>Distribute traffic across healthy servers to ensure high availability, scalability, and optimal performance. Master L4/L7 balancing, algorithms, and health checks.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">99.99%</div>
+                    <div class="hero-metric-label">Availability SLA</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;1ms</div>
+                    <div class="hero-metric-label">Added Latency</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">1M+</div>
+                    <div class="hero-metric-label">Requests/sec</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Auto</div>
+                    <div class="hero-metric-label">Scaling</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Fundamentals of traffic distribution</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is Load Balancing?</h3>
+                    <p>Load balancing distributes incoming network traffic across multiple servers to ensure no single server bears too much load. This improves responsiveness, increases availability, and enables horizontal scaling.</p>
+                    <p>Modern load balancers do more than traffic distribution—they provide <strong>SSL termination</strong>, <strong>health monitoring</strong>, <strong>session persistence</strong>, and <strong>content-based routing</strong>.</p>
+                </div>
+                <div>
+                    <h3>Key Benefits</h3>
+                    <ul>
+                        <li><strong>High Availability</strong> — Route around failed servers automatically</li>
+                        <li><strong>Scalability</strong> — Add servers without changing client configuration</li>
+                        <li><strong>Performance</strong> — Distribute load evenly, avoid hotspots</li>
+                        <li><strong>Security</strong> — Hide backend topology, terminate SSL at edge</li>
+                        <li><strong>Flexibility</strong> — Route based on URL, headers, or content</li>
+                    </ul>
+                </div>
+                <div class="overview-full">
+                    <h3>Types of Load Balancers</h3>
+                    <p><strong>Hardware Load Balancers:</strong> Physical appliances (F5, Citrix) with dedicated ASICs. High performance but expensive and inflexible. Legacy in most cloud environments.</p>
+                    <p><strong>Software Load Balancers:</strong> Run on commodity hardware or VMs (NGINX, HAProxy, Envoy). Flexible, scriptable, and cost-effective. Dominant in modern architectures.</p>
+                    <p><strong>Cloud Load Balancers:</strong> Managed services (AWS ALB/NLB, Azure Load Balancer, GCP Load Balancer). Auto-scaling, integrated with cloud services, pay-per-use pricing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="module" id="how-it-works">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>How Load Balancing Works</h2>
+                    <p>Traffic distribution in action</p>
+                </div>
+            </div>
+
+            <div class="lb-diagram">
+                <div class="lb-diagram-header">
+                    <div class="lb-diagram-title">🔄 Load Balancer Traffic Flow</div>
+                    <div class="lb-toggle">
+                        <button class="lb-toggle-btn active">Round Robin</button>
+                        <button class="lb-toggle-btn">Least Connections</button>
+                    </div>
+                </div>
+                
+                <div class="lb-canvas">
+                    <!-- Clients -->
+                    <div class="lb-clients">
+                        <div class="lb-client"><span class="lb-client-icon">👤</span><span class="lb-client-label">User A</span></div>
+                        <div class="lb-client"><span class="lb-client-icon">👤</span><span class="lb-client-label">User B</span></div>
+                        <div class="lb-client"><span class="lb-client-icon">👤</span><span class="lb-client-label">User C</span></div>
+                        <div class="lb-client"><span class="lb-client-icon">👤</span><span class="lb-client-label">User D</span></div>
+                    </div>
+                    
+                    <!-- Arrows In -->
+                    <div class="lb-arrows">
+                        <svg class="lb-arrow-svg" viewBox="0 0 140 180" preserveAspectRatio="none">
+                            <path class="lb-path" stroke="#F59E0B" d="M 0 20 Q 70 20, 140 90" />
+                            <path class="lb-path" stroke="#F59E0B" d="M 0 60 Q 70 60, 140 90" />
+                            <path class="lb-path" stroke="#F59E0B" d="M 0 120 Q 70 120, 140 90" />
+                            <path class="lb-path" stroke="#F59E0B" d="M 0 160 Q 70 160, 140 90" />
+                            <circle r="4" fill="#F59E0B"><animateMotion dur="1.5s" repeatCount="indefinite" path="M 0 20 Q 70 20, 140 90" /></circle>
+                            <circle r="4" fill="#F59E0B"><animateMotion dur="1.8s" repeatCount="indefinite" path="M 0 60 Q 70 60, 140 90" /></circle>
+                            <circle r="4" fill="#F59E0B"><animateMotion dur="1.6s" repeatCount="indefinite" path="M 0 120 Q 70 120, 140 90" /></circle>
+                            <circle r="4" fill="#F59E0B"><animateMotion dur="2s" repeatCount="indefinite" path="M 0 160 Q 70 160, 140 90" /></circle>
+                        </svg>
+                    </div>
+                    
+                    <!-- Load Balancer -->
+                    <div class="lb-balancer">
+                        <span class="lb-balancer-icon">⚖️</span>
+                        <span class="lb-balancer-label">Load Balancer</span>
+                        <span class="lb-balancer-type">Application (L7)</span>
+                    </div>
+                    
+                    <!-- Arrows Out -->
+                    <div class="lb-arrows">
+                        <svg class="lb-arrow-svg" viewBox="0 0 140 180" preserveAspectRatio="none">
+                            <path class="lb-path" stroke="#10B981" d="M 0 90 Q 70 20, 140 20" />
+                            <path class="lb-path" stroke="#10B981" d="M 0 90 Q 70 60, 140 60" />
+                            <path class="lb-path inactive" stroke="#EF4444" d="M 0 90 Q 70 120, 140 120" />
+                            <path class="lb-path" stroke="#10B981" d="M 0 90 Q 70 160, 140 160" />
+                            <circle r="4" fill="#10B981"><animateMotion dur="1.4s" repeatCount="indefinite" path="M 0 90 Q 70 20, 140 20" /></circle>
+                            <circle r="4" fill="#10B981"><animateMotion dur="1.7s" repeatCount="indefinite" path="M 0 90 Q 70 60, 140 60" /></circle>
+                            <circle r="4" fill="#10B981"><animateMotion dur="1.5s" repeatCount="indefinite" path="M 0 90 Q 70 160, 140 160" /></circle>
+                        </svg>
+                    </div>
+                    
+                    <!-- Servers -->
+                    <div class="lb-servers">
+                        <div class="lb-server"><span class="lb-server-icon">📦</span><div class="lb-server-info"><div class="lb-server-name">Server 1</div><div class="lb-server-ip">10.0.1.10</div></div><div class="lb-server-status"></div></div>
+                        <div class="lb-server"><span class="lb-server-icon">📦</span><div class="lb-server-info"><div class="lb-server-name">Server 2</div><div class="lb-server-ip">10.0.1.11</div></div><div class="lb-server-status"></div></div>
+                        <div class="lb-server unhealthy"><span class="lb-server-icon">📦</span><div class="lb-server-info"><div class="lb-server-name">Server 3</div><div class="lb-server-ip">10.0.1.12</div></div><div class="lb-server-status"></div></div>
+                        <div class="lb-server"><span class="lb-server-icon">📦</span><div class="lb-server-info"><div class="lb-server-name">Server 4</div><div class="lb-server-ip">10.0.1.13</div></div><div class="lb-server-status"></div></div>
+                    </div>
+                </div>
+                
+                <div class="lb-stats">
+                    <div class="lb-stat"><div class="lb-stat-value">4</div><div class="lb-stat-label">Target Servers</div></div>
+                    <div class="lb-stat"><div class="lb-stat-value">3</div><div class="lb-stat-label">Healthy</div></div>
+                    <div class="lb-stat"><div class="lb-stat-value">12,450</div><div class="lb-stat-label">Requests/min</div></div>
+                    <div class="lb-stat"><div class="lb-stat-value">23ms</div><div class="lb-stat-label">Avg Latency</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- L4 vs L7 -->
+        <section class="module" id="layers">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Layer 4 vs Layer 7</h2>
+                    <p>Network vs Application load balancing</p>
+                </div>
+            </div>
+
+            <div class="layer-compare">
+                <div class="layer-card l4">
+                    <div class="layer-header">
+                        <div>
+                            <div class="layer-title">Layer 4 (Transport)</div>
+                            <div class="layer-subtitle">TCP/UDP Load Balancing</div>
+                        </div>
+                        <span style="font-size: 28px;">🔌</span>
+                    </div>
+                    <div class="layer-body">
+                        <div class="layer-features">
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Routes based on IP address and port</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Very fast—no packet inspection</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Protocol agnostic (any TCP/UDP)</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Lower latency than L7</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✗</span> No content-based routing</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✗</span> No SSL termination</div>
+                        </div>
+                        <div class="layer-services">
+                            <span class="layer-service">AWS NLB</span>
+                            <span class="layer-service">Azure LB</span>
+                            <span class="layer-service">GCP TCP/UDP LB</span>
+                            <span class="layer-service">HAProxy (TCP)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="layer-card l7">
+                    <div class="layer-header">
+                        <div>
+                            <div class="layer-title">Layer 7 (Application)</div>
+                            <div class="layer-subtitle">HTTP/HTTPS Load Balancing</div>
+                        </div>
+                        <span style="font-size: 28px;">🌐</span>
+                    </div>
+                    <div class="layer-body">
+                        <div class="layer-features">
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Routes based on URL, headers, cookies</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> SSL/TLS termination</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Content-based routing rules</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> WebSocket support</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✓</span> Request/response modification</div>
+                            <div class="layer-feature"><span class="layer-feature-icon">✗</span> Higher latency (inspection)</div>
+                        </div>
+                        <div class="layer-services">
+                            <span class="layer-service">AWS ALB</span>
+                            <span class="layer-service">Azure App GW</span>
+                            <span class="layer-service">GCP HTTP(S) LB</span>
+                            <span class="layer-service">NGINX</span>
+                            <span class="layer-service">Envoy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div class="overview-full">
+                    <h3>When to Use Each</h3>
+                    <p><strong>Use Layer 4</strong> for: High-throughput TCP/UDP services, non-HTTP protocols (databases, MQTT, gaming), when you need absolute minimum latency, or passthrough SSL (end-to-end encryption without termination).</p>
+                    <p><strong>Use Layer 7</strong> for: Web applications, APIs, microservices routing, when you need path-based routing (/api vs /static), A/B testing, canary deployments, or WAF integration.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ALGORITHMS -->
+        <section class="module" id="algorithms">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Load Balancing Algorithms</h2>
+                    <p>How traffic gets distributed</p>
+                </div>
+            </div>
+
+            <div class="algo-grid">
+                <div class="algo-card">
+                    <div class="algo-header">
+                        <div class="algo-name">Round Robin</div>
+                        <div class="algo-badge common">Common</div>
+                    </div>
+                    <div class="algo-desc">Requests distributed sequentially to each server in rotation. Simple and effective when servers have equal capacity.</div>
+                    <div class="algo-visual">
+                        <div class="algo-bar" style="height: 33%;"></div>
+                        <div class="algo-bar" style="height: 33%;"></div>
+                        <div class="algo-bar" style="height: 33%;"></div>
+                    </div>
+                    <div class="algo-pros">✓ Simple, predictable</div>
+                    <div class="algo-cons">✗ Ignores server load</div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-header">
+                        <div class="algo-name">Weighted Round Robin</div>
+                        <div class="algo-badge common">Common</div>
+                    </div>
+                    <div class="algo-desc">Like round robin but servers get traffic proportional to assigned weights. Use when servers have different capacities.</div>
+                    <div class="algo-visual">
+                        <div class="algo-bar" style="height: 60%;"></div>
+                        <div class="algo-bar" style="height: 30%;"></div>
+                        <div class="algo-bar" style="height: 10%;"></div>
+                    </div>
+                    <div class="algo-pros">✓ Accounts for capacity</div>
+                    <div class="algo-cons">✗ Manual weight tuning</div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-header">
+                        <div class="algo-name">Least Connections</div>
+                        <div class="algo-badge common">Common</div>
+                    </div>
+                    <div class="algo-desc">Routes to the server with fewest active connections. Great for long-lived connections or varying request complexity.</div>
+                    <div class="algo-visual">
+                        <div class="algo-bar" style="height: 80%;"></div>
+                        <div class="algo-bar" style="height: 20%;"></div>
+                        <div class="algo-bar" style="height: 50%;"></div>
+                    </div>
+                    <div class="algo-pros">✓ Adapts to load</div>
+                    <div class="algo-cons">✗ Overhead tracking</div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-header">
+                        <div class="algo-name">IP Hash</div>
+                        <div class="algo-badge advanced">Advanced</div>
+                    </div>
+                    <div class="algo-desc">Hash of client IP determines server. Same client always goes to same server—provides session affinity without cookies.</div>
+                    <div class="algo-visual">
+                        <div class="algo-bar" style="height: 45%;"></div>
+                        <div class="algo-bar" style="height: 35%;"></div>
+                        <div class="algo-bar" style="height: 40%;"></div>
+                    </div>
+                    <div class="algo-pros">✓ Session persistence</div>
+                    <div class="algo-cons">✗ Uneven with NAT</div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-header">
+                        <div class="algo-name">Least Response Time</div>
+                        <div class="algo-badge advanced">Advanced</div>
+                    </div>
+                    <div class="algo-desc">Routes to server with lowest response time and fewest connections. Requires active health monitoring.</div>
+                    <div class="algo-visual">
+                        <div class="algo-bar" style="height: 70%;"></div>
+                        <div class="algo-bar" style="height: 15%;"></div>
+                        <div class="algo-bar" style="height: 35%;"></div>
+                    </div>
+                    <div class="algo-pros">✓ Performance optimized</div>
+                    <div class="algo-cons">✗ Complex monitoring</div>
+                </div>
+                
+                <div class="algo-card">
+                    <div class="algo-header">
+                        <div class="algo-name">Random</div>
+                        <div class="algo-badge advanced">Advanced</div>
+                    </div>
+                    <div class="algo-desc">Randomly selects a server. Statistically distributes evenly over time. Simple, no state needed.</div>
+                    <div class="algo-visual">
+                        <div class="algo-bar" style="height: 28%;"></div>
+                        <div class="algo-bar" style="height: 42%;"></div>
+                        <div class="algo-bar" style="height: 30%;"></div>
+                    </div>
+                    <div class="algo-pros">✓ No coordination</div>
+                    <div class="algo-cons">✗ Short-term variance</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HEALTH CHECKS -->
+        <section class="module" id="health">
+            <div class="module-header">
+                <div class="module-icon">💚</div>
+                <div class="module-info">
+                    <h2>Health Checks</h2>
+                    <p>Monitoring target availability</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-bottom: 24px;">
+                <div>
+                    <h3>Why Health Checks Matter</h3>
+                    <p>Health checks verify that backend servers can handle requests. Without them, the load balancer would send traffic to crashed or overloaded servers, causing failures.</p>
+                    <p>Configure checks to detect both <strong>server availability</strong> (is it running?) and <strong>application health</strong> (is it working correctly?).</p>
+                </div>
+                <div>
+                    <h3>Types of Health Checks</h3>
+                    <ul>
+                        <li><strong>TCP</strong> — Connection succeeds (basic liveness)</li>
+                        <li><strong>HTTP</strong> — Returns expected status code (200)</li>
+                        <li><strong>HTTPS</strong> — HTTP over TLS</li>
+                        <li><strong>gRPC</strong> — gRPC health protocol</li>
+                        <li><strong>Custom</strong> — Application-specific endpoints</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="health-grid">
+                <div class="health-card">
+                    <div class="health-card-header">
+                        <div class="health-card-icon">🔍</div>
+                        <div class="health-card-title">HTTP Health Check</div>
+                    </div>
+                    <div class="health-params">
+                        <div class="health-param">
+                            <span class="health-param-name">Protocol</span>
+                            <span class="health-param-value">HTTP</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Path</span>
+                            <span class="health-param-value">/health</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Port</span>
+                            <span class="health-param-value">8080</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Interval</span>
+                            <span class="health-param-value">30s</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Timeout</span>
+                            <span class="health-param-value">5s</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Healthy Threshold</span>
+                            <span class="health-param-value">2 checks</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Unhealthy Threshold</span>
+                            <span class="health-param-value">3 checks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="health-card">
+                    <div class="health-card-header">
+                        <div class="health-card-icon">📋</div>
+                        <div class="health-card-title">Health Endpoint Design</div>
+                    </div>
+                    <div class="health-params">
+                        <div class="health-param">
+                            <span class="health-param-name">Shallow Check</span>
+                            <span class="health-param-value">/health (fast)</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Deep Check</span>
+                            <span class="health-param-value">/health/ready</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Liveness</span>
+                            <span class="health-param-value">/health/live</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Success Response</span>
+                            <span class="health-param-value">200 OK</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Failure Response</span>
+                            <span class="health-param-value">503 Unavailable</span>
+                        </div>
+                        <div class="health-param">
+                            <span class="health-param-name">Include Dependencies</span>
+                            <span class="health-param-value">DB, Cache, APIs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SSL/TLS -->
+        <section class="module" id="ssl">
+            <div class="module-header">
+                <div class="module-icon">🔒</div>
+                <div class="module-info">
+                    <h2>SSL/TLS Termination</h2>
+                    <p>Offloading encryption at the load balancer</p>
+                </div>
+            </div>
+
+            <div class="ssl-flow">
+                <div class="ssl-flow-header">🔐 SSL Termination Flow</div>
+                <div class="ssl-steps">
+                    <div class="ssl-step">
+                        <div class="ssl-step-num">1</div>
+                        <div class="ssl-step-title">Client Request</div>
+                        <div class="ssl-step-desc">HTTPS (encrypted)</div>
+                    </div>
+                    <span class="ssl-arrow">→</span>
+                    <div class="ssl-step">
+                        <div class="ssl-step-num">2</div>
+                        <div class="ssl-step-title">Load Balancer</div>
+                        <div class="ssl-step-desc">Decrypt & inspect</div>
+                    </div>
+                    <span class="ssl-arrow">→</span>
+                    <div class="ssl-step">
+                        <div class="ssl-step-num">3</div>
+                        <div class="ssl-step-title">Backend</div>
+                        <div class="ssl-step-desc">HTTP or re-encrypt</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Termination Modes</h3>
+                    <ul>
+                        <li><strong>SSL Termination</strong> — Decrypt at LB, HTTP to backends (common)</li>
+                        <li><strong>SSL Passthrough</strong> — Forward encrypted to backends (L4 only)</li>
+                        <li><strong>SSL Re-encryption</strong> — Decrypt at LB, re-encrypt to backends</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Certificate Management</h3>
+                    <ul>
+                        <li><strong>AWS</strong> — ACM (free, auto-renewal)</li>
+                        <li><strong>Azure</strong> — Key Vault, App Service Certs</li>
+                        <li><strong>GCP</strong> — Google-managed SSL, Certificate Manager</li>
+                        <li><strong>Self-managed</strong> — Let's Encrypt, commercial CAs</li>
+                    </ul>
+                </div>
+                <div class="overview-full">
+                    <h3>Best Practices</h3>
+                    <p>Use <strong>TLS 1.3</strong> minimum (disable TLS 1.0/1.1). Enable <strong>HSTS</strong> headers. Use <strong>strong cipher suites</strong> (ECDHE, AES-GCM). Implement <strong>OCSP stapling</strong> for faster validation. Consider <strong>mutual TLS (mTLS)</strong> for service-to-service communication.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLOUD COMPARISON -->
+        <section class="module" id="cloud-compare">
+            <div class="module-header">
+                <div class="module-icon">☁️</div>
+                <div class="module-info">
+                    <h2>Cloud Load Balancers</h2>
+                    <p>Comparing AWS, Azure, and GCP offerings</p>
+                </div>
+            </div>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th class="aws">AWS</th>
+                        <th class="azure">Azure</th>
+                        <th class="gcp">GCP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature">L7 Load Balancer</td>
+                        <td>Application LB (ALB)</td>
+                        <td>Application Gateway</td>
+                        <td>HTTP(S) Load Balancer</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">L4 Load Balancer</td>
+                        <td>Network LB (NLB)</td>
+                        <td>Azure Load Balancer</td>
+                        <td>TCP/UDP Load Balancer</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Global Load Balancing</td>
+                        <td>Global Accelerator</td>
+                        <td>Front Door, Traffic Manager</td>
+                        <td>Global HTTP(S) LB</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">WebSocket Support</td>
+                        <td>ALB ✓</td>
+                        <td>App Gateway ✓</td>
+                        <td>HTTP(S) LB ✓</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">WAF Integration</td>
+                        <td>AWS WAF (separate)</td>
+                        <td>Built into App Gateway</td>
+                        <td>Cloud Armor</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Auto Scaling</td>
+                        <td>Fully managed</td>
+                        <td>Fully managed</td>
+                        <td>Fully managed</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Static IP</td>
+                        <td>NLB only</td>
+                        <td>Standard LB</td>
+                        <td>Premium Tier</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">gRPC Support</td>
+                        <td>ALB ✓</td>
+                        <td>App Gateway v2 ✓</td>
+                        <td>HTTP(S) LB ✓</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective load balancing</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Use Multiple Availability Zones</h4>
+                        <p>Deploy targets across at least 2-3 AZs for fault tolerance. Enable cross-zone load balancing to distribute traffic evenly. A single-AZ failure should not take down your application. Test failover scenarios regularly.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Implement Proper Health Checks</h4>
+                        <p>Use deep health checks that verify application functionality, database connectivity, and downstream dependencies—not just TCP port availability. Return 503 if the app can't serve traffic. Set intervals (30s) and thresholds (2-3 failures) appropriately.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Enable Connection Draining</h4>
+                        <p>Allow in-flight requests to complete before removing targets during deployments or scale-in. Set drain timeout (default 300s) based on your longest request duration. Prevents 5xx errors during rolling updates and auto-scaling events.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Configure Appropriate Timeouts</h4>
+                        <p>Set idle timeout based on application needs (default 60s). For long-polling or WebSockets, increase to 3600s. Configure backend response timeout shorter than client timeout. Use keep-alive for HTTP/1.1 connection reuse.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Use Sticky Sessions Sparingly</h4>
+                        <p>Prefer stateless backends with external session stores (Redis, DynamoDB). If stickiness is required, use application-controlled cookies over LB-generated ones. Duration-based stickiness can cause uneven load distribution and complicate scaling.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Monitor and Alert Proactively</h4>
+                        <p>Track key metrics: 5xx error rate (&lt;0.1%), latency p99 (&lt;500ms), healthy host count, request count, and connection count. Set up alerts for anomalies. Use access logs for debugging. Create dashboards for real-time visibility.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Pre-warm for Traffic Spikes</h4>
+                        <p>Cloud LBs scale automatically but need time. Contact AWS/GCP/Azure support 48hrs before expected traffic surges (product launches, marketing events, sales). Provide expected RPS, duration, and traffic pattern for optimal pre-warming.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Use TLS 1.3 and Strong Ciphers</h4>
+                        <p>Enable TLS 1.3 for faster handshakes and better security. Disable TLS 1.0/1.1 and weak ciphers. Use managed certificates (ACM, Let's Encrypt) with auto-renewal. Enable HSTS headers. Consider OCSP stapling for faster validation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered load balancer configuration</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>⚖️ LoadBalancerAdvisor</h3>
+                    <p>Analyzes traffic patterns, latency requirements, and application architecture to recommend optimal load balancer configuration. Generates Terraform code and monitoring dashboards.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Traffic pattern analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> Algorithm recommendation</div>
+                        <div class="agent-capability"><span class="capability-icon">💚</span> Health check configuration</div>
+                        <div class="agent-capability"><span class="capability-icon">🔒</span> SSL/TLS optimization</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Terraform code generation</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">lb_advisor_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Initialize load balancer tools</span>
+traffic_analyzer = TrafficAnalyzerTool()
+lb_recommender = LBRecommenderTool()
+terraform_gen = TerraformGeneratorTool()
+
+<span class="code-comment"># Load Balancer Advisor Agent</span>
+lb_advisor = Agent(
+    role=<span class="code-string">"Load Balancer Specialist"</span>,
+    goal=<span class="code-string">"""Recommend optimal load balancer 
+    configuration for the workload."""</span>,
+    tools=[traffic_analyzer, lb_recommender, terraform_gen],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Configuration Task</span>
+config_task = Task(
+    description=<span class="code-string">"""
+    1. Analyze traffic patterns and requirements
+    2. Recommend L4 vs L7 load balancer
+    3. Select optimal algorithm
+    4. Configure health checks
+    5. Set up SSL/TLS termination
+    6. Generate Terraform configuration
+    """</span>,
+    agent=lb_advisor
+)
+
+crew = Crew(agents=[lb_advisor], tasks=[config_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring networking</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat15-p1-network-architecture.html" class="related-card">
+                    <div class="related-icon">🏗️</div>
+                    <div class="related-title">Network Architecture</div>
+                    <div class="related-desc">VPC design, subnets, and routing tables</div>
+                </a>
+                <a href="cat15-p3-dns-cdn.html" class="related-card">
+                    <div class="related-icon">🌍</div>
+                    <div class="related-title">DNS & CDN</div>
+                    <div class="related-desc">Global traffic routing and content delivery</div>
+                </a>
+                <a href="cat15-p6-service-mesh.html" class="related-card">
+                    <div class="related-icon">🕸️</div>
+                    <div class="related-title">Service Mesh</div>
+                    <div class="related-desc">Istio, Linkerd, and microservices routing</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat15-p1-network-architecture.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">15.1 Network Architecture</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 15</div>
+        <a href="cat15-p3-dns-cdn.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">15.3 DNS & CDN</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

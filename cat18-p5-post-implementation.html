@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Implementation Review | 18.5 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        .framework-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .framework-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .framework-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .framework-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .framework-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .concept-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .concept-icon { font-size: 36px; margin-bottom: var(--space-md); }
+        .concept-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .concept-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .table-container table { width: 100%; border-collapse: collapse; }
+        .table-container th { background: var(--bg-card-alt); padding: var(--space-md) var(--space-lg); text-align: left; font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .table-container td { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .table-container tr:last-child td { border-bottom: none; }
+        .table-container tr:hover td { background: var(--bg-hover); }
+        .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--radius-full); font-size: var(--font-xs); font-weight: 600; }
+        .status-badge.achieved { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+        .status-badge.partial { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .status-badge.missed { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .status-badge.tracking { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+        .status-badge.exceeded { background: rgba(16, 185, 129, 0.3); color: #6EE7B7; }
+        .phase-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .phase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; }
+        .phase-card.active { border-color: var(--cat-primary); background: var(--cat-glow); }
+        .phase-card.complete { border-color: var(--success-green); }
+        .phase-number { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: 2px; }
+        .phase-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .phase-timing { font-size: var(--font-xs); color: var(--text-muted); }
+        .phase-card.complete .phase-number { color: var(--success-green); }
+        .phase-card.active .phase-number { color: var(--cat-light); }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .kpi-card.green::before { background: var(--success-green); }
+        .kpi-card.yellow::before { background: var(--warning-yellow); }
+        .kpi-card.red::before { background: var(--danger-red); }
+        .kpi-card.blue::before { background: var(--blue); }
+        .kpi-value { font-size: var(--font-xl); font-weight: 700; margin-bottom: var(--space-xs); }
+        .kpi-card.green .kpi-value { color: var(--success-green); }
+        .kpi-card.yellow .kpi-value { color: var(--warning-yellow); }
+        .kpi-card.red .kpi-value { color: var(--danger-red); }
+        .kpi-card.blue .kpi-value { color: var(--blue); }
+        .kpi-label { font-size: var(--font-sm); color: var(--text-muted); margin-bottom: var(--space-sm); }
+        .kpi-trend { font-size: var(--font-xs); display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .kpi-trend.up { color: var(--success-green); }
+        .kpi-trend.down { color: var(--danger-red); }
+        .lessons-container { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .lessons-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .lessons-card.success { border-color: var(--success-green); }
+        .lessons-card.improve { border-color: var(--warning-yellow); }
+        .lessons-header { padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-color); }
+        .lessons-card.success .lessons-header { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent); }
+        .lessons-card.improve .lessons-header { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent); }
+        .lessons-title { font-size: var(--font-base); font-weight: 600; }
+        .lessons-card.success .lessons-title { color: var(--success-green); }
+        .lessons-card.improve .lessons-title { color: var(--warning-yellow); }
+        .lessons-body { padding: var(--space-lg); }
+        .lessons-item { display: flex; align-items: flex-start; gap: var(--space-md); padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); }
+        .lessons-item:last-child { border-bottom: none; }
+        .lessons-icon { font-size: 16px; margin-top: 2px; }
+        .lessons-text { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        .lessons-text strong { color: var(--text-primary); }
+        .survey-results { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .survey-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .survey-question { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-md); }
+        .survey-bar-container { margin-bottom: var(--space-sm); }
+        .survey-bar-label { display: flex; justify-content: space-between; font-size: var(--font-xs); color: var(--text-muted); margin-bottom: 4px; }
+        .survey-bar { height: 20px; background: var(--bg-card-alt); border-radius: var(--radius-sm); overflow: hidden; }
+        .survey-bar-fill { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: var(--font-xs); color: #fff; font-weight: 600; }
+        .debt-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-md); }
+        .debt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
+        .debt-title { font-size: var(--font-sm); font-weight: 600; }
+        .debt-severity { font-size: var(--font-xs); padding: 2px 8px; border-radius: var(--radius-full); }
+        .debt-severity.high { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .debt-severity.medium { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .debt-severity.low { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+        .debt-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-sm); }
+        .debt-meta { display: flex; gap: var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); }
+        .risk-item { display: flex; align-items: flex-start; gap: var(--space-md); padding: var(--space-md); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: var(--space-md); }
+        .risk-indicator { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+        .risk-indicator.closed { background: var(--success-green); }
+        .risk-indicator.mitigated { background: var(--blue); }
+        .risk-indicator.accepted { background: var(--warning-yellow); }
+        .risk-indicator.transferred { background: var(--violet); }
+        .risk-content { flex: 1; }
+        .risk-title { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .risk-detail { font-size: var(--font-xs); color: var(--text-muted); }
+        .closure-checklist { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .closure-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .closure-title { font-size: var(--font-base); font-weight: 600; }
+        .closure-body { padding: var(--space-lg); }
+        .closure-category { margin-bottom: var(--space-lg); }
+        .closure-category:last-child { margin-bottom: 0; }
+        .closure-category-title { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); margin-bottom: var(--space-md); }
+        .closure-items { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
+        .closure-item { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; }
+        .closure-check { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .closure-check.done { background: var(--success-green); color: #fff; }
+        .closure-check.pending { background: var(--bg-card-alt); border: 1px solid var(--border-color); }
+        .value-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .value-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .value-title { font-size: var(--font-sm); font-weight: 600; }
+        .value-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .value-metrics { padding: var(--space-lg); display: grid; gap: var(--space-md); }
+        .value-metric { display: grid; grid-template-columns: 120px 1fr 80px; align-items: center; gap: var(--space-md); }
+        .value-metric-label { font-size: var(--font-sm); color: var(--text-secondary); }
+        .value-metric-bar { height: 8px; background: var(--bg-card-alt); border-radius: var(--radius-full); overflow: hidden; }
+        .value-metric-fill { height: 100%; border-radius: var(--radius-full); }
+        .value-metric-fill.low { background: var(--success-green); }
+        .value-metric-fill.medium { background: var(--warning-yellow); }
+        .value-metric-fill.high { background: var(--cat-primary); }
+        .value-metric-fill.critical { background: var(--danger-red); }
+        .value-metric-value { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); text-align: right; }
+        .proscons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .proscons-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .proscons-card.pros { border-color: var(--success-green); }
+        .proscons-card.cons { border-color: var(--danger-red); }
+        .proscons-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .proscons-card.pros .proscons-title { color: var(--success-green); }
+        .proscons-card.cons .proscons-title { color: var(--danger-red); }
+        .proscons-list { list-style: none; }
+        .proscons-list li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) 0; line-height: 1.6; border-bottom: 1px solid var(--border-color); }
+        .proscons-list li:last-child { border-bottom: none; }
+        .proscons-list li strong { color: var(--text-primary); }
+        .callout { background: linear-gradient(135deg, var(--cat-glow), transparent); border: 1px solid var(--cat-dark); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-xl); }
+        .callout-title { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .callout-text { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .callout.warning { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), transparent); border-color: var(--danger-red); }
+        .callout.warning .callout-title { color: var(--danger-red); }
+        .callout.info { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent); border-color: var(--blue); }
+        .callout.info .callout-title { color: var(--blue); }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); border-right: 1px solid var(--border-color); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); font-size: 10px; }
+        .code-panel { background: var(--bg-dark); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0 var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-filename { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: var(--space-lg); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-function { color: var(--cat-light); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .concepts-grid, .lessons-container, .proscons-grid, .agent-grid, .survey-results { grid-template-columns: 1fr; }
+            .kpi-grid, .phase-cards { grid-template-columns: repeat(2, 1fr); }
+            .closure-items { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat18-implementation-overview.html">Implementation</a>
+        <span class="sep">/</span>
+        <span class="current">Post-Implementation Review</span>
+    </div>
+</header>
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 18</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat18-implementation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat18-p1-go-live-planning.html"><span class="nav-icon">📋</span> 18.1 Go-Live Planning</a></li>
+            <li><a href="cat18-p2-cutover-management.html"><span class="nav-icon">⚡</span> 18.2 Cutover Management</a></li>
+            <li><a href="cat18-p3-hypercare.html"><span class="nav-icon">🩺</span> 18.3 Hypercare & Support</a></li>
+            <li><a href="cat18-p4-wave-rollout.html"><span class="nav-icon">🌊</span> 18.4 Wave Rollout</a></li>
+            <li><a href="cat18-p5-post-implementation.html" class="active"><span class="nav-icon">📊</span> 18.5 Post-Implementation</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#phases"><span class="nav-icon">📅</span> PIR Phases</a></li>
+            <li><a href="#benefits"><span class="nav-icon">💰</span> Benefits Realization</a></li>
+            <li><a href="#kpis"><span class="nav-icon">📈</span> Success Metrics</a></li>
+            <li><a href="#feedback"><span class="nav-icon">💬</span> Stakeholder Feedback</a></li>
+            <li><a href="#lessons"><span class="nav-icon">📝</span> Lessons Learned</a></li>
+            <li><a href="#debt"><span class="nav-icon">🔧</span> Technical Debt</a></li>
+            <li><a href="#risk"><span class="nav-icon">⚠️</span> Risk Closeout</a></li>
+            <li><a href="#continuous"><span class="nav-icon">🔄</span> Continuous Improvement</a></li>
+            <li><a href="#handover"><span class="nav-icon">🤝</span> Operations Handover</a></li>
+            <li><a href="#closure"><span class="nav-icon">✅</span> Project Closure</a></li>
+            <li><a href="#celebration"><span class="nav-icon">🎉</span> Recognition</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+<div class="main-wrapper">
+    <div class="main-content">
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📊 Page 18.5</span>
+                <h1>Post-Implementation Review</h1>
+                <p>Comprehensive evaluation of project outcomes, benefits realization, lessons learned, and formal closure. The critical final phase that transforms project experience into organizational wisdom.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">30-90 days</div><div class="hero-metric-label">PIR Window</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Benefits Realized</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">24</div><div class="hero-metric-label">Lessons Captured</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100%</div><div class="hero-metric-label">Handover Complete</div></div>
+            </div>
+        </section>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <section class="module" id="summary">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Executive Summary</h2>
+                    <p>High-level project outcomes at a glance</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The Enterprise Platform Modernization project has <strong>successfully achieved 85% of projected benefits</strong> within 60 days of go-live. User adoption exceeds target at 87%, system stability is strong with 99.7% uptime, and stakeholder satisfaction is positive with NPS +38. The project came in under budget (-2.4%) despite a 4-week schedule extension for quality. Key risks have been mitigated and the system is ready for full operations handover.</p>
+            </div>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card green"><div class="kpi-value">✓</div><div class="kpi-label">Go-Live</div><div class="kpi-trend">Sept 15, 2025</div></div>
+                <div class="kpi-card green"><div class="kpi-value">$4.1M</div><div class="kpi-label">Final Cost</div><div class="kpi-trend up">2.4% under budget</div></div>
+                <div class="kpi-card yellow"><div class="kpi-value">11 mo</div><div class="kpi-label">Duration</div><div class="kpi-trend">+1 month for quality</div></div>
+                <div class="kpi-card green"><div class="kpi-value">95%</div><div class="kpi-label">Scope Delivered</div><div class="kpi-trend">3 items → Phase 2</div></div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Success Criteria</th><th>Target</th><th>Actual</th><th>Status</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>System Go-Live</strong></td><td>Sept 1, 2025</td><td>Sept 15, 2025</td><td><span class="status-badge partial">+2 weeks</span></td><td>Extended for UAT quality</td></tr>
+                        <tr><td><strong>User Adoption</strong></td><td>&gt;80%</td><td>87%</td><td><span class="status-badge achieved">Exceeded</span></td><td>Champions program effective</td></tr>
+                        <tr><td><strong>System Uptime</strong></td><td>&gt;99.5%</td><td>99.7%</td><td><span class="status-badge achieved">Exceeded</span></td><td>Strong infrastructure</td></tr>
+                        <tr><td><strong>Benefits Realized</strong></td><td>&gt;75%</td><td>85%</td><td><span class="status-badge achieved">Exceeded</span></td><td>Ahead of projections</td></tr>
+                        <tr><td><strong>User Satisfaction</strong></td><td>NPS &gt;+30</td><td>NPS +38</td><td><span class="status-badge achieved">Exceeded</span></td><td>Trending positive</td></tr>
+                        <tr><td><strong>Budget</strong></td><td>≤$4.2M</td><td>$4.1M</td><td><span class="status-badge achieved">Under</span></td><td>Scope discipline</td></tr>
+                        <tr><td><strong>Zero Critical Defects</strong></td><td>0</td><td>0</td><td><span class="status-badge achieved">Met</span></td><td>Strong testing</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="proscons-grid">
+                <div class="proscons-card pros"><div class="proscons-title">✅ Key Achievements</div><ul class="proscons-list"><li><strong>Successful migration:</strong> 2.4M records migrated with 99.7% accuracy</li><li><strong>Zero critical defects:</strong> No P1 issues in production</li><li><strong>Strong adoption:</strong> 87% of users active within 30 days</li><li><strong>Under budget:</strong> $100K returned to portfolio</li><li><strong>Positive feedback:</strong> 77% user satisfaction rate</li><li><strong>Effective support:</strong> Average ticket resolution under 18 hours</li></ul></div>
+                <div class="proscons-card cons"><div class="proscons-title">⚠️ Areas for Attention</div><ul class="proscons-list"><li><strong>Training completion:</strong> 73% vs 90% target - need push</li><li><strong>Error rate reduction:</strong> 58% vs 75% target - more work needed</li><li><strong>Performance:</strong> P95 response at 2.3s vs 2.0s target</li><li><strong>3 features deferred:</strong> Advanced reporting, bulk actions, dark mode</li><li><strong>Technical debt:</strong> 12 sprint-equivalents accumulated</li><li><strong>2 partners incomplete:</strong> Legacy integrations still active</li></ul></div>
+            </div>
+            
+            <div class="callout"><div class="callout-title">🎯 Recommendation</div><div class="callout-text"><strong>Project Status: SUCCESS</strong> - Proceed with formal closure. The project has achieved its primary objectives and is delivering value. Handover to operations is complete. Recommend allocating Phase 2 budget for deferred features and technical debt reduction. Schedule benefits review at 6-month and 12-month marks.</div></div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- PIR PHASES -->
+        <section class="module" id="phases">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Post-Implementation Phases</h2>
+                    <p>The complete PIR lifecycle from stabilization to closure</p>
+                </div>
+            </div>
+            <div class="description-block">
+                <p>Post-implementation is not a single event but a <strong>structured process spanning 30-90 days</strong>. It begins with stabilization immediately after go-live and concludes with formal project closure. Each phase has specific objectives, deliverables, and success criteria that must be met before progressing to the next phase.</p>
+            </div>
+            <div class="phase-cards">
+                <div class="phase-card complete"><div class="phase-number">Phase 1</div><div class="phase-name">Stabilization</div><div class="phase-timing">Days 1-14</div></div>
+                <div class="phase-card complete"><div class="phase-number">Phase 2</div><div class="phase-name">Optimization</div><div class="phase-timing">Days 15-30</div></div>
+                <div class="phase-card active"><div class="phase-number">Phase 3</div><div class="phase-name">Evaluation</div><div class="phase-timing">Days 30-60</div></div>
+                <div class="phase-card"><div class="phase-number">Phase 4</div><div class="phase-name">Transition</div><div class="phase-timing">Days 60-75</div></div>
+                <div class="phase-card"><div class="phase-number">Phase 5</div><div class="phase-name">Closure</div><div class="phase-timing">Days 75-90</div></div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Phase</th><th>Primary Focus</th><th>Key Activities</th><th>Deliverables</th><th>Exit Criteria</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>1. Stabilization</strong></td><td>System stability and critical issue resolution</td><td>Bug fixes, performance tuning, user support, monitoring</td><td>Stability report, critical issue log, performance baseline</td><td>Zero P1 issues, &lt;5 P2 issues, SLA &gt;95%</td></tr>
+                        <tr><td><strong>2. Optimization</strong></td><td>Fine-tuning and efficiency improvements</td><td>Process refinement, training reinforcement, KB expansion</td><td>Optimization log, updated training, KB articles</td><td>Adoption &gt;80%, support volume declining</td></tr>
+                        <tr><td><strong>3. Evaluation</strong></td><td>Measuring outcomes against objectives</td><td>Benefits tracking, stakeholder surveys, data analysis</td><td>Benefits report, feedback summary, PIR draft</td><td>All metrics collected, feedback gathered</td></tr>
+                        <tr><td><strong>4. Transition</strong></td><td>Knowledge transfer to operations</td><td>Documentation handover, KT sessions, support transition</td><td>Runbooks, KT certificates, transition plan</td><td>Ops handling 95% of tickets independently</td></tr>
+                        <tr><td><strong>5. Closure</strong></td><td>Formal project completion</td><td>Final PIR, lessons learned, financial closeout, celebration</td><td>Final PIR report, lessons register, closure sign-off</td><td>Sponsor sign-off, resources released</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="framework-container">
+                <div class="framework-header"><div class="framework-title">📅 Post-Implementation Timeline</div><div class="framework-badge">90-Day Journey</div></div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 200" style="width: 100%; height: auto;">
+                        <rect x="40" y="80" width="770" height="4" rx="2" fill="#2a2a3e"/>
+                        <rect x="40" y="80" width="120" height="4" rx="2" fill="#10B981"/>
+                        <rect x="160" y="80" width="120" height="4" rx="2" fill="#10B981"/>
+                        <rect x="280" y="80" width="200" height="4" rx="2" fill="#F59E0B"><animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/></rect>
+                        <g transform="translate(40, 60)"><circle r="8" fill="#10B981"/><text x="0" y="-20" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Day 1</text><text x="0" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Go-Live</text></g>
+                        <g transform="translate(160, 60)"><circle r="8" fill="#10B981"/><text x="0" y="-20" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Day 14</text><text x="0" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Stable</text></g>
+                        <g transform="translate(280, 60)"><circle r="8" fill="#10B981"/><text x="0" y="-20" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Day 30</text><text x="0" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Optimized</text></g>
+                        <g transform="translate(480, 60)"><circle r="8" fill="#F59E0B"><animate attributeName="r" values="8;10;8" dur="1s" repeatCount="indefinite"/></circle><text x="0" y="-20" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">Day 60</text><text x="0" y="45" text-anchor="middle" fill="#FBBF24" font-size="9">NOW</text></g>
+                        <g transform="translate(620, 60)"><circle r="8" fill="#2a2a3e" stroke="#3B82F6" stroke-width="2"/><text x="0" y="-20" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">Day 75</text><text x="0" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Transition</text></g>
+                        <g transform="translate(810, 60)"><circle r="8" fill="#2a2a3e" stroke="#8B5CF6" stroke-width="2"/><text x="0" y="-20" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">Day 90</text><text x="0" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Closure</text></g>
+                        <text x="100" y="140" text-anchor="middle" fill="#10B981" font-size="9">STABILIZATION</text>
+                        <text x="220" y="140" text-anchor="middle" fill="#10B981" font-size="9">OPTIMIZATION</text>
+                        <text x="380" y="140" text-anchor="middle" fill="#F59E0B" font-size="9">EVALUATION</text>
+                        <text x="550" y="140" text-anchor="middle" fill="#6a6a7a" font-size="9">TRANSITION</text>
+                        <text x="715" y="140" text-anchor="middle" fill="#6a6a7a" font-size="9">CLOSURE</text>
+                        <g transform="translate(40, 165)"><rect width="770" height="25" rx="4" fill="#1a1a2e"/><text x="100" y="17" text-anchor="middle" fill="#6a6a7a" font-size="8">Hypercare ends</text><text x="280" y="17" text-anchor="middle" fill="#6a6a7a" font-size="8">30-day review</text><text x="480" y="17" text-anchor="middle" fill="#FBBF24" font-size="8">PIR Report Due</text><text x="680" y="17" text-anchor="middle" fill="#6a6a7a" font-size="8">Final sign-off</text></g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">🔧</div><div class="concept-title">Phase 1: Stabilization</div><div class="concept-desc"><strong>Days 1-14:</strong> Focus on system stability and critical issue resolution. Bug fixes, performance tuning, user support escalations, and 24/7 monitoring. Exit: Zero P1 issues, SLA &gt;95%.</div></div>
+                <div class="concept-card"><div class="concept-icon">⚡</div><div class="concept-title">Phase 2: Optimization</div><div class="concept-desc"><strong>Days 15-30:</strong> Fine-tuning processes and reinforcing adoption. Training refreshers, knowledge base expansion, workflow optimization. Exit: Adoption &gt;80%, declining support volume.</div></div>
+                <div class="concept-card"><div class="concept-icon">📊</div><div class="concept-title">Phase 3: Evaluation</div><div class="concept-desc"><strong>Days 30-60:</strong> Measuring outcomes against objectives. Benefits tracking, stakeholder surveys, data analysis, PIR draft preparation. Exit: All metrics collected.</div></div>
+                <div class="concept-card"><div class="concept-icon">🤝</div><div class="concept-title">Phase 4: Transition</div><div class="concept-desc"><strong>Days 60-75:</strong> Knowledge transfer to operations. Documentation handover, KT sessions, shadow period, support transition. Exit: Ops handling 95% independently.</div></div>
+                <div class="concept-card"><div class="concept-icon">✅</div><div class="concept-title">Phase 5: Closure</div><div class="concept-desc"><strong>Days 75-90:</strong> Formal project completion. Final PIR presentation, lessons learned session, financial closeout, celebration. Exit: Sponsor sign-off received.</div></div>
+                <div class="concept-card"><div class="concept-icon">📋</div><div class="concept-title">PIR Report</div><div class="concept-desc"><strong>Key deliverable:</strong> Comprehensive document covering benefits realized, lessons learned, stakeholder feedback, technical debt, risk closeout, and improvement recommendations.</div></div>
+            </div>
+            
+            <div class="callout"><div class="callout-title">⏰ PIR Timing Best Practices</div><div class="callout-text"><strong>30-Day Review:</strong> Quick health check, initial metrics, early lessons. <strong>60-Day Review:</strong> Comprehensive PIR with benefits analysis. <strong>90-Day Review:</strong> Final closeout, formal sign-off, celebration. Don't wait too long—details fade and team disperses. Schedule PIR sessions before go-live to ensure attendance.</div></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>PIR Activity</th><th>Participants</th><th>Duration</th><th>Deliverables</th><th>Timing</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Data Collection</strong></td><td>PM, BA, Tech Lead</td><td>2 weeks</td><td>Metrics report, survey results</td><td>Days 30-44</td></tr>
+                        <tr><td><strong>Stakeholder Interviews</strong></td><td>PM, Change Lead</td><td>1 week</td><td>Interview notes, themes</td><td>Days 40-47</td></tr>
+                        <tr><td><strong>Technical Review</strong></td><td>Tech Lead, Architects</td><td>3 days</td><td>Technical debt assessment</td><td>Days 45-48</td></tr>
+                        <tr><td><strong>Lessons Workshop</strong></td><td>Full project team</td><td>3 hours</td><td>Lessons learned register</td><td>Day 50</td></tr>
+                        <tr><td><strong>Draft PIR Report</strong></td><td>PM</td><td>3 days</td><td>Draft PIR document</td><td>Days 51-54</td></tr>
+                        <tr><td><strong>Review Cycle</strong></td><td>Steering Committee</td><td>1 week</td><td>Feedback, revisions</td><td>Days 55-62</td></tr>
+                        <tr><td><strong>Final PIR Presentation</strong></td><td>PM, Sponsor</td><td>1 hour</td><td>Final approval</td><td>Day 65</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">📝</div><div class="concept-title">PIR Report Structure</div><div class="concept-desc"><strong>Sections:</strong> Executive summary, project overview, benefits analysis, stakeholder feedback, lessons learned, risk closeout, continuous improvement, closure checklist.</div></div>
+                <div class="concept-card"><div class="concept-icon">👥</div><div class="concept-title">Key Participants</div><div class="concept-desc"><strong>Required:</strong> PM, Sponsor, Tech Lead, BA Lead, Change Lead, QA Lead, Key stakeholders, External facilitator (recommended for objectivity).</div></div>
+                <div class="concept-card"><div class="concept-icon">📊</div><div class="concept-title">Data Sources</div><div class="concept-desc"><strong>Quantitative:</strong> Jira metrics, monitoring data, survey scores, financial reports. <strong>Qualitative:</strong> Interviews, focus groups, retrospective notes.</div></div>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+        <!-- BENEFITS REALIZATION -->
+        <section class="module" id="benefits">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>Benefits Realization</h2>
+                    <p>Measuring actual value delivered vs. business case</p>
+                </div>
+            </div>
+            <div class="description-block">
+                <p>Benefits realization is the ultimate measure of project success—did we deliver what we promised? This requires <strong>comparing actual outcomes against the original business case</strong> with the same rigor used to justify the investment. Benefits tracking should continue for 12-18 months as full value emerges.</p>
+            </div>
+            <div class="framework-container">
+                <div class="framework-header"><div class="framework-title">💰 Benefits Realization Dashboard</div><div class="framework-badge">60-Day Review</div></div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 280" style="width: 100%; height: auto;">
+                        <g transform="translate(60, 40)"><circle cx="80" cy="80" r="75" fill="none" stroke="#2a2a3e" stroke-width="12"/><circle cx="80" cy="80" r="75" fill="none" stroke="#10B981" stroke-width="12" stroke-dasharray="400" stroke-dashoffset="60" stroke-linecap="round" transform="rotate(-90 80 80)"/><text x="80" y="70" text-anchor="middle" fill="#fff" font-size="28" font-weight="700">85%</text><text x="80" y="95" text-anchor="middle" fill="#a0a0b0" font-size="11">Benefits</text><text x="80" y="110" text-anchor="middle" fill="#a0a0b0" font-size="11">Realized</text></g>
+                        <g transform="translate(240, 30)">
+                            <g><rect width="180" height="65" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/><text x="15" y="22" fill="#34D399" font-size="10" font-weight="600">💵 COST SAVINGS</text><text x="15" y="42" fill="#fff" font-size="15" font-weight="700">$2.4M / $2.5M</text><text x="165" y="42" text-anchor="end" fill="#34D399" font-size="10">96%</text></g>
+                            <g transform="translate(200, 0)"><rect width="180" height="65" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/><text x="15" y="22" fill="#34D399" font-size="10" font-weight="600">⚡ PRODUCTIVITY</text><text x="15" y="42" fill="#fff" font-size="15" font-weight="700">+32% / +35%</text><text x="165" y="42" text-anchor="end" fill="#34D399" font-size="10">91%</text></g>
+                            <g transform="translate(400, 0)"><rect width="180" height="65" rx="8" fill="#1a1a2e" stroke="#FBBF24" stroke-width="2"/><text x="15" y="22" fill="#FBBF24" font-size="10" font-weight="600">🎯 ERROR REDUCTION</text><text x="15" y="42" fill="#fff" font-size="15" font-weight="700">-58% / -75%</text><text x="165" y="42" text-anchor="end" fill="#FBBF24" font-size="10">77%</text></g>
+                            <g transform="translate(0, 80)"><rect width="180" height="65" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/><text x="15" y="22" fill="#34D399" font-size="10" font-weight="600">⏱️ CYCLE TIME</text><text x="15" y="42" fill="#fff" font-size="15" font-weight="700">1.1 / 1.5 days</text><text x="165" y="42" text-anchor="end" fill="#6EE7B7" font-size="10">109%</text></g>
+                            <g transform="translate(200, 80)"><rect width="180" height="65" rx="8" fill="#1a1a2e" stroke="#FBBF24" stroke-width="2"/><text x="15" y="22" fill="#FBBF24" font-size="10" font-weight="600">😊 USER SATISFACTION</text><text x="15" y="42" fill="#fff" font-size="15" font-weight="700">NPS +38 / +45</text><text x="165" y="42" text-anchor="end" fill="#FBBF24" font-size="10">84%</text></g>
+                            <g transform="translate(400, 80)"><rect width="180" height="65" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/><text x="15" y="22" fill="#34D399" font-size="10" font-weight="600">🛡️ COMPLIANCE</text><text x="15" y="42" fill="#fff" font-size="15" font-weight="700">100% / 100%</text><text x="165" y="42" text-anchor="end" fill="#34D399" font-size="10">100%</text></g>
+                        </g>
+                        <g transform="translate(60, 195)"><text x="0" y="15" fill="#a0a0b0" font-size="11" font-weight="600">Benefits Trajectory</text><line x1="0" y1="70" x2="720" y2="70" stroke="#2a2a3e"/><path d="M 0,65 L 180,52 L 360,40 L 540,34" fill="none" stroke="#10B981" stroke-width="3"/><circle cx="540" cy="34" r="5" fill="#10B981"/><path d="M 0,65 Q 180,48 360,35 T 720,22" fill="none" stroke="#3B82F6" stroke-width="2" stroke-dasharray="6,4"/></g>
+                    </svg>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Benefit</th><th>Baseline</th><th>Target</th><th>Actual</th><th>Variance</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Annual Cost Savings</strong></td><td>$0</td><td>$2.5M</td><td>$2.4M</td><td style="color: #34D399;">-4%</td><td><span class="status-badge achieved">Achieved</span></td><td>Continue tracking Year 2</td></tr>
+                        <tr><td><strong>Process Efficiency</strong></td><td>Baseline</td><td>+35%</td><td>+32%</td><td style="color: #FBBF24;">-3%</td><td><span class="status-badge partial">Partial</span></td><td>Additional automation Q1</td></tr>
+                        <tr><td><strong>Error Rate</strong></td><td>4.2%</td><td>1.05%</td><td>1.76%</td><td style="color: #F87171;">-17%</td><td><span class="status-badge tracking">Tracking</span></td><td>Training refresh needed</td></tr>
+                        <tr><td><strong>Cycle Time</strong></td><td>3.2 days</td><td>1.5 days</td><td>1.1 days</td><td style="color: #34D399;">+27%</td><td><span class="status-badge exceeded">Exceeded</span></td><td>Document best practices</td></tr>
+                        <tr><td><strong>User Satisfaction</strong></td><td>NPS +12</td><td>NPS +45</td><td>NPS +38</td><td style="color: #FBBF24;">-7 pts</td><td><span class="status-badge partial">Partial</span></td><td>UI improvements Phase 2</td></tr>
+                        <tr><td><strong>Compliance</strong></td><td>87%</td><td>100%</td><td>100%</td><td style="color: #34D399;">0%</td><td><span class="status-badge achieved">Achieved</span></td><td>Maintain for audit</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout"><div class="callout-title">📈 Benefits Tracking Cadence</div><div class="callout-text"><strong>Monthly (Months 1-6):</strong> Full benefits review with steering committee. <strong>Quarterly (Months 7-18):</strong> Continued tracking with lighter touch. <strong>Annually:</strong> Benefits sustainability review. Document methodology so benefits can be validated independently.</div></div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">💵</div><div class="concept-title">Cost Avoidance</div><div class="concept-desc"><strong>$1.8M identified:</strong> Legacy license termination ($800K), infrastructure reduction ($600K), manual process elimination ($400K). Realized faster than projected.</div></div>
+                <div class="concept-card"><div class="concept-icon">⏱️</div><div class="concept-title">Time Savings</div><div class="concept-desc"><strong>12,500 hours/year:</strong> Report generation (4,000 hrs), data entry automation (5,000 hrs), approval workflows (3,500 hrs). Converted to productivity gains.</div></div>
+                <div class="concept-card"><div class="concept-icon">📉</div><div class="concept-title">Risk Reduction</div><div class="concept-desc"><strong>3 audit findings eliminated:</strong> Data integrity controls, access management, compliance reporting. Zero findings in post-implementation audit.</div></div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ROI Metric</th><th>Business Case</th><th>Actual</th><th>Variance</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Total Investment</strong></td><td>$4.2M</td><td>$4.1M</td><td style="color: #34D399;">-2.4%</td><td>Under budget due to scope discipline</td></tr>
+                        <tr><td><strong>Year 1 Benefits</strong></td><td>$2.5M</td><td>$2.4M</td><td style="color: #FBBF24;">-4.0%</td><td>On track for full realization</td></tr>
+                        <tr><td><strong>Payback Period</strong></td><td>20 months</td><td>21 months</td><td style="color: #FBBF24;">+5.0%</td><td>Within acceptable range</td></tr>
+                        <tr><td><strong>3-Year NPV</strong></td><td>$3.8M</td><td>$3.6M (proj)</td><td style="color: #FBBF24;">-5.3%</td><td>Projected based on current trajectory</td></tr>
+                        <tr><td><strong>IRR</strong></td><td>42%</td><td>39% (proj)</td><td style="color: #FBBF24;">-3 pts</td><td>Still exceeds hurdle rate of 15%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="framework-container">
+                <div class="framework-header"><div class="framework-title">📊 Benefits Measurement Methodology</div><div class="framework-badge">Tracking Framework</div></div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 220" style="width: 100%; height: auto;">
+                        <g transform="translate(40, 30)">
+                            <rect x="0" y="0" width="180" height="80" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">DEFINE</text>
+                            <text x="90" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Baseline metrics</text>
+                            <text x="90" y="58" text-anchor="middle" fill="#a0a0b0" font-size="9">Success criteria</text>
+                            <text x="90" y="71" text-anchor="middle" fill="#a0a0b0" font-size="9">Data sources</text>
+                        </g>
+                        <path d="M 225 50 L 250 50" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow)"/>
+                        <g transform="translate(255, 30)">
+                            <rect x="0" y="0" width="180" height="80" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">MEASURE</text>
+                            <text x="90" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Collect actuals</text>
+                            <text x="90" y="58" text-anchor="middle" fill="#a0a0b0" font-size="9">Calculate variance</text>
+                            <text x="90" y="71" text-anchor="middle" fill="#a0a0b0" font-size="9">Validate data</text>
+                        </g>
+                        <path d="M 440 50 L 465 50" stroke="#10B981" stroke-width="2"/>
+                        <g transform="translate(470, 30)">
+                            <rect x="0" y="0" width="180" height="80" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">ANALYZE</text>
+                            <text x="90" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Root cause gaps</text>
+                            <text x="90" y="58" text-anchor="middle" fill="#a0a0b0" font-size="9">Trend analysis</text>
+                            <text x="90" y="71" text-anchor="middle" fill="#a0a0b0" font-size="9">Projections</text>
+                        </g>
+                        <path d="M 655 50 L 680 50" stroke="#F59E0B" stroke-width="2"/>
+                        <g transform="translate(685, 30)">
+                            <rect x="0" y="0" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="60" y="25" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">REPORT</text>
+                            <text x="60" y="45" text-anchor="middle" fill="#a0a0b0" font-size="9">Dashboard</text>
+                            <text x="60" y="58" text-anchor="middle" fill="#a0a0b0" font-size="9">Executive</text>
+                            <text x="60" y="71" text-anchor="middle" fill="#a0a0b0" font-size="9">summary</text>
+                        </g>
+                        <g transform="translate(40, 130)">
+                            <rect x="0" y="0" width="765" height="70" rx="8" fill="#1a1a2e"/>
+                            <text x="20" y="25" fill="#a0a0b0" font-size="10" font-weight="600">Key Principles:</text>
+                            <text x="20" y="45" fill="#6a6a7a" font-size="9">• Use same methodology as business case for comparability</text>
+                            <text x="280" y="45" fill="#6a6a7a" font-size="9">• Document assumptions and limitations</text>
+                            <text x="540" y="45" fill="#6a6a7a" font-size="9">• Get finance sign-off on calculations</text>
+                            <text x="20" y="60" fill="#6a6a7a" font-size="9">• Track leading indicators for early warning</text>
+                            <text x="280" y="60" fill="#6a6a7a" font-size="9">• Separate one-time vs recurring benefits</text>
+                            <text x="540" y="60" fill="#6a6a7a" font-size="9">• Account for external factors</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- SUCCESS METRICS -->
+        <section class="module" id="kpis">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Success Metrics & KPIs</h2>
+                    <p>Comprehensive performance measurement</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Beyond business benefits, track <strong>operational health, user adoption, and system performance</strong>. These leading indicators predict long-term success and identify issues before they become problems.</p></div>
+            <div class="kpi-grid">
+                <div class="kpi-card green"><div class="kpi-value">99.7%</div><div class="kpi-label">System Uptime</div><div class="kpi-trend up">↑ 0.2% above target</div></div>
+                <div class="kpi-card green"><div class="kpi-value">87%</div><div class="kpi-label">User Adoption</div><div class="kpi-trend up">↑ 7% above target</div></div>
+                <div class="kpi-card yellow"><div class="kpi-value">2.3s</div><div class="kpi-label">Avg Response Time</div><div class="kpi-trend down">↓ 0.3s above target</div></div>
+                <div class="kpi-card green"><div class="kpi-value">96%</div><div class="kpi-label">SLA Compliance</div><div class="kpi-trend up">↑ 1% above target</div></div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card blue"><div class="kpi-value">42</div><div class="kpi-label">Daily Active Users</div><div class="kpi-trend">→ Stable</div></div>
+                <div class="kpi-card green"><div class="kpi-value">18</div><div class="kpi-label">Open Tickets</div><div class="kpi-trend up">↓ 65% from Week 1</div></div>
+                <div class="kpi-card green"><div class="kpi-value">4.2</div><div class="kpi-label">User Rating (1-5)</div><div class="kpi-trend up">↑ 0.4 from baseline</div></div>
+                <div class="kpi-card yellow"><div class="kpi-value">73%</div><div class="kpi-label">Training Completion</div><div class="kpi-trend down">↓ 17% below target</div></div>
+            </div>
+            <div class="value-container">
+                <div class="value-header"><div class="value-title">📊 PIR Assessment Dimensions</div><div class="value-badge">Value Analysis</div></div>
+                <div class="value-metrics">
+                    <div class="value-metric"><div class="value-metric-label">Business Value</div><div class="value-metric-bar"><div class="value-metric-fill high" style="width: 85%;"></div></div><div class="value-metric-value">85%</div></div>
+                    <div class="value-metric"><div class="value-metric-label">Technical Quality</div><div class="value-metric-bar"><div class="value-metric-fill high" style="width: 88%;"></div></div><div class="value-metric-value">88%</div></div>
+                    <div class="value-metric"><div class="value-metric-label">User Satisfaction</div><div class="value-metric-bar"><div class="value-metric-fill medium" style="width: 78%;"></div></div><div class="value-metric-value">78%</div></div>
+                    <div class="value-metric"><div class="value-metric-label">Process Adherence</div><div class="value-metric-bar"><div class="value-metric-fill high" style="width: 92%;"></div></div><div class="value-metric-value">92%</div></div>
+                    <div class="value-metric"><div class="value-metric-label">On-Time Delivery</div><div class="value-metric-bar"><div class="value-metric-fill medium" style="width: 75%;"></div></div><div class="value-metric-value">75%</div></div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>KPI Category</th><th>Metric</th><th>Target</th><th>Current</th><th>Trend</th><th>Health</th></tr></thead>
+                    <tbody>
+                        <tr><td rowspan="3"><strong>System Health</strong></td><td>Uptime</td><td>&gt;99.5%</td><td>99.7%</td><td>↑ Improving</td><td><span class="status-badge achieved">Green</span></td></tr>
+                        <tr><td>Response Time (P95)</td><td>&lt;2s</td><td>2.3s</td><td>→ Stable</td><td><span class="status-badge partial">Yellow</span></td></tr>
+                        <tr><td>Error Rate</td><td>&lt;0.5%</td><td>0.3%</td><td>↓ Improving</td><td><span class="status-badge achieved">Green</span></td></tr>
+                        <tr><td rowspan="3"><strong>User Adoption</strong></td><td>Active Users</td><td>&gt;80%</td><td>87%</td><td>↑ Growing</td><td><span class="status-badge achieved">Green</span></td></tr>
+                        <tr><td>Feature Utilization</td><td>&gt;60%</td><td>54%</td><td>↑ Growing</td><td><span class="status-badge partial">Yellow</span></td></tr>
+                        <tr><td>Training Completion</td><td>&gt;90%</td><td>73%</td><td>↑ Slow</td><td><span class="status-badge missed">Red</span></td></tr>
+                        <tr><td rowspan="3"><strong>Support</strong></td><td>Ticket Volume (daily)</td><td>&lt;25</td><td>18</td><td>↓ Declining</td><td><span class="status-badge achieved">Green</span></td></tr>
+                        <tr><td>First Response Time</td><td>&lt;4 hrs</td><td>2.1 hrs</td><td>→ Stable</td><td><span class="status-badge achieved">Green</span></td></tr>
+                        <tr><td>Resolution Time</td><td>&lt;24 hrs</td><td>18 hrs</td><td>↓ Improving</td><td><span class="status-badge achieved">Green</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+        <!-- STAKEHOLDER FEEDBACK -->
+        <section class="module" id="feedback">
+            <div class="module-header">
+                <div class="module-icon">💬</div>
+                <div class="module-info">
+                    <h2>Stakeholder Feedback</h2>
+                    <p>Qualitative insights from users and sponsors</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Metrics tell part of the story; stakeholder feedback provides context and nuance. Collect through <strong>surveys, interviews, and focus groups</strong>. Include all stakeholder groups: end users, managers, executives, IT, and partners.</p></div>
+            <div class="survey-results">
+                <div class="survey-card"><div class="survey-question">Overall satisfaction with the new system?</div><div class="survey-bar-container"><div class="survey-bar-label"><span>Very Satisfied</span><span>42%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 42%; background: #10B981;">42%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Satisfied</span><span>35%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 35%; background: #3B82F6;">35%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Neutral</span><span>15%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 15%; background: #6B7280;">15%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Dissatisfied</span><span>8%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 8%; background: #F59E0B;">8%</div></div></div></div>
+                <div class="survey-card"><div class="survey-question">How would you rate training and support?</div><div class="survey-bar-container"><div class="survey-bar-label"><span>Excellent</span><span>28%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 28%; background: #10B981;">28%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Good</span><span>45%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 45%; background: #3B82F6;">45%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Adequate</span><span>18%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 18%; background: #6B7280;">18%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Poor</span><span>9%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 9%; background: #EF4444;">9%</div></div></div></div>
+                <div class="survey-card"><div class="survey-question">Is the new system easier than the old one?</div><div class="survey-bar-container"><div class="survey-bar-label"><span>Much Easier</span><span>38%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 38%; background: #10B981;">38%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Somewhat Easier</span><span>32%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 32%; background: #3B82F6;">32%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>About the Same</span><span>18%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 18%; background: #6B7280;">18%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Harder</span><span>12%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 12%; background: #EF4444;">12%</div></div></div></div>
+                <div class="survey-card"><div class="survey-question">Would you recommend to colleagues?</div><div class="survey-bar-container"><div class="survey-bar-label"><span>Definitely Yes</span><span>48%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 48%; background: #10B981;">48%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Probably Yes</span><span>34%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 34%; background: #3B82F6;">34%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>Not Sure</span><span>12%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 12%; background: #6B7280;">12%</div></div></div><div class="survey-bar-container"><div class="survey-bar-label"><span>No</span><span>6%</span></div><div class="survey-bar"><div class="survey-bar-fill" style="width: 6%; background: #EF4444;">6%</div></div></div></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">👍</div><div class="concept-title">Top Positive Themes</div><div class="concept-desc"><strong>Speed:</strong> "So much faster" (47x). <strong>Mobile:</strong> "Love working from phone" (32x). <strong>Search:</strong> "Actually works now" (28x).</div></div>
+                <div class="concept-card"><div class="concept-icon">👎</div><div class="concept-title">Improvement Areas</div><div class="concept-desc"><strong>Reports:</strong> "Need more options" (38x). <strong>Navigation:</strong> "Too many clicks" (24x). <strong>Training:</strong> "Needed more practice" (19x).</div></div>
+                <div class="concept-card"><div class="concept-icon">💡</div><div class="concept-title">Feature Requests</div><div class="concept-desc"><strong>Dashboard widgets</strong> (45 votes). <strong>Bulk actions</strong> (38 votes). <strong>Dark mode</strong> (22 votes).</div></div>
+            </div>
+            <div class="callout info"><div class="callout-title">📊 Feedback Collection Methods</div><div class="callout-text"><strong>Quantitative:</strong> In-app surveys (487 responses, 34% rate), post-ticket CSAT (312 responses). <strong>Qualitative:</strong> Executive interviews (8), focus groups (3 sessions, 24 participants), open-ended comments (156). All feedback anonymized and coded.</div></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Stakeholder Group</th><th>Method</th><th>Responses</th><th>Satisfaction</th><th>Key Themes</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>End Users</strong></td><td>In-app survey</td><td>487</td><td>77% satisfied</td><td>Speed good, reports need work</td></tr>
+                        <tr><td><strong>Managers</strong></td><td>Online survey</td><td>45</td><td>82% satisfied</td><td>Better visibility, want more dashboards</td></tr>
+                        <tr><td><strong>Executives</strong></td><td>1:1 interviews</td><td>8</td><td>88% satisfied</td><td>ROI on track, adoption exceeds target</td></tr>
+                        <tr><td><strong>IT Support</strong></td><td>Focus group</td><td>12</td><td>75% satisfied</td><td>Documentation helpful, need more KB</td></tr>
+                        <tr><td><strong>External Partners</strong></td><td>Email survey</td><td>15</td><td>72% satisfied</td><td>Integration stable, want more APIs</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="framework-container">
+                <div class="framework-header"><div class="framework-title">📈 Sentiment Analysis Dashboard</div><div class="framework-badge">NPS & CSAT Trends</div></div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 200" style="width: 100%; height: auto;">
+                        <g transform="translate(40, 20)">
+                            <text x="0" y="15" fill="#a0a0b0" font-size="11" font-weight="600">Net Promoter Score (NPS) Trend</text>
+                            <line x1="0" y1="140" x2="380" y2="140" stroke="#2a2a3e"/>
+                            <line x1="0" y1="40" x2="0" y2="140" stroke="#2a2a3e"/>
+                            <text x="-10" y="45" text-anchor="end" fill="#6a6a7a" font-size="8">+50</text>
+                            <text x="-10" y="95" text-anchor="end" fill="#6a6a7a" font-size="8">+25</text>
+                            <text x="-10" y="145" text-anchor="end" fill="#6a6a7a" font-size="8">0</text>
+                            <path d="M 0,115 L 95,100 L 190,80 L 285,65 L 380,58" fill="none" stroke="#10B981" stroke-width="3"/>
+                            <circle cx="380" cy="58" r="5" fill="#10B981"/>
+                            <text x="380" y="50" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">+38</text>
+                            <text x="0" y="160" fill="#6a6a7a" font-size="8">Week 1</text>
+                            <text x="95" y="160" fill="#6a6a7a" font-size="8">Week 2</text>
+                            <text x="190" y="160" fill="#6a6a7a" font-size="8">Week 3</text>
+                            <text x="285" y="160" fill="#6a6a7a" font-size="8">Week 4</text>
+                            <text x="380" y="160" fill="#FBBF24" font-size="8">Now</text>
+                        </g>
+                        <g transform="translate(470, 20)">
+                            <text x="0" y="15" fill="#a0a0b0" font-size="11" font-weight="600">CSAT Score Trend</text>
+                            <line x1="0" y1="140" x2="340" y2="140" stroke="#2a2a3e"/>
+                            <line x1="0" y1="40" x2="0" y2="140" stroke="#2a2a3e"/>
+                            <text x="-10" y="45" text-anchor="end" fill="#6a6a7a" font-size="8">5.0</text>
+                            <text x="-10" y="95" text-anchor="end" fill="#6a6a7a" font-size="8">3.5</text>
+                            <text x="-10" y="145" text-anchor="end" fill="#6a6a7a" font-size="8">2.0</text>
+                            <path d="M 0,100 L 85,85 L 170,70 L 255,62 L 340,56" fill="none" stroke="#3B82F6" stroke-width="3"/>
+                            <circle cx="340" cy="56" r="5" fill="#3B82F6"/>
+                            <text x="340" y="48" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">4.2</text>
+                            <text x="0" y="160" fill="#6a6a7a" font-size="8">Week 1</text>
+                            <text x="170" y="160" fill="#6a6a7a" font-size="8">Week 3</text>
+                            <text x="340" y="160" fill="#FBBF24" font-size="8">Now</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- LESSONS LEARNED -->
+        <section class="module" id="lessons">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Lessons Learned</h2>
+                    <p>Actionable insights for future projects</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Lessons learned transform project experience into organizational knowledge. The goal is <strong>specific, actionable insights</strong>—not vague observations. Each lesson answers: What happened? Why? What to do differently?</p></div>
+            <div class="lessons-container">
+                <div class="lessons-card success">
+                    <div class="lessons-header"><div class="lessons-title">✅ What Worked Well</div></div>
+                    <div class="lessons-body">
+                        <div class="lessons-item"><div class="lessons-icon">🎯</div><div class="lessons-text"><strong>Early stakeholder engagement:</strong> Involving business owners from requirements phase reduced scope creep by 40% and increased buy-in significantly.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">🎯</div><div class="lessons-text"><strong>Wave rollout approach:</strong> Phased deployment allowed us to fix 23 issues before they affected the majority of users.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">🎯</div><div class="lessons-text"><strong>Dedicated hypercare team:</strong> 3x staffing in Week 1 prevented ticket backlog and maintained user confidence throughout.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">🎯</div><div class="lessons-text"><strong>Champions network:</strong> 25 trained champions reduced Tier 1 tickets by 30% through peer support and local expertise.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">🎯</div><div class="lessons-text"><strong>Dress rehearsal cutover:</strong> Full rehearsal identified 8 critical issues that would have caused go-live delays.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">🎯</div><div class="lessons-text"><strong>Proactive communication:</strong> Weekly updates kept 200+ stakeholders informed with zero surprise escalations to leadership.</div></div>
+                    </div>
+                </div>
+                <div class="lessons-card improve">
+                    <div class="lessons-header"><div class="lessons-title">⚠️ Areas for Improvement</div></div>
+                    <div class="lessons-body">
+                        <div class="lessons-item"><div class="lessons-icon">💡</div><div class="lessons-text"><strong>Data migration complexity underestimated:</strong> Should have added 2 weeks for data cleansing. 15% of records required manual correction post-go-live.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">💡</div><div class="lessons-text"><strong>Training timing too early:</strong> Users forgot features by go-live (3-week gap). Move training to 1 week before with Day 1 refresher.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">💡</div><div class="lessons-text"><strong>Integration testing gaps:</strong> Third-party API changes weren't caught until UAT. Add integration smoke tests to every sprint.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">💡</div><div class="lessons-text"><strong>Change management started late:</strong> Began 3 months before go-live; should be 6 months. Resistance was higher than expected.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">💡</div><div class="lessons-text"><strong>Documentation incomplete:</strong> Ops struggled with runbooks written under time pressure. Add T-4 week documentation checkpoint.</div></div>
+                        <div class="lessons-item"><div class="lessons-icon">💡</div><div class="lessons-text"><strong>Vendor support assumptions:</strong> Assumed 24/7 but contract was business hours. Caused 6-hour P1 delay. Verify SLAs explicitly.</div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card green"><div class="kpi-value">12</div><div class="kpi-label">Keep Doing</div><div class="kpi-trend">Practices to continue</div></div>
+                <div class="kpi-card blue"><div class="kpi-value">8</div><div class="kpi-label">Start Doing</div><div class="kpi-trend">New practices to adopt</div></div>
+                <div class="kpi-card red"><div class="kpi-value">5</div><div class="kpi-label">Stop Doing</div><div class="kpi-trend">Practices to abandon</div></div>
+                <div class="kpi-card yellow"><div class="kpi-value">15</div><div class="kpi-label">Celebrate</div><div class="kpi-trend">Wins to recognize</div></div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Lesson ID</th><th>Category</th><th>Lesson</th><th>Impact</th><th>Action Owner</th><th>Target Date</th></tr></thead>
+                    <tbody>
+                        <tr><td>L-001</td><td>Planning</td><td>Add data quality sprint before migration</td><td>High</td><td>PMO</td><td>Template update</td></tr>
+                        <tr><td>L-002</td><td>Training</td><td>Move training to T-1 week, not T-3</td><td>High</td><td>L&D Team</td><td>Next project</td></tr>
+                        <tr><td>L-003</td><td>Testing</td><td>Include integration smoke tests in sprints</td><td>Medium</td><td>Dev Lead</td><td>Immediate</td></tr>
+                        <tr><td>L-004</td><td>Change Mgmt</td><td>Begin change management 6 months early</td><td>High</td><td>Change Team</td><td>Template update</td></tr>
+                        <tr><td>L-005</td><td>Documentation</td><td>Add T-4 week documentation checkpoint</td><td>Medium</td><td>Tech Writer</td><td>Next project</td></tr>
+                        <tr><td>L-006</td><td>Vendor</td><td>Verify vendor SLAs in contract review</td><td>High</td><td>Procurement</td><td>Process update</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="callout"><div class="callout-title">📋 Lessons Learned Distribution</div><div class="callout-text"><strong>Primary channels:</strong> PMO knowledge base, project retrospective wiki, new PM onboarding materials. <strong>Target audience:</strong> Future project teams, PMO leadership, steering committee. <strong>Review cadence:</strong> Lessons reviewed at kickoff of all new projects. Track implementation to ensure lessons are actually applied.</div></div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- TECHNICAL DEBT -->
+        <section class="module" id="debt">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Technical Debt Assessment</h2>
+                    <p>Shortcuts taken and remediation needed</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Every project accumulates technical debt—intentional shortcuts to meet deadlines. The PIR must <strong>document this debt honestly and plan remediation</strong>. Ignoring debt leads to increasing maintenance costs over time.</p></div>
+            <div class="debt-item"><div class="debt-header"><div class="debt-title">🔴 Hardcoded Configuration Values</div><div class="debt-severity high">High</div></div><div class="debt-desc">Database connections, API endpoints, and feature flags hardcoded in 12 locations rather than externalized to configuration management.</div><div class="debt-meta"><span><strong>Impact:</strong> Deployment flexibility</span><span><strong>Effort:</strong> 3 sprints</span><span><strong>Target:</strong> Q1 2026</span></div></div>
+            <div class="debt-item"><div class="debt-header"><div class="debt-title">🟡 Missing Unit Test Coverage</div><div class="debt-severity medium">Medium</div></div><div class="debt-desc">Current coverage 47% (target 80%). Critical business logic in payment processing and reporting has minimal coverage increasing regression risk.</div><div class="debt-meta"><span><strong>Impact:</strong> Code quality</span><span><strong>Effort:</strong> 4 sprints</span><span><strong>Target:</strong> Q2 2026</span></div></div>
+            <div class="debt-item"><div class="debt-header"><div class="debt-title">🟡 Legacy API Compatibility Layer</div><div class="debt-severity medium">Medium</div></div><div class="debt-desc">Temporary layer for 3 legacy integrations that haven't migrated. Adds complexity and performance overhead. Target retirement in 6 months.</div><div class="debt-meta"><span><strong>Impact:</strong> Performance</span><span><strong>Effort:</strong> 2 sprints</span><span><strong>Target:</strong> Q1 2026</span></div></div>
+            <div class="debt-item"><div class="debt-header"><div class="debt-title">🔵 Documentation Gaps</div><div class="debt-severity low">Low</div></div><div class="debt-desc">API documentation 60% complete. Architecture diagrams outdated. New team members require significant onboarding support due to gaps.</div><div class="debt-meta"><span><strong>Impact:</strong> Onboarding</span><span><strong>Effort:</strong> Ongoing</span><span><strong>Target:</strong> Continuous</span></div></div>
+            <div class="callout warning"><div class="callout-title">⚠️ Technical Debt Risk</div><div class="callout-text">Total estimated debt: <strong>12 sprint-equivalents</strong>. If not addressed within 12 months, maintenance overhead projected to increase 25% and deployment velocity will decrease. Recommend allocating 20% of sprint capacity to debt reduction.</div></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Debt Item</th><th>Category</th><th>Severity</th><th>Effort</th><th>Impact if Ignored</th><th>Remediation Plan</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Hardcoded configs</strong></td><td>Architecture</td><td><span class="status-badge missed">High</span></td><td>3 sprints</td><td>Deployment friction, security risk</td><td>Externalize to config service Q1</td></tr>
+                        <tr><td><strong>Test coverage gaps</strong></td><td>Quality</td><td><span class="status-badge partial">Medium</span></td><td>4 sprints</td><td>Regression risk, slower releases</td><td>Ongoing 1 sprint/quarter</td></tr>
+                        <tr><td><strong>Legacy API layer</strong></td><td>Integration</td><td><span class="status-badge partial">Medium</span></td><td>2 sprints</td><td>Performance, complexity</td><td>Retire after partner migration</td></tr>
+                        <tr><td><strong>Documentation gaps</strong></td><td>Knowledge</td><td><span class="status-badge tracking">Low</span></td><td>Ongoing</td><td>Onboarding delays</td><td>Documentation day monthly</td></tr>
+                        <tr><td><strong>Monitoring gaps</strong></td><td>Operations</td><td><span class="status-badge partial">Medium</span></td><td>1 sprint</td><td>Blind spots in production</td><td>Add dashboards Q1</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+        <!-- RISK CLOSEOUT -->
+        <section class="module" id="risk">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Risk Register Closeout</h2>
+                    <p>Final disposition of project risks</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Every risk must have a final disposition: closed (didn't occur or mitigated), accepted (residual acknowledged), transferred (to ops), or realized (occurred and handled). No risk remains "open" at project closure.</p></div>
+            <div class="risk-item"><div class="risk-indicator closed"></div><div class="risk-content"><div class="risk-title">R-001: Data Migration Failure</div><div class="risk-detail"><strong>CLOSED - Mitigated</strong> | Parallel run and rollback were effective. 99.7% accuracy achieved. No data loss.</div></div></div>
+            <div class="risk-item"><div class="risk-indicator closed"></div><div class="risk-content"><div class="risk-title">R-002: User Adoption Resistance</div><div class="risk-detail"><strong>CLOSED - Mitigated</strong> | Champions program and executive sponsorship drove 87% adoption, exceeding 80% target.</div></div></div>
+            <div class="risk-item"><div class="risk-indicator mitigated"></div><div class="risk-content"><div class="risk-title">R-003: Vendor Support Availability</div><div class="risk-detail"><strong>CLOSED - Partially Realized</strong> | 6-hour P1 delay occurred during incident. Upgraded to 24/7 support contract post-incident.</div></div></div>
+            <div class="risk-item"><div class="risk-indicator accepted"></div><div class="risk-content"><div class="risk-title">R-004: Integration Partner Delays</div><div class="risk-detail"><strong>TRANSFERRED</strong> | 2 of 5 partners haven't completed migration. Ops team owns ongoing partner coordination.</div></div></div>
+            <div class="risk-item"><div class="risk-indicator transferred"></div><div class="risk-content"><div class="risk-title">R-005: Performance Under Peak Load</div><div class="risk-detail"><strong>TRANSFERRED</strong> | Load testing passed but real peak not yet experienced. Monitoring in place; ops owns.</div></div></div>
+            <div class="risk-item"><div class="risk-indicator closed"></div><div class="risk-content"><div class="risk-title">R-006: Budget Overrun</div><div class="risk-detail"><strong>CLOSED - Did Not Occur</strong> | Project completed 3% under budget. Contingency returned to portfolio.</div></div></div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Disposition</th><th>Count</th><th>Percentage</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Closed - Mitigated</strong></td><td>12</td><td>48%</td><td>Risk occurred but mitigation effective</td></tr>
+                        <tr><td><strong>Closed - Did Not Occur</strong></td><td>8</td><td>32%</td><td>Risk never materialized</td></tr>
+                        <tr><td><strong>Transferred to Operations</strong></td><td>3</td><td>12%</td><td>Ongoing operational risks</td></tr>
+                        <tr><td><strong>Accepted</strong></td><td>2</td><td>8%</td><td>Residual risk acknowledged by sponsor</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">✅</div><div class="concept-title">Closed Risks</div><div class="concept-desc"><strong>20 risks closed:</strong> 12 mitigated successfully, 8 never materialized. Risk management process validated. No unexpected risks in production.</div></div>
+                <div class="concept-card"><div class="concept-icon">↗️</div><div class="concept-title">Transferred Risks</div><div class="concept-desc"><strong>3 risks to ops:</strong> Performance scaling, partner delays, vendor support. Runbooks created, monitoring in place, escalation paths defined.</div></div>
+                <div class="concept-card"><div class="concept-icon">⚖️</div><div class="concept-title">Accepted Residual</div><div class="concept-desc"><strong>2 risks accepted:</strong> Legacy data quality (mitigation cost &gt; impact), feature parity gaps (Phase 2 roadmap). Sponsor formally acknowledged.</div></div>
+            </div>
+            
+            <div class="callout"><div class="callout-title">📋 Risk Management Retrospective</div><div class="callout-text"><strong>What worked:</strong> Weekly risk reviews, quantified risk scoring, executive visibility. <strong>Gaps:</strong> Third-party risks underweighted, contingency for vendor issues insufficient. <strong>Action:</strong> Update risk assessment template to weight external dependencies higher.</div></div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- CONTINUOUS IMPROVEMENT -->
+        <section class="module" id="continuous">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Continuous Improvement Plan</h2>
+                    <p>Roadmap for ongoing enhancement</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Go-live isn't the end—it's the beginning of continuous improvement. The PIR identifies gaps that feed the <strong>post-implementation enhancement roadmap</strong>. Prioritize by value and effort while momentum is fresh.</p></div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Enhancement</th><th>Category</th><th>Value</th><th>Effort</th><th>Priority</th><th>Target</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Custom reporting dashboard</strong></td><td>Feature</td><td>High (38 requests)</td><td>3 sprints</td><td><span class="status-badge achieved">P1</span></td><td>Q1 2026</td></tr>
+                        <tr><td><strong>Mobile app enhancements</strong></td><td>Feature</td><td>High (32 requests)</td><td>4 sprints</td><td><span class="status-badge achieved">P1</span></td><td>Q1 2026</td></tr>
+                        <tr><td><strong>Bulk action capabilities</strong></td><td>Efficiency</td><td>Medium (24 requests)</td><td>2 sprints</td><td><span class="status-badge partial">P2</span></td><td>Q2 2026</td></tr>
+                        <tr><td><strong>Navigation simplification</strong></td><td>UX</td><td>Medium (22 complaints)</td><td>2 sprints</td><td><span class="status-badge partial">P2</span></td><td>Q1 2026</td></tr>
+                        <tr><td><strong>Additional integrations</strong></td><td>Integration</td><td>Medium</td><td>3 sprints</td><td><span class="status-badge partial">P2</span></td><td>Q2 2026</td></tr>
+                        <tr><td><strong>Performance optimization</strong></td><td>Technical</td><td>Medium</td><td>2 sprints</td><td><span class="status-badge partial">P2</span></td><td>Q1 2026</td></tr>
+                        <tr><td><strong>Dark mode support</strong></td><td>UX</td><td>Lower (22 requests)</td><td>1 sprint</td><td><span class="status-badge tracking">P3</span></td><td>Q2 2026</td></tr>
+                        <tr><td><strong>Advanced training</strong></td><td>Adoption</td><td>Medium</td><td>Ongoing</td><td><span class="status-badge tracking">P3</span></td><td>Continuous</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="proscons-grid">
+                <div class="proscons-card pros"><div class="proscons-title">✅ PIR Best Practices</div><ul class="proscons-list"><li><strong>Schedule early:</strong> Book PIR session before go-live to ensure attendance</li><li><strong>Use data:</strong> Ground discussions in metrics, not just opinions and feelings</li><li><strong>Be blameless:</strong> Focus on systems and processes, not individuals</li><li><strong>Include all voices:</strong> Junior members often have valuable insights</li><li><strong>Create action items:</strong> Every lesson needs an owner and deadline</li><li><strong>Share widely:</strong> Publish findings to benefit future projects</li></ul></div>
+                <div class="proscons-card cons"><div class="proscons-title">❌ PIR Anti-Patterns</div><ul class="proscons-list"><li><strong>Skipping PIR:</strong> "Too busy" means lessons lost forever</li><li><strong>Blame sessions:</strong> Finger-pointing shuts down honest discussion immediately</li><li><strong>Vague lessons:</strong> "Communicate better" isn't actionable or useful</li><li><strong>No follow-through:</strong> Documented lessons that no one reads or implements</li><li><strong>Waiting too long:</strong> Details fade after 2-3 months; schedule promptly</li><li><strong>Missing stakeholders:</strong> Excluding critics misses key feedback and insights</li></ul></div>
+            </div>
+            
+            <div class="framework-container">
+                <div class="framework-header"><div class="framework-title">🗓️ Enhancement Roadmap</div><div class="framework-badge">Next 12 Months</div></div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 180" style="width: 100%; height: auto;">
+                        <g transform="translate(40, 30)">
+                            <text x="0" y="0" fill="#a0a0b0" font-size="10" font-weight="600">Q1 2026</text>
+                            <rect x="0" y="10" width="180" height="25" rx="4" fill="#10B981" opacity="0.3"/>
+                            <text x="10" y="27" fill="#34D399" font-size="9">Custom Reporting Dashboard</text>
+                            <rect x="0" y="40" width="160" height="25" rx="4" fill="#3B82F6" opacity="0.3"/>
+                            <text x="10" y="57" fill="#60A5FA" font-size="9">Navigation Simplification</text>
+                            <rect x="0" y="70" width="120" height="25" rx="4" fill="#8B5CF6" opacity="0.3"/>
+                            <text x="10" y="87" fill="#A78BFA" font-size="9">Performance Opt</text>
+                        </g>
+                        <g transform="translate(240, 30)">
+                            <text x="0" y="0" fill="#a0a0b0" font-size="10" font-weight="600">Q2 2026</text>
+                            <rect x="0" y="10" width="170" height="25" rx="4" fill="#10B981" opacity="0.3"/>
+                            <text x="10" y="27" fill="#34D399" font-size="9">Mobile Enhancements</text>
+                            <rect x="0" y="40" width="150" height="25" rx="4" fill="#F59E0B" opacity="0.3"/>
+                            <text x="10" y="57" fill="#FBBF24" font-size="9">Bulk Actions</text>
+                            <rect x="0" y="70" width="140" height="25" rx="4" fill="#EC4899" opacity="0.3"/>
+                            <text x="10" y="87" fill="#F472B6" font-size="9">Integrations</text>
+                        </g>
+                        <g transform="translate(440, 30)">
+                            <text x="0" y="0" fill="#a0a0b0" font-size="10" font-weight="600">Q3 2026</text>
+                            <rect x="0" y="10" width="160" height="25" rx="4" fill="#06B6D4" opacity="0.3"/>
+                            <text x="10" y="27" fill="#22D3EE" font-size="9">Advanced Analytics</text>
+                            <rect x="0" y="40" width="100" height="25" rx="4" fill="#14B8A6" opacity="0.3"/>
+                            <text x="10" y="57" fill="#2DD4BF" font-size="9">Dark Mode</text>
+                        </g>
+                        <g transform="translate(640, 30)">
+                            <text x="0" y="0" fill="#a0a0b0" font-size="10" font-weight="600">Q4 2026</text>
+                            <rect x="0" y="10" width="150" height="25" rx="4" fill="#EF4444" opacity="0.3"/>
+                            <text x="10" y="27" fill="#F87171" font-size="9">AI-Powered Features</text>
+                            <rect x="0" y="40" width="130" height="25" rx="4" fill="#6366F1" opacity="0.3"/>
+                            <text x="10" y="57" fill="#818CF8" font-size="9">Mobile App v2</text>
+                        </g>
+                        <g transform="translate(40, 130)"><rect width="770" height="30" rx="4" fill="#1a1a2e"/><text x="385" y="20" text-anchor="middle" fill="#6a6a7a" font-size="9">Continuous: Advanced Training • Documentation Updates • Technical Debt Reduction (20% capacity)</text></g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="callout"><div class="callout-title">📊 Improvement Prioritization Framework</div><div class="callout-text"><strong>Scoring model:</strong> Business value (40%), user impact (30%), effort required (20%), strategic alignment (10%). <strong>Governance:</strong> Product council reviews quarterly, steering committee approves annual roadmap. <strong>Capacity:</strong> 60% new features, 20% tech debt, 20% maintenance.</div></div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- OPERATIONS HANDOVER -->
+        <section class="module" id="handover">
+            <div class="module-header">
+                <div class="module-icon">🤝</div>
+                <div class="module-info">
+                    <h2>Operations Handover</h2>
+                    <p>Transitioning from project to BAU support</p>
+                </div>
+            </div>
+            <div class="description-block"><p>The handover transfers ownership from project to operations. A poor handover creates gaps; a good handover ensures <strong>ops teams are equipped, confident, and ready</strong> to support long-term without project involvement.</p></div>
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">📚</div><div class="concept-title">Documentation Transfer</div><div class="concept-desc">Architecture diagrams, runbooks, troubleshooting guides, config details. Ops should support without project team involvement.</div></div>
+                <div class="concept-card"><div class="concept-icon">🎓</div><div class="concept-title">Knowledge Transfer Sessions</div><div class="concept-desc">Hands-on sessions covering operation, common issues, escalation paths. Record all sessions for future onboarding.</div></div>
+                <div class="concept-card"><div class="concept-icon">🔐</div><div class="concept-title">Access & Credentials</div><div class="concept-desc">Transfer admin access, service accounts, vendor portal credentials. Update password vault and access matrices completely.</div></div>
+                <div class="concept-card"><div class="concept-icon">📞</div><div class="concept-title">Vendor Relationships</div><div class="concept-desc">Introduce ops to vendor contacts. Transfer support contracts and escalation procedures. Update all contact lists.</div></div>
+                <div class="concept-card"><div class="concept-icon">🔄</div><div class="concept-title">Shadow Period</div><div class="concept-desc">Ops shadows project team for 2-4 weeks. Gradually transfer responsibility with project team available as backup only.</div></div>
+                <div class="concept-card"><div class="concept-icon">✅</div><div class="concept-title">Acceptance Criteria</div><div class="concept-desc">Clear criteria for handover completion. Ops manager signs off when ready. Never force premature handover.</div></div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Handover Item</th><th>From</th><th>To</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Technical documentation</strong></td><td>Dev Team</td><td>Platform Ops</td><td>Confluence + review</td><td><span class="status-badge achieved">Complete</span></td><td>Oct 15</td></tr>
+                        <tr><td><strong>Support runbooks</strong></td><td>Project Team</td><td>Service Desk</td><td>ServiceNow KB</td><td><span class="status-badge achieved">Complete</span></td><td>Oct 18</td></tr>
+                        <tr><td><strong>Admin access transfer</strong></td><td>Tech Lead</td><td>Ops Manager</td><td>Access request</td><td><span class="status-badge achieved">Complete</span></td><td>Oct 20</td></tr>
+                        <tr><td><strong>Vendor introductions</strong></td><td>PM</td><td>Vendor Manager</td><td>Joint call</td><td><span class="status-badge achieved">Complete</span></td><td>Oct 22</td></tr>
+                        <tr><td><strong>KT sessions (5)</strong></td><td>Project Team</td><td>Ops Team</td><td>Recorded sessions</td><td><span class="status-badge achieved">Complete</span></td><td>Oct 25</td></tr>
+                        <tr><td><strong>Shadow period</strong></td><td>Hypercare</td><td>BAU Support</td><td>2-week shadow</td><td><span class="status-badge achieved">Complete</span></td><td>Nov 8</td></tr>
+                        <tr><td><strong>Final acceptance</strong></td><td>PM</td><td>Ops Manager</td><td>Sign-off meeting</td><td><span class="status-badge achieved">Complete</span></td><td>Nov 12</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout"><div class="callout-title">🎯 Handover Success Criteria</div><div class="callout-text">Complete when: <strong>(1)</strong> Ops handles 95% of tickets without escalation. <strong>(2)</strong> All docs reviewed and accepted. <strong>(3)</strong> Ops manager signs off. <strong>(4)</strong> Project team fully released. <strong>(5)</strong> No project involvement for 2+ consecutive weeks.</div></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>KT Session</th><th>Topic</th><th>Duration</th><th>Attendees</th><th>Recording</th><th>Quiz Score</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>KT-1</strong></td><td>System Architecture & Components</td><td>3 hours</td><td>12</td><td>✓ Recorded</td><td>92% avg</td></tr>
+                        <tr><td><strong>KT-2</strong></td><td>Operations & Monitoring</td><td>2 hours</td><td>8</td><td>✓ Recorded</td><td>88% avg</td></tr>
+                        <tr><td><strong>KT-3</strong></td><td>Troubleshooting & Common Issues</td><td>2.5 hours</td><td>10</td><td>✓ Recorded</td><td>85% avg</td></tr>
+                        <tr><td><strong>KT-4</strong></td><td>Security & Access Management</td><td>1.5 hours</td><td>6</td><td>✓ Recorded</td><td>94% avg</td></tr>
+                        <tr><td><strong>KT-5</strong></td><td>Integration & APIs</td><td>2 hours</td><td>5</td><td>✓ Recorded</td><td>87% avg</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">📹</div><div class="concept-title">Recorded Sessions</div><div class="concept-desc">All 5 KT sessions recorded and stored in SharePoint. New team members can self-onboard. Average viewing time: 45 min per session.</div></div>
+                <div class="concept-card"><div class="concept-icon">📝</div><div class="concept-title">Knowledge Verification</div><div class="concept-desc">Post-session quizzes ensure comprehension. 85% minimum passing score required. Retake available within 48 hours.</div></div>
+                <div class="concept-card"><div class="concept-icon">👥</div><div class="concept-title">Buddy System</div><div class="concept-desc">Each ops team member paired with project team member for 2-week shadow period. Gradual responsibility transfer.</div></div>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+        <!-- PROJECT CLOSURE -->
+        <section class="module" id="closure">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Project Closure</h2>
+                    <p>Formal completion and administrative wrap-up</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Project closure formally ends the project and releases resources. It ensures <strong>all deliverables complete, documentation finalized, and contracts closed</strong>. Without proper closure, projects linger indefinitely consuming resources.</p></div>
+            
+            <!-- Project Timeline -->
+            <div class="framework-container">
+                <div class="framework-header"><div class="framework-title">📅 Project Journey Timeline</div><div class="framework-badge">12-Month Retrospective</div></div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 180" style="width: 100%; height: auto;">
+                        <line x1="40" y1="90" x2="810" y2="90" stroke="#2a2a3e" stroke-width="3"/>
+                        <g transform="translate(40, 90)"><circle r="10" fill="#3B82F6"/><text x="0" y="-25" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">Jan</text><text x="0" y="35" text-anchor="middle" fill="#a0a0b0" font-size="8">Kickoff</text></g>
+                        <g transform="translate(170, 90)"><circle r="10" fill="#8B5CF6"/><text x="0" y="-25" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">Mar</text><text x="0" y="35" text-anchor="middle" fill="#a0a0b0" font-size="8">Design</text></g>
+                        <g transform="translate(300, 90)"><circle r="10" fill="#EC4899"/><text x="0" y="-25" text-anchor="middle" fill="#F472B6" font-size="10" font-weight="600">May</text><text x="0" y="35" text-anchor="middle" fill="#a0a0b0" font-size="8">Build</text></g>
+                        <g transform="translate(430, 90)"><circle r="10" fill="#F59E0B"/><text x="0" y="-25" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">Jul</text><text x="0" y="35" text-anchor="middle" fill="#a0a0b0" font-size="8">Test</text></g>
+                        <g transform="translate(560, 90)"><circle r="10" fill="#10B981"/><text x="0" y="-25" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Sep</text><text x="0" y="35" text-anchor="middle" fill="#34D399" font-size="8">Go-Live</text></g>
+                        <g transform="translate(690, 90)"><circle r="10" fill="#10B981"/><text x="0" y="-25" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Nov</text><text x="0" y="35" text-anchor="middle" fill="#a0a0b0" font-size="8">PIR</text></g>
+                        <g transform="translate(810, 90)"><circle r="10" fill="#10B981" stroke="#fff" stroke-width="2"/><text x="0" y="-25" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">Dec</text><text x="0" y="35" text-anchor="middle" fill="#34D399" font-size="8">Closure</text></g>
+                        <g transform="translate(40, 130)"><rect width="770" height="30" rx="4" fill="#1a1a2e"/><text x="65" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">Requirements</text><text x="235" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">Development</text><text x="430" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">Testing & UAT</text><text x="625" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">Hypercare</text><text x="750" y="20" text-anchor="middle" fill="#34D399" font-size="8">Complete</text></g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Project Metric</th><th>Planned</th><th>Actual</th><th>Variance</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Duration</strong></td><td>10 months</td><td>11 months</td><td style="color: #FBBF24;">+10%</td><td>UAT extended 4 weeks for quality</td></tr>
+                        <tr><td><strong>Budget</strong></td><td>$4.2M</td><td>$4.1M</td><td style="color: #34D399;">-2.4%</td><td>Under budget due to scope discipline</td></tr>
+                        <tr><td><strong>Scope</strong></td><td>100%</td><td>95%</td><td style="color: #FBBF24;">-5%</td><td>3 features deferred to Phase 2</td></tr>
+                        <tr><td><strong>Quality</strong></td><td>0 critical defects</td><td>0 critical defects</td><td style="color: #34D399;">Met</td><td>98.2% test pass rate</td></tr>
+                        <tr><td><strong>Team Size</strong></td><td>25 FTE</td><td>28 FTE</td><td style="color: #FBBF24;">+12%</td><td>Added QA resources mid-project</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="closure-checklist">
+                <div class="closure-header"><div class="closure-title">📋 Project Closure Checklist</div></div>
+                <div class="closure-body">
+                    <div class="closure-category">
+                        <div class="closure-category-title">📄 Documentation</div>
+                        <div class="closure-items">
+                            <div class="closure-item"><div class="closure-check done">✓</div> Final project report completed</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Technical documentation finalized</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> User guides published</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Training materials archived</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Lessons learned documented</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Architecture diagrams updated</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Knowledge base complete</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Runbooks tested by ops</div>
+                        </div>
+                    </div>
+                    <div class="closure-category">
+                        <div class="closure-category-title">💰 Financial</div>
+                        <div class="closure-items">
+                            <div class="closure-item"><div class="closure-check done">✓</div> Final budget reconciliation</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Vendor invoices processed</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Contract closeouts completed</div>
+                            <div class="closure-item"><div class="closure-check pending"></div> Capitalization documentation</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Charge codes closed</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Benefits baseline established</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Contingency reconciled</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Final cost report submitted</div>
+                        </div>
+                    </div>
+                    <div class="closure-category">
+                        <div class="closure-category-title">👥 Resources</div>
+                        <div class="closure-items">
+                            <div class="closure-item"><div class="closure-check done">✓</div> Team members released</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Contractor off-boarding</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Access permissions revoked</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Equipment returned</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Performance feedback given</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Recognition delivered</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Staffing recommendations</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Skills inventory updated</div>
+                        </div>
+                    </div>
+                    <div class="closure-category">
+                        <div class="closure-category-title">🎯 Governance</div>
+                        <div class="closure-items">
+                            <div class="closure-item"><div class="closure-check done">✓</div> Steering committee sign-off</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Sponsor acceptance</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Risk register dispositioned</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Issue log resolved/transferred</div>
+                            <div class="closure-item"><div class="closure-check pending"></div> Audit trail archived</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Project site archived</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> PMO notified</div>
+                            <div class="closure-item"><div class="closure-check done">✓</div> Portfolio dashboard updated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- CELEBRATION & RECOGNITION -->
+        <section class="module" id="celebration">
+            <div class="module-header">
+                <div class="module-icon">🎉</div>
+                <div class="module-info">
+                    <h2>Celebration & Recognition</h2>
+                    <p>Acknowledging team effort and success</p>
+                </div>
+            </div>
+            <div class="description-block"><p>Recognition is essential, not optional. Celebrating success <strong>reinforces positive behaviors, builds morale, and creates organizational memory</strong> of what good looks like. Take time to acknowledge contributions.</p></div>
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">🏆</div><div class="concept-title">Individual Recognition</div><div class="concept-desc">Specific callouts for exceptional contributions. Formal recognition programs. LinkedIn recommendations. Career development conversations.</div></div>
+                <div class="concept-card"><div class="concept-icon">👥</div><div class="concept-title">Team Celebration</div><div class="concept-desc">Team dinner or event. Executive thank-you message. Team photo and memento. Success story in company communications.</div></div>
+                <div class="concept-card"><div class="concept-icon">📢</div><div class="concept-title">Organizational Visibility</div><div class="concept-desc">Town hall presentation. Case study for future projects. Newsletter inclusion. Reference for similar initiatives.</div></div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Recognition Type</th><th>Recipients</th><th>Method</th><th>Timing</th><th>Owner</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Executive Thank You</strong></td><td>Full team (45)</td><td>Email from CIO + Slack</td><td>Go-live +1 day</td><td>Sponsor</td></tr>
+                        <tr><td><strong>Team Celebration</strong></td><td>Core team (25)</td><td>Team dinner</td><td>PIR completion</td><td>PM</td></tr>
+                        <tr><td><strong>Spot Bonuses</strong></td><td>Top performers (8)</td><td>HR recognition</td><td>Project closure</td><td>PM + HR</td></tr>
+                        <tr><td><strong>Town Hall</strong></td><td>Company-wide</td><td>15-min presentation</td><td>Next all-hands</td><td>PM + Tech Lead</td></tr>
+                        <tr><td><strong>Case Study</strong></td><td>PMO / Future projects</td><td>Internal wiki</td><td>Within 30 days</td><td>PM</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout"><div class="callout-title">🌟 Recognition Best Practices</div><div class="callout-text"><strong>Be specific:</strong> "Sarah's script saved 40 hours" beats "Sarah did great work." <strong>Be timely:</strong> Recognition loses impact if delayed months. <strong>Be inclusive:</strong> Acknowledge support roles, not just visible leads. <strong>Be proportionate:</strong> Match recognition to contribution.</div></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Team Member</th><th>Role</th><th>Key Contribution</th><th>Recognition</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Sarah Chen</strong></td><td>Tech Lead</td><td>Designed migration architecture, prevented 4-hour outage with DNS fix</td><td>Spot bonus + Town Hall mention</td></tr>
+                        <tr><td><strong>Mike Rodriguez</strong></td><td>Dev Lead</td><td>Led development team, maintained 98% test coverage</td><td>Spot bonus + Career discussion</td></tr>
+                        <tr><td><strong>Jennifer Park</strong></td><td>QA Lead</td><td>Caught 23 critical bugs in UAT, streamlined test automation</td><td>Promotion recommendation</td></tr>
+                        <tr><td><strong>David Thompson</strong></td><td>PM</td><td>Kept project on track, managed stakeholder expectations expertly</td><td>Performance bonus</td></tr>
+                        <tr><td><strong>Lisa Wang</strong></td><td>Change Lead</td><td>Champions program drove 87% adoption</td><td>Internal recognition award</td></tr>
+                        <tr><td><strong>James Miller</strong></td><td>BA Lead</td><td>Requirements clarity prevented scope creep</td><td>Team dinner host</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">🎊</div><div class="concept-title">Team Event</div><div class="concept-desc"><strong>Celebration dinner:</strong> Restaurant event for core team (25 people). Budget: $2,500. Date: Nov 22. Includes project video montage and awards ceremony.</div></div>
+                <div class="concept-card"><div class="concept-icon">🏅</div><div class="concept-title">Project Awards</div><div class="concept-desc"><strong>Categories:</strong> MVP (Sarah), Unsung Hero (ops team), Best Collaboration (dev+QA), Rising Star (junior dev), Innovation (migration script).</div></div>
+                <div class="concept-card"><div class="concept-icon">📸</div><div class="concept-title">Project Memorabilia</div><div class="concept-desc"><strong>Keepsakes:</strong> Team photo with signed frame, custom project t-shirts, commemorative coin for leads. Shared via company newsletter.</div></div>
+            </div>
+        </section>
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered PIR analysis and reporting</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📊</div>
+                    <div class="agent-name">PIRAnalyst</div>
+                    <div class="agent-role">Post-Implementation Intelligence</div>
+                    <div class="agent-desc">Automates benefits tracking, synthesizes lessons from project artifacts, analyzes stakeholder feedback, and generates comprehensive PIR reports. Identifies patterns across projects for organizational improvement.</div>
+                    <ul class="agent-capabilities">
+                        <li>Automated benefits measurement vs business case</li>
+                        <li>Lessons learned extraction from documents</li>
+                        <li>Cross-project pattern analysis</li>
+                        <li>Stakeholder sentiment analysis from surveys</li>
+                        <li>PIR report generation with visualizations</li>
+                        <li>Technical debt assessment and prioritization</li>
+                        <li>Risk closeout recommendations</li>
+                        <li>Continuous improvement prioritization</li>
+                        <li>KPI dashboard generation</li>
+                        <li>Executive summary creation</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header"><div class="code-tabs"><div class="code-tab active">Python</div><div class="code-tab">Config</div></div><div class="code-filename">pir_analyst_agent.py</div></div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Post-Implementation Review Analyst Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> pir_tools <span class="code-keyword">import</span> (
+    BenefitsTracker, SentimentAnalyzer,
+    PatternDetector, ReportGenerator,
+    DebtAssessor, RiskAnalyzer, KPICalculator
+)
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Initialize specialized tools</span>
+benefits_tracker = BenefitsTracker(business_case_path=<span class="code-string">"./business_case.json"</span>)
+sentiment_analyzer = SentimentAnalyzer(model=<span class="code-string">"sentiment-v2"</span>)
+pattern_detector = PatternDetector(historical_pirs=<span class="code-string">"./pir_archive/"</span>)
+report_generator = ReportGenerator(template=<span class="code-string">"enterprise"</span>)
+debt_assessor = DebtAssessor(codebase_path=<span class="code-string">"./src/"</span>)
+risk_analyzer = RiskAnalyzer(risk_register=<span class="code-string">"./risks.json"</span>)
+kpi_calculator = KPICalculator(metrics_db=<span class="code-string">"./metrics/"</span>)
+
+pir_analyst = Agent(
+    role=<span class="code-string">"Post-Implementation Review Analyst"</span>,
+    goal=<span class="code-string">"Extract maximum learning and value from project completion"</span>,
+    backstory=<span class="code-string">"""Expert in project evaluation with deep 
+    experience in benefits realization, lessons learned 
+    facilitation, and organizational learning. Combines 
+    quantitative analysis with qualitative insights to 
+    deliver actionable recommendations."""</span>,
+    llm=llm,
+    tools=[
+        benefits_tracker, sentiment_analyzer, 
+        pattern_detector, report_generator,
+        debt_assessor, risk_analyzer, kpi_calculator
+    ],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">generate_pir_report</span>(project_data: <span class="code-keyword">dict</span>) -> <span class="code-keyword">dict</span>:
+    <span class="code-string">"""Generate comprehensive PIR with all phases."""</span>
+    
+    task = Task(
+        description=<span class="code-string">f"""
+        Analyze project and generate full PIR:
+        
+        PHASE 1: Benefits Analysis
+        - Compare actual vs business case targets
+        - Calculate ROI, NPV, and payback period
+        - Project future benefits trajectory
+        - Identify gaps and remediation actions
+        
+        PHASE 2: Stakeholder Analysis
+        - Analyze survey responses (NPS, CSAT)
+        - Extract themes from qualitative feedback
+        - Segment by stakeholder group
+        - Identify satisfaction drivers and detractors
+        
+        PHASE 3: Lessons Learned
+        - Extract lessons from all project artifacts
+        - Categorize as keep/start/stop/celebrate
+        - Assign owners and target dates
+        - Cross-reference with historical PIRs
+        
+        PHASE 4: Technical Assessment
+        - Inventory technical debt items
+        - Assess risk register closeout status
+        - Evaluate system health KPIs
+        - Prioritize remediation backlog
+        
+        PHASE 5: Recommendations
+        - Prioritize enhancement roadmap
+        - Define handover readiness criteria
+        - Generate executive summary
+        - Create stakeholder-specific views
+        
+        Project: {project_data}
+        """</span>,
+        agent=pir_analyst,
+        expected_output=<span class="code-string">"Comprehensive PIR report with all sections"</span>
+    )
+    
+    crew = Crew(
+        agents=[pir_analyst], 
+        tasks=[task],
+        verbose=<span class="code-keyword">True</span>
+    )
+    result = <span class="code-keyword">await</span> crew.kickoff_async()
+    
+    <span class="code-keyword">return</span> {
+        <span class="code-string">"benefits_score"</span>: result.benefits_pct,
+        <span class="code-string">"roi_actual"</span>: result.roi,
+        <span class="code-string">"nps_score"</span>: result.nps,
+        <span class="code-string">"lessons_count"</span>: len(result.lessons_learned),
+        <span class="code-string">"lessons"</span>: result.lessons_learned,
+        <span class="code-string">"tech_debt_items"</span>: result.debt_items,
+        <span class="code-string">"risk_summary"</span>: result.risks,
+        <span class="code-string">"recommendations"</span>: result.improvements,
+        <span class="code-string">"executive_summary"</span>: result.summary,
+        <span class="code-string">"report_url"</span>: result.report_path
+    }</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-icon">📊</div><div class="concept-title">Automated Analysis</div><div class="concept-desc"><strong>Data sources:</strong> Jira tickets, Confluence docs, survey responses, monitoring metrics, financial systems. Agent synthesizes across all sources automatically.</div></div>
+                <div class="concept-card"><div class="concept-icon">🔄</div><div class="concept-title">Cross-Project Learning</div><div class="concept-desc"><strong>Pattern detection:</strong> Compares current project to 50+ historical PIRs. Identifies recurring issues, successful practices, and organizational blind spots.</div></div>
+                <div class="concept-card"><div class="concept-icon">📝</div><div class="concept-title">Report Generation</div><div class="concept-desc"><strong>Multiple formats:</strong> Executive summary (2 pages), full PIR (20+ pages), stakeholder-specific views, interactive dashboard, presentation deck.</div></div>
+            </div>
+        </section>
+    </div>
+</div>
+<footer>
+    <div class="footer-nav">
+        <a href="cat18-p4-wave-rollout.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous</div><div class="footer-link-title">18.4 Wave Rollout</div></div></a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 18.5</div>
+        <a href="cat18-implementation-overview.html" class="footer-link"><div><div class="footer-link-label">Back to</div><div class="footer-link-title">Category Overview</div></div><span>→</span></a>
+    </div>
+</footer>
+</body>
+</html>

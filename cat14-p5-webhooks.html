@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhooks | 14.5 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --violet: #7C3AED;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 56px; height: 56px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        .subsection { margin-top: var(--space-xl); }
+        .subsection-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-lg); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           WEBHOOK FLOW VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .webhook-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .webhook-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .webhook-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .webhook-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .webhook-canvas { padding: var(--space-2xl) var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; }
+        .webhook-canvas::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.06) 0%, transparent 40%), radial-gradient(circle at 80% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 40%); }
+        
+        .webhook-flow { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg); max-width: 900px; margin: 0 auto; }
+        
+        /* Flow Nodes */
+        .flow-node { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .flow-node-box { width: 120px; height: 120px; background: var(--bg-card); border: 3px solid var(--node-color, var(--cat-primary)); border-radius: var(--radius-xl); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 30px color-mix(in srgb, var(--node-color) 30%, transparent); transition: all 0.3s; }
+        .flow-node-box:hover { transform: scale(1.05); box-shadow: 0 0 40px color-mix(in srgb, var(--node-color) 50%, transparent); }
+        .flow-node-icon { font-size: 36px; margin-bottom: var(--space-xs); }
+        .flow-node-label { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); }
+        .flow-node-sublabel { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-xs); }
+        
+        .flow-node.source { --node-color: #3B82F6; }
+        .flow-node.webhook { --node-color: var(--cat-primary); }
+        .flow-node.destination { --node-color: #10B981; }
+        
+        /* Flow Arrow */
+        .flow-arrow { flex: 1; position: relative; height: 4px; background: linear-gradient(90deg, var(--arrow-from, #3B82F6), var(--arrow-to, var(--cat-primary))); border-radius: 2px; min-width: 80px; }
+        .flow-arrow::after { content: ''; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); border: 8px solid transparent; border-left-color: var(--arrow-to, var(--cat-primary)); }
+        .flow-arrow.to-webhook { --arrow-from: #3B82F6; --arrow-to: var(--cat-primary); }
+        .flow-arrow.to-dest { --arrow-from: var(--cat-primary); --arrow-to: #10B981; }
+        
+        /* Animated Particles */
+        .flow-particle { position: absolute; width: 10px; height: 10px; background: var(--arrow-to); border-radius: 50%; top: 50%; transform: translateY(-50%); animation: particle-flow 1.5s ease-in-out infinite; filter: drop-shadow(0 0 6px var(--arrow-to)); }
+        .flow-arrow.to-webhook .flow-particle { background: var(--cat-primary); filter: drop-shadow(0 0 6px var(--cat-primary)); }
+        .flow-arrow.to-dest .flow-particle { background: #10B981; filter: drop-shadow(0 0 6px #10B981); }
+        .flow-particle:nth-child(2) { animation-delay: 0.5s; }
+        .flow-particle:nth-child(3) { animation-delay: 1s; }
+        
+        @keyframes particle-flow {
+            0% { left: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: calc(100% - 10px); opacity: 0; }
+        }
+        
+        /* Event Label */
+        .event-label { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: var(--font-xs); color: var(--text-muted); background: var(--bg-card-alt); padding: 2px 10px; border-radius: var(--radius-sm); white-space: nowrap; }
+        
+        /* Stats Bar */
+        .webhook-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); padding: var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .webhook-stat { text-align: center; }
+        .webhook-stat-value { font-size: var(--font-base); font-weight: 700; color: var(--cat-light); }
+        .webhook-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           POLLING VS WEBHOOKS COMPARISON
+        ═══════════════════════════════════════════════════════════════ */
+        .comparison-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .comparison-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; }
+        .comparison-side { padding: var(--space-xl); }
+        .comparison-side.polling { border-right: 1px solid var(--border-color); }
+        .comparison-side-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .comparison-icon { width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .comparison-side.polling .comparison-icon { background: rgba(239, 68, 68, 0.15); border: 2px solid var(--danger-red); }
+        .comparison-side.webhooks .comparison-icon { background: rgba(16, 185, 129, 0.15); border: 2px solid var(--success-green); }
+        .comparison-side-title { font-size: var(--font-lg); font-weight: 600; }
+        .comparison-side.polling .comparison-side-title { color: var(--danger-red); }
+        .comparison-side.webhooks .comparison-side-title { color: var(--success-green); }
+        
+        .comparison-visual { height: 120px; background: var(--bg-dark); border-radius: var(--radius-lg); margin-bottom: var(--space-lg); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        
+        /* Polling Animation */
+        .polling-visual { display: flex; align-items: center; gap: var(--space-lg); }
+        .polling-client, .polling-server { width: 50px; height: 50px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .polling-arrows { display: flex; flex-direction: column; gap: var(--space-xs); }
+        .polling-arrow { font-size: 20px; color: var(--danger-red); animation: poll-bounce 1s ease-in-out infinite; }
+        .polling-arrow:nth-child(2) { animation-delay: 0.33s; }
+        .polling-arrow:nth-child(3) { animation-delay: 0.66s; }
+        @keyframes poll-bounce { 0%, 100% { opacity: 0.3; transform: translateX(0); } 50% { opacity: 1; transform: translateX(5px); } }
+        
+        /* Webhook Animation */
+        .webhook-visual { display: flex; align-items: center; gap: var(--space-lg); }
+        .webhook-server, .webhook-client { width: 50px; height: 50px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .webhook-push { position: relative; width: 80px; height: 4px; background: var(--success-green); border-radius: 2px; }
+        .webhook-push::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-left-color: var(--success-green); }
+        .webhook-dot { position: absolute; width: 8px; height: 8px; background: var(--success-green); border-radius: 50%; top: 50%; transform: translateY(-50%); animation: webhook-flow 2s ease-in-out infinite; filter: drop-shadow(0 0 4px var(--success-green)); }
+        @keyframes webhook-flow { 0% { left: 0; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        
+        .comparison-list { list-style: none; }
+        .comparison-list li { padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .comparison-side.polling .comparison-list li::before { content: '✗'; color: var(--danger-red); font-weight: bold; }
+        .comparison-side.webhooks .comparison-list li::before { content: '✓'; color: var(--success-green); font-weight: bold; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           EVENT TYPES GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .events-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .event-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); transition: all 0.3s; }
+        .event-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); }
+        .event-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .event-card-icon { width: 44px; height: 44px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .event-card-title { font-size: var(--font-base); font-weight: 600; }
+        .event-card-events { list-style: none; }
+        .event-card-events li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); font-family: monospace; }
+        .event-card-events li::before { content: '→ '; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PAYLOAD STRUCTURE
+        ═══════════════════════════════════════════════════════════════ */
+        .payload-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .payload-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .payload-title { font-size: var(--font-sm); font-weight: 600; }
+        .payload-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .payload-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+        .code-key { color: #79C0FF; }
+        .code-string { color: #A5D6FF; }
+        .code-number { color: #79C0FF; }
+        .code-comment { color: #6A737D; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SECURITY SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .security-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .security-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .security-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .security-card-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .security-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .security-card-content { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .security-card-content code { background: var(--bg-card-alt); padding: 2px 6px; border-radius: var(--radius-sm); font-family: monospace; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RETRY STRATEGIES
+        ═══════════════════════════════════════════════════════════════ */
+        .retry-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .retry-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .retry-content { padding: var(--space-xl); }
+        
+        .retry-timeline { position: relative; padding-left: var(--space-2xl); }
+        .retry-timeline::before { content: ''; position: absolute; left: 16px; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--success-green), var(--warning-yellow), var(--danger-red)); border-radius: 2px; }
+        
+        .retry-item { position: relative; padding-bottom: var(--space-xl); }
+        .retry-item:last-child { padding-bottom: 0; }
+        .retry-dot { position: absolute; left: -32px; top: 4px; width: 20px; height: 20px; background: var(--bg-card); border: 3px solid var(--item-color, var(--cat-primary)); border-radius: 50%; }
+        .retry-time { font-size: var(--font-xs); color: var(--item-color); font-weight: 600; margin-bottom: var(--space-xs); }
+        .retry-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); }
+        .retry-desc { font-size: var(--font-sm); color: var(--text-secondary); }
+        
+        .retry-item.attempt-1 { --item-color: var(--success-green); }
+        .retry-item.attempt-2 { --item-color: #84CC16; }
+        .retry-item.attempt-3 { --item-color: var(--warning-yellow); }
+        .retry-item.attempt-4 { --item-color: var(--orange); }
+        .retry-item.attempt-5 { --item-color: var(--danger-red); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .tools-table-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table { width: 100%; border-collapse: collapse; }
+        .tools-table th { padding: var(--space-md); text-align: left; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table td { padding: var(--space-md); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .tools-table tr:last-child td { border-bottom: none; }
+        .tools-table tr:hover td { background: var(--bg-hover); }
+        .tool-name { display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-primary); }
+        .tool-icon { font-size: 20px; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); }
+        .badge-oss { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .badge-commercial { background: rgba(124, 58, 237, 0.2); color: var(--violet); }
+        .badge-cloud { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-dark); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-base); margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-panel-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-panel-title { font-size: var(--font-sm); font-weight: 600; }
+        .code-panel-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .code-panel-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #79C0FF; }
+
+        .use-case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .use-case-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .use-case-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .use-case-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .use-case-content h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); color: var(--cat-light); }
+        .use-case-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .comparison-side.polling { border-right: none; border-bottom: 1px solid var(--border-color); }
+            .events-grid { grid-template-columns: 1fr; }
+            .security-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .use-case-grid { grid-template-columns: 1fr; }
+            .webhook-flow { flex-direction: column; }
+            .flow-arrow { width: 4px; height: 60px; min-width: auto; }
+            .flow-arrow::after { right: auto; bottom: -8px; top: auto; transform: translateX(-50%) rotate(90deg); left: 50%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat14-integration-apis-overview.html">Integration & APIs</a>
+        <span class="sep">/</span>
+        <span class="current">Webhooks</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔗 Category 14</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat14-integration-apis-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat14-p1-api-gateway.html"><span class="nav-icon">🚪</span> 14.1 API Gateway</a></li>
+            <li><a href="cat14-p2-event-architecture.html"><span class="nav-icon">📡</span> 14.2 Event Architecture</a></li>
+            <li><a href="cat14-p3-connectors.html"><span class="nav-icon">🔌</span> 14.3 Connectors</a></li>
+            <li><a href="cat14-p4-api-lifecycle.html"><span class="nav-icon">🔄</span> 14.4 API Lifecycle</a></li>
+            <li><a href="cat14-p5-webhooks.html" class="active"><span class="nav-icon">🪝</span> 14.5 Webhooks</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Polling vs Webhooks</a></li>
+            <li><a href="#events"><span class="nav-icon">📋</span> Event Types</a></li>
+            <li><a href="#payload"><span class="nav-icon">📦</span> Payload Structure</a></li>
+            <li><a href="#security"><span class="nav-icon">🔒</span> Security</a></li>
+            <li><a href="#retry"><span class="nav-icon">🔁</span> Retry Strategies</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🪝 Page 14.5</span>
+                <h1>Webhooks</h1>
+                <p>Real-time event notifications that push data to your endpoints when changes occur, eliminating the need for constant polling.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">&lt;100ms</div><div class="hero-metric-label">Delivery Latency</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">50+</div><div class="hero-metric-label">Event Types</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.9%</div><div class="hero-metric-label">Delivery Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5x</div><div class="hero-metric-label">Retry Attempts</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Webhook Overview</h2>
+                    <p>Understanding event-driven notifications</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Webhooks are HTTP callbacks that deliver real-time notifications when events occur in a source system. Instead of your application repeatedly asking "has anything changed?" (polling), webhooks <strong>push</strong> updates to your endpoint the moment they happen. This pattern is fundamental to modern integrations—from payment notifications to CI/CD triggers to chat bots.</p>
+                <p>The webhook model inverts the traditional client-server relationship. Your application becomes the <strong>server</strong>, exposing an endpoint that receives POST requests from external systems. When a user completes a payment on Stripe, when a commit is pushed to GitHub, when a message arrives in Slack—the source system makes an HTTP request to your registered URL with event details in the payload.</p>
+                <p>Webhooks excel at <strong>efficiency and immediacy</strong>. Polling wastes resources checking for changes that may not exist; webhooks only fire when something happens. Polling introduces latency—you might wait minutes between checks; webhooks deliver in milliseconds. The tradeoff is complexity: your endpoint must be publicly accessible, handle authentication, process events idempotently, and manage failures gracefully.</p>
+            </div>
+            
+            <!-- Webhook Flow Visualization -->
+            <div class="webhook-container">
+                <div class="webhook-header">
+                    <div class="webhook-title">🪝 Webhook Event Flow</div>
+                    <div class="webhook-badge">Real-time Push</div>
+                </div>
+                <div class="webhook-canvas">
+                    <div class="webhook-flow">
+                        <!-- Source System -->
+                        <div class="flow-node source">
+                            <div class="flow-node-box">
+                                <div class="flow-node-icon">🏢</div>
+                                <div class="flow-node-label">Source</div>
+                            </div>
+                            <div class="flow-node-sublabel">Stripe, GitHub, etc.</div>
+                        </div>
+                        
+                        <!-- Arrow to Webhook -->
+                        <div class="flow-arrow to-webhook">
+                            <div class="event-label">Event Triggered</div>
+                            <div class="flow-particle"></div>
+                            <div class="flow-particle"></div>
+                            <div class="flow-particle"></div>
+                        </div>
+                        
+                        <!-- Webhook Endpoint -->
+                        <div class="flow-node webhook">
+                            <div class="flow-node-box">
+                                <div class="flow-node-icon">🪝</div>
+                                <div class="flow-node-label">Webhook</div>
+                            </div>
+                            <div class="flow-node-sublabel">Your Endpoint</div>
+                        </div>
+                        
+                        <!-- Arrow to Destination -->
+                        <div class="flow-arrow to-dest">
+                            <div class="event-label">Process & Act</div>
+                            <div class="flow-particle"></div>
+                            <div class="flow-particle"></div>
+                            <div class="flow-particle"></div>
+                        </div>
+                        
+                        <!-- Destination -->
+                        <div class="flow-node destination">
+                            <div class="flow-node-box">
+                                <div class="flow-node-icon">⚡</div>
+                                <div class="flow-node-label">Action</div>
+                            </div>
+                            <div class="flow-node-sublabel">Database, Queue, etc.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="webhook-stats">
+                    <div class="webhook-stat">
+                        <div class="webhook-stat-value">HTTP POST</div>
+                        <div class="webhook-stat-label">Delivery Method</div>
+                    </div>
+                    <div class="webhook-stat">
+                        <div class="webhook-stat-value">JSON</div>
+                        <div class="webhook-stat-label">Payload Format</div>
+                    </div>
+                    <div class="webhook-stat">
+                        <div class="webhook-stat-value">2xx</div>
+                        <div class="webhook-stat-label">Success Response</div>
+                    </div>
+                    <div class="webhook-stat">
+                        <div class="webhook-stat-value">HMAC</div>
+                        <div class="webhook-stat-label">Signature Verification</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- POLLING VS WEBHOOKS -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Polling vs Webhooks</h2>
+                    <p>Why webhooks win for real-time integrations</p>
+                </div>
+            </div>
+            
+            <div class="comparison-container">
+                <div class="comparison-header">
+                    <h3>📊 Comparison</h3>
+                </div>
+                <div class="comparison-grid">
+                    <!-- Polling Side -->
+                    <div class="comparison-side polling">
+                        <div class="comparison-side-header">
+                            <div class="comparison-icon">🔄</div>
+                            <div class="comparison-side-title">Polling</div>
+                        </div>
+                        <div class="comparison-visual">
+                            <div class="polling-visual">
+                                <div class="polling-client">📱</div>
+                                <div class="polling-arrows">
+                                    <span class="polling-arrow">→</span>
+                                    <span class="polling-arrow">→</span>
+                                    <span class="polling-arrow">→</span>
+                                </div>
+                                <div class="polling-server">🖥️</div>
+                            </div>
+                        </div>
+                        <ul class="comparison-list">
+                            <li>Client repeatedly asks "any updates?"</li>
+                            <li>Wastes API calls when nothing changed</li>
+                            <li>Latency between polls (seconds to minutes)</li>
+                            <li>Higher server load from constant requests</li>
+                            <li>Rate limits can throttle your checks</li>
+                            <li>Simpler to implement initially</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Webhooks Side -->
+                    <div class="comparison-side webhooks">
+                        <div class="comparison-side-header">
+                            <div class="comparison-icon">🪝</div>
+                            <div class="comparison-side-title">Webhooks</div>
+                        </div>
+                        <div class="comparison-visual">
+                            <div class="webhook-visual">
+                                <div class="webhook-server">🖥️</div>
+                                <div class="webhook-push">
+                                    <div class="webhook-dot"></div>
+                                </div>
+                                <div class="webhook-client">📱</div>
+                            </div>
+                        </div>
+                        <ul class="comparison-list">
+                            <li>Server pushes updates when they happen</li>
+                            <li>Zero wasted requests—only real events</li>
+                            <li>Near-instant delivery (milliseconds)</li>
+                            <li>Minimal server load—events only</li>
+                            <li>No rate limit concerns for receiving</li>
+                            <li>Requires public endpoint & security</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- EVENT TYPES -->
+        <section class="module" id="events">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Common Event Types</h2>
+                    <p>Events you'll encounter across platforms</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Different platforms expose different event types based on their domain. Payment platforms fire events for charges and refunds; version control systems emit push and pull request events; CRM systems notify on deal updates. Understanding the event taxonomy helps you subscribe only to what you need.</p>
+            </div>
+            
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-card-header">
+                        <div class="event-card-icon">💳</div>
+                        <div class="event-card-title">Payments</div>
+                    </div>
+                    <ul class="event-card-events">
+                        <li>payment.succeeded</li>
+                        <li>payment.failed</li>
+                        <li>refund.created</li>
+                        <li>subscription.updated</li>
+                        <li>invoice.paid</li>
+                    </ul>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-card-header">
+                        <div class="event-card-icon">📂</div>
+                        <div class="event-card-title">Version Control</div>
+                    </div>
+                    <ul class="event-card-events">
+                        <li>push</li>
+                        <li>pull_request.opened</li>
+                        <li>pull_request.merged</li>
+                        <li>release.published</li>
+                        <li>issues.created</li>
+                    </ul>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-card-header">
+                        <div class="event-card-icon">💬</div>
+                        <div class="event-card-title">Communication</div>
+                    </div>
+                    <ul class="event-card-events">
+                        <li>message.received</li>
+                        <li>channel.created</li>
+                        <li>user.joined</li>
+                        <li>reaction.added</li>
+                        <li>file.uploaded</li>
+                    </ul>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-card-header">
+                        <div class="event-card-icon">👥</div>
+                        <div class="event-card-title">CRM / Sales</div>
+                    </div>
+                    <ul class="event-card-events">
+                        <li>contact.created</li>
+                        <li>deal.stage_changed</li>
+                        <li>deal.won</li>
+                        <li>company.updated</li>
+                        <li>note.added</li>
+                    </ul>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-card-header">
+                        <div class="event-card-icon">🛒</div>
+                        <div class="event-card-title">E-Commerce</div>
+                    </div>
+                    <ul class="event-card-events">
+                        <li>order.placed</li>
+                        <li>order.fulfilled</li>
+                        <li>cart.abandoned</li>
+                        <li>product.updated</li>
+                        <li>inventory.low</li>
+                    </ul>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-card-header">
+                        <div class="event-card-icon">🔧</div>
+                        <div class="event-card-title">CI/CD</div>
+                    </div>
+                    <ul class="event-card-events">
+                        <li>build.started</li>
+                        <li>build.completed</li>
+                        <li>deploy.succeeded</li>
+                        <li>deploy.failed</li>
+                        <li>test.finished</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PAYLOAD STRUCTURE -->
+        <section class="module" id="payload">
+            <div class="module-header">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                    <h2>Payload Structure</h2>
+                    <p>Standard webhook payload anatomy</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>While each platform structures payloads differently, most follow common patterns. Payloads typically include an <strong>event type</strong>, <strong>timestamp</strong>, <strong>unique ID</strong> for idempotency, and the <strong>data</strong> object containing the changed resource. Some platforms wrap the payload in an envelope; others send the resource directly.</p>
+            </div>
+            
+            <div class="payload-container">
+                <div class="payload-header">
+                    <span class="payload-title">Example Webhook Payload</span>
+                    <span class="payload-lang">JSON</span>
+                </div>
+                <div class="payload-content">
+<pre>{
+  <span class="code-key">"id"</span>: <span class="code-string">"evt_1234567890"</span>,           <span class="code-comment">// Unique event ID for idempotency</span>
+  <span class="code-key">"type"</span>: <span class="code-string">"payment.succeeded"</span>,       <span class="code-comment">// Event type identifier</span>
+  <span class="code-key">"created"</span>: <span class="code-number">1704067200</span>,              <span class="code-comment">// Unix timestamp</span>
+  <span class="code-key">"api_version"</span>: <span class="code-string">"2024-01-01"</span>,      <span class="code-comment">// API version for payload schema</span>
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"object"</span>: {
+      <span class="code-key">"id"</span>: <span class="code-string">"pay_abc123"</span>,
+      <span class="code-key">"amount"</span>: <span class="code-number">9900</span>,                  <span class="code-comment">// Amount in cents</span>
+      <span class="code-key">"currency"</span>: <span class="code-string">"usd"</span>,
+      <span class="code-key">"customer"</span>: <span class="code-string">"cus_xyz789"</span>,
+      <span class="code-key">"status"</span>: <span class="code-string">"succeeded"</span>,
+      <span class="code-key">"metadata"</span>: {
+        <span class="code-key">"order_id"</span>: <span class="code-string">"ORD-2024-001"</span>
+      }
+    }
+  },
+  <span class="code-key">"livemode"</span>: <span class="code-keyword">true</span>                    <span class="code-comment">// Production vs test mode</span>
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SECURITY -->
+        <section class="module" id="security">
+            <div class="module-header">
+                <div class="module-icon">🔒</div>
+                <div class="module-info">
+                    <h2>Webhook Security</h2>
+                    <p>Protecting your endpoints from abuse</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Webhook endpoints are publicly accessible URLs—anyone who discovers them can send requests. <strong>Signature verification</strong> is essential: the source signs each payload with a shared secret, and your endpoint verifies the signature before processing. Without verification, attackers could forge events to trigger unauthorized actions.</p>
+            </div>
+            
+            <div class="security-grid">
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">🔐</div>
+                        <div class="security-card-title">HMAC Signature</div>
+                    </div>
+                    <div class="security-card-content">
+                        <p>Most platforms sign payloads using HMAC-SHA256. The signature is sent in a header like <code>X-Signature</code> or <code>X-Hub-Signature-256</code>. Compute your own signature from the raw request body using your webhook secret, then compare.</p>
+                        <p style="margin-top: var(--space-md);">Never parse the body before verifying—use the raw bytes to compute the signature.</p>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">⏱️</div>
+                        <div class="security-card-title">Timestamp Validation</div>
+                    </div>
+                    <div class="security-card-content">
+                        <p>Include the timestamp in signature validation to prevent replay attacks. Reject requests where the timestamp is more than 5 minutes old. The timestamp is typically included in the signature computation.</p>
+                        <p style="margin-top: var(--space-md);">Check header: <code>X-Webhook-Timestamp</code></p>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">🔑</div>
+                        <div class="security-card-title">Secret Rotation</div>
+                    </div>
+                    <div class="security-card-content">
+                        <p>Rotate webhook secrets periodically. Good platforms support multiple active secrets during rotation—verify against both old and new secrets until fully migrated. Store secrets in environment variables or secret managers, never in code.</p>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-card-header">
+                        <div class="security-card-icon">🌐</div>
+                        <div class="security-card-title">IP Allowlisting</div>
+                    </div>
+                    <div class="security-card-content">
+                        <p>Some platforms publish their webhook IP ranges. Add firewall rules to only accept requests from these IPs. This is defense-in-depth—always verify signatures even with IP allowlisting, as IPs can be spoofed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RETRY STRATEGIES -->
+        <section class="module" id="retry">
+            <div class="module-header">
+                <div class="module-icon">🔁</div>
+                <div class="module-info">
+                    <h2>Retry Strategies</h2>
+                    <p>Handling failed deliveries gracefully</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Networks fail. Servers go down. Webhooks must handle these realities. Most platforms implement <strong>exponential backoff</strong>—retrying with increasing delays. Your endpoint should return <code>200-299</code> quickly to acknowledge receipt, then process asynchronously. If processing fails, the event ID enables you to fetch and reprocess later.</p>
+            </div>
+            
+            <div class="retry-container">
+                <div class="retry-header">
+                    <h3>🔁 Exponential Backoff Timeline</h3>
+                </div>
+                <div class="retry-content">
+                    <div class="retry-timeline">
+                        <div class="retry-item attempt-1">
+                            <div class="retry-dot"></div>
+                            <div class="retry-time">T+0</div>
+                            <div class="retry-title">Initial Delivery</div>
+                            <div class="retry-desc">First attempt to deliver the webhook. If your endpoint returns 2xx, delivery is complete.</div>
+                        </div>
+                        <div class="retry-item attempt-2">
+                            <div class="retry-dot"></div>
+                            <div class="retry-time">T+1 minute</div>
+                            <div class="retry-title">Retry #1</div>
+                            <div class="retry-desc">First retry after short delay. Handles brief network hiccups or temporary overload.</div>
+                        </div>
+                        <div class="retry-item attempt-3">
+                            <div class="retry-dot"></div>
+                            <div class="retry-time">T+5 minutes</div>
+                            <div class="retry-title">Retry #2</div>
+                            <div class="retry-desc">Second retry with increased delay. Your service should be back by now if it was a deployment.</div>
+                        </div>
+                        <div class="retry-item attempt-4">
+                            <div class="retry-dot"></div>
+                            <div class="retry-time">T+30 minutes</div>
+                            <div class="retry-title">Retry #3</div>
+                            <div class="retry-desc">Third retry. At this point, on-call might need to investigate the receiving service.</div>
+                        </div>
+                        <div class="retry-item attempt-5">
+                            <div class="retry-dot"></div>
+                            <div class="retry-time">T+2 hours</div>
+                            <div class="retry-title">Final Retry</div>
+                            <div class="retry-desc">Last attempt before marking delivery as failed. Event logged for manual investigation or replay.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Software for webhook management</p>
+                </div>
+            </div>
+            
+            <div class="tools-table-container">
+                <div class="tools-table-header">
+                    <h3>🔧 Webhook Tools</h3>
+                </div>
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Type</th>
+                            <th>Primary Use</th>
+                            <th>Key Feature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔗</span> ngrok</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>Local Development</td>
+                            <td>Tunnel to localhost</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🪝</span> Svix</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Webhook Infrastructure</td>
+                            <td>Enterprise webhook service</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">📬</span> Hookdeck</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Webhook Gateway</td>
+                            <td>Retry & transform</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🐰</span> Convoy</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Webhook Server</td>
+                            <td>Self-hosted delivery</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">📡</span> webhook.site</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Testing & Debug</td>
+                            <td>Instant test endpoints</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔬</span> RequestBin</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Payload Inspection</td>
+                            <td>Capture & inspect</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">⚡</span> Zapier</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>No-code Integration</td>
+                            <td>Webhook to workflow</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔄</span> n8n</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Workflow Automation</td>
+                            <td>Self-hosted Zapier alternative</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for robust webhook handling</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Verify Signatures Always</h4>
+                        <p>Never process a webhook without verifying its signature. This is your primary defense against forged requests and replay attacks.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Return 200 Quickly</h4>
+                        <p>Acknowledge receipt immediately, then process asynchronously. Long-running handlers cause timeouts and unnecessary retries.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Handle Idempotently</h4>
+                        <p>Webhooks may be delivered multiple times. Use the event ID to deduplicate—track processed IDs and skip duplicates.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Use a Queue</h4>
+                        <p>Don't process webhooks synchronously in the HTTP handler. Push to a message queue (SQS, Redis, RabbitMQ) for reliable processing.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Log Everything</h4>
+                        <p>Log the raw payload, headers, and processing results. When things go wrong, detailed logs are essential for debugging.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Monitor Delivery Health</h4>
+                        <p>Track webhook success rates, latencies, and error types. Alert on anomalies—a spike in failures often indicates a real problem.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Support Replay</h4>
+                        <p>Build an endpoint to re-fetch missed events using the source API. When webhooks fail, you need a recovery mechanism.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Version Your Handlers</h4>
+                        <p>Payload schemas change over time. Version your webhook handlers and gracefully handle unknown fields or event types.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered webhook automation</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The <strong>WebhookOps Crew</strong> brings AI-powered automation to webhook management. These specialized agents monitor delivery health, investigate failures, validate payloads, and even auto-generate handler code—transforming webhook operations from reactive firefighting into proactive reliability engineering.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🪝</div>
+                    <div class="agent-name">WebhookOps Crew</div>
+                    <div class="agent-role">Webhook Automation</div>
+                    <p class="agent-desc">A coordinated team of specialized agents that manage webhook infrastructure, from delivery monitoring to failure investigation to handler code generation. Each agent focuses on a specific aspect while sharing context for holistic webhook operations.</p>
+                    <ul class="agent-capabilities">
+                        <li>Delivery health monitoring & alerting</li>
+                        <li>Failure root cause analysis</li>
+                        <li>Payload validation & schema detection</li>
+                        <li>Handler code generation</li>
+                        <li>Signature verification testing</li>
+                        <li>Retry pattern optimization</li>
+                        <li>Event replay orchestration</li>
+                        <li>Security audit & recommendations</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header">
+                        <span class="code-panel-title">webhook_ops_crew.py</span>
+                        <span class="code-panel-lang">Python</span>
+                    </div>
+                    <div class="code-panel-content">
+                        <pre><span class="code-comment"># WebhookOps Crew - AI-Powered Webhook Management</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Delivery Monitor Agent</span>
+monitor_agent = Agent(
+    role=<span class="code-string">"Delivery Monitor"</span>,
+    goal=<span class="code-string">"Track webhook delivery health in real-time"</span>,
+    backstory=<span class="code-string">"""Expert at monitoring webhook metrics,
+    detecting anomalies in delivery rates, latencies,
+    and error patterns. Alerts on degradation."""</span>,
+    llm=llm,
+    tools=[metrics_collector, anomaly_detector, alerter]
+)
+
+<span class="code-comment"># Failure Investigator Agent</span>
+investigator_agent = Agent(
+    role=<span class="code-string">"Failure Investigator"</span>,
+    goal=<span class="code-string">"Diagnose webhook delivery failures"</span>,
+    backstory=<span class="code-string">"""Root cause analysis expert who examines
+    failed deliveries, correlates with infrastructure
+    events, and identifies resolution steps."""</span>,
+    llm=llm,
+    tools=[log_analyzer, error_classifier, remediation_suggester]
+)
+
+<span class="code-comment"># Payload Validator Agent</span>
+validator_agent = Agent(
+    role=<span class="code-string">"Payload Validator"</span>,
+    goal=<span class="code-string">"Ensure webhook payloads are valid and secure"</span>,
+    backstory=<span class="code-string">"""Security-focused agent who validates
+    signatures, checks payload schemas, and detects
+    potentially malicious or malformed requests."""</span>,
+    llm=llm,
+    tools=[signature_verifier, schema_validator, threat_detector]
+)
+
+<span class="code-comment"># Handler Generator Agent</span>
+generator_agent = Agent(
+    role=<span class="code-string">"Handler Generator"</span>,
+    goal=<span class="code-string">"Generate webhook handler code"</span>,
+    backstory=<span class="code-string">"""Code generation expert who creates
+    idempotent, secure webhook handlers from
+    payload examples and business requirements."""</span>,
+    llm=llm,
+    tools=[code_generator, test_writer, doc_generator]
+)
+
+<span class="code-comment"># Create WebhookOps Crew</span>
+webhook_ops_crew = Crew(
+    agents=[monitor_agent, investigator_agent, 
+            validator_agent, generator_agent],
+    tasks=[
+        Task(description=<span class="code-string">"Monitor delivery health"</span>,
+             agent=monitor_agent),
+        Task(description=<span class="code-string">"Investigate failures"</span>,
+             agent=investigator_agent),
+        Task(description=<span class="code-string">"Validate incoming webhooks"</span>,
+             agent=validator_agent),
+        Task(description=<span class="code-string">"Generate handler code"</span>,
+             agent=generator_agent),
+    ],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Use Cases -->
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Agent Use Cases</h3>
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔍</div>
+                        <div class="use-case-content">
+                            <h4>Failure Investigation</h4>
+                            <p>Agent analyzes failed Stripe webhook, finds signature mismatch due to middleware parsing body, recommends raw body preservation fix.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📊</div>
+                        <div class="use-case-content">
+                            <h4>Anomaly Detection</h4>
+                            <p>Monitor agent detects 40% drop in GitHub webhook deliveries, correlates with recent firewall change, alerts ops team with specific rule to check.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">💻</div>
+                        <div class="use-case-content">
+                            <h4>Handler Generation</h4>
+                            <p>Given sample Shopify order.created payload, generator creates idempotent Node.js handler with signature verification and queue integration.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔁</div>
+                        <div class="use-case-content">
+                            <h4>Event Replay</h4>
+                            <p>After outage recovery, agent orchestrates replay of 2,340 missed webhook events from source API, tracking progress and handling failures.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat14-p4-api-lifecycle.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">14.4 API Lifecycle</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 14.5</div>
+        <a href="cat14-integration-apis-overview.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

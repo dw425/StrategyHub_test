@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Rollout Strategy | 18.4 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .framework-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .framework-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .framework-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .framework-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .framework-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .concept-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .concept-icon { font-size: 36px; margin-bottom: var(--space-md); }
+        .concept-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .concept-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .table-container table { width: 100%; border-collapse: collapse; }
+        .table-container th { background: var(--bg-card-alt); padding: var(--space-md) var(--space-lg); text-align: left; font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .table-container td { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .table-container tr:last-child td { border-bottom: none; }
+        .table-container tr:hover td { background: var(--bg-hover); }
+        
+        .wave-timeline { display: flex; gap: var(--space-md); margin-bottom: var(--space-xl); overflow-x: auto; padding-bottom: var(--space-md); }
+        .wave-card { min-width: 200px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; flex-shrink: 0; transition: all 0.3s; }
+        .wave-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .wave-card.complete { border-color: var(--success-green); }
+        .wave-card.current { border-color: var(--cat-primary); border-width: 2px; }
+        .wave-card.upcoming { opacity: 0.7; }
+        .wave-header { padding: var(--space-md) var(--space-lg); text-align: center; border-bottom: 1px solid var(--border-color); }
+        .wave-number { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+        .wave-name { font-size: var(--font-base); font-weight: 700; }
+        .wave-body { padding: var(--space-md) var(--space-lg); }
+        .wave-stat { display: flex; justify-content: space-between; padding: var(--space-xs) 0; font-size: var(--font-sm); }
+        .wave-stat-label { color: var(--text-muted); }
+        .wave-stat-value { color: var(--text-primary); font-weight: 600; }
+        .wave-status { padding: var(--space-sm) var(--space-lg); text-align: center; font-size: var(--font-xs); font-weight: 600; }
+        .wave-status.complete { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+        .wave-status.active { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+        .wave-status.pending { background: rgba(107, 114, 128, 0.15); color: #9CA3AF; }
+        
+        .criteria-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .criteria-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .criteria-header { padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .criteria-icon { font-size: 24px; }
+        .criteria-title { font-size: var(--font-base); font-weight: 600; }
+        .criteria-body { padding: var(--space-md) var(--space-lg); }
+        .criteria-item { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .criteria-item:last-child { border-bottom: none; }
+        .criteria-check { color: var(--success-green); font-size: 14px; margin-top: 2px; }
+        
+        .learning-loop { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .learning-steps { display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .learning-steps::before { content: ''; position: absolute; top: 30px; left: 60px; right: 60px; height: 2px; background: var(--border-color); }
+        .learning-step { display: flex; flex-direction: column; align-items: center; gap: var(--space-sm); position: relative; z-index: 1; }
+        .learning-step-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; background: var(--bg-dark); border: 2px solid var(--cat-primary); }
+        .learning-step-label { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); text-align: center; }
+        .learning-step-desc { font-size: var(--font-xs); color: var(--text-muted); text-align: center; max-width: 120px; }
+        
+        .proscons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .proscons-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .proscons-card.pros { border-color: var(--success-green); }
+        .proscons-card.cons { border-color: var(--danger-red); }
+        .proscons-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .proscons-card.pros .proscons-title { color: var(--success-green); }
+        .proscons-card.cons .proscons-title { color: var(--danger-red); }
+        .proscons-list { list-style: none; }
+        .proscons-list li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) 0; line-height: 1.6; border-bottom: 1px solid var(--border-color); }
+        .proscons-list li:last-child { border-bottom: none; }
+        .proscons-list li strong { color: var(--text-primary); }
+        
+        .value-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .value-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .value-title { font-size: var(--font-sm); font-weight: 600; }
+        .value-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .value-metrics { padding: var(--space-lg); display: grid; gap: var(--space-md); }
+        .value-metric { display: grid; grid-template-columns: 120px 1fr 80px; align-items: center; gap: var(--space-md); }
+        .value-metric-label { font-size: var(--font-sm); color: var(--text-secondary); }
+        .value-metric-bar { height: 8px; background: var(--bg-card-alt); border-radius: var(--radius-full); overflow: hidden; }
+        .value-metric-fill { height: 100%; border-radius: var(--radius-full); }
+        .value-metric-fill.low { background: var(--success-green); }
+        .value-metric-fill.medium { background: var(--warning-yellow); }
+        .value-metric-fill.high { background: var(--cat-primary); }
+        .value-metric-fill.critical { background: var(--danger-red); }
+        .value-metric-value { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); text-align: right; }
+        
+        .callout { background: linear-gradient(135deg, var(--cat-glow), transparent); border: 1px solid var(--cat-dark); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-xl); }
+        .callout-title { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .callout-text { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); border-right: 1px solid var(--border-color); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); font-size: 10px; }
+        .code-panel { background: var(--bg-dark); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0 var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-filename { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: var(--space-lg); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-function { color: var(--cat-light); }
+        
+        .rating-dots { display: flex; gap: 4px; }
+        .rating-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bg-card-alt); border: 1px solid var(--border-color); }
+        .rating-dot.filled { background: var(--cat-primary); border-color: var(--cat-light); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .concepts-grid { grid-template-columns: 1fr; }
+            .criteria-grid { grid-template-columns: 1fr; }
+            .proscons-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .learning-steps { flex-direction: column; gap: var(--space-lg); }
+            .learning-steps::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat18-implementation-overview.html">Implementation</a>
+        <span class="sep">/</span>
+        <span class="current">Wave Rollout Strategy</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 18</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat18-implementation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat18-p1-go-live-planning.html"><span class="nav-icon">📋</span> 18.1 Go-Live Planning</a></li>
+            <li><a href="cat18-p2-cutover-management.html"><span class="nav-icon">⚡</span> 18.2 Cutover Management</a></li>
+            <li><a href="cat18-p3-hypercare.html"><span class="nav-icon">🩺</span> 18.3 Hypercare & Support</a></li>
+            <li><a href="cat18-p4-wave-rollout.html" class="active"><span class="nav-icon">🌊</span> 18.4 Wave Rollout</a></li>
+            <li><a href="cat18-p5-post-implementation.html"><span class="nav-icon">📊</span> 18.5 Post-Implementation</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#strategy"><span class="nav-icon">🎯</span> Wave Strategy</a></li>
+            <li><a href="#sizing"><span class="nav-icon">📏</span> Wave Sizing</a></li>
+            <li><a href="#sequencing"><span class="nav-icon">🔢</span> Wave Sequencing</a></li>
+            <li><a href="#criteria"><span class="nav-icon">✅</span> Go/No-Go Criteria</a></li>
+            <li><a href="#learning"><span class="nav-icon">🔄</span> Learning Loop</a></li>
+            <li><a href="#communication"><span class="nav-icon">📢</span> Communication</a></li>
+            <li><a href="#parallel"><span class="nav-icon">⚖️</span> Parallel Systems</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🌊 Page 18.4</span>
+                <h1>Wave Rollout Strategy</h1>
+                <p>Phased deployment across user groups and regions. Each wave builds on learnings from the last, progressively reducing risk while expanding reach.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">3-6</div><div class="hero-metric-label">Typical Waves</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2-4 wks</div><div class="hero-metric-label">Between Waves</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">94%</div><div class="hero-metric-label">Success Rate</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">3x</div><div class="hero-metric-label">vs Big Bang Risk</div></div>
+            </div>
+        </section>
+
+        <!-- WAVE STRATEGY -->
+        <section class="module" id="strategy">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Wave Rollout Strategy</h2>
+                    <p>Progressive deployment for reduced risk</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Wave rollout divides users into groups and deploys sequentially rather than all at once. This approach <strong>reduces risk by limiting blast radius</strong>—if something goes wrong, only a subset of users is affected. Each wave provides learnings that improve subsequent waves, creating a virtuous cycle of improvement.</p>
+            </div>
+            
+            <!-- Wave Progression Visualization -->
+            <div class="framework-container">
+                <div class="framework-header">
+                    <div class="framework-title">🌊 Wave Progression Model</div>
+                    <div class="framework-badge">5-Wave Rollout</div>
+                </div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 850 320" style="width: 100%; height: auto;">
+                        <defs>
+                            <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3B82F6"/>
+                                <stop offset="25%" style="stop-color:#8B5CF6"/>
+                                <stop offset="50%" style="stop-color:#F59E0B"/>
+                                <stop offset="75%" style="stop-color:#06B6D4"/>
+                                <stop offset="100%" style="stop-color:#10B981"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Background -->
+                        <rect x="40" y="40" width="770" height="220" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                        
+                        <!-- Wave bars - growing in size -->
+                        <g transform="translate(80, 200)">
+                            <!-- Wave 1: Pilot -->
+                            <rect x="0" y="-30" width="100" height="30" rx="4" fill="#3B82F6"/>
+                            <text x="50" y="-40" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">WAVE 1</text>
+                            <text x="50" y="-8" text-anchor="middle" fill="#fff" font-size="9">Pilot</text>
+                            <text x="50" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">50 users</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#34D399" font-size="8">✓ Complete</text>
+                        </g>
+                        
+                        <g transform="translate(200, 200)">
+                            <!-- Wave 2: Early Adopters -->
+                            <rect x="0" y="-60" width="100" height="60" rx="4" fill="#8B5CF6"/>
+                            <text x="50" y="-70" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">WAVE 2</text>
+                            <text x="50" y="-30" text-anchor="middle" fill="#fff" font-size="9">Early Adopters</text>
+                            <text x="50" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">200 users</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#34D399" font-size="8">✓ Complete</text>
+                        </g>
+                        
+                        <g transform="translate(320, 200)">
+                            <!-- Wave 3: Regional -->
+                            <rect x="0" y="-100" width="100" height="100" rx="4" fill="#F59E0B">
+                                <animate attributeName="opacity" values="1;0.7;1" dur="1.5s" repeatCount="indefinite"/>
+                            </rect>
+                            <text x="50" y="-110" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">WAVE 3</text>
+                            <text x="50" y="-50" text-anchor="middle" fill="#fff" font-size="9">Regional</text>
+                            <text x="50" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">500 users</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#FBBF24" font-size="8">◐ In Progress</text>
+                        </g>
+                        
+                        <g transform="translate(440, 200)" opacity="0.6">
+                            <!-- Wave 4: Division -->
+                            <rect x="0" y="-140" width="100" height="140" rx="4" fill="#06B6D4"/>
+                            <text x="50" y="-150" text-anchor="middle" fill="#22D3EE" font-size="10" font-weight="600">WAVE 4</text>
+                            <text x="50" y="-70" text-anchor="middle" fill="#fff" font-size="9">Division</text>
+                            <text x="50" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">1,500 users</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#6a6a7a" font-size="8">○ Planned</text>
+                        </g>
+                        
+                        <g transform="translate(560, 200)" opacity="0.4">
+                            <!-- Wave 5: Enterprise -->
+                            <rect x="0" y="-170" width="200" height="170" rx="4" fill="#10B981"/>
+                            <text x="100" y="-180" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">WAVE 5</text>
+                            <text x="100" y="-85" text-anchor="middle" fill="#fff" font-size="9">Enterprise-Wide</text>
+                            <text x="100" y="20" text-anchor="middle" fill="#6a6a7a" font-size="8">5,000+ users</text>
+                            <text x="100" y="32" text-anchor="middle" fill="#6a6a7a" font-size="8">○ Planned</text>
+                        </g>
+                        
+                        <!-- Progress indicator -->
+                        <g transform="translate(40, 280)">
+                            <text x="0" y="12" fill="#6a6a7a" font-size="9">Overall Progress:</text>
+                            <rect x="100" y="2" width="600" height="14" rx="7" fill="#2a2a3e"/>
+                            <rect x="100" y="2" width="240" height="14" rx="7" fill="url(#waveGrad)"/>
+                            <text x="710" y="12" fill="#FBBF24" font-size="10" font-weight="600">40% (750 / 7,250 users)</text>
+                        </g>
+                        
+                        <!-- Risk reduction curve -->
+                        <path d="M 80,60 Q 200,70 320,90 T 560,150 T 760,180" fill="none" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,4" opacity="0.5"/>
+                        <text x="770" y="175" fill="#F87171" font-size="8">Risk ↓</text>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Wave Cards -->
+            <div class="wave-timeline">
+                <div class="wave-card complete">
+                    <div class="wave-header" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), transparent);">
+                        <div class="wave-number" style="color: #3B82F6;">Wave 1</div>
+                        <div class="wave-name">Pilot</div>
+                    </div>
+                    <div class="wave-body">
+                        <div class="wave-stat"><span class="wave-stat-label">Users</span><span class="wave-stat-value">50</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Scope</span><span class="wave-stat-value">IT + Power Users</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Duration</span><span class="wave-stat-value">2 weeks</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Issues</span><span class="wave-stat-value">12 found, 12 fixed</span></div>
+                    </div>
+                    <div class="wave-status complete">✓ COMPLETE</div>
+                </div>
+                
+                <div class="wave-card complete">
+                    <div class="wave-header" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), transparent);">
+                        <div class="wave-number" style="color: #8B5CF6;">Wave 2</div>
+                        <div class="wave-name">Early Adopters</div>
+                    </div>
+                    <div class="wave-body">
+                        <div class="wave-stat"><span class="wave-stat-label">Users</span><span class="wave-stat-value">200</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Scope</span><span class="wave-stat-value">Champions Network</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Duration</span><span class="wave-stat-value">3 weeks</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Issues</span><span class="wave-stat-value">8 found, 7 fixed</span></div>
+                    </div>
+                    <div class="wave-status complete">✓ COMPLETE</div>
+                </div>
+                
+                <div class="wave-card current">
+                    <div class="wave-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), transparent);">
+                        <div class="wave-number" style="color: #F59E0B;">Wave 3</div>
+                        <div class="wave-name">Regional</div>
+                    </div>
+                    <div class="wave-body">
+                        <div class="wave-stat"><span class="wave-stat-label">Users</span><span class="wave-stat-value">500</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Scope</span><span class="wave-stat-value">West Region</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Duration</span><span class="wave-stat-value">3 weeks</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Progress</span><span class="wave-stat-value">Week 2 of 3</span></div>
+                    </div>
+                    <div class="wave-status active">◐ IN PROGRESS</div>
+                </div>
+                
+                <div class="wave-card upcoming">
+                    <div class="wave-header" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), transparent);">
+                        <div class="wave-number" style="color: #06B6D4;">Wave 4</div>
+                        <div class="wave-name">Division</div>
+                    </div>
+                    <div class="wave-body">
+                        <div class="wave-stat"><span class="wave-stat-label">Users</span><span class="wave-stat-value">1,500</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Scope</span><span class="wave-stat-value">Operations Div</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Duration</span><span class="wave-stat-value">4 weeks</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Start</span><span class="wave-stat-value">+3 weeks</span></div>
+                    </div>
+                    <div class="wave-status pending">○ PLANNED</div>
+                </div>
+                
+                <div class="wave-card upcoming">
+                    <div class="wave-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), transparent);">
+                        <div class="wave-number" style="color: #10B981;">Wave 5</div>
+                        <div class="wave-name">Enterprise</div>
+                    </div>
+                    <div class="wave-body">
+                        <div class="wave-stat"><span class="wave-stat-label">Users</span><span class="wave-stat-value">5,000+</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Scope</span><span class="wave-stat-value">All Remaining</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Duration</span><span class="wave-stat-value">6 weeks</span></div>
+                        <div class="wave-stat"><span class="wave-stat-label">Start</span><span class="wave-stat-value">+7 weeks</span></div>
+                    </div>
+                    <div class="wave-status pending">○ PLANNED</div>
+                </div>
+            </div>
+            
+            <div class="value-container">
+                <div class="value-header">
+                    <div class="value-title">📊 Wave Rollout Value Analysis</div>
+                    <div class="value-badge">Risk Profile</div>
+                </div>
+                <div class="value-metrics">
+                    <div class="value-metric">
+                        <div class="value-metric-label">Risk Reduction</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 92%;"></div></div>
+                        <div class="value-metric-value">Very High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Time to Full Deploy</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill medium" style="width: 65%;"></div></div>
+                        <div class="value-metric-value">Medium</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Learning Integration</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill critical" style="width: 95%;"></div></div>
+                        <div class="value-metric-value">Excellent</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Coordination Effort</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 78%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">User Confidence</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 88%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- WAVE SIZING -->
+        <section class="module" id="sizing">
+            <div class="module-header">
+                <div class="module-icon">📏</div>
+                <div class="module-info">
+                    <h2>Wave Sizing Principles</h2>
+                    <p>How to determine the right size for each wave</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Wave sizing balances risk containment with deployment speed. <strong>Waves should progressively increase in size</strong> as confidence builds. Early waves are small to contain risk; later waves are larger to accelerate completion. The multiplier between waves is typically 2-4x.</p>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-title">Pilot (1-5%)</div>
+                    <div class="concept-desc">Smallest group—typically IT, super users, or volunteers. Purpose is to validate basic functionality and identify major issues. Can tolerate rough edges.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">⚡</div>
+                    <div class="concept-title">Early Adopters (5-15%)</div>
+                    <div class="concept-desc">Champions and enthusiastic users. Provides broader validation, stress-tests support model, and generates internal advocates. Tolerates some issues.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🏢</div>
+                    <div class="concept-title">Business Unit (15-30%)</div>
+                    <div class="concept-desc">Full department or region. Tests real-world workflows, integrations, and scale. Should be stable enough for normal business operations.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🌍</div>
+                    <div class="concept-title">Division (30-50%)</div>
+                    <div class="concept-desc">Multiple business units or geographies. Validates enterprise readiness, cross-functional processes, and full support model.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🏛️</div>
+                    <div class="concept-title">Enterprise (50-100%)</div>
+                    <div class="concept-desc">All remaining users. By this point, system is proven stable. May still phase by geography or function for logistics.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <div class="concept-title">Sizing Factors</div>
+                    <div class="concept-desc">Consider: support capacity, training throughput, risk tolerance, business criticality, geographic spread, and integration complexity.</div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Factor</th>
+                            <th>Smaller Waves</th>
+                            <th>Larger Waves</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>System Complexity</strong></td>
+                            <td>High complexity, many integrations</td>
+                            <td>Simple system, few dependencies</td>
+                        </tr>
+                        <tr>
+                            <td><strong>User Technical Skill</strong></td>
+                            <td>Low technical proficiency</td>
+                            <td>Tech-savvy user base</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Support Capacity</strong></td>
+                            <td>Limited support resources</td>
+                            <td>Strong support team</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Business Criticality</strong></td>
+                            <td>Mission-critical operations</td>
+                            <td>Lower-risk functions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Change Readiness</strong></td>
+                            <td>Change-resistant culture</td>
+                            <td>Change-ready organization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Geographic Distribution</strong></td>
+                            <td>Globally distributed, time zones</td>
+                            <td>Single location/timezone</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- WAVE SEQUENCING -->
+        <section class="module" id="sequencing">
+            <div class="module-header">
+                <div class="module-icon">🔢</div>
+                <div class="module-info">
+                    <h2>Wave Sequencing Strategy</h2>
+                    <p>Who goes first, and why</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Wave sequence is as important as wave size. The order of deployment should <strong>maximize learning while minimizing risk</strong>. Groups with higher tolerance for issues go first; groups with highest business impact go later when the system is proven.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sequence Strategy</th>
+                            <th>Description</th>
+                            <th>Best For</th>
+                            <th>Complexity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>By Risk Tolerance</strong></td>
+                            <td>Start with groups that can tolerate disruption, end with critical operations</td>
+                            <td>Most implementations</td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot"></div>
+                                    <div class="rating-dot"></div>
+                                    <div class="rating-dot"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>By Geography</strong></td>
+                            <td>Region by region, often following time zones or business similarity</td>
+                            <td>Global rollouts</td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot"></div>
+                                    <div class="rating-dot"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>By Function</strong></td>
+                            <td>Department by department (e.g., Sales → Marketing → Finance)</td>
+                            <td>Cross-functional systems</td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>By Workflow</strong></td>
+                            <td>Follow the business process flow (e.g., order entry → fulfillment → billing)</td>
+                            <td>Process-centric systems</td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>By Complexity</strong></td>
+                            <td>Start with simple use cases, add complexity with each wave</td>
+                            <td>Feature-rich platforms</td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot"></div>
+                                    <div class="rating-dot"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">🎯 Sequencing Golden Rules</div>
+                <div class="callout-text"><strong>1. Never start with your most critical users.</strong> If the pilot fails, you want it to affect the most forgiving group. <strong>2. Include at least one "skeptic" group</strong> in Wave 2-3—their buy-in becomes powerful advocacy. <strong>3. Avoid parallel waves</strong> until the system is proven stable. <strong>4. Plan for wave acceleration</strong>—if things go well, you may combine or accelerate later waves.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- GO/NO-GO CRITERIA -->
+        <section class="module" id="criteria">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Wave Go/No-Go Criteria</h2>
+                    <p>When to proceed to the next wave</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Each wave has explicit criteria that must be met before proceeding to the next. These criteria ensure <strong>learnings are captured and issues resolved</strong> before expanding scope. Proceeding without meeting criteria amplifies problems across more users.</p>
+            </div>
+            
+            <div class="criteria-grid">
+                <div class="criteria-card" style="border-top: 3px solid #10B981;">
+                    <div class="criteria-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);">
+                        <div class="criteria-icon">✅</div>
+                        <div class="criteria-title">Exit Criteria (Current Wave)</div>
+                    </div>
+                    <div class="criteria-body">
+                        <div class="criteria-item"><span class="criteria-check">✓</span> All P1/P2 issues from this wave resolved</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> User adoption rate meets target (&gt;80%)</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> SLA compliance above threshold (&gt;95%)</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> No critical system instability (&gt;99.5% uptime)</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Support queue manageable (&lt;24hr backlog)</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> User satisfaction score acceptable (NPS &gt;30)</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Lessons learned documented and actioned</div>
+                    </div>
+                </div>
+                
+                <div class="criteria-card" style="border-top: 3px solid #3B82F6;">
+                    <div class="criteria-header" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);">
+                        <div class="criteria-icon">🚀</div>
+                        <div class="criteria-title">Entry Criteria (Next Wave)</div>
+                    </div>
+                    <div class="criteria-body">
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Current wave exit criteria met</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Next wave users identified and communicated</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Training scheduled and materials ready</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Support capacity scaled for wave size</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Any wave-specific configuration complete</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Stakeholder sign-off obtained</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Rollback plan updated if needed</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Wave 1 Target</th>
+                            <th>Wave 2 Target</th>
+                            <th>Wave 3+ Target</th>
+                            <th>Current</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>User Adoption</strong></td>
+                            <td>&gt;70%</td>
+                            <td>&gt;80%</td>
+                            <td>&gt;85%</td>
+                            <td style="color: #34D399;">87%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>System Uptime</strong></td>
+                            <td>&gt;99.0%</td>
+                            <td>&gt;99.5%</td>
+                            <td>&gt;99.9%</td>
+                            <td style="color: #34D399;">99.7%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P1/P2 Resolution</strong></td>
+                            <td>100% within 48hr</td>
+                            <td>100% within 24hr</td>
+                            <td>100% within 8hr</td>
+                            <td style="color: #34D399;">100%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Training Completion</strong></td>
+                            <td>&gt;90%</td>
+                            <td>&gt;95%</td>
+                            <td>&gt;95%</td>
+                            <td style="color: #34D399;">96%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Support Queue</strong></td>
+                            <td>&lt;48hr backlog</td>
+                            <td>&lt;24hr backlog</td>
+                            <td>&lt;8hr backlog</td>
+                            <td style="color: #FBBF24;">18hr</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- LEARNING LOOP -->
+        <section class="module" id="learning">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Wave Learning Loop</h2>
+                    <p>Capturing and applying insights between waves</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The power of wave rollout comes from <strong>systematically learning and improving</strong> between waves. Each wave is a learning opportunity—issues found, user feedback gathered, and processes refined. The learning loop ensures these insights translate into better outcomes for subsequent waves.</p>
+            </div>
+            
+            <div class="learning-loop">
+                <div class="learning-steps">
+                    <div class="learning-step">
+                        <div class="learning-step-icon" style="border-color: #3B82F6;">📊</div>
+                        <div class="learning-step-label">Collect</div>
+                        <div class="learning-step-desc">Gather metrics, feedback, and issues</div>
+                    </div>
+                    <div class="learning-step">
+                        <div class="learning-step-icon" style="border-color: #8B5CF6;">🔍</div>
+                        <div class="learning-step-label">Analyze</div>
+                        <div class="learning-step-desc">Identify patterns and root causes</div>
+                    </div>
+                    <div class="learning-step">
+                        <div class="learning-step-icon" style="border-color: #F59E0B;">💡</div>
+                        <div class="learning-step-label">Decide</div>
+                        <div class="learning-step-desc">Prioritize actions and changes</div>
+                    </div>
+                    <div class="learning-step">
+                        <div class="learning-step-icon" style="border-color: #06B6D4;">🔧</div>
+                        <div class="learning-step-label">Implement</div>
+                        <div class="learning-step-desc">Make fixes and improvements</div>
+                    </div>
+                    <div class="learning-step">
+                        <div class="learning-step-icon" style="border-color: #10B981;">✅</div>
+                        <div class="learning-step-label">Validate</div>
+                        <div class="learning-step-desc">Confirm improvements work</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">📝</div>
+                    <div class="concept-title">Wave Retrospective</div>
+                    <div class="concept-desc">Structured review within 1 week of wave completion. Include support, users, and project team. Focus on: What worked? What didn't? What to change?</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🐛</div>
+                    <div class="concept-title">Defect Analysis</div>
+                    <div class="concept-desc">Categorize all issues by type and root cause. Identify systemic problems vs one-offs. Prioritize fixes that prevent recurrence in future waves.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📚</div>
+                    <div class="concept-title">KB Enhancement</div>
+                    <div class="concept-desc">Every support ticket should result in a KB article if one doesn't exist. Update training materials based on common questions. Reduce repeat tickets.</div>
+                </div>
+            </div>
+            
+            <div class="proscons-grid">
+                <div class="proscons-card pros">
+                    <div class="proscons-title">✅ Wave Rollout Best Practices</div>
+                    <ul class="proscons-list">
+                        <li><strong>Start small</strong> — First wave should be &lt;5% of total users</li>
+                        <li><strong>Allow stabilization time</strong> — Minimum 2 weeks between waves</li>
+                        <li><strong>Include skeptics</strong> — Convert critics to advocates through early success</li>
+                        <li><strong>Document everything</strong> — Future waves benefit from detailed learnings</li>
+                        <li><strong>Celebrate wins</strong> — Wave completions are team achievements</li>
+                        <li><strong>Stay flexible</strong> — Adjust wave composition based on learnings</li>
+                    </ul>
+                </div>
+                <div class="proscons-card cons">
+                    <div class="proscons-title">❌ Wave Rollout Anti-Patterns</div>
+                    <ul class="proscons-list">
+                        <li><strong>Rushing waves</strong> — Skipping stabilization to hit arbitrary dates</li>
+                        <li><strong>Ignoring feedback</strong> — Proceeding despite user concerns</li>
+                        <li><strong>Wave bloat</strong> — Making waves too large too fast</li>
+                        <li><strong>Parallel waves</strong> — Running multiple waves simultaneously early on</li>
+                        <li><strong>Moving goalposts</strong> — Lowering criteria to claim "success"</li>
+                        <li><strong>Single-wave thinking</strong> — Not planning for the full sequence</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- WAVE COMMUNICATION -->
+        <section class="module" id="communication">
+            <div class="module-header">
+                <div class="module-icon">📢</div>
+                <div class="module-info">
+                    <h2>Wave Communication Strategy</h2>
+                    <p>Keeping all stakeholders informed across waves</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Communication complexity multiplies with wave rollouts—different user groups are at different stages simultaneously. A clear communication strategy ensures <strong>the right message reaches the right audience at the right time</strong> without overwhelming anyone with irrelevant updates.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Audience</th>
+                            <th>Message Focus</th>
+                            <th>Frequency</th>
+                            <th>Channel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Current Wave Users</strong></td>
+                            <td>Training dates, go-live timing, support resources, tips & tricks</td>
+                            <td>Daily during wave</td>
+                            <td>Email, Slack, in-app</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Completed Wave Users</strong></td>
+                            <td>New features, bug fixes, success stories, advanced training</td>
+                            <td>Weekly</td>
+                            <td>Newsletter, Slack</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Upcoming Wave Users</strong></td>
+                            <td>Timeline preview, what to expect, preparation checklist</td>
+                            <td>Bi-weekly → Daily as wave approaches</td>
+                            <td>Email, manager cascade</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Not-Yet-Scheduled Users</strong></td>
+                            <td>Overall progress, estimated timeline, early access options</td>
+                            <td>Monthly</td>
+                            <td>Company newsletter</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Executives / Sponsors</strong></td>
+                            <td>Wave completion, metrics, risks, decisions needed</td>
+                            <td>Weekly + milestone</td>
+                            <td>Dashboard, exec summary</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Support Team</strong></td>
+                            <td>Wave timing, expected volume, known issues, escalation paths</td>
+                            <td>Daily during transitions</td>
+                            <td>Team channel, standup</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="criteria-grid">
+                <div class="criteria-card" style="border-top: 3px solid #3B82F6;">
+                    <div class="criteria-header" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);">
+                        <div class="criteria-icon">📅</div>
+                        <div class="criteria-title">Pre-Wave Communications</div>
+                    </div>
+                    <div class="criteria-body">
+                        <div class="criteria-item"><span class="criteria-check">✓</span> T-4 weeks: Initial notification with timeline overview</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> T-3 weeks: Training schedule and registration</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> T-2 weeks: Preparation checklist and FAQs</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> T-1 week: Final reminder with support contacts</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> T-1 day: Go-live confirmation and last-minute tips</div>
+                    </div>
+                </div>
+                
+                <div class="criteria-card" style="border-top: 3px solid #10B981;">
+                    <div class="criteria-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);">
+                        <div class="criteria-icon">🎉</div>
+                        <div class="criteria-title">Post-Wave Communications</div>
+                    </div>
+                    <div class="criteria-body">
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Day 1: Welcome message with quick-start guide</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Day 3: Tips for common first-week tasks</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Week 1: Feedback survey and office hours invite</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Week 2: Success stories from wave users</div>
+                        <div class="criteria-item"><span class="criteria-check">✓</span> Week 3: Advanced features and training opportunities</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">🎯 Communication Golden Rule</div>
+                <div class="callout-text"><strong>Segment ruthlessly.</strong> Users only care about their wave. Sending "Wave 3 go-live tomorrow!" to Wave 5 users creates confusion and fatigue. Use distribution lists per wave and resist the urge to over-communicate to everyone. Less noise = more signal.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PARALLEL SYSTEMS -->
+        <section class="module" id="parallel">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Parallel Systems Management</h2>
+                    <p>Running old and new systems during transition</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>During wave rollout, some users are on the new system while others remain on legacy. This <strong>parallel operation period requires careful data management</strong> to ensure business continuity. The longer parallel operation lasts, the more complex synchronization becomes.</p>
+            </div>
+            
+            <div class="framework-container">
+                <div class="framework-header">
+                    <div class="framework-title">⚖️ Parallel Operations Model</div>
+                    <div class="framework-badge">Data Flow</div>
+                </div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 800 260" style="width: 100%; height: auto;">
+                        <!-- Legacy System -->
+                        <g transform="translate(80, 80)">
+                            <rect width="180" height="100" rx="8" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                            <text x="90" y="30" text-anchor="middle" fill="#F87171" font-size="12" font-weight="600">LEGACY SYSTEM</text>
+                            <text x="90" y="55" text-anchor="middle" fill="#a0a0b0" font-size="10">Waves 4-5 Users</text>
+                            <text x="90" y="70" text-anchor="middle" fill="#6a6a7a" font-size="9">(5,000 users)</text>
+                            <text x="90" y="90" text-anchor="middle" fill="#F87171" font-size="9">Read/Write Active</text>
+                        </g>
+                        
+                        <!-- New System -->
+                        <g transform="translate(540, 80)">
+                            <rect width="180" height="100" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="90" y="30" text-anchor="middle" fill="#34D399" font-size="12" font-weight="600">NEW SYSTEM</text>
+                            <text x="90" y="55" text-anchor="middle" fill="#a0a0b0" font-size="10">Waves 1-3 Users</text>
+                            <text x="90" y="70" text-anchor="middle" fill="#6a6a7a" font-size="9">(750 users)</text>
+                            <text x="90" y="90" text-anchor="middle" fill="#34D399" font-size="9">Primary System</text>
+                        </g>
+                        
+                        <!-- Sync Hub -->
+                        <g transform="translate(330, 60)">
+                            <rect width="140" height="140" rx="70" fill="#1a1a2e" stroke="#F59E0B" stroke-width="3"/>
+                            <text x="70" y="60" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">DATA SYNC</text>
+                            <text x="70" y="78" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">HUB</text>
+                            <text x="70" y="100" text-anchor="middle" fill="#a0a0b0" font-size="9">Bi-directional</text>
+                            <text x="70" y="115" text-anchor="middle" fill="#a0a0b0" font-size="9">Real-time sync</text>
+                            <text x="70" y="130" text-anchor="middle" fill="#6a6a7a" font-size="8">Conflict resolution</text>
+                        </g>
+                        
+                        <!-- Arrows -->
+                        <path d="M260,130 L330,130" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+                        <path d="M330,130 L260,130" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowOrange)" transform="translate(0, 20)"/>
+                        
+                        <path d="M470,130 L540,130" stroke="#10B981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+                        <path d="M540,130 L470,130" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowOrange)" transform="translate(0, 20)"/>
+                        
+                        <!-- Labels -->
+                        <text x="295" y="120" text-anchor="middle" fill="#6a6a7a" font-size="8">Changes</text>
+                        <text x="295" y="165" text-anchor="middle" fill="#6a6a7a" font-size="8">Master data</text>
+                        
+                        <text x="505" y="120" text-anchor="middle" fill="#6a6a7a" font-size="8">Changes</text>
+                        <text x="505" y="165" text-anchor="middle" fill="#6a6a7a" font-size="8">Master data</text>
+                        
+                        <!-- Timeline -->
+                        <g transform="translate(80, 220)">
+                            <rect width="640" height="30" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <rect x="0" y="0" width="200" height="30" rx="4" fill="rgba(16, 185, 129, 0.2)"/>
+                            <text x="100" y="20" text-anchor="middle" fill="#34D399" font-size="9">Waves 1-3 Complete</text>
+                            <rect x="200" y="0" width="140" height="30" fill="rgba(245, 158, 11, 0.2)"/>
+                            <text x="270" y="20" text-anchor="middle" fill="#FBBF24" font-size="9">Wave 4 Active</text>
+                            <rect x="340" y="0" width="300" height="30" fill="rgba(107, 114, 128, 0.1)"/>
+                            <text x="490" y="20" text-anchor="middle" fill="#6a6a7a" font-size="9">Wave 5 → Full Migration</text>
+                        </g>
+                        
+                        <defs>
+                            <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#EF4444"/>
+                            </marker>
+                            <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"/>
+                            </marker>
+                            <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#F59E0B"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">🔄</div>
+                    <div class="concept-title">Data Synchronization</div>
+                    <div class="concept-desc">Real-time or near-real-time sync between systems. Define master system for each data type. Establish conflict resolution rules before issues arise.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <div class="concept-title">Reporting Challenges</div>
+                    <div class="concept-desc">Reports may need to pull from both systems during transition. Consider a unified reporting layer or accept temporary reporting gaps.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🔗</div>
+                    <div class="concept-title">Integration Routing</div>
+                    <div class="concept-desc">External systems may need to route to different endpoints based on user. API gateway or middleware can handle intelligent routing.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">👥</div>
+                    <div class="concept-title">Cross-Wave Collaboration</div>
+                    <div class="concept-desc">Users on different systems may need to work together. Define handoff processes and shared data access during transition.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🛡️</div>
+                    <div class="concept-title">Audit & Compliance</div>
+                    <div class="concept-desc">Maintain audit trails in both systems. Document data lineage for compliance. Plan for unified audit after migration complete.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">⏱️</div>
+                    <div class="concept-title">Sunset Timeline</div>
+                    <div class="concept-desc">Define clear legacy system retirement date. Communicate early and often. Resist extending "just one more month"—it compounds complexity.</div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">⚠️ Parallel Operation Risks</div>
+                <div class="callout-text"><strong>Data drift</strong> is the biggest risk—systems gradually diverge due to sync failures or timing gaps. Implement daily reconciliation checks. <strong>User confusion</strong> occurs when people don't know which system to use. Clear communication and access controls prevent this. <strong>Cost</strong> doubles (or more) during parallel operation—factor this into timeline decisions.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered wave planning and monitoring</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🌊</div>
+                    <div class="agent-name">WaveOptimizer</div>
+                    <div class="agent-role">Rollout Planning Intelligence</div>
+                    <div class="agent-desc">Analyzes organizational data to recommend optimal wave composition, sequence, and timing. Monitors wave progress in real-time and predicts go/no-go outcomes based on current metrics.</div>
+                    <ul class="agent-capabilities">
+                        <li>Optimal wave sizing recommendations</li>
+                        <li>User segmentation for wave assignment</li>
+                        <li>Risk-based sequence optimization</li>
+                        <li>Real-time wave health monitoring</li>
+                        <li>Go/No-Go prediction and alerts</li>
+                        <li>Learning extraction and application</li>
+                        <li>Wave timeline optimization</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">wave_optimizer_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Wave Rollout Optimization Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Wave Optimizer Agent</span>
+wave_optimizer = Agent(
+    role=<span class="code-string">"Wave Rollout Optimizer"</span>,
+    goal=<span class="code-string">"Maximize rollout success through optimal wave planning"</span>,
+    backstory=<span class="code-string">"""Expert in phased deployments with deep 
+    understanding of organizational dynamics, risk 
+    management, and change adoption. Uses data-driven 
+    approaches to optimize wave composition and timing."""</span>,
+    llm=llm,
+    tools=[
+        user_analyzer,
+        risk_assessor,
+        metrics_monitor,
+        learning_extractor,
+        timeline_optimizer
+    ]
+)
+
+<span class="code-comment"># Wave planning task</span>
+<span class="code-keyword">def</span> <span class="code-function">plan_next_wave</span>(current_wave_data: <span class="code-keyword">dict</span>) -> <span class="code-keyword">dict</span>:
+    <span class="code-string">"""Plan optimal next wave based on current results."""</span>
+    task = Task(
+        description=<span class="code-string">f"""
+        Analyze current wave results and plan next wave:
+        1. Evaluate exit criteria status
+        2. Extract key learnings and issues
+        3. Recommend wave size and composition
+        4. Identify users for next wave
+        5. Predict success probability
+        6. Suggest timeline and resources
+        
+        Current wave data: {current_wave_data}
+        """</span>,
+        agent=wave_optimizer,
+        expected_output=<span class="code-string">"Next wave plan with recommendations"</span>
+    )
+    
+    crew = Crew(agents=[wave_optimizer], tasks=[task])
+    result = crew.kickoff()
+    
+    <span class="code-keyword">return</span> {
+        <span class="code-string">"wave_ready"</span>: result.criteria_met,
+        <span class="code-string">"recommended_size"</span>: result.wave_size,
+        <span class="code-string">"user_segments"</span>: result.target_users,
+        <span class="code-string">"success_probability"</span>: result.prediction,
+        <span class="code-string">"key_risks"</span>: result.risks
+    }</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat18-p3-hypercare.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">18.3 Hypercare & Support</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 18.4</div>
+        <a href="cat18-p5-post-implementation.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">18.5 Post-Implementation</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

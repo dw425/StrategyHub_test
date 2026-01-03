@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementation | Category 18 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 18 - IMPLEMENTATION AMBER */
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        /* VIZ CONTAINERS */
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .viz-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .viz-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .viz-canvas { padding: var(--space-lg); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        .viz-svg { width: 100%; height: auto; }
+        
+        /* CONCEPTS GRID */
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .concept-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .concept-icon { font-size: 36px; margin-bottom: var(--space-md); }
+        .concept-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .concept-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* TOOL CARDS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* PAGES GRID */
+        .pages-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .page-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; transition: all 0.3s; position: relative; overflow: hidden; }
+        .page-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--cat-primary); opacity: 0; transition: opacity 0.3s; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateX(4px); }
+        .page-card:hover::before { opacity: 1; }
+        .page-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .page-title { font-size: var(--font-lg); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-sm); }
+        .page-desc { font-size: var(--font-sm); color: var(--text-secondary); }
+        .page-arrow { position: absolute; right: var(--space-lg); top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--cat-light); opacity: 0; transition: opacity 0.3s; }
+        .page-card:hover .page-arrow { opacity: 1; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); border-right: 1px solid var(--border-color); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); font-size: 10px; }
+        .code-panel { background: var(--bg-dark); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0 var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-filename { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: var(--space-lg); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-function { color: var(--cat-light); }
+        
+        /* CHECKLIST */
+        .checklist-container { margin-bottom: var(--space-xl); }
+        .checklist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .checklist-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .checklist-header { padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .checklist-icon { font-size: 24px; }
+        .checklist-title { font-size: var(--font-base); font-weight: 600; }
+        .checklist-items { padding: var(--space-md) var(--space-lg); }
+        .checklist-item { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .check-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+        .check-icon.pass { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .check-icon.warn { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+        .check-icon.fail { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        
+        .decision-box { background: var(--bg-card); border: 2px solid var(--success-green); border-radius: var(--radius-xl); overflow: hidden; }
+        .decision-header { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), transparent); padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .decision-icon { font-size: 24px; }
+        .decision-title { font-size: var(--font-base); font-weight: 700; color: var(--success-green); }
+        .decision-body { padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-xl); }
+        .decision-status { display: flex; flex-direction: column; align-items: center; gap: var(--space-sm); }
+        .decision-status.go .status-light { width: 60px; height: 60px; background: var(--success-green); border-radius: 50%; box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .decision-status.go .status-text { font-size: var(--font-xl); font-weight: 700; color: var(--success-green); }
+        .decision-status.nogo .status-light { width: 60px; height: 60px; background: var(--danger-red); border-radius: 50%; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        .decision-status.nogo .status-text { font-size: var(--font-xl); font-weight: 700; color: var(--danger-red); }
+        .decision-details { display: flex; flex-direction: column; gap: var(--space-xs); }
+        .decision-stat { font-size: var(--font-sm); color: var(--text-secondary); }
+        .decision-note { flex: 1; font-size: var(--font-sm); color: var(--text-muted); padding: var(--space-md); background: var(--bg-card-alt); border-radius: var(--radius-md); }
+        
+        /* PROS/CONS */
+        .proscons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .proscons-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .proscons-card.pros { border-color: var(--success-green); }
+        .proscons-card.cons { border-color: var(--danger-red); }
+        .proscons-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .proscons-card.pros .proscons-title { color: var(--success-green); }
+        .proscons-card.cons .proscons-title { color: var(--danger-red); }
+        .proscons-list { list-style: none; }
+        .proscons-list li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) 0; line-height: 1.6; border-bottom: 1px solid var(--border-color); }
+        .proscons-list li:last-child { border-bottom: none; }
+        .proscons-list li strong { color: var(--text-primary); }
+        
+        /* VALUE ANALYSIS */
+        .value-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .value-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .value-title { font-size: var(--font-sm); font-weight: 600; }
+        .value-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .value-metrics { padding: var(--space-lg); display: grid; gap: var(--space-md); }
+        .value-metric { display: grid; grid-template-columns: 120px 1fr 80px; align-items: center; gap: var(--space-md); }
+        .value-metric-label { font-size: var(--font-sm); color: var(--text-secondary); }
+        .value-metric-bar { height: 8px; background: var(--bg-card-alt); border-radius: var(--radius-full); overflow: hidden; }
+        .value-metric-fill { height: 100%; border-radius: var(--radius-full); transition: width 0.5s ease; }
+        .value-metric-fill.low { background: var(--success-green); }
+        .value-metric-fill.medium { background: var(--warning-yellow); }
+        .value-metric-fill.high { background: var(--cat-primary); }
+        .value-metric-fill.critical { background: var(--danger-red); }
+        .value-metric-value { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); text-align: right; }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .concepts-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .pages-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .checklist-grid { grid-template-columns: 1fr; }
+            .proscons-grid { grid-template-columns: 1fr; }
+            .decision-body { flex-direction: column; text-align: center; }
+            .value-metric { grid-template-columns: 1fr; gap: var(--space-xs); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="index.html">Categories</a>
+        <span class="sep">/</span>
+        <span class="current">Implementation</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 18</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat18-implementation-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat18-p1-go-live-planning.html"><span class="nav-icon">📋</span> 18.1 Go-Live Planning</a></li>
+            <li><a href="cat18-p2-cutover-management.html"><span class="nav-icon">⚡</span> 18.2 Cutover Management</a></li>
+            <li><a href="cat18-p3-hypercare.html"><span class="nav-icon">🩺</span> 18.3 Hypercare & Support</a></li>
+            <li><a href="cat18-p4-wave-rollout.html"><span class="nav-icon">🌊</span> 18.4 Wave Rollout</a></li>
+            <li><a href="cat18-p5-post-implementation.html"><span class="nav-icon">📊</span> 18.5 Post-Implementation</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#runway"><span class="nav-icon">🛤️</span> Road to Go-Live</a></li>
+            <li><a href="#command"><span class="nav-icon">🎛️</span> Mission Control</a></li>
+            <li><a href="#concepts"><span class="nav-icon">💡</span> Key Concepts</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+            <li><a href="#pages"><span class="nav-icon">📑</span> Pages</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🚀 Category 18</span>
+                <h1>Implementation</h1>
+                <p>Execute flawless go-lives with structured rollout planning, mission control monitoring, and hypercare support frameworks. Transform project deliverables into operational reality.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">70%</div><div class="hero-metric-label">Projects Fail at Go-Live</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">4-6 wks</div><div class="hero-metric-label">Avg Hypercare Period</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">3x</div><div class="hero-metric-label">Risk with Big Bang</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">94%</div><div class="hero-metric-label">Success w/ Phased Rollout</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: ROAD TO GO-LIVE -->
+        <section class="module" id="runway">
+            <div class="module-header">
+                <div class="module-icon">🛤️</div>
+                <div class="module-info">
+                    <h2>Road to Go-Live</h2>
+                    <p>Navigate the journey from preparation to successful launch</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The road to go-live is a journey with distinct milestones. Each phase brings you closer to the destination—a successful launch. The <strong>Implementation Runway</strong> provides visibility into where you are, what's ahead, and what needs attention. Track progress, overcome obstacles, and keep your eyes on the finish line.</p>
+            </div>
+            
+            <!-- Road to Go-Live Visualization -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🛤️ Implementation Runway</div>
+                    <div class="viz-badge">Journey Tracker</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 420" class="viz-svg">
+                        <defs>
+                            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a1a2e"/>
+                                <stop offset="100%" style="stop-color:#0a0a0f"/>
+                            </linearGradient>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <path id="roadPath" d="M 30,380 
+                                     C 60,380 80,350 100,320
+                                     C 120,290 140,270 170,270
+                                     C 200,270 220,240 240,210
+                                     C 260,180 280,160 310,160
+                                     C 340,160 360,130 380,100
+                                     C 400,70 420,50 460,50"/>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#skyGrad)"/>
+                        
+                        <!-- Winding road path -->
+                        <use href="#roadPath" fill="none" stroke="#3a3a4e" stroke-width="24" stroke-linecap="round"/>
+                        <use href="#roadPath" fill="none" stroke="#F59E0B" stroke-width="2" stroke-dasharray="8,5" stroke-linecap="round"/>
+                        
+                        <!-- START -->
+                        <g transform="translate(30, 380)">
+                            <rect x="-22" y="8" width="44" height="18" rx="3" fill="#1a1a2e" stroke="#6B7280"/>
+                            <text x="0" y="20" text-anchor="middle" fill="#9CA3AF" font-size="8" font-weight="600">🏁 START</text>
+                        </g>
+                        
+                        <!-- Phase 1: PREPARE -->
+                        <g transform="translate(100, 320)">
+                            <line x1="0" y1="0" x2="0" y2="40" stroke="#3B82F6" stroke-width="2" stroke-dasharray="3,2"/>
+                            <circle cy="40" r="12" fill="#3B82F6" stroke="#60A5FA" stroke-width="2"/>
+                            <text x="0" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">1</text>
+                            <g transform="translate(0, 58)">
+                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#3B82F6" stroke-width="2"/>
+                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#3B82F6"/>
+                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">📋 PREPARE</text>
+                                <circle cx="40" cy="8" r="5" fill="#10B981"/>
+                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <text x="-45" y="26" fill="#60A5FA" font-size="7">• Requirements finalized</text>
+                                <text x="-45" y="36" fill="#60A5FA" font-size="7">• Environment ready</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Phase 2: BUILD -->
+                        <g transform="translate(170, 270)">
+                            <line x1="0" y1="0" x2="0" y2="-40" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="3,2"/>
+                            <circle cy="-40" r="12" fill="#8B5CF6" stroke="#A78BFA" stroke-width="2"/>
+                            <text x="0" y="-36" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">2</text>
+                            <g transform="translate(0, -95)">
+                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#8B5CF6" stroke-width="2"/>
+                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#8B5CF6"/>
+                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🔨 BUILD</text>
+                                <circle cx="40" cy="8" r="5" fill="#10B981"/>
+                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <text x="-45" y="26" fill="#A78BFA" font-size="7">• Configure systems</text>
+                                <text x="-45" y="36" fill="#A78BFA" font-size="7">• Build integrations</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Phase 3: TEST -->
+                        <g transform="translate(240, 210)">
+                            <line x1="0" y1="0" x2="0" y2="40" stroke="#06B6D4" stroke-width="2" stroke-dasharray="3,2"/>
+                            <circle cy="40" r="12" fill="#06B6D4" stroke="#22D3EE" stroke-width="2"/>
+                            <text x="0" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">3</text>
+                            <g transform="translate(0, 58)">
+                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#06B6D4" stroke-width="2"/>
+                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#06B6D4"/>
+                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🔍 TEST</text>
+                                <circle cx="40" cy="8" r="5" fill="#10B981"/>
+                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <text x="-45" y="26" fill="#22D3EE" font-size="7">• UAT sign-off</text>
+                                <text x="-45" y="36" fill="#22D3EE" font-size="7">• Go/No-Go decision</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Phase 4: DEPLOY (CURRENT) -->
+                        <g transform="translate(310, 160)">
+                            <line x1="0" y1="0" x2="0" y2="-40" stroke="#F59E0B" stroke-width="2" stroke-dasharray="3,2"/>
+                            <circle cy="-40" r="14" fill="#F59E0B" stroke="#FBBF24" stroke-width="3">
+                                <animate attributeName="r" values="14;16;14" dur="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <text x="0" y="-36" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">4</text>
+                            <g transform="translate(0, -105)">
+                                <rect x="-52" y="0" width="104" height="48" rx="5" fill="#12121a" stroke="#F59E0B" stroke-width="3">
+                                    <animate attributeName="stroke-opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#F59E0B"/>
+                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🚀 DEPLOY</text>
+                                <circle cx="40" cy="8" r="5" fill="#F59E0B">
+                                    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+                                </circle>
+                                <text x="40" y="11" text-anchor="middle" fill="#fff" font-size="5">⟳</text>
+                                <text x="-45" y="26" fill="#FBBF24" font-size="7">• Execute cutover</text>
+                                <text x="-45" y="36" fill="#FBBF24" font-size="7">• Go live activation</text>
+                                <text x="-45" y="46" fill="#F59E0B" font-size="6" font-weight="600">Day 3 of 10</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Phase 5: STABILIZE -->
+                        <g transform="translate(380, 100)">
+                            <line x1="0" y1="0" x2="0" y2="40" stroke="#10B981" stroke-width="2" stroke-dasharray="3,2" opacity="0.5"/>
+                            <circle cy="40" r="12" fill="#10B981" stroke="#34D399" stroke-width="2" opacity="0.5"/>
+                            <text x="0" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" opacity="0.5">5</text>
+                            <g transform="translate(0, 58)" opacity="0.5">
+                                <rect x="-52" y="0" width="104" height="42" rx="5" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                                <rect x="-52" y="0" width="104" height="16" rx="5" fill="#10B981"/>
+                                <text x="0" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="600">🩺 STABILIZE</text>
+                                <circle cx="40" cy="8" r="5" fill="#2a2a3e" stroke="#3a3a4e"/>
+                                <text x="40" y="11" text-anchor="middle" fill="#6a6a7a" font-size="6">○</text>
+                                <text x="-45" y="26" fill="#34D399" font-size="7">• Hypercare 24/7</text>
+                                <text x="-45" y="36" fill="#34D399" font-size="7">• Issue resolution</text>
+                            </g>
+                        </g>
+                        
+                        <!-- SUCCESS destination -->
+                        <g transform="translate(460, 50)" filter="url(#glow)">
+                            <rect x="-30" y="-18" width="60" height="36" rx="6" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                            <text x="0" y="-2" text-anchor="middle" fill="#34D399" font-size="9" font-weight="700">🏆 SUCCESS</text>
+                            <text x="0" y="12" text-anchor="middle" fill="#6a6a7a" font-size="7">GO-LIVE</text>
+                            <polygon points="25,-25 40,-18 25,-11" fill="#10B981"/>
+                            <rect x="22" y="-25" width="3" height="16" fill="#10B981"/>
+                        </g>
+                        
+                        <!-- ANIMATED CAR -->
+                        <g>
+                            <g transform="translate(-12, -6)">
+                                <rect x="0" y="2" width="22" height="10" rx="3" fill="#F59E0B"/>
+                                <rect x="3" y="-3" width="12" height="8" rx="2" fill="#FBBF24"/>
+                                <rect x="5" y="-1" width="4" height="5" rx="1" fill="#1a1a2e"/>
+                                <rect x="10" y="-1" width="4" height="5" rx="1" fill="#1a1a2e"/>
+                                <circle cx="5" cy="12" r="3" fill="#1a1a2e" stroke="#6B7280" stroke-width="1"/>
+                                <circle cx="17" cy="12" r="3" fill="#1a1a2e" stroke="#6B7280" stroke-width="1"/>
+                                <rect x="20" y="5" width="3" height="3" rx="1" fill="#FEF3C7"/>
+                            </g>
+                            <animateMotion dur="12s" repeatCount="indefinite">
+                                <mpath href="#roadPath"/>
+                            </animateMotion>
+                        </g>
+                        
+                        <!-- RIGHT SIDE: PHASE DETAILS -->
+                        <g transform="translate(505, 15)">
+                            <rect width="280" height="390" rx="10" fill="#12121a" stroke="#2a2a3e" stroke-width="2"/>
+                            <rect width="280" height="35" rx="10" fill="#1a1a2e"/>
+                            <text x="140" y="23" text-anchor="middle" fill="#F59E0B" font-size="11" font-weight="700">📋 IMPLEMENTATION PHASES</text>
+                            
+                            <!-- Phase details -->
+                            <g transform="translate(15, 50)">
+                                <circle cx="12" cy="12" r="12" fill="#3B82F6"/>
+                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">1</text>
+                                <text x="32" y="16" fill="#60A5FA" font-size="11" font-weight="600">PREPARE</text>
+                                <circle cx="250" cy="12" r="10" fill="#10B981"/>
+                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="9">✓</text>
+                                <text x="32" y="32" fill="#6a6a7a" font-size="8">Environment setup, data migration prep</text>
+                            </g>
+                            
+                            <g transform="translate(15, 100)">
+                                <circle cx="12" cy="12" r="12" fill="#8B5CF6"/>
+                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">2</text>
+                                <text x="32" y="16" fill="#A78BFA" font-size="11" font-weight="600">BUILD</text>
+                                <circle cx="250" cy="12" r="10" fill="#10B981"/>
+                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="9">✓</text>
+                                <text x="32" y="32" fill="#6a6a7a" font-size="8">Configuration, integrations, customizations</text>
+                            </g>
+                            
+                            <g transform="translate(15, 150)">
+                                <circle cx="12" cy="12" r="12" fill="#06B6D4"/>
+                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">3</text>
+                                <text x="32" y="16" fill="#22D3EE" font-size="11" font-weight="600">TEST</text>
+                                <circle cx="250" cy="12" r="10" fill="#10B981"/>
+                                <text x="250" y="16" text-anchor="middle" fill="#fff" font-size="9">✓</text>
+                                <text x="32" y="32" fill="#6a6a7a" font-size="8">UAT, performance testing, Go/No-Go</text>
+                            </g>
+                            
+                            <g transform="translate(15, 200)">
+                                <circle cx="12" cy="12" r="14" fill="#F59E0B" stroke="#FBBF24" stroke-width="2">
+                                    <animate attributeName="r" values="12;14;12" dur="1.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">4</text>
+                                <text x="34" y="16" fill="#FBBF24" font-size="11" font-weight="600">DEPLOY</text>
+                                <text x="100" y="16" fill="#F59E0B" font-size="9">← CURRENT</text>
+                                <text x="34" y="32" fill="#6a6a7a" font-size="8">Cutover execution, go-live activation</text>
+                            </g>
+                            
+                            <g transform="translate(15, 250)" opacity="0.5">
+                                <circle cx="12" cy="12" r="12" fill="#10B981"/>
+                                <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">5</text>
+                                <text x="32" y="16" fill="#34D399" font-size="11" font-weight="600">STABILIZE</text>
+                                <circle cx="250" cy="12" r="10" fill="#2a2a3e" stroke="#3a3a4e"/>
+                                <text x="250" y="16" text-anchor="middle" fill="#6a6a7a" font-size="9">○</text>
+                                <text x="32" y="32" fill="#6a6a7a" font-size="8">Hypercare, monitoring, issue resolution</text>
+                            </g>
+                            
+                            <!-- Progress summary -->
+                            <g transform="translate(15, 310)">
+                                <rect width="250" height="60" rx="6" fill="#1a1a2e" stroke="#F59E0B"/>
+                                <text x="125" y="20" text-anchor="middle" fill="#F59E0B" font-size="9" font-weight="600">OVERALL PROGRESS</text>
+                                <rect x="15" y="30" width="220" height="8" rx="4" fill="#2a2a3e"/>
+                                <rect x="15" y="30" width="154" height="8" rx="4" fill="#F59E0B"/>
+                                <text x="125" y="52" text-anchor="middle" fill="#FBBF24" font-size="12" font-weight="700">70% Complete</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 2: KEY CONCEPTS -->
+        <section class="module" id="concepts">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Key Implementation Concepts</h2>
+                    <p>Essential knowledge for successful go-lives</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Implementation is where planning meets reality. Success depends on rigorous preparation, real-time coordination, and rapid response to issues. These concepts form the foundation of effective implementation management.</p>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">📋</div>
+                    <div class="concept-title">Cutover Planning</div>
+                    <div class="concept-desc">Detailed task sequencing with dependencies, owners, and timing. Every minute of the cutover window is planned, with rollback triggers defined.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🎛️</div>
+                    <div class="concept-title">Mission Control</div>
+                    <div class="concept-desc">War room operations with real-time dashboards, status tracking, and coordinated decision-making. Central command for all go-live activities.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🩺</div>
+                    <div class="concept-title">Hypercare</div>
+                    <div class="concept-desc">Intensive post-go-live support with 24/7 coverage, rapid issue resolution, and elevated SLAs. Typically 2-6 weeks duration.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🌊</div>
+                    <div class="concept-title">Wave Rollout</div>
+                    <div class="concept-desc">Phased deployment across user groups, regions, or functions. Each wave learns from the last, reducing risk progressively.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🔄</div>
+                    <div class="concept-title">Rollback Strategy</div>
+                    <div class="concept-desc">Pre-defined fallback procedures with trigger criteria, responsibilities, and RTO targets. Essential safety net for every deployment.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">✅</div>
+                    <div class="concept-title">Go/No-Go Decision</div>
+                    <div class="concept-desc">Structured checkpoint with defined criteria across technical readiness, business readiness, and risk tolerance. Final gate before go-live.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE: MISSION CONTROL -->
+        <section class="module" id="command">
+            <div class="module-header">
+                <div class="module-icon">🎛️</div>
+                <div class="module-info">
+                    <h2>Mission Control Center</h2>
+                    <p>Real-time command and coordination during go-live</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The Mission Control Center (War Room) is the nerve center during go-live. It brings together all stakeholders with real-time visibility into system health, task progress, and issue status. <strong>Effective war rooms reduce mean time to resolution by 60%</strong> and ensure coordinated decision-making under pressure.</p>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🎛️ Go-Live Mission Control</div>
+                    <div class="viz-badge">Live Dashboard</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 380" class="viz-svg">
+                        <defs>
+                            <linearGradient id="mcGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a1a2e"/>
+                                <stop offset="100%" style="stop-color:#0a0a0f"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#mcGrad)"/>
+                        
+                        <!-- Header bar -->
+                        <rect x="10" y="10" width="780" height="35" rx="6" fill="#12121a" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="30" y="33" fill="#F59E0B" font-size="14" font-weight="700">🚀 MISSION CONTROL: WAVE 2 GO-LIVE</text>
+                        <text x="400" y="33" fill="#FBBF24" font-size="11">T+04:23:45 | Status: ACTIVE</text>
+                        <circle cx="700" cy="27" r="8" fill="#10B981">
+                            <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="720" y="31" fill="#34D399" font-size="10" font-weight="600">LIVE</text>
+                        
+                        <!-- Left column: System Status -->
+                        <g transform="translate(15, 55)">
+                            <text x="0" y="15" fill="#F59E0B" font-size="10" font-weight="600">SYSTEM STATUS</text>
+                            
+                            <!-- Status cards -->
+                            <g transform="translate(0, 25)">
+                                <rect width="180" height="45" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <circle cx="20" cy="22" r="8" fill="#10B981"/>
+                                <text x="35" y="18" fill="#a0a0b0" font-size="8">DATABASE</text>
+                                <text x="35" y="30" fill="#34D399" font-size="11" font-weight="600">HEALTHY</text>
+                                <text x="140" y="26" fill="#34D399" font-size="10">99.9%</text>
+                            </g>
+                            
+                            <g transform="translate(0, 78)">
+                                <rect width="180" height="45" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <circle cx="20" cy="22" r="8" fill="#10B981"/>
+                                <text x="35" y="18" fill="#a0a0b0" font-size="8">API GATEWAY</text>
+                                <text x="35" y="30" fill="#34D399" font-size="11" font-weight="600">HEALTHY</text>
+                                <text x="140" y="26" fill="#34D399" font-size="10">100%</text>
+                            </g>
+                            
+                            <g transform="translate(0, 131)">
+                                <rect width="180" height="45" rx="6" fill="#1a1a2e" stroke="#FBBF24"/>
+                                <circle cx="20" cy="22" r="8" fill="#FBBF24">
+                                    <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+                                </circle>
+                                <text x="35" y="18" fill="#a0a0b0" font-size="8">SSO SERVICE</text>
+                                <text x="35" y="30" fill="#FBBF24" font-size="11" font-weight="600">DEGRADED</text>
+                                <text x="140" y="26" fill="#FBBF24" font-size="10">87%</text>
+                            </g>
+                            
+                            <g transform="translate(0, 184)">
+                                <rect width="180" height="45" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <circle cx="20" cy="22" r="8" fill="#10B981"/>
+                                <text x="35" y="18" fill="#a0a0b0" font-size="8">CDN / ASSETS</text>
+                                <text x="35" y="30" fill="#34D399" font-size="11" font-weight="600">HEALTHY</text>
+                                <text x="140" y="26" fill="#34D399" font-size="10">100%</text>
+                            </g>
+                            
+                            <g transform="translate(0, 237)">
+                                <rect width="180" height="45" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <circle cx="20" cy="22" r="8" fill="#10B981"/>
+                                <text x="35" y="18" fill="#a0a0b0" font-size="8">MESSAGE QUEUE</text>
+                                <text x="35" y="30" fill="#34D399" font-size="11" font-weight="600">HEALTHY</text>
+                                <text x="140" y="26" fill="#34D399" font-size="10">100%</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Center: Activity Feed -->
+                        <g transform="translate(210, 55)">
+                            <text x="0" y="15" fill="#F59E0B" font-size="10" font-weight="600">LIVE ACTIVITY FEED</text>
+                            
+                            <g transform="translate(0, 25)">
+                                <rect width="370" height="255" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                                
+                                <g transform="translate(10, 15)">
+                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:23:12</text>
+                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ Production database cutover complete</text>
+                                </g>
+                                <g transform="translate(10, 40)">
+                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:18:45</text>
+                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ API gateway switched to production</text>
+                                </g>
+                                <g transform="translate(10, 65)">
+                                    <circle cx="8" cy="8" r="4" fill="#FBBF24">
+                                        <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+                                    </circle>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:15:22</text>
+                                    <text x="20" y="15" fill="#FBBF24" font-size="8">◐ SSO integration verification in progress...</text>
+                                </g>
+                                <g transform="translate(10, 90)">
+                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:10:03</text>
+                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ User accounts migrated (2,847 users)</text>
+                                </g>
+                                <g transform="translate(10, 115)">
+                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">04:05:18</text>
+                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ Legacy system read-only mode activated</text>
+                                </g>
+                                <g transform="translate(10, 140)">
+                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">03:58:41</text>
+                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ DNS propagation verified (all regions)</text>
+                                </g>
+                                <g transform="translate(10, 165)">
+                                    <circle cx="8" cy="8" r="4" fill="#EF4444"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">03:45:12</text>
+                                    <text x="20" y="15" fill="#F87171" font-size="8">✗ Cache warmup timeout - RESOLVED</text>
+                                </g>
+                                <g transform="translate(10, 190)">
+                                    <circle cx="8" cy="8" r="4" fill="#10B981"/>
+                                    <text x="20" y="5" fill="#6a6a7a" font-size="7">03:30:00</text>
+                                    <text x="20" y="15" fill="#34D399" font-size="8">✓ Cutover window opened</text>
+                                </g>
+                                <g transform="translate(10, 220)">
+                                    <text x="165" y="15" text-anchor="middle" fill="#6a6a7a" font-size="8">↓ 47 more events</text>
+                                </g>
+                            </g>
+                        </g>
+                        
+                        <!-- Right column: Metrics -->
+                        <g transform="translate(595, 55)">
+                            <text x="0" y="15" fill="#F59E0B" font-size="10" font-weight="600">KEY METRICS</text>
+                            
+                            <g transform="translate(0, 25)">
+                                <rect width="185" height="55" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="15" y="22" fill="#6a6a7a" font-size="8">TASKS COMPLETE</text>
+                                <text x="15" y="42" fill="#34D399" font-size="20" font-weight="700">47</text>
+                                <text x="55" y="42" fill="#6a6a7a" font-size="12">/ 52</text>
+                                <text x="130" y="42" fill="#34D399" font-size="12" font-weight="600">90%</text>
+                            </g>
+                            
+                            <g transform="translate(0, 88)">
+                                <rect width="185" height="55" rx="6" fill="#1a1a2e" stroke="#FBBF24"/>
+                                <text x="15" y="22" fill="#6a6a7a" font-size="8">OPEN BLOCKERS</text>
+                                <text x="15" y="42" fill="#FBBF24" font-size="20" font-weight="700">1</text>
+                                <text x="50" y="38" fill="#6a6a7a" font-size="8">SSO timeout</text>
+                                <text x="50" y="48" fill="#FBBF24" font-size="8">Team investigating</text>
+                            </g>
+                            
+                            <g transform="translate(0, 151)">
+                                <rect width="185" height="55" rx="6" fill="#1a1a2e" stroke="#3B82F6"/>
+                                <text x="15" y="22" fill="#6a6a7a" font-size="8">USERS ONLINE</text>
+                                <text x="15" y="42" fill="#60A5FA" font-size="20" font-weight="700">1,847</text>
+                                <text x="85" y="42" fill="#6a6a7a" font-size="10">/ 2,847</text>
+                            </g>
+                            
+                            <g transform="translate(0, 214)">
+                                <rect width="185" height="55" rx="6" fill="#1a1a2e" stroke="#10B981"/>
+                                <text x="15" y="22" fill="#6a6a7a" font-size="8">ROLLBACK STATUS</text>
+                                <text x="15" y="42" fill="#34D399" font-size="14" font-weight="700">READY</text>
+                                <text x="90" y="42" fill="#6a6a7a" font-size="10">15 min RTO</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Bottom status bar -->
+                        <g transform="translate(15, 340)">
+                            <rect width="770" height="28" rx="4" fill="#12121a" stroke="#2a2a3e"/>
+                            <text x="15" y="18" fill="#6a6a7a" font-size="9">WAR ROOM:</text>
+                            <text x="85" y="18" fill="#34D399" font-size="9">12 members online</text>
+                            <text x="210" y="18" fill="#3a3a4e" font-size="9">|</text>
+                            <text x="230" y="18" fill="#6a6a7a" font-size="9">NEXT CHECKPOINT:</text>
+                            <text x="350" y="18" fill="#FBBF24" font-size="9">User validation (T+05:00:00)</text>
+                            <text x="530" y="18" fill="#3a3a4e" font-size="9">|</text>
+                            <text x="550" y="18" fill="#6a6a7a" font-size="9">GO-LIVE LEAD:</text>
+                            <text x="640" y="18" fill="#60A5FA" font-size="9">Sarah Chen</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE: ROLLOUT STRATEGIES -->
+        <section class="module" id="strategies">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Rollout Strategy Comparison</h2>
+                    <p>Choose the right deployment approach for your context</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The choice of rollout strategy dramatically impacts risk, complexity, and success rates. <strong>Big Bang</strong> deploys to everyone at once—high risk but fast. <strong>Phased/Wave</strong> deploys incrementally—lower risk but slower. <strong>Parallel</strong> runs old and new systems simultaneously—safest but most expensive. Most enterprise implementations use phased approaches.</p>
+            </div>
+            
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Rollout Strategy Matrix</div>
+                    <div class="viz-badge">Risk vs Speed</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 320" class="viz-svg">
+                        <!-- Big Bang -->
+                        <g transform="translate(30, 20)">
+                            <rect width="230" height="280" rx="10" fill="#12121a" stroke="#EF4444" stroke-width="2"/>
+                            <rect width="230" height="45" rx="10" fill="#EF4444"/>
+                            <text x="115" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">💥 BIG BANG</text>
+                            <text x="115" y="35" text-anchor="middle" fill="#fca5a5" font-size="9">All users, all at once</text>
+                            
+                            <g transform="translate(15, 60)">
+                                <text x="0" y="0" fill="#F87171" font-size="9" font-weight="600">CHARACTERISTICS</text>
+                                <text x="0" y="18" fill="#a0a0b0" font-size="8">• Single cutover date</text>
+                                <text x="0" y="32" fill="#a0a0b0" font-size="8">• No gradual transition</text>
+                                <text x="0" y="46" fill="#a0a0b0" font-size="8">• Legacy system retired immediately</text>
+                                <text x="0" y="60" fill="#a0a0b0" font-size="8">• High coordination required</text>
+                                
+                                <text x="0" y="85" fill="#F87171" font-size="9" font-weight="600">METRICS</text>
+                                <text x="0" y="103" fill="#6a6a7a" font-size="8">Risk Level:</text>
+                                <rect x="60" y="95" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="95" width="72" height="10" rx="2" fill="#EF4444"/>
+                                <text x="150" y="103" fill="#EF4444" font-size="8" font-weight="600">HIGH</text>
+                                
+                                <text x="0" y="120" fill="#6a6a7a" font-size="8">Speed:</text>
+                                <rect x="60" y="112" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="112" width="72" height="10" rx="2" fill="#10B981"/>
+                                <text x="150" y="120" fill="#10B981" font-size="8" font-weight="600">FAST</text>
+                                
+                                <text x="0" y="137" fill="#6a6a7a" font-size="8">Cost:</text>
+                                <rect x="60" y="129" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="129" width="32" height="10" rx="2" fill="#10B981"/>
+                                <text x="150" y="137" fill="#10B981" font-size="8" font-weight="600">LOW</text>
+                                
+                                <text x="0" y="162" fill="#F87171" font-size="9" font-weight="600">BEST FOR</text>
+                                <text x="0" y="180" fill="#a0a0b0" font-size="8">• Small user bases (&lt;100)</text>
+                                <text x="0" y="194" fill="#a0a0b0" font-size="8">• Simple systems</text>
+                                <text x="0" y="208" fill="#a0a0b0" font-size="8">• Tight deadlines</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Phased/Wave -->
+                        <g transform="translate(285, 20)">
+                            <rect width="230" height="280" rx="10" fill="#12121a" stroke="#10B981" stroke-width="3"/>
+                            <rect width="230" height="45" rx="10" fill="#10B981"/>
+                            <text x="115" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">🌊 PHASED / WAVE</text>
+                            <text x="115" y="35" text-anchor="middle" fill="#6ee7b7" font-size="9">Incremental rollout</text>
+                            <text x="200" y="-5" fill="#10B981" font-size="9" font-weight="700">★ RECOMMENDED</text>
+                            
+                            <g transform="translate(15, 60)">
+                                <text x="0" y="0" fill="#34D399" font-size="9" font-weight="600">CHARACTERISTICS</text>
+                                <text x="0" y="18" fill="#a0a0b0" font-size="8">• Multiple go-live dates</text>
+                                <text x="0" y="32" fill="#a0a0b0" font-size="8">• Learn from each wave</text>
+                                <text x="0" y="46" fill="#a0a0b0" font-size="8">• Gradual legacy retirement</text>
+                                <text x="0" y="60" fill="#a0a0b0" font-size="8">• Adjustable pace</text>
+                                
+                                <text x="0" y="85" fill="#34D399" font-size="9" font-weight="600">METRICS</text>
+                                <text x="0" y="103" fill="#6a6a7a" font-size="8">Risk Level:</text>
+                                <rect x="60" y="95" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="95" width="32" height="10" rx="2" fill="#10B981"/>
+                                <text x="150" y="103" fill="#10B981" font-size="8" font-weight="600">LOW</text>
+                                
+                                <text x="0" y="120" fill="#6a6a7a" font-size="8">Speed:</text>
+                                <rect x="60" y="112" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="112" width="48" height="10" rx="2" fill="#FBBF24"/>
+                                <text x="150" y="120" fill="#FBBF24" font-size="8" font-weight="600">MEDIUM</text>
+                                
+                                <text x="0" y="137" fill="#6a6a7a" font-size="8">Cost:</text>
+                                <rect x="60" y="129" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="129" width="48" height="10" rx="2" fill="#FBBF24"/>
+                                <text x="150" y="137" fill="#FBBF24" font-size="8" font-weight="600">MEDIUM</text>
+                                
+                                <text x="0" y="162" fill="#34D399" font-size="9" font-weight="600">BEST FOR</text>
+                                <text x="0" y="180" fill="#a0a0b0" font-size="8">• Enterprise deployments</text>
+                                <text x="0" y="194" fill="#a0a0b0" font-size="8">• Multi-region rollouts</text>
+                                <text x="0" y="208" fill="#a0a0b0" font-size="8">• Complex integrations</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Parallel -->
+                        <g transform="translate(540, 20)">
+                            <rect width="230" height="280" rx="10" fill="#12121a" stroke="#3B82F6" stroke-width="2"/>
+                            <rect width="230" height="45" rx="10" fill="#3B82F6"/>
+                            <text x="115" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">⚡ PARALLEL RUN</text>
+                            <text x="115" y="35" text-anchor="middle" fill="#93c5fd" font-size="9">Old + New simultaneously</text>
+                            
+                            <g transform="translate(15, 60)">
+                                <text x="0" y="0" fill="#60A5FA" font-size="9" font-weight="600">CHARACTERISTICS</text>
+                                <text x="0" y="18" fill="#a0a0b0" font-size="8">• Both systems active</text>
+                                <text x="0" y="32" fill="#a0a0b0" font-size="8">• Data reconciliation required</text>
+                                <text x="0" y="46" fill="#a0a0b0" font-size="8">• Instant fallback available</text>
+                                <text x="0" y="60" fill="#a0a0b0" font-size="8">• High operational overhead</text>
+                                
+                                <text x="0" y="85" fill="#60A5FA" font-size="9" font-weight="600">METRICS</text>
+                                <text x="0" y="103" fill="#6a6a7a" font-size="8">Risk Level:</text>
+                                <rect x="60" y="95" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="95" width="16" height="10" rx="2" fill="#10B981"/>
+                                <text x="150" y="103" fill="#10B981" font-size="8" font-weight="600">V.LOW</text>
+                                
+                                <text x="0" y="120" fill="#6a6a7a" font-size="8">Speed:</text>
+                                <rect x="60" y="112" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="112" width="24" height="10" rx="2" fill="#EF4444"/>
+                                <text x="150" y="120" fill="#EF4444" font-size="8" font-weight="600">SLOW</text>
+                                
+                                <text x="0" y="137" fill="#6a6a7a" font-size="8">Cost:</text>
+                                <rect x="60" y="129" width="80" height="10" rx="2" fill="#2a2a3e"/>
+                                <rect x="60" y="129" width="72" height="10" rx="2" fill="#EF4444"/>
+                                <text x="150" y="137" fill="#EF4444" font-size="8" font-weight="600">HIGH</text>
+                                
+                                <text x="0" y="162" fill="#60A5FA" font-size="9" font-weight="600">BEST FOR</text>
+                                <text x="0" y="180" fill="#a0a0b0" font-size="8">• Mission-critical systems</text>
+                                <text x="0" y="194" fill="#a0a0b0" font-size="8">• Financial applications</text>
+                                <text x="0" y="208" fill="#a0a0b0" font-size="8">• Zero-downtime required</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE: GO/NO-GO CHECKLIST -->
+        <section class="module" id="gonogo">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Go/No-Go Decision Framework</h2>
+                    <p>Structured criteria for launch readiness</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The Go/No-Go decision is the final gate before cutover. It's a structured checkpoint where stakeholders assess readiness across multiple dimensions. <strong>Every criterion must pass</strong>—a single critical failure means No-Go. This discipline prevents costly failures and ensures alignment across teams.</p>
+            </div>
+            
+            <div class="checklist-container">
+                <div class="checklist-grid">
+                    <div class="checklist-card">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), transparent); border-color: #3B82F6;">
+                            <div class="checklist-icon">🔧</div>
+                            <div class="checklist-title">Technical Readiness</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> All environments provisioned and configured</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Data migration complete and validated</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Integration testing passed (100%)</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Performance testing within SLA</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Security scan passed (no critical/high)</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Rollback procedures tested</div>
+                        </div>
+                    </div>
+                    <div class="checklist-card">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), transparent); border-color: #10B981;">
+                            <div class="checklist-icon">👥</div>
+                            <div class="checklist-title">Business Readiness</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> UAT signed off by business owners</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Training complete for all user groups</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Change communications sent</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Support team staffed and trained</div>
+                            <div class="checklist-item"><span class="check-icon warn">⚠</span> Documentation reviewed (95%)</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Executive sponsor sign-off</div>
+                        </div>
+                    </div>
+                    <div class="checklist-card">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), transparent); border-color: #F59E0B;">
+                            <div class="checklist-icon">🛡️</div>
+                            <div class="checklist-title">Operational Readiness</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Monitoring and alerting configured</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> On-call schedule confirmed</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Runbook reviewed and approved</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> War room logistics confirmed</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Escalation paths documented</div>
+                            <div class="checklist-item"><span class="check-icon pass">✓</span> Vendor support engaged</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="decision-box">
+                    <div class="decision-header">
+                        <span class="decision-icon">🚦</span>
+                        <span class="decision-title">GO/NO-GO DECISION</span>
+                    </div>
+                    <div class="decision-body">
+                        <div class="decision-status go">
+                            <span class="status-light"></span>
+                            <span class="status-text">GO</span>
+                        </div>
+                        <div class="decision-details">
+                            <div class="decision-stat"><strong>17</strong> of 18 criteria passed</div>
+                            <div class="decision-stat"><strong>1</strong> warning (non-blocking)</div>
+                            <div class="decision-stat"><strong>0</strong> critical failures</div>
+                        </div>
+                        <div class="decision-note">Proceed with cutover. Documentation gap accepted with remediation plan post-go-live.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE: BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Implementation Best Practices</h2>
+                    <p>Proven patterns for successful go-lives</p>
+                </div>
+            </div>
+            
+            <div class="proscons-grid">
+                <div class="proscons-card pros">
+                    <div class="proscons-title">✅ Do This</div>
+                    <ul class="proscons-list">
+                        <li><strong>Rehearse the cutover</strong> — Run full dress rehearsals with timing, not just task completion</li>
+                        <li><strong>Over-communicate</strong> — Status updates every 30 minutes during critical windows</li>
+                        <li><strong>Define rollback triggers</strong> — Clear, measurable criteria that trigger automatic rollback</li>
+                        <li><strong>Staff for surge</strong> — 3x normal support capacity during hypercare week 1</li>
+                        <li><strong>Freeze changes</strong> — No code changes 48+ hours before go-live</li>
+                        <li><strong>Document everything</strong> — Real-time logging of decisions, issues, and resolutions</li>
+                    </ul>
+                </div>
+                <div class="proscons-card cons">
+                    <div class="proscons-title">❌ Avoid This</div>
+                    <ul class="proscons-list">
+                        <li><strong>Friday go-lives</strong> — Issues discovered over weekends are harder to resolve</li>
+                        <li><strong>Skipping UAT sign-off</strong> — Business ownership of testing is non-negotiable</li>
+                        <li><strong>Optimistic timelines</strong> — Cutover tasks always take longer than planned</li>
+                        <li><strong>Single points of failure</strong> — Key person unavailable = blocked cutover</li>
+                        <li><strong>Ignoring early warnings</strong> — Small issues during cutover often escalate</li>
+                        <li><strong>Premature hypercare exit</strong> — Ending support too early causes user abandonment</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="value-container">
+                <div class="value-header">
+                    <div class="value-title">📊 Implementation Value Analysis</div>
+                    <div class="value-badge">ROI Factors</div>
+                </div>
+                <div class="value-metrics">
+                    <div class="value-metric">
+                        <div class="value-metric-label">Planning Effort</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 85%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Risk Reduction</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 90%;"></div></div>
+                        <div class="value-metric-value">Very High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Cost of Failure</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill critical" style="width: 95%;"></div></div>
+                        <div class="value-metric-value">Critical</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">User Impact</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 88%;"></div></div>
+                        <div class="value-metric-value">Very High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Scalability</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill medium" style="width: 70%;"></div></div>
+                        <div class="value-metric-value">Medium</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 3: TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Implementation Tools</h2>
+                    <p>Project management, monitoring, and support platforms</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📊</div>
+                        <div class="tool-card-name">Jira</div>
+                    </div>
+                    <div class="tool-card-desc">Cutover task tracking, sprint management, and issue resolution workflows during implementation.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📈</div>
+                        <div class="tool-card-name">Datadog</div>
+                    </div>
+                    <div class="tool-card-desc">Real-time infrastructure monitoring, APM, and alerting for go-live system health.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🎫</div>
+                        <div class="tool-card-name">ServiceNow</div>
+                    </div>
+                    <div class="tool-card-desc">Hypercare ticket management, knowledge base, and SLA tracking for support teams.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📱</div>
+                        <div class="tool-card-name">WalkMe</div>
+                    </div>
+                    <div class="tool-card-desc">Digital adoption platform with in-app guidance, analytics, and user training.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">💬</div>
+                        <div class="tool-card-name">Slack/Teams</div>
+                    </div>
+                    <div class="tool-card-desc">War room communications, status updates, and rapid coordination channels.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📋</div>
+                        <div class="tool-card-name">Smartsheet</div>
+                    </div>
+                    <div class="tool-card-desc">Cutover runbook management, task dependencies, and real-time progress tracking.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔔</div>
+                        <div class="tool-card-name">PagerDuty</div>
+                    </div>
+                    <div class="tool-card-desc">On-call scheduling, incident escalation, and alerting during hypercare periods.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📊</div>
+                        <div class="tool-card-name">Tableau/PowerBI</div>
+                    </div>
+                    <div class="tool-card-desc">Go-live dashboards, adoption metrics, and executive status reporting.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 4: AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered implementation coordination</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🚀</div>
+                    <div class="agent-name">ImplementationOps</div>
+                    <div class="agent-role">Go-Live Command Center</div>
+                    <div class="agent-desc">Orchestrates implementation activities across cutover management, system monitoring, support coordination, and adoption tracking. Provides real-time status, identifies risks, and recommends interventions.</div>
+                    <ul class="agent-capabilities">
+                        <li>Cutover task sequencing and dependencies</li>
+                        <li>Real-time system health monitoring</li>
+                        <li>Support ticket triage and routing</li>
+                        <li>Adoption metrics tracking</li>
+                        <li>Rollback decision support</li>
+                        <li>Stakeholder status reporting</li>
+                        <li>Issue pattern detection</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">implementation_ops_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Implementation Command Center Crew</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+<span class="code-comment"># Initialize LLM</span>
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Implementation Agents</span>
+cutover_agent = Agent(
+    role=<span class="code-string">"Cutover Coordinator"</span>,
+    goal=<span class="code-string">"Execute cutover tasks in precise sequence"</span>,
+    backstory=<span class="code-string">"""Expert in coordinating complex cutovers 
+    with multiple dependencies and rollback points."""</span>,
+    llm=llm,
+    tools=[task_sequencer, dependency_checker, rollback_tool]
+)
+
+health_agent = Agent(
+    role=<span class="code-string">"System Health Monitor"</span>,
+    goal=<span class="code-string">"Monitor all systems during go-live window"</span>,
+    backstory=<span class="code-string">"""Specialist in real-time monitoring, detecting
+    anomalies and triggering alerts before issues escalate."""</span>,
+    llm=llm,
+    tools=[health_monitor, alert_manager, metrics_collector]
+)
+
+hypercare_agent = Agent(
+    role=<span class="code-string">"Hypercare Support Lead"</span>,
+    goal=<span class="code-string">"Manage support queue and ensure rapid resolution"</span>,
+    backstory=<span class="code-string">"""Experienced in high-volume support during
+    critical periods, prioritizing and routing issues."""</span>,
+    llm=llm,
+    tools=[ticket_router, knowledge_base, escalation_tool]
+)
+
+<span class="code-comment"># Create Implementation Crew</span>
+implementation_crew = Crew(
+    agents=[cutover_agent, health_agent, hypercare_agent],
+    process=Process.hierarchical,
+    manager_llm=llm,
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">execute_go_live</span>(wave: <span class="code-keyword">int</span>):
+    <span class="code-string">"""Execute go-live for specified wave."""</span>
+    tasks = [
+        Task(description=<span class="code-string">f"Execute Wave {wave} cutover"</span>, 
+             agent=cutover_agent),
+        Task(description=<span class="code-string">"Monitor system health"</span>, 
+             agent=health_agent),
+        Task(description=<span class="code-string">"Manage hypercare queue"</span>, 
+             agent=hypercare_agent)
+    ]
+    <span class="code-keyword">return await</span> implementation_crew.kickoff_async(tasks=tasks)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 5: PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Explore This Category</h2>
+                    <p>Deep dives into implementation topics</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat18-p1-go-live-planning.html" class="page-card">
+                    <div class="page-num">Page 18.1</div>
+                    <div class="page-title">Go-Live Planning</div>
+                    <div class="page-desc">Readiness checklists, Go/No-Go criteria, risk assessment, and launch preparation frameworks</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat18-p2-cutover-management.html" class="page-card">
+                    <div class="page-num">Page 18.2</div>
+                    <div class="page-title">Cutover Management</div>
+                    <div class="page-desc">Runbook design, task sequencing, dependency management, and rollback procedures</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat18-p3-hypercare.html" class="page-card">
+                    <div class="page-num">Page 18.3</div>
+                    <div class="page-title">Hypercare & Support</div>
+                    <div class="page-desc">Support models, escalation paths, SLA management, and issue triage frameworks</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat18-p4-wave-rollout.html" class="page-card">
+                    <div class="page-num">Page 18.4</div>
+                    <div class="page-title">Wave Rollout Strategy</div>
+                    <div class="page-desc">Phased deployment planning, wave sizing, learning integration, and expansion criteria</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat18-p5-post-implementation.html" class="page-card">
+                    <div class="page-num">Page 18.5</div>
+                    <div class="page-title">Post-Implementation Review</div>
+                    <div class="page-desc">Lessons learned, benefits realization, stabilization criteria, and handover to operations</div>
+                    <div class="page-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat17-change-management-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">17: Change Management</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 18 of 29</div>
+        <a href="cat18-p1-go-live-planning.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Start Learning</div>
+                <div class="footer-link-title">18.1 Go-Live Planning</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

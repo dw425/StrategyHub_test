@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go-Live Planning | 18.1 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .framework-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .framework-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .framework-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .framework-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .framework-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .concept-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .concept-icon { font-size: 36px; margin-bottom: var(--space-md); }
+        .concept-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .concept-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .table-container table { width: 100%; border-collapse: collapse; }
+        .table-container th { background: var(--bg-card-alt); padding: var(--space-md) var(--space-lg); text-align: left; font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .table-container td { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .table-container tr:last-child td { border-bottom: none; }
+        .table-container tr:hover td { background: var(--bg-hover); }
+        
+        .rating-dots { display: flex; gap: 4px; }
+        .rating-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bg-card-alt); border: 1px solid var(--border-color); }
+        .rating-dot.filled { background: var(--cat-primary); border-color: var(--cat-light); }
+        .rating-dot.half { background: linear-gradient(90deg, var(--cat-primary) 50%, var(--bg-card-alt) 50%); }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--font-xs); font-weight: 600; }
+        .status-badge.critical { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .status-badge.high { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .status-badge.medium { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+        .status-badge.low { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+        
+        .checklist-section { margin-bottom: var(--space-xl); }
+        .checklist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+        .checklist-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .checklist-header { padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .checklist-icon { font-size: 24px; }
+        .checklist-title { font-size: var(--font-base); font-weight: 600; }
+        .checklist-progress { margin-left: auto; font-size: var(--font-xs); color: var(--cat-light); }
+        .checklist-items { padding: var(--space-md) var(--space-lg); }
+        .checklist-item { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .checklist-item:last-child { border-bottom: none; }
+        .check-box { width: 18px; height: 18px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+        .check-box.pass { background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid #10B981; }
+        .check-box.pending { background: var(--bg-card-alt); color: var(--text-muted); border: 1px solid var(--border-color); }
+        .check-box.warn { background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid #F59E0B; }
+        
+        .timeline-container { position: relative; padding-left: var(--space-xl); }
+        .timeline-line { position: absolute; left: 11px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
+        .timeline-item { position: relative; padding-bottom: var(--space-xl); }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: calc(-1 * var(--space-xl) + 4px); width: 16px; height: 16px; border-radius: 50%; background: var(--cat-primary); border: 3px solid var(--bg-dark); }
+        .timeline-dot.completed { background: var(--success-green); }
+        .timeline-dot.current { background: var(--cat-primary); box-shadow: 0 0 0 4px var(--cat-glow); }
+        .timeline-dot.upcoming { background: var(--bg-card-alt); border-color: var(--border-color); }
+        .timeline-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); }
+        .timeline-title { font-size: var(--font-base); font-weight: 600; }
+        .timeline-date { font-size: var(--font-xs); color: var(--text-muted); }
+        .timeline-desc { font-size: var(--font-sm); color: var(--text-secondary); }
+        
+        .proscons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .proscons-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .proscons-card.pros { border-color: var(--success-green); }
+        .proscons-card.cons { border-color: var(--danger-red); }
+        .proscons-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .proscons-card.pros .proscons-title { color: var(--success-green); }
+        .proscons-card.cons .proscons-title { color: var(--danger-red); }
+        .proscons-list { list-style: none; }
+        .proscons-list li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) 0; line-height: 1.6; border-bottom: 1px solid var(--border-color); }
+        .proscons-list li:last-child { border-bottom: none; }
+        .proscons-list li strong { color: var(--text-primary); }
+        
+        .value-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .value-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .value-title { font-size: var(--font-sm); font-weight: 600; }
+        .value-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .value-metrics { padding: var(--space-lg); display: grid; gap: var(--space-md); }
+        .value-metric { display: grid; grid-template-columns: 120px 1fr 80px; align-items: center; gap: var(--space-md); }
+        .value-metric-label { font-size: var(--font-sm); color: var(--text-secondary); }
+        .value-metric-bar { height: 8px; background: var(--bg-card-alt); border-radius: var(--radius-full); overflow: hidden; }
+        .value-metric-fill { height: 100%; border-radius: var(--radius-full); }
+        .value-metric-fill.low { background: var(--success-green); }
+        .value-metric-fill.medium { background: var(--warning-yellow); }
+        .value-metric-fill.high { background: var(--cat-primary); }
+        .value-metric-fill.critical { background: var(--danger-red); }
+        .value-metric-value { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); text-align: right; }
+        
+        .callout { background: linear-gradient(135deg, var(--cat-glow), transparent); border: 1px solid var(--cat-dark); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-xl); }
+        .callout-title { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .callout-text { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); border-right: 1px solid var(--border-color); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); font-size: 10px; }
+        .code-panel { background: var(--bg-dark); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0 var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-filename { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: var(--space-lg); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-function { color: var(--cat-light); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .concepts-grid { grid-template-columns: 1fr; }
+            .checklist-grid { grid-template-columns: 1fr; }
+            .proscons-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .value-metric { grid-template-columns: 1fr; gap: var(--space-xs); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat18-implementation-overview.html">Implementation</a>
+        <span class="sep">/</span>
+        <span class="current">Go-Live Planning</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 18</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat18-implementation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat18-p1-go-live-planning.html" class="active"><span class="nav-icon">📋</span> 18.1 Go-Live Planning</a></li>
+            <li><a href="cat18-p2-cutover-management.html"><span class="nav-icon">⚡</span> 18.2 Cutover Management</a></li>
+            <li><a href="cat18-p3-hypercare.html"><span class="nav-icon">🩺</span> 18.3 Hypercare & Support</a></li>
+            <li><a href="cat18-p4-wave-rollout.html"><span class="nav-icon">🌊</span> 18.4 Wave Rollout</a></li>
+            <li><a href="cat18-p5-post-implementation.html"><span class="nav-icon">📊</span> 18.5 Post-Implementation</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#countdown"><span class="nav-icon">⏱️</span> Launch Countdown</a></li>
+            <li><a href="#readiness"><span class="nav-icon">✅</span> Readiness Dimensions</a></li>
+            <li><a href="#checklists"><span class="nav-icon">📋</span> Master Checklists</a></li>
+            <li><a href="#gonogo"><span class="nav-icon">🚦</span> Go/No-Go Framework</a></li>
+            <li><a href="#risks"><span class="nav-icon">⚠️</span> Risk Assessment</a></li>
+            <li><a href="#stakeholders"><span class="nav-icon">👥</span> Stakeholder Sign-Off</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📋 Page 18.1</span>
+                <h1>Go-Live Planning</h1>
+                <p>Comprehensive readiness assessment, structured Go/No-Go criteria, and launch preparation frameworks. The difference between chaotic deployments and smooth launches.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">4-8 wks</div><div class="hero-metric-label">Typical Planning Horizon</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">150+</div><div class="hero-metric-label">Checklist Items</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">5</div><div class="hero-metric-label">Readiness Dimensions</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">48 hrs</div><div class="hero-metric-label">Final Freeze Window</div></div>
+            </div>
+        </section>
+
+        <!-- LAUNCH COUNTDOWN -->
+        <section class="module" id="countdown">
+            <div class="module-header">
+                <div class="module-icon">⏱️</div>
+                <div class="module-info">
+                    <h2>Launch Countdown Framework</h2>
+                    <p>Structured timeline from T-8 weeks to Go-Live</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Go-live planning follows a countdown structure with specific milestones and gates. Each phase has defined deliverables, stakeholder checkpoints, and exit criteria. <strong>Missing a milestone should trigger escalation</strong>—not schedule compression. The countdown provides visibility and accountability across all workstreams.</p>
+            </div>
+            
+            <!-- Countdown Visualization -->
+            <div class="framework-container">
+                <div class="framework-header">
+                    <div class="framework-title">⏱️ Go-Live Countdown Timeline</div>
+                    <div class="framework-badge">8-Week Runway</div>
+                </div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 900 300" style="width: 100%; height: auto;">
+                        <defs>
+                            <linearGradient id="countdownGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3B82F6"/>
+                                <stop offset="50%" style="stop-color:#F59E0B"/>
+                                <stop offset="100%" style="stop-color:#10B981"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Timeline base -->
+                        <line x1="50" y1="150" x2="850" y2="150" stroke="#2a2a3e" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="50" y1="150" x2="850" y2="150" stroke="url(#countdownGrad)" stroke-width="2" stroke-dasharray="8,4"/>
+                        
+                        <!-- T-8 Weeks -->
+                        <g transform="translate(80, 150)">
+                            <circle r="20" fill="#3B82F6" stroke="#60A5FA" stroke-width="3"/>
+                            <text y="5" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">T-8</text>
+                            <text y="-35" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">PLANNING</text>
+                            <text y="-22" text-anchor="middle" fill="#6a6a7a" font-size="8">KICKOFF</text>
+                            <text y="50" text-anchor="middle" fill="#a0a0b0" font-size="8">Scope finalized</text>
+                            <text y="62" text-anchor="middle" fill="#a0a0b0" font-size="8">Team assembled</text>
+                        </g>
+                        
+                        <!-- T-6 Weeks -->
+                        <g transform="translate(200, 150)">
+                            <circle r="18" fill="#8B5CF6" stroke="#A78BFA" stroke-width="2"/>
+                            <text y="5" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">T-6</text>
+                            <text y="50" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">ENVIRONMENT</text>
+                            <text y="62" text-anchor="middle" fill="#6a6a7a" font-size="8">READY</text>
+                            <text y="-35" text-anchor="middle" fill="#a0a0b0" font-size="8">Infra provisioned</text>
+                            <text y="-22" text-anchor="middle" fill="#a0a0b0" font-size="8">Data migrated</text>
+                        </g>
+                        
+                        <!-- T-4 Weeks -->
+                        <g transform="translate(340, 150)">
+                            <circle r="18" fill="#06B6D4" stroke="#22D3EE" stroke-width="2"/>
+                            <text y="5" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">T-4</text>
+                            <text y="-35" text-anchor="middle" fill="#22D3EE" font-size="10" font-weight="600">UAT</text>
+                            <text y="-22" text-anchor="middle" fill="#6a6a7a" font-size="8">BEGINS</text>
+                            <text y="50" text-anchor="middle" fill="#a0a0b0" font-size="8">User testing</text>
+                            <text y="62" text-anchor="middle" fill="#a0a0b0" font-size="8">Defect triage</text>
+                        </g>
+                        
+                        <!-- T-2 Weeks -->
+                        <g transform="translate(480, 150)">
+                            <circle r="18" fill="#F59E0B" stroke="#FBBF24" stroke-width="2"/>
+                            <text y="5" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">T-2</text>
+                            <text y="50" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">DRESS</text>
+                            <text y="62" text-anchor="middle" fill="#6a6a7a" font-size="8">REHEARSAL</text>
+                            <text y="-35" text-anchor="middle" fill="#a0a0b0" font-size="8">Cutover dry run</text>
+                            <text y="-22" text-anchor="middle" fill="#a0a0b0" font-size="8">Timing validated</text>
+                        </g>
+                        
+                        <!-- T-1 Week -->
+                        <g transform="translate(620, 150)">
+                            <circle r="18" fill="#F59E0B" stroke="#FBBF24" stroke-width="2"/>
+                            <text y="5" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">T-1</text>
+                            <text y="-35" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">GO/NO-GO</text>
+                            <text y="-22" text-anchor="middle" fill="#6a6a7a" font-size="8">DECISION</text>
+                            <text y="50" text-anchor="middle" fill="#a0a0b0" font-size="8">Final sign-offs</text>
+                            <text y="62" text-anchor="middle" fill="#a0a0b0" font-size="8">Comms sent</text>
+                        </g>
+                        
+                        <!-- T-48 Hours -->
+                        <g transform="translate(740, 150)">
+                            <circle r="18" fill="#EF4444" stroke="#F87171" stroke-width="2"/>
+                            <text y="5" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">T-48h</text>
+                            <text y="50" text-anchor="middle" fill="#F87171" font-size="10" font-weight="600">CODE</text>
+                            <text y="62" text-anchor="middle" fill="#6a6a7a" font-size="8">FREEZE</text>
+                            <text y="-35" text-anchor="middle" fill="#a0a0b0" font-size="8">No changes</text>
+                            <text y="-22" text-anchor="middle" fill="#a0a0b0" font-size="8">Final prep</text>
+                        </g>
+                        
+                        <!-- GO-LIVE -->
+                        <g transform="translate(850, 150)">
+                            <circle r="25" fill="#10B981" stroke="#34D399" stroke-width="4">
+                                <animate attributeName="r" values="25;28;25" dur="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <text y="6" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">🚀</text>
+                            <text y="-40" text-anchor="middle" fill="#34D399" font-size="12" font-weight="700">GO-LIVE</text>
+                            <text y="55" text-anchor="middle" fill="#34D399" font-size="9">Launch!</text>
+                        </g>
+                        
+                        <!-- Phase labels -->
+                        <rect x="50" y="220" width="200" height="24" rx="4" fill="rgba(59, 130, 246, 0.15)" stroke="#3B82F6"/>
+                        <text x="150" y="236" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">PREPARATION PHASE</text>
+                        
+                        <rect x="270" y="220" width="200" height="24" rx="4" fill="rgba(6, 182, 212, 0.15)" stroke="#06B6D4"/>
+                        <text x="370" y="236" text-anchor="middle" fill="#22D3EE" font-size="9" font-weight="600">VALIDATION PHASE</text>
+                        
+                        <rect x="490" y="220" width="200" height="24" rx="4" fill="rgba(245, 158, 11, 0.15)" stroke="#F59E0B"/>
+                        <text x="590" y="236" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">FINAL READINESS</text>
+                        
+                        <rect x="710" y="220" width="140" height="24" rx="4" fill="rgba(16, 185, 129, 0.15)" stroke="#10B981"/>
+                        <text x="780" y="236" text-anchor="middle" fill="#34D399" font-size="9" font-weight="600">EXECUTION</text>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Timeline Details -->
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div class="timeline-title">T-8 Weeks: Planning Kickoff</div>
+                            <div class="timeline-date">Complete scope, team, timeline</div>
+                        </div>
+                        <div class="timeline-desc">Finalize go-live scope and exclusions. Assemble implementation team with clear roles. Create master schedule with all workstreams. Identify critical path and dependencies. Establish communication cadence.</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div class="timeline-title">T-6 Weeks: Environment Ready</div>
+                            <div class="timeline-date">Infrastructure and data prepared</div>
+                        </div>
+                        <div class="timeline-desc">Production environment provisioned and hardened. Data migration complete with validation. Integrations tested end-to-end. Performance baseline established. Security scans passed.</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div class="timeline-title">T-4 Weeks: UAT Begins</div>
+                            <div class="timeline-date">User acceptance testing starts</div>
+                        </div>
+                        <div class="timeline-desc">Business users execute test scripts. Defects logged, triaged, and prioritized. Training materials finalized. Change communications drafted. Support team training begins.</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot current"></div>
+                    <div class="timeline-content" style="border-color: var(--cat-primary);">
+                        <div class="timeline-header">
+                            <div class="timeline-title">T-2 Weeks: Dress Rehearsal</div>
+                            <div class="timeline-date">Full cutover simulation</div>
+                        </div>
+                        <div class="timeline-desc">Execute complete cutover runbook with timing. Validate rollback procedures. Test monitoring and alerting. Confirm war room logistics. All critical defects resolved.</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot upcoming"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div class="timeline-title">T-1 Week: Go/No-Go Decision</div>
+                            <div class="timeline-date">Final readiness checkpoint</div>
+                        </div>
+                        <div class="timeline-desc">Formal Go/No-Go meeting with all stakeholders. All readiness criteria evaluated. Executive sign-off obtained. Final communications sent. Support team on standby.</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot upcoming"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div class="timeline-title">T-48 Hours: Code Freeze</div>
+                            <div class="timeline-date">No changes permitted</div>
+                        </div>
+                        <div class="timeline-desc">Absolute code freeze—no exceptions without executive approval. Final system health checks. Team briefings complete. On-call schedules confirmed. War room activated.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- READINESS DIMENSIONS -->
+        <section class="module" id="readiness">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Five Readiness Dimensions</h2>
+                    <p>Comprehensive assessment across all go-live factors</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Go-live readiness isn't just about technology. Successful launches require alignment across five dimensions: <strong>Technical, Business, Operational, Organizational, and Communication</strong>. Weakness in any dimension can derail an otherwise well-planned deployment. Each dimension has specific criteria, owners, and acceptance thresholds.</p>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card" style="border-top: 3px solid #3B82F6;">
+                    <div class="concept-icon">🔧</div>
+                    <div class="concept-title">Technical Readiness</div>
+                    <div class="concept-desc">Systems configured, tested, and production-ready. Includes infrastructure, integrations, security, performance, and data migration validation.</div>
+                </div>
+                <div class="concept-card" style="border-top: 3px solid #10B981;">
+                    <div class="concept-icon">💼</div>
+                    <div class="concept-title">Business Readiness</div>
+                    <div class="concept-desc">Processes documented, users trained, and acceptance criteria met. UAT complete with sign-off. Business continuity plans in place.</div>
+                </div>
+                <div class="concept-card" style="border-top: 3px solid #F59E0B;">
+                    <div class="concept-icon">⚙️</div>
+                    <div class="concept-title">Operational Readiness</div>
+                    <div class="concept-desc">Support model defined, monitoring configured, and runbooks documented. Escalation paths clear. On-call schedules confirmed.</div>
+                </div>
+                <div class="concept-card" style="border-top: 3px solid #8B5CF6;">
+                    <div class="concept-icon">👥</div>
+                    <div class="concept-title">Organizational Readiness</div>
+                    <div class="concept-desc">Stakeholders aligned, change management complete, and resistance addressed. Leadership engaged. Champions activated.</div>
+                </div>
+                <div class="concept-card" style="border-top: 3px solid #EC4899;">
+                    <div class="concept-icon">📢</div>
+                    <div class="concept-title">Communication Readiness</div>
+                    <div class="concept-desc">All stakeholders informed, support channels established, and feedback mechanisms ready. Crisis communication plan in place.</div>
+                </div>
+                <div class="concept-card" style="border-top: 3px solid #06B6D4;">
+                    <div class="concept-icon">🔄</div>
+                    <div class="concept-title">Rollback Readiness</div>
+                    <div class="concept-desc">Fallback procedures tested, data recovery validated, and trigger criteria defined. Team trained on rollback execution.</div>
+                </div>
+            </div>
+            
+            <!-- Readiness Matrix -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Owner</th>
+                            <th>Key Criteria</th>
+                            <th>Status</th>
+                            <th>Readiness</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>🔧 Technical</strong></td>
+                            <td>Tech Lead</td>
+                            <td>All integrations tested, performance within SLA, security scan passed</td>
+                            <td><span class="status-badge low">Complete</span></td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>💼 Business</strong></td>
+                            <td>Product Owner</td>
+                            <td>UAT signed off, training complete, processes documented</td>
+                            <td><span class="status-badge low">Complete</span></td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>⚙️ Operational</strong></td>
+                            <td>Ops Manager</td>
+                            <td>Monitoring live, runbooks reviewed, support staffed</td>
+                            <td><span class="status-badge medium">In Progress</span></td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>👥 Organizational</strong></td>
+                            <td>Change Lead</td>
+                            <td>Stakeholders aligned, champions ready, resistance managed</td>
+                            <td><span class="status-badge low">Complete</span></td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>📢 Communication</strong></td>
+                            <td>Comms Lead</td>
+                            <td>All stakeholders informed, support channels ready</td>
+                            <td><span class="status-badge high">Pending</span></td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot"></div>
+                                    <div class="rating-dot"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>🔄 Rollback</strong></td>
+                            <td>Tech Lead</td>
+                            <td>Procedures tested, triggers defined, team trained</td>
+                            <td><span class="status-badge low">Complete</span></td>
+                            <td>
+                                <div class="rating-dots">
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                    <div class="rating-dot filled"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="value-container">
+                <div class="value-header">
+                    <div class="value-title">📊 Go-Live Planning Value Analysis</div>
+                    <div class="value-badge">Investment Profile</div>
+                </div>
+                <div class="value-metrics">
+                    <div class="value-metric">
+                        <div class="value-metric-label">Planning Effort</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 85%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Risk Reduction</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 95%;"></div></div>
+                        <div class="value-metric-value">Very High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Success Impact</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill critical" style="width: 90%;"></div></div>
+                        <div class="value-metric-value">Critical</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Stakeholder Buy-in</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 80%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Reusability</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill medium" style="width: 70%;"></div></div>
+                        <div class="value-metric-value">Medium</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MASTER CHECKLISTS -->
+        <section class="module" id="checklists">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Master Readiness Checklists</h2>
+                    <p>Comprehensive criteria for each readiness dimension</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>These checklists represent the minimum requirements for go-live. Each item must be explicitly verified—not assumed. <strong>A single critical item failure should block go-live.</strong> Checklists should be reviewed in the Go/No-Go meeting with evidence provided for each item.</p>
+            </div>
+            
+            <div class="checklist-section">
+                <div class="checklist-grid">
+                    <div class="checklist-card" style="border-top: 3px solid #3B82F6;">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);">
+                            <div class="checklist-icon">🔧</div>
+                            <div class="checklist-title">Technical Readiness</div>
+                            <div class="checklist-progress">12/12</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Production environment provisioned and hardened</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> All code deployed to production (no pending releases)</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Database migration complete and validated</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> All integrations tested end-to-end</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Performance testing passed (within SLA)</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Security scan passed (no critical/high findings)</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> SSL certificates valid and configured</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> DNS records prepared for cutover</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Backup and recovery procedures tested</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Monitoring and alerting configured</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Log aggregation and retention set up</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Disaster recovery plan documented and tested</div>
+                        </div>
+                    </div>
+                    
+                    <div class="checklist-card" style="border-top: 3px solid #10B981;">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);">
+                            <div class="checklist-icon">💼</div>
+                            <div class="checklist-title">Business Readiness</div>
+                            <div class="checklist-progress">10/10</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-box pass">✓</span> UAT completed with formal sign-off</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> All critical/high defects resolved</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Business processes documented and approved</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> User training completed for all groups</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Training materials available and accessible</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Job aids and quick reference guides ready</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Business continuity plan in place</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Data quality validated by business owners</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Reporting and analytics configured</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Regulatory/compliance requirements met</div>
+                        </div>
+                    </div>
+                    
+                    <div class="checklist-card" style="border-top: 3px solid #F59E0B;">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent);">
+                            <div class="checklist-icon">⚙️</div>
+                            <div class="checklist-title">Operational Readiness</div>
+                            <div class="checklist-progress">9/10</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Support team staffed and trained</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Escalation matrix defined and communicated</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> On-call schedule confirmed for go-live week</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Runbooks reviewed and approved</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Knowledge base articles created</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Ticketing system configured</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> SLAs defined and agreed</div>
+                            <div class="checklist-item"><span class="check-box warn">⚠</span> Vendor support contracts active (pending)</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> War room logistics confirmed</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Post-go-live handover plan documented</div>
+                        </div>
+                    </div>
+                    
+                    <div class="checklist-card" style="border-top: 3px solid #8B5CF6;">
+                        <div class="checklist-header" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), transparent);">
+                            <div class="checklist-icon">🔄</div>
+                            <div class="checklist-title">Rollback Readiness</div>
+                            <div class="checklist-progress">8/8</div>
+                        </div>
+                        <div class="checklist-items">
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Rollback procedures documented</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Rollback tested in dress rehearsal</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Rollback triggers clearly defined</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Decision authority for rollback confirmed</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Database restore procedures validated</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> Legacy system can be reactivated</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> User communication plan for rollback ready</div>
+                            <div class="checklist-item"><span class="check-box pass">✓</span> RTO confirmed (target: 2 hours)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">⚠️ Critical Item Policy</div>
+                <div class="callout-text">Any checklist item marked as <strong>Critical</strong> that is not complete results in automatic NO-GO. There are no exceptions without executive sign-off and documented risk acceptance. Items marked as <strong>Warning</strong> can proceed with a remediation plan and owner assigned.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- GO/NO-GO FRAMEWORK -->
+        <section class="module" id="gonogo">
+            <div class="module-header">
+                <div class="module-icon">🚦</div>
+                <div class="module-info">
+                    <h2>Go/No-Go Decision Framework</h2>
+                    <p>Structured process for the final launch decision</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The Go/No-Go meeting is the formal decision point where stakeholders collectively decide whether to proceed with go-live. The decision should be based on <strong>objective criteria, not optimism</strong>. A structured framework removes emotion and ensures consistency across launches.</p>
+            </div>
+            
+            <!-- Decision Framework Visualization -->
+            <div class="framework-container">
+                <div class="framework-header">
+                    <div class="framework-title">🚦 Go/No-Go Decision Tree</div>
+                    <div class="framework-badge">Decision Logic</div>
+                </div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 800 350" style="width: 100%; height: auto;">
+                        <!-- Start node -->
+                        <g transform="translate(100, 50)">
+                            <rect x="-60" y="-25" width="120" height="50" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text y="5" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">GO/NO-GO</text>
+                            <text y="18" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="600">MEETING</text>
+                        </g>
+                        
+                        <!-- Arrow to first decision -->
+                        <line x1="160" y1="50" x2="220" y2="50" stroke="#6a6a7a" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Decision 1: Critical Items -->
+                        <g transform="translate(300, 50)">
+                            <polygon points="0,-40 80,0 0,40 -80,0" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text y="-5" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">ALL CRITICAL</text>
+                            <text y="8" text-anchor="middle" fill="#60A5FA" font-size="9" font-weight="600">ITEMS PASS?</text>
+                        </g>
+                        
+                        <!-- No path from Decision 1 -->
+                        <line x1="300" y1="90" x2="300" y2="150" stroke="#EF4444" stroke-width="2"/>
+                        <text x="310" y="120" fill="#EF4444" font-size="10" font-weight="600">NO</text>
+                        
+                        <!-- NO-GO result -->
+                        <g transform="translate(300, 200)">
+                            <rect x="-50" y="-30" width="100" height="60" rx="8" fill="#EF4444" stroke="#F87171" stroke-width="2"/>
+                            <text y="-5" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">NO-GO</text>
+                            <text y="12" text-anchor="middle" fill="#fca5a5" font-size="9">Resolve & reschedule</text>
+                        </g>
+                        
+                        <!-- Yes path from Decision 1 -->
+                        <line x1="380" y1="50" x2="440" y2="50" stroke="#10B981" stroke-width="2"/>
+                        <text x="400" y="40" fill="#10B981" font-size="10" font-weight="600">YES</text>
+                        
+                        <!-- Decision 2: Risk Acceptance -->
+                        <g transform="translate(520, 50)">
+                            <polygon points="0,-40 80,0 0,40 -80,0" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text y="-5" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">RISKS</text>
+                            <text y="8" text-anchor="middle" fill="#FBBF24" font-size="9" font-weight="600">ACCEPTABLE?</text>
+                        </g>
+                        
+                        <!-- No path from Decision 2 -->
+                        <line x1="520" y1="90" x2="520" y2="150" stroke="#EF4444" stroke-width="2"/>
+                        <text x="530" y="120" fill="#EF4444" font-size="10" font-weight="600">NO</text>
+                        
+                        <!-- Mitigate path -->
+                        <g transform="translate(520, 200)">
+                            <rect x="-55" y="-25" width="110" height="50" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text y="0" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">MITIGATE</text>
+                            <text y="14" text-anchor="middle" fill="#6a6a7a" font-size="8">Add controls</text>
+                        </g>
+                        
+                        <!-- Loop back -->
+                        <path d="M465,200 L420,200 L420,100 L440,50" fill="none" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4,4"/>
+                        
+                        <!-- Yes path from Decision 2 -->
+                        <line x1="600" y1="50" x2="660" y2="50" stroke="#10B981" stroke-width="2"/>
+                        <text x="620" y="40" fill="#10B981" font-size="10" font-weight="600">YES</text>
+                        
+                        <!-- GO result -->
+                        <g transform="translate(730, 50)">
+                            <rect x="-50" y="-35" width="100" height="70" rx="8" fill="#10B981" stroke="#34D399" stroke-width="3"/>
+                            <text y="-5" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">GO</text>
+                            <text y="12" text-anchor="middle" fill="#6ee7b7" font-size="9">Proceed to cutover</text>
+                            <text y="25" text-anchor="middle" fill="#6ee7b7" font-size="20">🚀</text>
+                        </g>
+                        
+                        <!-- Legend -->
+                        <g transform="translate(50, 280)">
+                            <rect width="700" height="50" rx="6" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="20" y="30" fill="#6a6a7a" font-size="10">Decision Criteria:</text>
+                            <circle cx="150" cy="25" r="8" fill="#10B981"/>
+                            <text x="165" y="30" fill="#a0a0b0" font-size="10">All critical items complete</text>
+                            <circle cx="350" cy="25" r="8" fill="#F59E0B"/>
+                            <text x="365" y="30" fill="#a0a0b0" font-size="10">Risks documented & accepted</text>
+                            <circle cx="550" cy="25" r="8" fill="#3B82F6"/>
+                            <text x="565" y="30" fill="#a0a0b0" font-size="10">Stakeholders aligned</text>
+                        </g>
+                        
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#6a6a7a"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Meeting Agenda -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Agenda Item</th>
+                            <th>Duration</th>
+                            <th>Owner</th>
+                            <th>Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Technical Readiness Review</strong></td>
+                            <td>15 min</td>
+                            <td>Tech Lead</td>
+                            <td>Confirm all technical criteria met</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Business Readiness Review</strong></td>
+                            <td>15 min</td>
+                            <td>Product Owner</td>
+                            <td>Confirm UAT sign-off and training complete</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Operational Readiness Review</strong></td>
+                            <td>10 min</td>
+                            <td>Ops Manager</td>
+                            <td>Confirm support model ready</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Risk Review</strong></td>
+                            <td>15 min</td>
+                            <td>Project Manager</td>
+                            <td>Review open risks and mitigations</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Go/No-Go Vote</strong></td>
+                            <td>5 min</td>
+                            <td>Sponsor</td>
+                            <td>Formal decision recorded</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6. Next Steps</strong></td>
+                            <td>5 min</td>
+                            <td>Project Manager</td>
+                            <td>Cutover timing confirmed or reschedule</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RISK ASSESSMENT -->
+        <section class="module" id="risks">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Pre-Launch Risk Assessment</h2>
+                    <p>Identify, assess, and mitigate go-live risks</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Every go-live carries risk. The goal isn't to eliminate all risk—it's to <strong>understand, accept, and mitigate</strong> risks to acceptable levels. A formal risk assessment ensures stakeholders make informed decisions about proceeding with launch.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Risk</th>
+                            <th>Category</th>
+                            <th>Likelihood</th>
+                            <th>Impact</th>
+                            <th>Mitigation</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>SSO integration timeout under load</strong></td>
+                            <td>Technical</td>
+                            <td><span class="status-badge medium">Medium</span></td>
+                            <td><span class="status-badge high">High</span></td>
+                            <td>Increased timeout thresholds, fallback auth option</td>
+                            <td>DevOps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data migration discrepancies</strong></td>
+                            <td>Technical</td>
+                            <td><span class="status-badge low">Low</span></td>
+                            <td><span class="status-badge critical">Critical</span></td>
+                            <td>Reconciliation reports, manual correction procedures</td>
+                            <td>Data Team</td>
+                        </tr>
+                        <tr>
+                            <td><strong>User adoption below target</strong></td>
+                            <td>Business</td>
+                            <td><span class="status-badge medium">Medium</span></td>
+                            <td><span class="status-badge medium">Medium</span></td>
+                            <td>Champions network, enhanced support, incentives</td>
+                            <td>Change Lead</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Support queue overwhelmed</strong></td>
+                            <td>Operational</td>
+                            <td><span class="status-badge high">High</span></td>
+                            <td><span class="status-badge medium">Medium</span></td>
+                            <td>3x staffing week 1, self-service KB, chatbot</td>
+                            <td>Support Mgr</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Third-party vendor unavailable</strong></td>
+                            <td>External</td>
+                            <td><span class="status-badge low">Low</span></td>
+                            <td><span class="status-badge high">High</span></td>
+                            <td>Confirmed support window, backup contacts</td>
+                            <td>Vendor Mgr</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Executive sponsor unavailable</strong></td>
+                            <td>Organizational</td>
+                            <td><span class="status-badge low">Low</span></td>
+                            <td><span class="status-badge medium">Medium</span></td>
+                            <td>Delegate authority documented, backup decision-maker</td>
+                            <td>PM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="proscons-grid">
+                <div class="proscons-card pros">
+                    <div class="proscons-title">✅ Go-Live Planning Best Practices</div>
+                    <ul class="proscons-list">
+                        <li><strong>Start early</strong> — 8+ weeks runway prevents compressed timelines and shortcuts</li>
+                        <li><strong>Use objective criteria</strong> — Emotion-free decisions based on measurable outcomes</li>
+                        <li><strong>Rehearse completely</strong> — Full dress rehearsal with timing, not just task completion</li>
+                        <li><strong>Document everything</strong> — Evidence for every checklist item, not assumptions</li>
+                        <li><strong>Plan for failure</strong> — Rollback is a valid outcome, not a defeat</li>
+                        <li><strong>Over-communicate</strong> — Stakeholders should never be surprised by go-live status</li>
+                    </ul>
+                </div>
+                <div class="proscons-card cons">
+                    <div class="proscons-title">❌ Common Go-Live Planning Mistakes</div>
+                    <ul class="proscons-list">
+                        <li><strong>Optimism bias</strong> — "It'll be fine" is not a risk mitigation strategy</li>
+                        <li><strong>Skipping rehearsals</strong> — First-time execution during go-live always fails</li>
+                        <li><strong>Incomplete checklists</strong> — Unchecked items assumed complete</li>
+                        <li><strong>Single decision-maker</strong> — Go/No-Go should be collective, not autocratic</li>
+                        <li><strong>Ignoring warnings</strong> — Yellow flags become red flags during cutover</li>
+                        <li><strong>Compressed timelines</strong> — Skipping phases to meet arbitrary deadlines</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- STAKEHOLDER SIGN-OFF -->
+        <section class="module" id="stakeholders">
+            <div class="module-header">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h2>Stakeholder Sign-Off Matrix</h2>
+                    <p>Who must approve before go-live proceeds</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Go-live requires explicit sign-off from key stakeholders. This isn't bureaucracy—it ensures <strong>shared ownership of the decision</strong> and commitment to support the launch. Without formal sign-off, accountability is unclear when issues arise.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stakeholder Role</th>
+                            <th>Sign-Off Scope</th>
+                            <th>Authority Level</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Executive Sponsor</strong></td>
+                            <td>Overall go-live decision, risk acceptance</td>
+                            <td><span class="status-badge critical">Mandatory</span></td>
+                            <td>✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Business Owner</strong></td>
+                            <td>UAT acceptance, process readiness, training complete</td>
+                            <td><span class="status-badge critical">Mandatory</span></td>
+                            <td>✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Technical Lead</strong></td>
+                            <td>System readiness, performance, security</td>
+                            <td><span class="status-badge critical">Mandatory</span></td>
+                            <td>✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Operations Manager</strong></td>
+                            <td>Support readiness, monitoring, runbooks</td>
+                            <td><span class="status-badge critical">Mandatory</span></td>
+                            <td>⏳ Pending</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Security Officer</strong></td>
+                            <td>Security scan results, compliance requirements</td>
+                            <td><span class="status-badge high">Required</span></td>
+                            <td>✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Change Manager</strong></td>
+                            <td>Change readiness, communication complete</td>
+                            <td><span class="status-badge high">Required</span></td>
+                            <td>✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Legal/Compliance</strong></td>
+                            <td>Regulatory requirements met</td>
+                            <td><span class="status-badge medium">Advisory</span></td>
+                            <td>✅ Approved</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">📝 Sign-Off Documentation</div>
+                <div class="callout-text">Each sign-off should be formally documented with: (1) Stakeholder name and role, (2) Date and time of sign-off, (3) Scope of approval, (4) Any conditions or caveats, (5) Evidence reviewed. Email confirmation is minimum; digital signature preferred for audit trail.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered go-live readiness assessment</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📋</div>
+                    <div class="agent-name">ReadinessAssessor</div>
+                    <div class="agent-role">Go-Live Planning Intelligence</div>
+                    <div class="agent-desc">Continuously monitors readiness across all dimensions, identifies gaps, predicts risks, and provides recommendations. Automates checklist tracking and stakeholder status collection.</div>
+                    <ul class="agent-capabilities">
+                        <li>Multi-dimensional readiness scoring</li>
+                        <li>Automated checklist verification</li>
+                        <li>Risk identification and prediction</li>
+                        <li>Stakeholder sign-off tracking</li>
+                        <li>Timeline milestone monitoring</li>
+                        <li>Go/No-Go recommendation engine</li>
+                        <li>Historical comparison analysis</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">readiness_assessor_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Go-Live Readiness Assessment Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Readiness Assessment Agent</span>
+readiness_agent = Agent(
+    role=<span class="code-string">"Go-Live Readiness Assessor"</span>,
+    goal=<span class="code-string">"Evaluate all readiness dimensions and provide Go/No-Go recommendation"</span>,
+    backstory=<span class="code-string">"""Expert in implementation readiness with 
+    deep experience across technical, business, and 
+    operational dimensions. Data-driven assessor who 
+    identifies gaps before they become blockers."""</span>,
+    llm=llm,
+    tools=[
+        checklist_verifier,
+        risk_analyzer,
+        stakeholder_tracker,
+        timeline_monitor
+    ]
+)
+
+<span class="code-comment"># Readiness Assessment Task</span>
+assessment_task = Task(
+    description=<span class="code-string">"""
+    Assess go-live readiness across all dimensions:
+    1. Verify all checklist items with evidence
+    2. Calculate readiness scores per dimension
+    3. Identify gaps and blockers
+    4. Evaluate risk profile
+    5. Check stakeholder sign-off status
+    6. Provide Go/No-Go recommendation with confidence
+    """</span>,
+    agent=readiness_agent,
+    expected_output=<span class="code-string">"Readiness report with scores, gaps, risks, and recommendation"</span>
+)
+
+<span class="code-keyword">def</span> <span class="code-function">assess_readiness</span>(project_id: <span class="code-keyword">str</span>) -> <span class="code-keyword">dict</span>:
+    <span class="code-string">"""Run full readiness assessment for a project."""</span>
+    crew = Crew(
+        agents=[readiness_agent],
+        tasks=[assessment_task],
+        verbose=<span class="code-keyword">True</span>
+    )
+    result = crew.kickoff(inputs={<span class="code-string">"project_id"</span>: project_id})
+    <span class="code-keyword">return</span> {
+        <span class="code-string">"recommendation"</span>: result.recommendation,
+        <span class="code-string">"confidence"</span>: result.confidence,
+        <span class="code-string">"scores"</span>: result.dimension_scores,
+        <span class="code-string">"blockers"</span>: result.blockers,
+        <span class="code-string">"risks"</span>: result.risks
+    }</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat18-implementation-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Back to Overview</div>
+                <div class="footer-link-title">Implementation</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 18.1</div>
+        <a href="cat18-p2-cutover-management.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">18.2 Cutover Management</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

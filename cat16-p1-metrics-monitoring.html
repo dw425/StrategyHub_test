@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics & Monitoring | Monitoring & Observability | Category 16 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        .architecture-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .architecture-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .architecture-title { font-size: var(--font-sm); font-weight: 600; }
+        .architecture-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .architecture-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        .model-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .model-card { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .model-card:hover { border-color: var(--model-color); }
+        .model-card.pull { --model-color: #E6522C; }
+        .model-card.push { --model-color: #3B82F6; }
+        .model-header { padding: var(--space-lg); background: color-mix(in srgb, var(--model-color) 10%, transparent); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .model-icon { width: 48px; height: 48px; background: color-mix(in srgb, var(--model-color) 20%, transparent); border: 2px solid var(--model-color); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .model-title { font-size: var(--font-lg); font-weight: 700; color: var(--model-color); }
+        .model-subtitle { font-size: var(--font-xs); color: var(--text-muted); }
+        .model-body { padding: var(--space-lg); }
+        .model-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .model-list { list-style: none; margin-bottom: var(--space-lg); }
+        .model-list li { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .model-list li::before { content: '✓'; color: var(--model-color); font-weight: bold; }
+        .model-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+        .model-tool { font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-full); color: var(--text-muted); }
+        .metric-types-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .metric-type-card { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .metric-type-card:hover { border-color: var(--type-color); transform: translateY(-4px); }
+        .metric-type-header { padding: var(--space-lg); background: color-mix(in srgb, var(--type-color) 8%, transparent); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .metric-type-icon { width: 56px; height: 56px; background: color-mix(in srgb, var(--type-color) 15%, transparent); border: 2px solid var(--type-color); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .metric-type-name { font-size: var(--font-lg); font-weight: 700; color: var(--type-color); }
+        .metric-type-tagline { font-size: var(--font-xs); color: var(--text-muted); }
+        .metric-type-body { padding: var(--space-lg); }
+        .metric-type-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.7; }
+        .metric-type-code { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-dark); padding: var(--space-md); border-radius: var(--radius-md); color: var(--cyan); margin-bottom: var(--space-md); overflow-x: auto; white-space: pre; }
+        .metric-type-use-cases { display: flex; flex-wrap: wrap; gap: 6px; }
+        .metric-use-case { font-size: 10px; padding: 4px 10px; background: color-mix(in srgb, var(--type-color) 15%, transparent); border-radius: var(--radius-full); color: var(--type-color); }
+        .metric-type-card.counter { --type-color: #3B82F6; }
+        .metric-type-card.gauge { --type-color: #10B981; }
+        .metric-type-card.histogram { --type-color: #8B5CF6; }
+        .metric-type-card.summary { --type-color: #EC4899; }
+        .exporters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .exporter-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .exporter-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .exporter-icon { font-size: 32px; margin-bottom: var(--space-sm); }
+        .exporter-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: 4px; }
+        .exporter-port { font-size: var(--font-xs); color: var(--cat-light); font-family: monospace; margin-bottom: var(--space-sm); }
+        .exporter-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .cardinality-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .cardinality-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .cardinality-title { font-size: var(--font-sm); font-weight: 600; }
+        .cardinality-body { padding: var(--space-xl); }
+        .cardinality-visual { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-xl); }
+        .cardinality-example { background: var(--bg-dark); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .cardinality-example.bad { border: 2px solid var(--danger-red); }
+        .cardinality-example.good { border: 2px solid var(--success-green); }
+        .cardinality-label { font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-md); }
+        .cardinality-example.bad .cardinality-label { color: var(--danger-red); }
+        .cardinality-example.good .cardinality-label { color: var(--success-green); }
+        .cardinality-code { font-family: 'Monaco', monospace; font-size: 11px; color: var(--text-secondary); line-height: 1.8; white-space: pre; }
+        .cardinality-code .highlight-bad { color: var(--danger-red); }
+        .cardinality-code .highlight-good { color: var(--success-green); }
+        .cardinality-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .cardinality-stat { background: var(--bg-dark); border-radius: var(--radius-md); padding: var(--space-md); text-align: center; }
+        .cardinality-stat-value { font-size: var(--font-xl); font-weight: 700; }
+        .cardinality-stat.danger .cardinality-stat-value { color: var(--danger-red); }
+        .cardinality-stat.warning .cardinality-stat-value { color: var(--warning-yellow); }
+        .cardinality-stat.success .cardinality-stat-value { color: var(--success-green); }
+        .cardinality-stat-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 4px; }
+        .slo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .slo-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .slo-card-header { padding: var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .slo-card-title { font-size: var(--font-base); font-weight: 600; }
+        .slo-card-body { padding: var(--space-lg); }
+        .slo-metric { display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); }
+        .slo-metric:last-child { border-bottom: none; }
+        .slo-metric-name { font-size: var(--font-sm); color: var(--text-secondary); }
+        .slo-metric-value { font-size: var(--font-sm); font-weight: 600; font-family: monospace; }
+        .slo-metric-value.target { color: var(--cat-light); }
+        .slo-metric-value.current { color: var(--success-green); }
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); }
+        .tool-card-header { padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .tool-logo { width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; }
+        .tool-info h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: 2px; }
+        .tool-type { font-size: var(--font-xs); color: var(--text-muted); }
+        .tool-card-body { padding: var(--space-lg); }
+        .tool-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .tool-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tool-feature { font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-full); color: var(--text-muted); }
+        .promql-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .promql-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .promql-title { font-size: var(--font-sm); font-weight: 600; }
+        .promql-category { padding: var(--space-md) var(--space-lg); background: color-mix(in srgb, var(--cat-primary) 10%, transparent); border-bottom: 1px solid var(--border-color); font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--cat-light); }
+        .promql-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border-color); }
+        .promql-example { background: var(--bg-card); padding: var(--space-lg); }
+        .promql-label { font-size: var(--font-xs); font-weight: 600; margin-bottom: var(--space-sm); }
+        .promql-code { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-dark); padding: var(--space-md); border-radius: var(--radius-md); color: var(--cyan); margin-bottom: var(--space-sm); overflow-x: auto; }
+        .promql-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .dashboard-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; }
+        .dashboard-card:hover { border-color: var(--cat-primary); }
+        .dashboard-preview { height: 100px; background: var(--bg-dark); padding: var(--space-sm); display: grid; gap: 4px; }
+        .dashboard-preview.layout-4x2 { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; }
+        .dashboard-preview.layout-1x2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+        .dashboard-preview.layout-2x2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .dashboard-preview.layout-3x2 { grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; }
+        .mini-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; }
+        .mini-panel.span-2 { grid-column: span 2; }
+        .mini-panel.span-3 { grid-column: span 3; }
+        .mini-panel.span-4 { grid-column: span 4; }
+        .dashboard-info { padding: var(--space-md); }
+        .dashboard-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: 4px; }
+        .dashboard-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-primary); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 1px solid var(--cat-dark); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; }
+        .antipatterns-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .antipattern-card { background: var(--bg-card); border: 1px solid var(--danger-red); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .antipattern-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+        .antipattern-icon { font-size: 20px; }
+        .antipattern-title { font-size: var(--font-sm); font-weight: 600; color: var(--danger-red); }
+        .antipattern-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; margin-bottom: var(--space-md); }
+        .antipattern-fix { font-size: var(--font-xs); color: var(--success-green); display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .antipattern-fix::before { content: '✓'; font-weight: bold; }
+        .scorecard-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .scorecard-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .scorecard-title { font-size: var(--font-sm); font-weight: 600; }
+        .scorecard-table { width: 100%; border-collapse: collapse; }
+        .scorecard-table th, .scorecard-table td { padding: var(--space-md) var(--space-lg); text-align: left; border-bottom: 1px solid var(--border-color); }
+        .scorecard-table th { font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; background: var(--bg-card-alt); }
+        .scorecard-table tr:last-child td { border-bottom: none; }
+        .scorecard-table td { font-size: var(--font-sm); }
+        .scorecard-table tr:hover td { background: var(--bg-hover); }
+        .score-bar { height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden; width: 50px; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        .score-fill { height: 100%; border-radius: 4px; }
+        .score-fill.high { background: var(--success-green); }
+        .score-fill.medium { background: var(--warning-yellow); }
+        .score-fill.low { background: var(--danger-red); }
+        .score-cell { display: flex; align-items: center; gap: 8px; }
+        .score-num { font-size: var(--font-xs); color: var(--text-secondary); font-weight: 600; min-width: 24px; }
+        .tool-name-cell { display: flex; align-items: center; gap: var(--space-sm); }
+        .tool-mini-logo { width: 24px; height: 24px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; }
+        .retention-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .retention-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .retention-card:hover { border-color: var(--cat-primary); }
+        .retention-period { font-size: var(--font-2xl); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .retention-type { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); }
+        .retention-resolution { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-md); }
+        .retention-use { font-size: var(--font-xs); color: var(--text-secondary); line-height: 1.5; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 450px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-comment { color: #6A737D; }
+        .section-intro { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .section-intro p { color: var(--text-secondary); line-height: 1.8; margin-bottom: var(--space-md); }
+        .section-intro p:last-child { margin-bottom: 0; }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .related-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .related-title { font-size: var(--font-base); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-xs); }
+        .related-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .model-comparison, .metric-types-grid, .slo-grid { grid-template-columns: 1fr; }
+            .exporters-grid, .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-grid, .promql-grid, .practices-grid, .antipatterns-grid, .retention-grid, .related-grid, .cardinality-visual, .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat16-monitoring-observability-overview.html">Monitoring & Observability</a>
+        <span class="sep">/</span>
+        <span class="current">Metrics & Monitoring</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 16</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat16-monitoring-observability-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat16-p1-metrics-monitoring.html" class="active"><span class="nav-icon">📈</span> 16.1 Metrics</a></li>
+            <li><a href="cat16-p2-logging.html"><span class="nav-icon">📝</span> 16.2 Logging</a></li>
+            <li><a href="cat16-p3-distributed-tracing.html"><span class="nav-icon">🔗</span> 16.3 Tracing</a></li>
+            <li><a href="cat16-p4-alerting-incidents.html"><span class="nav-icon">🚨</span> 16.4 Alerting</a></li>
+            <li><a href="cat16-p5-apm.html"><span class="nav-icon">⚡</span> 16.5 APM</a></li>
+            <li><a href="cat16-p6-aiops.html"><span class="nav-icon">🤖</span> 16.6 AIOps</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture</a></li>
+            <li><a href="#models"><span class="nav-icon">🔄</span> Pull vs Push</a></li>
+            <li><a href="#types"><span class="nav-icon">📊</span> Metric Types</a></li>
+            <li><a href="#exporters"><span class="nav-icon">📤</span> Exporters</a></li>
+            <li><a href="#cardinality"><span class="nav-icon">⚠️</span> Cardinality</a></li>
+            <li><a href="#slos"><span class="nav-icon">🎯</span> SLIs & SLOs</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#promql"><span class="nav-icon">🔍</span> PromQL</a></li>
+            <li><a href="#dashboards"><span class="nav-icon">📊</span> Dashboards</a></li>
+            <li><a href="#storage"><span class="nav-icon">🗄️</span> Storage</a></li>
+            <li><a href="#practices"><span class="nav-icon">✨</span> Best Practices</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">🚫</span> Anti-Patterns</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📋</span> Scorecard</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">📈 Page 16.1</div>
+                <h1>Metrics & Monitoring</h1>
+                <p>Collect, store, and query time-series data to understand system behavior. Build dashboards, set thresholds, and gain real-time visibility into performance and reliability.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">15s</div>
+                    <div class="hero-metric-label">Scrape Interval</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">4</div>
+                    <div class="hero-metric-label">Metric Types</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">10M+</div>
+                    <div class="hero-metric-label">Time Series at Scale</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">PromQL</div>
+                    <div class="hero-metric-label">Query Language</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Metrics Architecture</h2>
+                    <p>How metrics flow from applications to dashboards</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Metrics are numeric measurements collected at regular intervals over time. Unlike logs which capture discrete events, metrics provide a continuous view of system state—CPU usage, request rates, error counts, and latency percentiles. This time-series data is the backbone of dashboards, alerting, and capacity planning.</p>
+                <p>A well-designed metrics architecture ensures you can answer questions about system health within seconds. The typical flow involves instrumentation at the application layer, collection by a time-series database, and visualization through dashboards with alerting on anomalies.</p>
+            </div>
+            
+            <div class="architecture-container">
+                <div class="architecture-header">
+                    <div class="architecture-title">📊 End-to-End Metrics Pipeline</div>
+                    <div class="architecture-badge">LIVE DATA FLOW</div>
+                </div>
+                <div class="architecture-canvas">
+                    <svg viewBox="0 0 900 400" style="width: 100%; height: 400px;">
+                        <defs>
+                            <filter id="glowAmber"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowBlue"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowPurple"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        </defs>
+                        
+                        <!-- INSTRUMENTATION -->
+                        <rect x="20" y="30" width="200" height="340" rx="12" fill="rgba(59,130,246,0.05)" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="120" y="55" fill="#60A5FA" font-size="11" font-weight="600" text-anchor="middle">INSTRUMENTATION</text>
+                        
+                        <rect x="40" y="75" width="160" height="50" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="120" y="105" fill="#60A5FA" font-size="11" text-anchor="middle">🖥️ Application</text>
+                        
+                        <rect x="40" y="140" width="75" height="45" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="77" y="167" fill="#34D399" font-size="10" text-anchor="middle">📦 Node</text>
+                        
+                        <rect x="125" y="140" width="75" height="45" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="162" y="167" fill="#A78BFA" font-size="10" text-anchor="middle">🐳 cAdvisor</text>
+                        
+                        <rect x="40" y="200" width="75" height="45" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="77" y="227" fill="#F472B6" font-size="10" text-anchor="middle">🗄️ MySQL</text>
+                        
+                        <rect x="125" y="200" width="75" height="45" rx="6" fill="#1a1a2e" stroke="#F97316" stroke-width="1"/>
+                        <text x="162" y="227" fill="#FB923C" font-size="10" text-anchor="middle">🔴 Redis</text>
+                        
+                        <rect x="40" y="260" width="75" height="45" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                        <text x="77" y="287" fill="#22D3EE" font-size="10" text-anchor="middle">☸️ K8s State</text>
+                        
+                        <rect x="125" y="260" width="75" height="45" rx="6" fill="#1a1a2e" stroke="#14B8A6" stroke-width="1"/>
+                        <text x="162" y="287" fill="#2DD4BF" font-size="10" text-anchor="middle">🌐 Nginx</text>
+                        
+                        <rect x="40" y="320" width="160" height="40" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="120" y="345" fill="#FBBF24" font-size="10" text-anchor="middle">📤 Pushgateway</text>
+                        
+                        <!-- PROMETHEUS -->
+                        <rect x="280" y="80" width="200" height="240" rx="16" fill="rgba(230,82,44,0.1)" stroke="#E6522C" stroke-width="3"/>
+                        <text x="380" y="110" fill="#E6522C" font-size="12" font-weight="700" text-anchor="middle">PROMETHEUS</text>
+                        
+                        <rect x="300" y="130" width="75" height="40" rx="6" fill="#1a1a2e" stroke="#E6522C" stroke-width="1"/>
+                        <text x="337" y="155" fill="#E6522C" font-size="9" text-anchor="middle">🔍 Discovery</text>
+                        
+                        <rect x="385" y="130" width="75" height="40" rx="6" fill="#1a1a2e" stroke="#E6522C" stroke-width="1"/>
+                        <text x="422" y="155" fill="#E6522C" font-size="9" text-anchor="middle">⚡ Scraper</text>
+                        
+                        <rect x="300" y="185" width="160" height="50" rx="8" fill="#1a1a2e" stroke="#E6522C" stroke-width="2"/>
+                        <text x="380" y="210" fill="#E6522C" font-size="11" font-weight="600" text-anchor="middle">🗃️ Time Series DB</text>
+                        <text x="380" y="225" fill="#6a6a7a" font-size="8" text-anchor="middle">Block storage • Compaction</text>
+                        
+                        <rect x="300" y="250" width="160" height="50" rx="6" fill="#1a1a2e" stroke="#E6522C" stroke-width="1"/>
+                        <text x="380" y="275" fill="#E6522C" font-size="10" text-anchor="middle">🔍 PromQL Engine</text>
+                        <text x="380" y="290" fill="#6a6a7a" font-size="8" text-anchor="middle">rate() • histogram_quantile()</text>
+                        
+                        <!-- VISUALIZATION -->
+                        <rect x="540" y="30" width="200" height="340" rx="12" fill="rgba(16,185,129,0.05)" stroke="#10B981" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="640" y="55" fill="#34D399" font-size="11" font-weight="600" text-anchor="middle">VISUALIZATION</text>
+                        
+                        <rect x="560" y="75" width="160" height="60" rx="8" fill="#1a1a2e" stroke="#F46800" stroke-width="2"/>
+                        <text x="640" y="100" fill="#F46800" font-size="11" font-weight="600" text-anchor="middle">📊 Grafana</text>
+                        <text x="640" y="120" fill="#6a6a7a" font-size="9" text-anchor="middle">Dashboards • Templating</text>
+                        
+                        <rect x="560" y="150" width="160" height="60" rx="8" fill="#1a1a2e" stroke="#EF4444" stroke-width="2"/>
+                        <text x="640" y="175" fill="#F87171" font-size="11" font-weight="600" text-anchor="middle">🚨 AlertManager</text>
+                        <text x="640" y="195" fill="#6a6a7a" font-size="9" text-anchor="middle">Routing • Grouping</text>
+                        
+                        <rect x="560" y="225" width="50" height="35" rx="6" fill="#1a1a2e" stroke="#25C151" stroke-width="1"/>
+                        <text x="585" y="247" fill="#34D058" font-size="9" text-anchor="middle">Slack</text>
+                        
+                        <rect x="615" y="225" width="50" height="35" rx="6" fill="#1a1a2e" stroke="#25C151" stroke-width="1"/>
+                        <text x="640" y="247" fill="#34D058" font-size="9" text-anchor="middle">Email</text>
+                        
+                        <rect x="670" y="225" width="50" height="35" rx="6" fill="#1a1a2e" stroke="#25C151" stroke-width="1"/>
+                        <text x="695" y="247" fill="#34D058" font-size="9" text-anchor="middle">PD</text>
+                        
+                        <rect x="560" y="275" width="160" height="80" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="640" y="300" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">🗄️ Long-Term Storage</text>
+                        <text x="640" y="320" fill="#6a6a7a" font-size="9" text-anchor="middle">Thanos / Cortex / Mimir</text>
+                        <text x="640" y="340" fill="#6a6a7a" font-size="8" text-anchor="middle">Unlimited retention</text>
+                        
+                        <!-- OBJECT STORAGE -->
+                        <rect x="780" y="150" width="100" height="100" rx="10" fill="rgba(139,92,246,0.1)" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="830" y="180" fill="#A78BFA" font-size="10" font-weight="600" text-anchor="middle">OBJECT</text>
+                        <text x="830" y="195" fill="#A78BFA" font-size="10" font-weight="600" text-anchor="middle">STORAGE</text>
+                        <text x="830" y="220" fill="#6a6a7a" font-size="9" text-anchor="middle">S3 / GCS</text>
+                        <text x="830" y="235" fill="#6a6a7a" font-size="9" text-anchor="middle">Azure Blob</text>
+                        
+                        <!-- CONNECTION LINES -->
+                        <line x1="200" y1="200" x2="280" y2="200" stroke="#3B82F6" stroke-width="3"/>
+                        <line x1="480" y1="150" x2="560" y2="105" stroke="#E6522C" stroke-width="3"/>
+                        <line x1="480" y1="200" x2="560" y2="180" stroke="#E6522C" stroke-width="3"/>
+                        <line x1="480" y1="275" x2="560" y2="315" stroke="#8B5CF6" stroke-width="3" stroke-dasharray="6 3"/>
+                        <line x1="720" y1="315" x2="780" y2="200" stroke="#8B5CF6" stroke-width="3" stroke-dasharray="6 3"/>
+                        
+                        <!-- LABELS -->
+                        <text x="240" y="190" fill="#F59E0B" font-size="9" font-weight="600" text-anchor="middle">SCRAPE</text>
+                        <text x="520" y="120" fill="#F59E0B" font-size="9" font-weight="600" text-anchor="middle">QUERY</text>
+                        <text x="520" y="300" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">REMOTE</text>
+                        <text x="520" y="315" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">WRITE</text>
+                        
+                        <!-- ANIMATED FLOWING DOTS - Scrape line -->
+                        <circle r="6" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 200 200 L 280 200"/>
+                        </circle>
+                        <circle r="6" fill="#10B981" filter="url(#glowBlue)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s" path="M 200 200 L 280 200"/>
+                        </circle>
+                        <circle r="6" fill="#8B5CF6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="1s" path="M 200 200 L 280 200"/>
+                        </circle>
+                        
+                        <!-- ANIMATED FLOWING DOTS - Query lines -->
+                        <circle r="6" fill="#E6522C" filter="url(#glowAmber)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" path="M 480 150 L 560 105"/>
+                        </circle>
+                        <circle r="6" fill="#E6522C" filter="url(#glowAmber)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.4s" path="M 480 150 L 560 105"/>
+                        </circle>
+                        <circle r="6" fill="#E6522C" filter="url(#glowAmber)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" path="M 480 200 L 560 180"/>
+                        </circle>
+                        <circle r="6" fill="#E6522C" filter="url(#glowAmber)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.6s" path="M 480 200 L 560 180"/>
+                        </circle>
+                        
+                        <!-- ANIMATED FLOWING DOTS - Remote write lines -->
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowPurple)">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M 480 275 L 560 315"/>
+                        </circle>
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowPurple)">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M 720 315 L 780 200"/>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PULL VS PUSH -->
+        <section class="module" id="models">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Pull vs Push Models</h2>
+                    <p>Two approaches to metrics collection</p>
+                </div>
+            </div>
+            
+            <div class="model-comparison">
+                <div class="model-card pull">
+                    <div class="model-header">
+                        <div class="model-icon">📥</div>
+                        <div>
+                            <div class="model-title">Pull-Based Model</div>
+                            <div class="model-subtitle">Prometheus, VictoriaMetrics</div>
+                        </div>
+                    </div>
+                    <div class="model-body">
+                        <div class="model-desc">The monitoring system actively scrapes metrics from targets at regular intervals. Targets expose an HTTP endpoint (typically /metrics) that returns current metric values.</div>
+                        <ul class="model-list">
+                            <li>Monitoring system controls scrape schedule</li>
+                            <li>Easy to detect when targets are down</li>
+                            <li>Simpler firewall rules (outbound only)</li>
+                            <li>Native service discovery integration</li>
+                            <li>Dominant in cloud-native ecosystems</li>
+                        </ul>
+                        <div class="model-tools">
+                            <span class="model-tool">Prometheus</span>
+                            <span class="model-tool">VictoriaMetrics</span>
+                            <span class="model-tool">Thanos</span>
+                            <span class="model-tool">Cortex</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-card push">
+                    <div class="model-header">
+                        <div class="model-icon">📤</div>
+                        <div>
+                            <div class="model-title">Push-Based Model</div>
+                            <div class="model-subtitle">StatsD, InfluxDB, Datadog</div>
+                        </div>
+                    </div>
+                    <div class="model-body">
+                        <div class="model-desc">Applications actively send metrics to a central collector. The application is responsible for batching and transmitting data at appropriate intervals.</div>
+                        <ul class="model-list">
+                            <li>Works behind firewalls and NAT</li>
+                            <li>Better for short-lived batch jobs</li>
+                            <li>Application controls timing</li>
+                            <li>Easier initial setup</li>
+                            <li>Traditional datacenter approach</li>
+                        </ul>
+                        <div class="model-tools">
+                            <span class="model-tool">StatsD</span>
+                            <span class="model-tool">InfluxDB</span>
+                            <span class="model-tool">Datadog Agent</span>
+                            <span class="model-tool">Graphite</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- METRIC TYPES -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Prometheus Metric Types</h2>
+                    <p>The four fundamental metric types</p>
+                </div>
+            </div>
+            
+            <div class="metric-types-grid">
+                <div class="metric-type-card counter">
+                    <div class="metric-type-header">
+                        <div class="metric-type-icon">📈</div>
+                        <div>
+                            <div class="metric-type-name">Counter</div>
+                            <div class="metric-type-tagline">Cumulative, monotonically increasing</div>
+                        </div>
+                    </div>
+                    <div class="metric-type-body">
+                        <div class="metric-type-desc">A counter only increases (or resets to zero on restart). Use counters to track totals: requests, errors, bytes. Always use rate() or increase() to query.</div>
+                        <div class="metric-type-code">http_requests_total{method="POST", status="200"} 1027
+http_requests_total{method="POST", status="500"} 3</div>
+                        <div class="metric-type-use-cases">
+                            <span class="metric-use-case">Request counts</span>
+                            <span class="metric-use-case">Error totals</span>
+                            <span class="metric-use-case">Bytes transferred</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-type-card gauge">
+                    <div class="metric-type-header">
+                        <div class="metric-type-icon">🌡️</div>
+                        <div>
+                            <div class="metric-type-name">Gauge</div>
+                            <div class="metric-type-tagline">Point-in-time, can go up or down</div>
+                        </div>
+                    </div>
+                    <div class="metric-type-body">
+                        <div class="metric-type-desc">A gauge represents a value that can increase or decrease. Used for memory usage, temperature, queue depth, concurrent connections.</div>
+                        <div class="metric-type-code">node_memory_MemAvailable_bytes 2.147483648e+09
+node_cpu_temperature_celsius 65.5</div>
+                        <div class="metric-type-use-cases">
+                            <span class="metric-use-case">Memory usage</span>
+                            <span class="metric-use-case">Temperature</span>
+                            <span class="metric-use-case">Queue depth</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-type-card histogram">
+                    <div class="metric-type-header">
+                        <div class="metric-type-icon">📊</div>
+                        <div>
+                            <div class="metric-type-name">Histogram</div>
+                            <div class="metric-type-tagline">Distribution in buckets</div>
+                        </div>
+                    </div>
+                    <div class="metric-type-body">
+                        <div class="metric-type-desc">Histograms sample observations into configurable buckets. Use histogram_quantile() for percentiles. Buckets are cumulative.</div>
+                        <div class="metric-type-code">http_request_duration_seconds_bucket{le="0.1"} 24054
+http_request_duration_seconds_bucket{le="0.5"} 33444
+http_request_duration_seconds_bucket{le="+Inf"} 34567</div>
+                        <div class="metric-type-use-cases">
+                            <span class="metric-use-case">Request latency</span>
+                            <span class="metric-use-case">P50/P95/P99</span>
+                            <span class="metric-use-case">Response sizes</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-type-card summary">
+                    <div class="metric-type-header">
+                        <div class="metric-type-icon">📉</div>
+                        <div>
+                            <div class="metric-type-name">Summary</div>
+                            <div class="metric-type-tagline">Pre-calculated quantiles</div>
+                        </div>
+                    </div>
+                    <div class="metric-type-body">
+                        <div class="metric-type-desc">Summaries calculate streaming φ-quantiles on the client. Unlike histograms, quantiles cannot be aggregated across instances.</div>
+                        <div class="metric-type-code">go_gc_duration_seconds{quantile="0.5"} 0.000107
+go_gc_duration_seconds{quantile="0.99"} 0.000706
+go_gc_duration_seconds_count 12345</div>
+                        <div class="metric-type-use-cases">
+                            <span class="metric-use-case">GC duration</span>
+                            <span class="metric-use-case">Single instance</span>
+                            <span class="metric-use-case">Accurate quantiles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- EXPORTERS -->
+        <section class="module" id="exporters">
+            <div class="module-header">
+                <div class="module-icon">📤</div>
+                <div class="module-info">
+                    <h2>Prometheus Exporters</h2>
+                    <p>Expose metrics from third-party systems</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Exporters are standalone binaries that collect metrics from systems that don't natively expose Prometheus metrics. They translate metrics into the Prometheus exposition format and expose them via HTTP for scraping.</p>
+            </div>
+            
+            <div class="exporters-grid">
+                <div class="exporter-card">
+                    <div class="exporter-icon">🖥️</div>
+                    <div class="exporter-name">Node Exporter</div>
+                    <div class="exporter-port">:9100</div>
+                    <div class="exporter-desc">CPU, memory, disk, network, filesystem</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🐳</div>
+                    <div class="exporter-name">cAdvisor</div>
+                    <div class="exporter-port">:8080</div>
+                    <div class="exporter-desc">Container CPU, memory, network metrics</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">☸️</div>
+                    <div class="exporter-name">Kube-State-Metrics</div>
+                    <div class="exporter-port">:8080</div>
+                    <div class="exporter-desc">K8s object states: pods, deployments</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🗄️</div>
+                    <div class="exporter-name">MySQL Exporter</div>
+                    <div class="exporter-port">:9104</div>
+                    <div class="exporter-desc">Queries, connections, InnoDB stats</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🐘</div>
+                    <div class="exporter-name">PostgreSQL Exporter</div>
+                    <div class="exporter-port">:9187</div>
+                    <div class="exporter-desc">Connections, locks, replication</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🔴</div>
+                    <div class="exporter-name">Redis Exporter</div>
+                    <div class="exporter-port">:9121</div>
+                    <div class="exporter-desc">Memory, clients, commands, keys</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🌐</div>
+                    <div class="exporter-name">Nginx Exporter</div>
+                    <div class="exporter-port">:9113</div>
+                    <div class="exporter-desc">Connections, requests, upstream</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">📨</div>
+                    <div class="exporter-name">Kafka Exporter</div>
+                    <div class="exporter-port">:9308</div>
+                    <div class="exporter-desc">Consumer lag, partitions, brokers</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🔍</div>
+                    <div class="exporter-name">Elasticsearch Exporter</div>
+                    <div class="exporter-port">:9114</div>
+                    <div class="exporter-desc">Cluster health, indices, JVM</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">🌍</div>
+                    <div class="exporter-name">Blackbox Exporter</div>
+                    <div class="exporter-port">:9115</div>
+                    <div class="exporter-desc">HTTP, TCP, ICMP, DNS probes</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">☁️</div>
+                    <div class="exporter-name">CloudWatch Exporter</div>
+                    <div class="exporter-port">:9106</div>
+                    <div class="exporter-desc">AWS CloudWatch metrics</div>
+                </div>
+                <div class="exporter-card">
+                    <div class="exporter-icon">📊</div>
+                    <div class="exporter-name">SNMP Exporter</div>
+                    <div class="exporter-port">:9116</div>
+                    <div class="exporter-desc">Network devices via SNMP</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CARDINALITY -->
+        <section class="module" id="cardinality">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Cardinality Management</h2>
+                    <p>The #1 cause of metrics system issues</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Cardinality refers to the number of unique time series. Each unique combination of metric name and label values creates a new time series. High cardinality—caused by labels with many possible values (user IDs, request IDs)—can overwhelm your monitoring system.</p>
+            </div>
+            
+            <div class="cardinality-container">
+                <div class="cardinality-header">
+                    <div class="cardinality-title">🚫 High Cardinality vs ✅ Low Cardinality</div>
+                </div>
+                <div class="cardinality-body">
+                    <div class="cardinality-visual">
+                        <div class="cardinality-example bad">
+                            <div class="cardinality-label">❌ Avoid: High Cardinality</div>
+                            <div class="cardinality-code">http_requests_total{
+  method="GET",
+  <span class="highlight-bad">user_id="u-12345"</span>,      # Millions!
+  <span class="highlight-bad">request_id="req-abc"</span>,   # Unique!
+  status="200"
+}
+<span class="highlight-bad">// Creates millions of series!</span></div>
+                        </div>
+                        <div class="cardinality-example good">
+                            <div class="cardinality-label">✓ Better: Bounded Labels</div>
+                            <div class="cardinality-code">http_requests_total{
+  method="GET",
+  <span class="highlight-good">user_type="premium"</span>,   # ~3 values
+  <span class="highlight-good">status_class="2xx"</span>,    # 5 values
+  region="us-east-1"
+}
+<span class="highlight-good">// ~1,500 series (manageable)</span></div>
+                        </div>
+                    </div>
+                    <div class="cardinality-stats">
+                        <div class="cardinality-stat danger">
+                            <div class="cardinality-stat-value">&gt;100K</div>
+                            <div class="cardinality-stat-label">Danger Zone</div>
+                        </div>
+                        <div class="cardinality-stat warning">
+                            <div class="cardinality-stat-value">10K-100K</div>
+                            <div class="cardinality-stat-label">Monitor Closely</div>
+                        </div>
+                        <div class="cardinality-stat success">
+                            <div class="cardinality-stat-value">&lt;10K</div>
+                            <div class="cardinality-stat-label">Healthy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SLIs & SLOs -->
+        <section class="module" id="slos">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>SLIs, SLOs & Error Budgets</h2>
+                    <p>Metrics-driven reliability targets</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p><strong>SLI (Service Level Indicator)</strong> is a quantitative measure of service behavior. <strong>SLO (Service Level Objective)</strong> is a target value for an SLI. <strong>Error Budget</strong> is the allowed unreliability (100% - SLO).</p>
+            </div>
+            
+            <div class="slo-grid">
+                <div class="slo-card">
+                    <div class="slo-card-header">
+                        <div class="slo-card-title">⚡ Availability SLO</div>
+                    </div>
+                    <div class="slo-card-body">
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">SLI Formula</span>
+                            <span class="slo-metric-value">successful / total</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Target (30d)</span>
+                            <span class="slo-metric-value target">99.9%</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Error Budget</span>
+                            <span class="slo-metric-value target">43.2 min/month</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Current</span>
+                            <span class="slo-metric-value current">99.95%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="slo-card">
+                    <div class="slo-card-header">
+                        <div class="slo-card-title">🕐 Latency SLO</div>
+                    </div>
+                    <div class="slo-card-body">
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">SLI Formula</span>
+                            <span class="slo-metric-value">requests &lt; threshold</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">P50 Target</span>
+                            <span class="slo-metric-value target">&lt;100ms (99%)</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">P99 Target</span>
+                            <span class="slo-metric-value target">&lt;500ms (99%)</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Current P99</span>
+                            <span class="slo-metric-value current">320ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="slo-card">
+                    <div class="slo-card-header">
+                        <div class="slo-card-title">📊 Throughput SLO</div>
+                    </div>
+                    <div class="slo-card-body">
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">SLI Formula</span>
+                            <span class="slo-metric-value">rate(requests[5m])</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Capacity Target</span>
+                            <span class="slo-metric-value target">10,000 req/s</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Current</span>
+                            <span class="slo-metric-value current">4,500 req/s</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Peak Today</span>
+                            <span class="slo-metric-value current">7,200 req/s</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="slo-card">
+                    <div class="slo-card-header">
+                        <div class="slo-card-title">✅ Correctness SLO</div>
+                    </div>
+                    <div class="slo-card-body">
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">SLI Formula</span>
+                            <span class="slo-metric-value">valid / total</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Target</span>
+                            <span class="slo-metric-value target">99.99%</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Error Budget</span>
+                            <span class="slo-metric-value target">4.3 min/month</span>
+                        </div>
+                        <div class="slo-metric">
+                            <span class="slo-metric-name">Current</span>
+                            <span class="slo-metric-value current">99.998%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Metrics Platforms</h2>
+                    <p>Leading tools for metrics collection and visualization</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #E6522C, #F05A28);">Pr</div>
+                        <div class="tool-info">
+                            <h4>Prometheus</h4>
+                            <div class="tool-type">CNCF Graduated • Open Source</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">The de facto standard for cloud-native metrics. Pull-based scraping, powerful PromQL, native K8s integration.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Pull Model</span>
+                            <span class="tool-feature">PromQL</span>
+                            <span class="tool-feature">AlertManager</span>
+                            <span class="tool-feature">Service Discovery</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">Gr</div>
+                        <div class="tool-info">
+                            <h4>Grafana</h4>
+                            <div class="tool-type">Open Source • Visualization</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Industry-leading dashboards supporting 80+ data sources. Powerful templating and alerting.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Multi-Datasource</span>
+                            <span class="tool-feature">Templating</span>
+                            <span class="tool-feature">Alerting</span>
+                            <span class="tool-feature">Plugins</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">Dd</div>
+                        <div class="tool-info">
+                            <h4>Datadog</h4>
+                            <div class="tool-type">SaaS • Full Stack</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Unified platform with metrics, logs, traces, APM. 600+ integrations, AI-powered detection.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Unified Platform</span>
+                            <span class="tool-feature">600+ Integrations</span>
+                            <span class="tool-feature">Watchdog AI</span>
+                            <span class="tool-feature">APM</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #425CC7, #5A67D8);">VM</div>
+                        <div class="tool-info">
+                            <h4>VictoriaMetrics</h4>
+                            <div class="tool-type">Open Source • Time Series</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">High-performance Prometheus alternative. 10x better compression, MetricsQL, native clustering.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">High Compression</span>
+                            <span class="tool-feature">MetricsQL</span>
+                            <span class="tool-feature">Clustering</span>
+                            <span class="tool-feature">PromQL Compatible</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #00ACD7, #5DC9E2);">Th</div>
+                        <div class="tool-info">
+                            <h4>Thanos</h4>
+                            <div class="tool-type">CNCF Incubating • Long-Term</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">HA Prometheus with unlimited retention. Global query view, object storage, downsampling.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">HA Prometheus</span>
+                            <span class="tool-feature">Object Storage</span>
+                            <span class="tool-feature">Global Query</span>
+                            <span class="tool-feature">Downsampling</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">Mi</div>
+                        <div class="tool-info">
+                            <h4>Grafana Mimir</h4>
+                            <div class="tool-type">Open Source • Scalable TSDB</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Horizontally scalable, multi-tenant TSDB. Successor to Cortex for massive scale.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Multi-Tenant</span>
+                            <span class="tool-feature">Horizontal Scale</span>
+                            <span class="tool-feature">Object Storage</span>
+                            <span class="tool-feature">PromQL</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #9146FF, #772CE8);">In</div>
+                        <div class="tool-info">
+                            <h4>InfluxDB</h4>
+                            <div class="tool-type">Open Source • Time Series</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Purpose-built TSDB with high-performance writes. Flux query language, great for IoT.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Push Model</span>
+                            <span class="tool-feature">Flux Query</span>
+                            <span class="tool-feature">High Cardinality</span>
+                            <span class="tool-feature">IoT</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #00BCD4, #26C6DA);">NR</div>
+                        <div class="tool-info">
+                            <h4>New Relic</h4>
+                            <div class="tool-type">SaaS • Full Stack</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">All-in-one observability with NRQL query language. AI-powered insights, 400+ integrations.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">NRQL</span>
+                            <span class="tool-feature">APM</span>
+                            <span class="tool-feature">Infrastructure</span>
+                            <span class="tool-feature">Synthetics</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #425CC7, #5A67D8);">OT</div>
+                        <div class="tool-info">
+                            <h4>OpenTelemetry</h4>
+                            <div class="tool-type">CNCF Incubating • Standard</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Vendor-neutral telemetry standard. Unified APIs for metrics, logs, traces. OTLP protocol.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Vendor Neutral</span>
+                            <span class="tool-feature">OTLP</span>
+                            <span class="tool-feature">Auto-Instrument</span>
+                            <span class="tool-feature">Collector</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PROMQL -->
+        <section class="module" id="promql">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>PromQL Query Library</h2>
+                    <p>Essential queries for monitoring</p>
+                </div>
+            </div>
+            
+            <div class="promql-container">
+                <div class="promql-header">
+                    <div class="promql-title">📝 PromQL Query Reference</div>
+                </div>
+                
+                <div class="promql-category">🚦 Traffic & Throughput</div>
+                <div class="promql-grid">
+                    <div class="promql-example">
+                        <div class="promql-label">Request Rate (per second)</div>
+                        <div class="promql-code">rate(http_requests_total[5m])</div>
+                        <div class="promql-desc">Per-second rate averaged over 5 minutes.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Request Rate by Service</div>
+                        <div class="promql-code">sum by (service) (rate(http_requests_total[5m]))</div>
+                        <div class="promql-desc">Aggregate rate grouped by service label.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Top 5 Endpoints</div>
+                        <div class="promql-code">topk(5, sum by (endpoint) (rate(http_requests_total[5m])))</div>
+                        <div class="promql-desc">Identifies the 5 busiest endpoints.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Traffic Increase</div>
+                        <div class="promql-code">increase(http_requests_total[1h])</div>
+                        <div class="promql-desc">Total request count increase over 1 hour.</div>
+                    </div>
+                </div>
+                
+                <div class="promql-category">❌ Errors & Failures</div>
+                <div class="promql-grid">
+                    <div class="promql-example">
+                        <div class="promql-label">Error Rate (%)</div>
+                        <div class="promql-code">sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100</div>
+                        <div class="promql-desc">Percentage of 5xx errors. Core SLI.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Error Rate by Status</div>
+                        <div class="promql-code">sum by (status) (rate(http_requests_total{status=~"[45].."}[5m]))</div>
+                        <div class="promql-desc">Error breakdown by HTTP status code.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Services with High Errors</div>
+                        <div class="promql-code">sum by (service) (rate(http_requests_total{status=~"5.."}[5m])) > 0.01</div>
+                        <div class="promql-desc">Services with error rates above 1%.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">30-Day Availability</div>
+                        <div class="promql-code">(1 - sum(rate(http_requests_total{status=~"5.."}[30d])) / sum(rate(http_requests_total[30d]))) * 100</div>
+                        <div class="promql-desc">30-day availability percentage.</div>
+                    </div>
+                </div>
+                
+                <div class="promql-category">⏱️ Latency & Performance</div>
+                <div class="promql-grid">
+                    <div class="promql-example">
+                        <div class="promql-label">P50 Latency (Median)</div>
+                        <div class="promql-code">histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))</div>
+                        <div class="promql-desc">50th percentile latency.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">P99 Latency</div>
+                        <div class="promql-code">histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))</div>
+                        <div class="promql-desc">99th percentile latency.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">P99 by Service</div>
+                        <div class="promql-code">histogram_quantile(0.99, sum by (service, le) (rate(http_request_duration_seconds_bucket[5m])))</div>
+                        <div class="promql-desc">P99 latency grouped by service.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Average Latency</div>
+                        <div class="promql-code">rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])</div>
+                        <div class="promql-desc">Average request duration.</div>
+                    </div>
+                </div>
+                
+                <div class="promql-category">🔋 Saturation & Resources</div>
+                <div class="promql-grid">
+                    <div class="promql-example">
+                        <div class="promql-label">CPU Usage (%)</div>
+                        <div class="promql-code">100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</div>
+                        <div class="promql-desc">CPU utilization percentage.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Memory Usage (%)</div>
+                        <div class="promql-code">(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100</div>
+                        <div class="promql-desc">Memory utilization percentage.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Disk Usage (%)</div>
+                        <div class="promql-code">(1 - node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100</div>
+                        <div class="promql-desc">Filesystem utilization.</div>
+                    </div>
+                    <div class="promql-example">
+                        <div class="promql-label">Predict Disk Full</div>
+                        <div class="promql-code">predict_linear(node_filesystem_avail_bytes[6h], 24*3600)</div>
+                        <div class="promql-desc">Predict value 24h from now.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- DASHBOARDS -->
+        <section class="module" id="dashboards">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Dashboard Design Patterns</h2>
+                    <p>Effective layouts for different use cases</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="dashboard-preview layout-4x2">
+                        <div class="mini-panel"><svg viewBox="0 0 50 30" preserveAspectRatio="none" style="width:100%;height:100%"><text x="25" y="12" fill="#F59E0B" font-size="8" text-anchor="middle">99.9%</text><text x="25" y="24" fill="#6a6a7a" font-size="5" text-anchor="middle">Avail</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 50 30" preserveAspectRatio="none" style="width:100%;height:100%"><text x="25" y="12" fill="#10B981" font-size="8" text-anchor="middle">42ms</text><text x="25" y="24" fill="#6a6a7a" font-size="5" text-anchor="middle">P50</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 50 30" preserveAspectRatio="none" style="width:100%;height:100%"><text x="25" y="12" fill="#3B82F6" font-size="8" text-anchor="middle">2.4k</text><text x="25" y="24" fill="#6a6a7a" font-size="5" text-anchor="middle">RPS</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 50 30" preserveAspectRatio="none" style="width:100%;height:100%"><text x="25" y="12" fill="#EF4444" font-size="8" text-anchor="middle">0.1%</text><text x="25" y="24" fill="#6a6a7a" font-size="5" text-anchor="middle">Errors</text></svg></div>
+                        <div class="mini-panel span-2"><svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width:100%;height:100%"><polyline points="5,25 15,20 25,22 35,15 45,18 55,10 65,12 75,8 85,14 95,6" fill="none" stroke="#F59E0B" stroke-width="2"/></svg></div>
+                        <div class="mini-panel span-2"><svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width:100%;height:100%"><rect x="10" y="20" width="12" height="8" fill="#3B82F6"/><rect x="28" y="12" width="12" height="16" fill="#3B82F6"/><rect x="46" y="16" width="12" height="12" fill="#3B82F6"/><rect x="64" y="8" width="12" height="20" fill="#3B82F6"/><rect x="82" y="14" width="12" height="14" fill="#3B82F6"/></svg></div>
+                    </div>
+                    <div class="dashboard-info">
+                        <div class="dashboard-name">🏠 Overview Dashboard</div>
+                        <div class="dashboard-desc">Golden signals, SLO status, service health</div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-preview layout-1x2">
+                        <div class="mini-panel"><svg viewBox="0 0 200 35" preserveAspectRatio="none" style="width:100%;height:100%"><polyline points="5,30 25,25 45,28 65,15 85,20 105,12 125,18 145,8 165,15 185,5" fill="none" stroke="#10B981" stroke-width="2"/><polyline points="5,32 25,30 45,31 65,25 85,27 105,22 125,26 145,20 165,24 185,18" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 2"/></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 200 35" preserveAspectRatio="none" style="width:100%;height:100%"><rect x="10" y="10" width="35" height="20" rx="2" fill="#1a1a2e" stroke="#3B82F6"/><rect x="55" y="10" width="35" height="20" rx="2" fill="#1a1a2e" stroke="#10B981"/><rect x="100" y="10" width="35" height="20" rx="2" fill="#1a1a2e" stroke="#8B5CF6"/><rect x="145" y="10" width="35" height="20" rx="2" fill="#1a1a2e" stroke="#F59E0B"/><line x1="45" y1="20" x2="55" y2="20" stroke="#6a6a7a"/><line x1="90" y1="20" x2="100" y2="20" stroke="#6a6a7a"/><line x1="135" y1="20" x2="145" y2="20" stroke="#6a6a7a"/></svg></div>
+                    </div>
+                    <div class="dashboard-info">
+                        <div class="dashboard-name">🔍 Service Deep Dive</div>
+                        <div class="dashboard-desc">Latency breakdown, dependencies, resources</div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-preview layout-2x2">
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><text x="40" y="15" fill="#10B981" font-size="10" text-anchor="middle">45%</text><text x="40" y="28" fill="#6a6a7a" font-size="6" text-anchor="middle">CPU</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><text x="40" y="15" fill="#F59E0B" font-size="10" text-anchor="middle">72%</text><text x="40" y="28" fill="#6a6a7a" font-size="6" text-anchor="middle">MEM</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><text x="40" y="15" fill="#3B82F6" font-size="10" text-anchor="middle">28%</text><text x="40" y="28" fill="#6a6a7a" font-size="6" text-anchor="middle">DISK</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><text x="40" y="15" fill="#8B5CF6" font-size="10" text-anchor="middle">1.2G</text><text x="40" y="28" fill="#6a6a7a" font-size="6" text-anchor="middle">NET</text></svg></div>
+                    </div>
+                    <div class="dashboard-info">
+                        <div class="dashboard-name">🏗️ Infrastructure</div>
+                        <div class="dashboard-desc">Node/cluster CPU, memory, disk, network</div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-preview layout-1x2">
+                        <div class="mini-panel"><svg viewBox="0 0 200 35" preserveAspectRatio="none" style="width:100%;height:100%"><polyline points="5,5 25,8 45,6 65,25 85,28 105,30 125,28 145,20 165,15 185,12" fill="none" stroke="#EF4444" stroke-width="2"/><circle cx="65" cy="25" r="4" fill="#EF4444"/><text x="75" y="28" fill="#EF4444" font-size="6">incident</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 200 35" preserveAspectRatio="none" style="width:100%;height:100%"><rect x="10" y="8" width="180" height="20" rx="3" fill="#1a1a2e" stroke="#2a2a3e"/><rect x="12" y="10" width="40" height="16" rx="2" fill="#EF4444" opacity="0.3"/><rect x="55" y="10" width="30" height="16" rx="2" fill="#F59E0B" opacity="0.3"/><rect x="90" y="10" width="95" height="16" rx="2" fill="#10B981" opacity="0.3"/><text x="100" y="22" fill="#6a6a7a" font-size="6">Timeline</text></svg></div>
+                    </div>
+                    <div class="dashboard-info">
+                        <div class="dashboard-name">🚨 Incident War Room</div>
+                        <div class="dashboard-desc">Real-time errors, recent changes, timeline</div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-preview layout-3x2">
+                        <div class="mini-panel"><svg viewBox="0 0 60 35" preserveAspectRatio="none" style="width:100%;height:100%"><circle cx="30" cy="18" r="12" fill="none" stroke="#10B981" stroke-width="3"/><text x="30" y="22" fill="#10B981" font-size="7" text-anchor="middle">OK</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 60 35" preserveAspectRatio="none" style="width:100%;height:100%"><circle cx="30" cy="18" r="12" fill="none" stroke="#10B981" stroke-width="3"/><text x="30" y="22" fill="#10B981" font-size="7" text-anchor="middle">OK</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 60 35" preserveAspectRatio="none" style="width:100%;height:100%"><circle cx="30" cy="18" r="12" fill="none" stroke="#F59E0B" stroke-width="3"/><text x="30" y="22" fill="#F59E0B" font-size="7" text-anchor="middle">85%</text></svg></div>
+                        <div class="mini-panel span-3"><svg viewBox="0 0 180 35" preserveAspectRatio="none" style="width:100%;height:100%"><rect x="5" y="18" width="170" height="10" rx="2" fill="#1a1a2e" stroke="#2a2a3e"/><rect x="6" y="19" width="140" height="8" rx="1" fill="#10B981"/><text x="90" y="14" fill="#6a6a7a" font-size="6" text-anchor="middle">Error Budget: 82% remaining</text></svg></div>
+                    </div>
+                    <div class="dashboard-info">
+                        <div class="dashboard-name">🎯 SLO Tracking</div>
+                        <div class="dashboard-desc">Error budget, SLI trends, compliance</div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-preview layout-2x2">
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><text x="40" y="15" fill="#EF4444" font-size="10" text-anchor="middle">$2.4k</text><text x="40" y="28" fill="#6a6a7a" font-size="6" text-anchor="middle">/day</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><text x="40" y="15" fill="#F59E0B" font-size="10" text-anchor="middle">847M</text><text x="40" y="28" fill="#6a6a7a" font-size="6" text-anchor="middle">series</text></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><polyline points="5,28 20,25 35,22 50,18 65,12 80,8" fill="none" stroke="#10B981" stroke-width="2"/></svg></div>
+                        <div class="mini-panel"><svg viewBox="0 0 80 35" preserveAspectRatio="none" style="width:100%;height:100%"><polyline points="5,8 20,12 35,15 50,20 65,25 80,30" fill="none" stroke="#EF4444" stroke-width="2"/></svg></div>
+                    </div>
+                    <div class="dashboard-info">
+                        <div class="dashboard-name">💰 Cost Analysis</div>
+                        <div class="dashboard-desc">Cardinality, storage growth, efficiency</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- STORAGE -->
+        <section class="module" id="storage">
+            <div class="module-header">
+                <div class="module-icon">🗄️</div>
+                <div class="module-info">
+                    <h2>Storage & Retention</h2>
+                    <p>Long-term metrics storage strategies</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Prometheus local storage is designed for 15-30 days. For longer retention, use remote storage like Thanos, Cortex, or Mimir with object storage (S3, GCS) and automatic downsampling.</p>
+            </div>
+            
+            <div class="retention-grid">
+                <div class="retention-card">
+                    <div class="retention-period">15d</div>
+                    <div class="retention-type">Hot Storage</div>
+                    <div class="retention-resolution">Full Resolution (15s)</div>
+                    <div class="retention-use">Real-time dashboards, incident investigation</div>
+                </div>
+                <div class="retention-card">
+                    <div class="retention-period">90d</div>
+                    <div class="retention-type">Warm Storage</div>
+                    <div class="retention-resolution">5-minute Resolution</div>
+                    <div class="retention-use">Trend analysis, capacity planning</div>
+                </div>
+                <div class="retention-card">
+                    <div class="retention-period">1y+</div>
+                    <div class="retention-type">Cold Storage</div>
+                    <div class="retention-resolution">1-hour Resolution</div>
+                    <div class="retention-use">YoY comparisons, compliance</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✨</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Design patterns for effective metrics</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Use Consistent Naming</h4>
+                        <p>Follow <code>namespace_subsystem_name_unit</code>. Include units: <code>_seconds</code>, <code>_bytes</code>, <code>_total</code>.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Control Cardinality</h4>
+                        <p>Avoid unbounded labels (user IDs, request IDs). Keep per-metric cardinality under 10K.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Prefer Histograms for Latency</h4>
+                        <p>Histograms allow aggregation across instances. Choose buckets based on SLO thresholds.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Instrument Golden Signals</h4>
+                        <p>Every service should expose latency, traffic, errors, saturation as minimum baseline.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Use Recording Rules</h4>
+                        <p>Pre-compute expensive queries. Improves dashboard performance and enables consistent alerting.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Add Metadata Labels</h4>
+                        <p>Include useful context: <code>team</code>, <code>env</code>, <code>version</code> for filtering and aggregation.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Document Metrics</h4>
+                        <p>Use HELP text and TYPE declarations. Maintain a metrics catalog for discoverability.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Monitor the Monitoring</h4>
+                        <p>Track Prometheus memory, scrape duration, failed scrapes. Alert on monitoring system health.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ANTI-PATTERNS -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">🚫</div>
+                <div class="module-info">
+                    <h2>Anti-Patterns to Avoid</h2>
+                    <p>Common mistakes that hurt metrics systems</p>
+                </div>
+            </div>
+            
+            <div class="antipatterns-grid">
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">💥</span>
+                        <span class="antipattern-title">High-Cardinality Labels</span>
+                    </div>
+                    <div class="antipattern-desc">Using user_id, request_id, or email as labels creates millions of time series, causing OOM crashes.</div>
+                    <div class="antipattern-fix">Use bounded labels like user_type, customer_tier, or region.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📊</span>
+                        <span class="antipattern-title">Querying Raw Counters</span>
+                    </div>
+                    <div class="antipattern-desc">Displaying counter values directly is meaningless. The raw number always increases.</div>
+                    <div class="antipattern-fix">Always use rate() or increase() with counters.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">⏰</span>
+                        <span class="antipattern-title">Too Short Scrape Intervals</span>
+                    </div>
+                    <div class="antipattern-desc">1-second scrape intervals waste resources. Most metrics don't change that fast.</div>
+                    <div class="antipattern-fix">Use 15-30 second intervals for most targets.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔀</span>
+                        <span class="antipattern-title">Inconsistent Label Names</span>
+                    </div>
+                    <div class="antipattern-desc">Using "svc" in one metric and "service" in another breaks correlation.</div>
+                    <div class="antipattern-fix">Establish and enforce naming conventions organization-wide.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📈</span>
+                        <span class="antipattern-title">Averaging Percentiles</span>
+                    </div>
+                    <div class="antipattern-desc">Taking avg() of P99 values gives mathematically meaningless numbers.</div>
+                    <div class="antipattern-fix">Use histogram_quantile() on aggregated buckets.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔕</span>
+                        <span class="antipattern-title">Alert Fatigue</span>
+                    </div>
+                    <div class="antipattern-desc">Alerting on every metric spike. Teams ignore alerts, miss real incidents.</div>
+                    <div class="antipattern-fix">Alert on symptoms (user impact), not causes.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SCORECARD -->
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Platform Scorecard</h2>
+                    <p>Comparing metrics platforms</p>
+                </div>
+            </div>
+            
+            <div class="scorecard-container">
+                <div class="scorecard-header">
+                    <div class="scorecard-title">Metrics Platform Comparison</div>
+                </div>
+                <table class="scorecard-table">
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Scale</th>
+                            <th>Query</th>
+                            <th>Ease</th>
+                            <th>Cost</th>
+                            <th>HA</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #E6522C, #F05A28);">Pr</div> Prometheus</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 70%"></div></div><span class="score-num">7.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 100%"></div></div><span class="score-num">10</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 60%"></div></div><span class="score-num">6.0</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.8</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #425CC7, #5A67D8);">VM</div> VictoriaMetrics</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div><span class="score-num">9.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div><span class="score-num">8.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div><span class="score-num">9.0</span></div></td>
+                            <td><strong style="color: var(--success-green);">9.3</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #00ACD7, #5DC9E2);">Th</div> Thanos</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div><span class="score-num">9.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 65%"></div></div><span class="score-num">6.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.7</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">Dd</div> Datadog</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div><span class="score-num">8.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill low" style="width: 35%"></div></div><span class="score-num">3.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><strong style="color: var(--warning-yellow);">8.5</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #9146FF, #772CE8);">In</div> InfluxDB</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 82%"></div></div><span class="score-num">8.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 78%"></div></div><span class="score-num">7.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 65%"></div></div><span class="score-num">6.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 80%"></div></div><span class="score-num">8.0</span></div></td>
+                            <td><strong style="color: var(--warning-yellow);">8.0</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered metrics optimization</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>The MetricsEngineer agent automates the complex task of <strong>metrics design and query optimization</strong> by analyzing application telemetry patterns, identifying cardinality issues, and generating efficient PromQL queries. It continuously monitors dashboard performance and suggests recording rules to pre-compute expensive queries.</p>
+                <p>The agent integrates with Prometheus and Grafana APIs to analyze metric schemas, builds dependency graphs between metrics and dashboards, and uses statistical methods to identify anomalous patterns. It provides <strong>what-if analysis</strong> for cardinality impact and alerts when new labels or metrics risk exploding series counts.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📈</div>
+                    <div class="agent-name">MetricsEngineer</div>
+                    <div class="agent-role">Observability & Optimization</div>
+                    <p class="agent-desc">Analyzes metric schemas, calculates query efficiency scores, and recommends optimal instrumentation patterns. Continuously monitors cardinality growth and suggests aggregation strategies when thresholds are exceeded. Integrates with Prometheus for data-driven optimization and provides real-time SLO burn rate analysis.</p>
+                    <ul class="agent-capabilities">
+                        <li>Metric naming & schema design</li>
+                        <li>PromQL query optimization</li>
+                        <li>Grafana dashboard generation</li>
+                        <li>Alert rule configuration</li>
+                        <li>Recording rule design</li>
+                        <li>SLO/SLI implementation</li>
+                        <li>Cardinality management</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">metrics_engineer_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Metrics Engineering Optimization Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Tool
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Cardinality analyzer tool</span>
+cardinality_analyzer = Tool(
+    name=<span class="code-string">"cardinality_analyzer"</span>,
+    description=<span class="code-string">"""Analyzes label combinations to
+    identify high-cardinality metrics and
+    recommends aggregation strategies"""</span>,
+    func=analyze_cardinality
+)
+
+<span class="code-comment"># PromQL optimizer tool</span>
+promql_optimizer = Tool(
+    name=<span class="code-string">"promql_optimizer"</span>,
+    description=<span class="code-string">"""Rewrites PromQL queries for
+    better performance, suggests recording
+    rules for expensive computations"""</span>,
+    func=optimize_promql
+)
+
+<span class="code-comment"># SLO calculator tool</span>
+slo_calculator = Tool(
+    name=<span class="code-string">"slo_calculator"</span>,
+    description=<span class="code-string">"""Computes error budgets, burn rates,
+    and generates multi-window alerting
+    rules based on SLO targets"""</span>,
+    func=calculate_slo
+)
+
+<span class="code-comment"># Dashboard generator tool</span>
+dashboard_generator = Tool(
+    name=<span class="code-string">"dashboard_generator"</span>,
+    description=<span class="code-string">"""Creates Grafana dashboard JSON
+    with golden signals, appropriate
+    visualizations, and templating"""</span>,
+    func=generate_dashboard
+)
+
+metrics_engineer_agent = Agent(
+    role=<span class="code-string">"Metrics Engineering Specialist"</span>,
+    goal=<span class="code-string">"""Design efficient metric schemas and
+    optimize observability infrastructure"""</span>,
+    backstory=<span class="code-string">"""Expert SRE with deep experience in
+    Prometheus, Grafana, and large-scale
+    metrics systems handling millions of
+    time series."""</span>,
+    llm=llm,
+    tools=[cardinality_analyzer, promql_optimizer,
+           slo_calculator, dashboard_generator],
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RELATED -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring observability</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat16-p2-logging.html" class="related-card">
+                    <div class="related-num">16.2</div>
+                    <div class="related-title">Logging</div>
+                    <div class="related-desc">Centralized logging, ELK Stack, Loki, structured logs</div>
+                </a>
+                <a href="cat16-p3-distributed-tracing.html" class="related-card">
+                    <div class="related-num">16.3</div>
+                    <div class="related-title">Distributed Tracing</div>
+                    <div class="related-desc">OpenTelemetry, Jaeger, Zipkin, trace propagation</div>
+                </a>
+                <a href="cat16-p4-alerting-incidents.html" class="related-card">
+                    <div class="related-num">16.4</div>
+                    <div class="related-title">Alerting & Incidents</div>
+                    <div class="related-desc">Alert design, on-call rotations, incident management</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat16-monitoring-observability-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 16.1</div>
+        <a href="cat16-p2-logging.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">16.2 Logging</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

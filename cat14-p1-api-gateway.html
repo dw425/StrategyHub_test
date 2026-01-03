@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway | 14.1 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --violet: #7C3AED;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 56px; height: 56px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Subsections */
+        .subsection { margin-top: var(--space-xl); }
+        .subsection-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-lg); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+        
+        /* Capability Detail Grid */
+        .capability-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .capability-detail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .capability-detail-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .capability-detail-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+        .capability-detail-icon { font-size: 20px; }
+        .capability-detail-title { font-size: var(--font-base); font-weight: 600; color: var(--cat-light); }
+        .capability-detail-card p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+
+        /* Use Case Grid */
+        .use-case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .use-case-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .use-case-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .use-case-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .use-case-content h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); color: var(--cat-light); }
+        .use-case-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           OBSERVABILITY SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .observability-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .observability-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-lg); }
+        .observability-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .observability-icon { font-size: 24px; }
+        .observability-title { font-size: var(--font-lg); font-weight: 600; color: var(--cat-light); }
+        .observability-list { list-style: none; }
+        .observability-list li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.5; }
+        .observability-list li strong { color: var(--text-primary); }
+
+        /* Alert Grid */
+        .alert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .alert-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); position: relative; overflow: hidden; }
+        .alert-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .alert-card.critical::before { background: var(--danger-red); }
+        .alert-card.warning::before { background: var(--warning-yellow); }
+        .alert-card.info::before { background: var(--blue); }
+        .alert-level { font-size: var(--font-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-xs); }
+        .alert-card.critical .alert-level { color: var(--danger-red); }
+        .alert-card.warning .alert-level { color: var(--warning-yellow); }
+        .alert-card.info .alert-level { color: var(--blue); }
+        .alert-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-md); }
+        .alert-card ul { list-style: none; }
+        .alert-card li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-sm); }
+        .alert-card li::before { content: '•'; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           GATEWAY ARCHITECTURE VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .arch-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .arch-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .arch-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .arch-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .arch-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; min-height: 450px; }
+        .arch-canvas::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px); background-size: 30px 30px; }
+        
+        /* Architecture Layers */
+        .arch-layers { position: relative; display: flex; flex-direction: column; gap: var(--space-lg); }
+        
+        .arch-layer { display: flex; align-items: center; gap: var(--space-lg); position: relative; z-index: 1; }
+        .arch-layer-label { width: 120px; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: right; flex-shrink: 0; }
+        .arch-layer-content { flex: 1; display: flex; gap: var(--space-md); }
+        
+        /* Client Layer */
+        .client-item { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-sm); transition: all 0.3s; }
+        .client-item:hover { border-color: var(--blue); transform: translateY(-2px); }
+        .client-item.mobile { border-color: var(--blue); }
+        .client-item.web { border-color: var(--success-green); }
+        .client-item.iot { border-color: var(--orange); }
+        .client-item.partner { border-color: var(--violet); }
+        .client-item-icon { font-size: 20px; }
+        .client-item-text { font-size: var(--font-sm); font-weight: 500; }
+        
+        /* Gateway Layer */
+        .gateway-box { flex: 1; background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); padding: var(--space-lg); position: relative; box-shadow: 0 0 40px rgba(6, 182, 212, 0.2); }
+        .gateway-box::before { content: '🚪'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--bg-dark); padding: 0 var(--space-sm); font-size: 24px; }
+        .gateway-title { text-align: center; font-size: var(--font-lg); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .gateway-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm); }
+        .gateway-feature { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); text-align: center; font-size: var(--font-xs); color: var(--text-secondary); transition: all 0.2s; }
+        .gateway-feature:hover { border-color: var(--cat-dark); color: var(--cat-light); }
+        .gateway-feature-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+        
+        /* Service Layer */
+        .service-item { background: var(--bg-card); border: 2px solid var(--cat-dark); border-radius: var(--radius-lg); padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-sm); transition: all 0.3s; flex: 1; }
+        .service-item:hover { border-color: var(--cat-light); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(6, 182, 212, 0.2); }
+        .service-item-icon { font-size: 20px; }
+        .service-item-text { font-size: var(--font-sm); font-weight: 500; color: var(--cat-light); }
+        
+        /* Connection Arrows */
+        .arch-arrows { position: absolute; left: 140px; right: 0; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
+        .arrow-down { position: absolute; left: 50%; width: 2px; background: linear-gradient(180deg, var(--border-color), var(--cat-dark)); }
+        .arrow-down::after { content: '▼'; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); color: var(--cat-dark); font-size: 10px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           GATEWAY PATTERNS
+        ═══════════════════════════════════════════════════════════════ */
+        .patterns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .pattern-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); transition: all 0.3s; position: relative; overflow: hidden; }
+        .pattern-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--pattern-color, var(--cat-primary)); }
+        .pattern-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .pattern-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .pattern-card-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .pattern-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .pattern-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-lg); }
+        .pattern-pros { list-style: none; }
+        .pattern-pros li { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .pattern-pros li::before { content: '✓'; color: var(--success-green); font-weight: bold; }
+        
+        .pattern-card.edge { --pattern-color: var(--blue); }
+        .pattern-card.micro { --pattern-color: var(--violet); }
+        .pattern-card.mesh { --pattern-color: var(--teal); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FEATURE DEEP DIVES
+        ═══════════════════════════════════════════════════════════════ */
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .feature-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .feature-card-icon { width: 44px; height: 44px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .feature-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .feature-card-content { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .feature-card-content ul { list-style: none; margin-top: var(--space-md); }
+        .feature-card-content li { padding: var(--space-xs) 0; display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .feature-card-content li::before { content: '→'; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RATE LIMITING VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .rate-limit-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .rate-limit-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .rate-limit-header h3 { font-size: var(--font-base); font-weight: 600; }
+        .rate-limit-content { padding: var(--space-xl); }
+        
+        .rate-algorithms { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .rate-algo { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .rate-algo:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .rate-algo-icon { font-size: 32px; margin-bottom: var(--space-md); }
+        .rate-algo-name { font-size: var(--font-base); font-weight: 600; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .rate-algo-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AUTH METHODS
+        ═══════════════════════════════════════════════════════════════ */
+        .auth-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .auth-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .auth-card-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .auth-card-icon { font-size: 24px; }
+        .auth-card-title { font-size: var(--font-base); font-weight: 600; }
+        .auth-card-body { padding: var(--space-lg); }
+        .auth-card-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .auth-flow { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+        .auth-step { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-xs) var(--space-sm); font-size: var(--font-xs); color: var(--text-muted); }
+        .auth-arrow { color: var(--cat-light); font-size: 12px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LOAD BALANCING
+        ═══════════════════════════════════════════════════════════════ */
+        .lb-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .lb-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .lb-strategies { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-color); }
+        .lb-strategy { background: var(--bg-card); padding: var(--space-lg); }
+        .lb-strategy-icon { font-size: 28px; margin-bottom: var(--space-sm); }
+        .lb-strategy-name { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); color: var(--cat-light); }
+        .lb-strategy-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS COMPARISON
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .tools-table-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table { width: 100%; border-collapse: collapse; }
+        .tools-table th { padding: var(--space-md); text-align: left; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table td { padding: var(--space-md); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .tools-table tr:last-child td { border-bottom: none; }
+        .tools-table tr:hover td { background: var(--bg-hover); }
+        .tool-name { display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-primary); }
+        .tool-icon { font-size: 20px; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); }
+        .badge-oss { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .badge-commercial { background: rgba(124, 58, 237, 0.2); color: var(--violet); }
+        .badge-cloud { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-base); margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CODE BLOCK
+        ═══════════════════════════════════════════════════════════════ */
+        .code-block { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .code-block-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-block-title { font-size: var(--font-sm); font-weight: 600; }
+        .code-block-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .code-block-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+        .code-block-content pre { margin: 0; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        .code-property { color: #79C0FF; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .patterns-grid { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .auth-grid { grid-template-columns: 1fr; }
+            .rate-algorithms { grid-template-columns: repeat(2, 1fr); }
+            .lb-strategies { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .gateway-features { grid-template-columns: repeat(2, 1fr); }
+            .capability-detail-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .use-case-grid { grid-template-columns: 1fr; }
+            .observability-grid { grid-template-columns: 1fr; }
+            .alert-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .rate-algorithms { grid-template-columns: 1fr; }
+            .arch-layer { flex-direction: column; align-items: flex-start; }
+            .arch-layer-label { width: 100%; text-align: left; margin-bottom: var(--space-sm); }
+            .arch-layer-content { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat14-integration-apis-overview.html">Integration & APIs</a>
+        <span class="sep">/</span>
+        <span class="current">API Gateway</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔗 Category 14</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat14-integration-apis-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat14-p1-api-gateway.html" class="active"><span class="nav-icon">🚪</span> 14.1 API Gateway</a></li>
+            <li><a href="cat14-p2-event-architecture.html"><span class="nav-icon">📡</span> 14.2 Event Architecture</a></li>
+            <li><a href="cat14-p3-connectors.html"><span class="nav-icon">🔌</span> 14.3 Connectors</a></li>
+            <li><a href="cat14-p4-api-lifecycle.html"><span class="nav-icon">🔄</span> 14.4 API Lifecycle</a></li>
+            <li><a href="cat14-p5-webhooks.html"><span class="nav-icon">🪝</span> 14.5 Webhooks</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📐</span> Gateway Patterns</a></li>
+            <li><a href="#auth"><span class="nav-icon">🔐</span> Authentication</a></li>
+            <li><a href="#traffic"><span class="nav-icon">🚦</span> Traffic Management</a></li>
+            <li><a href="#loadbalancing"><span class="nav-icon">⚖️</span> Load Balancing</a></li>
+            <li><a href="#observability"><span class="nav-icon">📊</span> Observability</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools Comparison</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🚪 Page 14.1</span>
+                <h1>API Gateway</h1>
+                <p>The single entry point that handles routing, authentication, rate limiting, and traffic management for all API requests in your architecture.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">99.99%</div><div class="hero-metric-label">Uptime Target</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;10ms</div><div class="hero-metric-label">Added Latency</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10K+</div><div class="hero-metric-label">RPS per Node</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100%</div><div class="hero-metric-label">Request Visibility</div></div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Gateway Architecture</h2>
+                    <p>How API gateways fit into your system design</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>An API gateway sits between clients and backend services, acting as a reverse proxy that routes requests to appropriate microservices. Beyond simple routing, it handles cross-cutting concerns like <strong>authentication</strong>, <strong>rate limiting</strong>, <strong>request transformation</strong>, and <strong>observability</strong>—removing this complexity from individual services and centralizing it in one manageable layer.</p>
+                <p>The gateway pattern emerged from the need to solve common microservices challenges: how do you handle authentication consistently across 50 services? How do you rate limit abusive clients? How do you transform legacy protocols to modern APIs? Rather than implementing these concerns in every service (violating DRY and creating maintenance nightmares), the gateway centralizes them in one place. This is the <strong>Backend for Frontend (BFF)</strong> pattern taken to its logical conclusion—a single, purpose-built layer that shields your services from the chaos of the outside world.</p>
+                <p>Modern API gateways have evolved far beyond simple reverse proxies. They're programmable platforms with plugin ecosystems, declarative configuration, and deep integration with service discovery, secrets management, and observability tools. Whether you choose Kong, Envoy, AWS API Gateway, or build your own, the architectural principles remain the same: <strong>centralize cross-cutting concerns</strong>, <strong>keep services focused on business logic</strong>, and <strong>maintain a single source of truth for API policies</strong>.</p>
+            </div>
+            
+            <div class="arch-container">
+                <div class="arch-header">
+                    <div class="arch-title">🏗️ Gateway Architecture Overview</div>
+                    <div class="arch-badge">Request Flow</div>
+                </div>
+                <div class="arch-canvas">
+                    <div class="arch-layers">
+                        <!-- Client Layer -->
+                        <div class="arch-layer">
+                            <div class="arch-layer-label">Clients</div>
+                            <div class="arch-layer-content">
+                                <div class="client-item mobile"><span class="client-item-icon">📱</span><span class="client-item-text">Mobile Apps</span></div>
+                                <div class="client-item web"><span class="client-item-icon">💻</span><span class="client-item-text">Web Apps</span></div>
+                                <div class="client-item iot"><span class="client-item-icon">📟</span><span class="client-item-text">IoT Devices</span></div>
+                                <div class="client-item partner"><span class="client-item-icon">🤝</span><span class="client-item-text">Partners</span></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gateway Layer -->
+                        <div class="arch-layer" style="margin: var(--space-xl) 0;">
+                            <div class="arch-layer-label">Gateway Layer</div>
+                            <div class="arch-layer-content">
+                                <div class="gateway-box">
+                                    <div class="gateway-title">API Gateway</div>
+                                    <div class="gateway-features">
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">🔐</span>Auth</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">⚡</span>Rate Limit</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">🔀</span>Routing</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">🔄</span>Transform</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">💾</span>Cache</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">📊</span>Metrics</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">📝</span>Logging</div>
+                                        <div class="gateway-feature"><span class="gateway-feature-icon">🛡️</span>Security</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Service Layer -->
+                        <div class="arch-layer">
+                            <div class="arch-layer-label">Services</div>
+                            <div class="arch-layer-content">
+                                <div class="service-item"><span class="service-item-icon">👥</span><span class="service-item-text">Users Service</span></div>
+                                <div class="service-item"><span class="service-item-icon">📦</span><span class="service-item-text">Orders Service</span></div>
+                                <div class="service-item"><span class="service-item-icon">💳</span><span class="service-item-text">Payments Service</span></div>
+                                <div class="service-item"><span class="service-item-icon">📧</span><span class="service-item-text">Notifications</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Core Capabilities Detail -->
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Core Gateway Capabilities</h3>
+                <div class="capability-detail-grid">
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">🔐</span>
+                            <span class="capability-detail-title">Authentication & Authorization</span>
+                        </div>
+                        <p>Validate identity at the edge before requests reach services. Support multiple auth mechanisms (OAuth 2.0, JWT, API keys, mTLS) and extract user context for downstream services. Centralize security policy enforcement.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">⚡</span>
+                            <span class="capability-detail-title">Rate Limiting & Throttling</span>
+                        </div>
+                        <p>Protect backends from traffic spikes and abuse. Implement per-client, per-API, or global limits using token bucket, sliding window, or leaky bucket algorithms. Return appropriate 429 responses with retry headers.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">🔀</span>
+                            <span class="capability-detail-title">Request Routing</span>
+                        </div>
+                        <p>Route requests based on path, headers, query params, or custom logic. Support canary deployments, A/B testing, blue-green releases, and traffic shadowing for safe production testing.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">🔄</span>
+                            <span class="capability-detail-title">Request/Response Transformation</span>
+                        </div>
+                        <p>Modify payloads on the fly—add/remove headers, transform JSON structures, translate protocols (REST to gRPC, SOAP to REST), and adapt legacy APIs to modern contracts.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">💾</span>
+                            <span class="capability-detail-title">Response Caching</span>
+                        </div>
+                        <p>Cache responses at the edge to reduce backend load and improve latency. Configure TTLs, cache keys, vary headers, and invalidation strategies. Serve stale content during backend outages.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">📊</span>
+                            <span class="capability-detail-title">Observability & Telemetry</span>
+                        </div>
+                        <p>Capture metrics (latency, throughput, errors), structured logs, and distributed traces for every request. Integrate with Prometheus, Grafana, Jaeger, Datadog, and other platforms.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">🛡️</span>
+                            <span class="capability-detail-title">Security & WAF</span>
+                        </div>
+                        <p>Block malicious requests with Web Application Firewall rules. Validate input schemas, prevent SQL injection and XSS, enforce CORS policies, and implement IP allowlisting/blocklisting.</p>
+                    </div>
+                    <div class="capability-detail-card">
+                        <div class="capability-detail-header">
+                            <span class="capability-detail-icon">🔌</span>
+                            <span class="capability-detail-title">Service Discovery</span>
+                        </div>
+                        <p>Automatically discover and route to healthy service instances. Integrate with Consul, Kubernetes, AWS Cloud Map, or other service registries. Handle instance failures gracefully.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- GATEWAY PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Gateway Patterns</h2>
+                    <p>Different deployment models for different needs</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Not all gateway deployments are the same. The right pattern depends on your architecture, team structure, and scalability requirements. From traditional edge gateways to modern service mesh approaches, each pattern offers distinct advantages and trade-offs that you need to understand before making architectural decisions.</p>
+                <p>The evolution of gateway patterns mirrors the evolution of distributed systems themselves. Monolithic applications needed simple reverse proxies. Microservices demanded smarter routing. Service meshes emerged when teams realized that inter-service communication needed the same governance as external traffic. Today's architectures often combine multiple patterns—an edge gateway for external traffic, service mesh for internal communication, and specialized gateways for specific domains or compliance requirements.</p>
+            </div>
+            
+            <div class="patterns-grid">
+                <div class="pattern-card edge">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">🌐</div>
+                        <div class="pattern-card-title">Edge Gateway</div>
+                    </div>
+                    <p class="pattern-card-desc">Traditional single entry point at the network edge. All external traffic flows through one gateway that handles authentication, routing, and cross-cutting concerns.</p>
+                    <ul class="pattern-pros">
+                        <li>Simple to deploy and manage</li>
+                        <li>Centralized security enforcement</li>
+                        <li>Single point for observability</li>
+                        <li>Easy SSL termination</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card micro">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">🧩</div>
+                        <div class="pattern-card-title">Micro Gateway</div>
+                    </div>
+                    <p class="pattern-card-desc">Multiple lightweight gateways, each owned by a team or domain. Enables independent deployment and scaling while maintaining gateway benefits.</p>
+                    <ul class="pattern-pros">
+                        <li>Team autonomy and ownership</li>
+                        <li>Independent scaling per domain</li>
+                        <li>Reduced blast radius</li>
+                        <li>Technology flexibility</li>
+                    </ul>
+                </div>
+                
+                <div class="pattern-card mesh">
+                    <div class="pattern-card-header">
+                        <div class="pattern-card-icon">🕸️</div>
+                        <div class="pattern-card-title">Service Mesh</div>
+                    </div>
+                    <p class="pattern-card-desc">Sidecar proxies alongside each service handle service-to-service communication. Combined with an ingress gateway for external traffic.</p>
+                    <ul class="pattern-pros">
+                        <li>Zero-trust security model</li>
+                        <li>mTLS between all services</li>
+                        <li>Fine-grained traffic control</li>
+                        <li>Advanced observability</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AUTHENTICATION -->
+        <section class="module" id="auth">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Authentication & Authorization</h2>
+                    <p>Securing access at the gateway level</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The API gateway is the ideal place to handle authentication—validating credentials once at the edge rather than in every downstream service. This centralizes security policy enforcement and simplifies service implementation. Services can focus on business logic, trusting that the gateway has already verified the caller's identity.</p>
+                <p>A well-designed gateway authentication layer supports <strong>multiple authentication mechanisms simultaneously</strong>. Mobile apps might use OAuth 2.0 with refresh tokens, web apps use session cookies, partner integrations use API keys, and internal services use mTLS. The gateway normalizes these different credentials into a consistent identity representation (typically a JWT or set of headers) that downstream services can consume uniformly.</p>
+                <p>Authorization is equally important. Even if a caller is authenticated, they may not have permission to access a specific resource or perform a certain action. Gateways can enforce <strong>coarse-grained authorization</strong> (does this API key have access to the Orders API?) while services handle <strong>fine-grained authorization</strong> (can this user modify this specific order?). This separation of concerns keeps both layers manageable.</p>
+            </div>
+            
+            <div class="auth-grid">
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <span class="auth-card-icon">🎫</span>
+                        <span class="auth-card-title">OAuth 2.0 / OIDC</span>
+                    </div>
+                    <div class="auth-card-body">
+                        <p class="auth-card-desc">Industry standard for delegated authorization. Gateway validates tokens from identity providers, extracts claims, and passes user context to services.</p>
+                        <div class="auth-flow">
+                            <span class="auth-step">Client</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">IdP Login</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Get Token</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Gateway Validates</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Service</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <span class="auth-card-icon">🔑</span>
+                        <span class="auth-card-title">API Keys</span>
+                    </div>
+                    <div class="auth-card-body">
+                        <p class="auth-card-desc">Simple authentication for server-to-server communication. Gateway validates keys against a registry and enforces usage quotas per key.</p>
+                        <div class="auth-flow">
+                            <span class="auth-step">Client + Key</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Gateway</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Validate Key</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Check Quota</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Route</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <span class="auth-card-icon">📜</span>
+                        <span class="auth-card-title">JWT Validation</span>
+                    </div>
+                    <div class="auth-card-body">
+                        <p class="auth-card-desc">Stateless token validation at the gateway. Verify signature, check expiration, validate claims, and extract user identity without database lookups.</p>
+                        <div class="auth-flow">
+                            <span class="auth-step">JWT Header</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Verify Sig</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Check Exp</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Extract Claims</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Forward</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <span class="auth-card-icon">🔒</span>
+                        <span class="auth-card-title">Mutual TLS (mTLS)</span>
+                    </div>
+                    <div class="auth-card-body">
+                        <p class="auth-card-desc">Two-way certificate authentication for service-to-service communication. Both client and server present certificates, ensuring mutual trust.</p>
+                        <div class="auth-flow">
+                            <span class="auth-step">Client Cert</span>
+                            <span class="auth-arrow">↔</span>
+                            <span class="auth-step">Server Cert</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Verify Both</span>
+                            <span class="auth-arrow">→</span>
+                            <span class="auth-step">Encrypted Channel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TRAFFIC MANAGEMENT -->
+        <section class="module" id="traffic">
+            <div class="module-header">
+                <div class="module-icon">🚦</div>
+                <div class="module-info">
+                    <h2>Traffic Management</h2>
+                    <p>Rate limiting, throttling, and quota enforcement</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Protecting backend services from traffic spikes and abuse is critical. API gateways implement various <strong>rate limiting algorithms</strong> to control request flow, ensuring fair usage and system stability even under heavy load. Without rate limiting, a single misbehaving client—or a DDoS attack—could overwhelm your entire infrastructure.</p>
+                <p>Rate limiting operates at multiple granularities: <strong>global limits</strong> protect overall system capacity, <strong>per-API limits</strong> ensure no single endpoint monopolizes resources, <strong>per-client limits</strong> enforce fair usage across consumers, and <strong>per-user limits</strong> prevent individual users from impacting others. Advanced implementations combine these with <strong>adaptive rate limiting</strong> that adjusts thresholds based on current system load.</p>
+                <p>Beyond basic rate limiting, production gateways implement <strong>circuit breakers</strong> to prevent cascade failures, <strong>retry policies</strong> with exponential backoff, <strong>timeout enforcement</strong> to bound request latency, and <strong>bulkhead isolation</strong> to contain failures to specific service partitions. Together, these patterns create resilient systems that degrade gracefully under stress.</p>
+            </div>
+            
+            <div class="rate-limit-container">
+                <div class="rate-limit-header">
+                    <h3>⚡ Rate Limiting Algorithms</h3>
+                </div>
+                <div class="rate-limit-content">
+                    <div class="rate-algorithms">
+                        <div class="rate-algo">
+                            <div class="rate-algo-icon">🪣</div>
+                            <div class="rate-algo-name">Token Bucket</div>
+                            <div class="rate-algo-desc">Tokens added at fixed rate. Each request consumes a token. Allows bursts up to bucket capacity.</div>
+                        </div>
+                        <div class="rate-algo">
+                            <div class="rate-algo-icon">💧</div>
+                            <div class="rate-algo-name">Leaky Bucket</div>
+                            <div class="rate-algo-desc">Requests queued and processed at constant rate. Smooths traffic but may add latency.</div>
+                        </div>
+                        <div class="rate-algo">
+                            <div class="rate-algo-icon">🪟</div>
+                            <div class="rate-algo-name">Fixed Window</div>
+                            <div class="rate-algo-desc">Count requests in fixed time windows. Simple but can allow 2x burst at window boundaries.</div>
+                        </div>
+                        <div class="rate-algo">
+                            <div class="rate-algo-icon">📊</div>
+                            <div class="rate-algo-name">Sliding Window</div>
+                            <div class="rate-algo-desc">Weighted average of current and previous window. Eliminates boundary burst problem.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-card-header">
+                        <div class="feature-card-icon">📈</div>
+                        <div class="feature-card-title">Spike Arrest</div>
+                    </div>
+                    <div class="feature-card-content">
+                        <p>Prevents sudden traffic spikes from overwhelming services by smoothing request distribution over time.</p>
+                        <ul>
+                            <li>Converts burst traffic into steady flow</li>
+                            <li>Configurable per-second or per-minute rates</li>
+                            <li>Protects against accidental client loops</li>
+                            <li>Works alongside quota policies</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-header">
+                        <div class="feature-card-icon">📋</div>
+                        <div class="feature-card-title">Quota Management</div>
+                    </div>
+                    <div class="feature-card-content">
+                        <p>Long-term usage limits per client, API key, or subscription tier. Enables API monetization and fair usage policies.</p>
+                        <ul>
+                            <li>Daily, weekly, or monthly quotas</li>
+                            <li>Tiered limits by subscription plan</li>
+                            <li>Quota headers in responses (X-RateLimit-*)</li>
+                            <li>Graceful degradation options</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- LOAD BALANCING -->
+        <section class="module" id="loadbalancing">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Load Balancing</h2>
+                    <p>Distributing traffic across service instances</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>API gateways distribute incoming requests across multiple backend instances using various algorithms. The right strategy depends on your service characteristics, session requirements, and infrastructure. Understanding these algorithms helps you make informed decisions that balance performance, reliability, and resource utilization.</p>
+                <p>Load balancing at the gateway level differs from traditional infrastructure load balancing. Gateways have <strong>application-layer awareness</strong>—they can make routing decisions based on request content, not just connection metadata. This enables sophisticated patterns like routing based on API version headers, tenant IDs, or feature flags. Combined with health checking and circuit breakers, gateway load balancing creates resilient systems that handle failures gracefully.</p>
+                <p>Most production deployments use <strong>weighted round-robin</strong> as the default strategy, adjusting weights during deployments or when instances have different capacities. <strong>Least connections</strong> works well for long-lived requests or WebSocket connections. <strong>Consistent hashing</strong> (a variant of IP hash) ensures cache locality when backends maintain local state. The key is matching your strategy to your workload characteristics.</p>
+            </div>
+            
+            <div class="lb-container">
+                <div class="lb-header">
+                    <h3>⚖️ Load Balancing Strategies</h3>
+                </div>
+                <div class="lb-strategies">
+                    <div class="lb-strategy">
+                        <div class="lb-strategy-icon">🔄</div>
+                        <div class="lb-strategy-name">Round Robin</div>
+                        <div class="lb-strategy-desc">Distributes requests sequentially across all healthy instances. Simple and effective when instances have similar capacity.</div>
+                    </div>
+                    <div class="lb-strategy">
+                        <div class="lb-strategy-icon">⚖️</div>
+                        <div class="lb-strategy-name">Weighted</div>
+                        <div class="lb-strategy-desc">Assigns weight to each instance based on capacity. Higher-weight instances receive more traffic. Ideal for heterogeneous infrastructure.</div>
+                    </div>
+                    <div class="lb-strategy">
+                        <div class="lb-strategy-icon">📉</div>
+                        <div class="lb-strategy-name">Least Connections</div>
+                        <div class="lb-strategy-desc">Routes to instance with fewest active connections. Best for long-lived connections or variable request processing times.</div>
+                    </div>
+                    <div class="lb-strategy">
+                        <div class="lb-strategy-icon">🎯</div>
+                        <div class="lb-strategy-name">IP Hash</div>
+                        <div class="lb-strategy-desc">Hashes client IP to consistently route to same instance. Provides session affinity without server-side state.</div>
+                    </div>
+                    <div class="lb-strategy">
+                        <div class="lb-strategy-icon">⏱️</div>
+                        <div class="lb-strategy-name">Least Latency</div>
+                        <div class="lb-strategy-desc">Routes to instance with lowest response time. Requires active health checking and latency measurement.</div>
+                    </div>
+                    <div class="lb-strategy">
+                        <div class="lb-strategy-icon">🎲</div>
+                        <div class="lb-strategy-name">Random</div>
+                        <div class="lb-strategy-desc">Randomly selects from healthy instances. Simple implementation with statistically even distribution at scale.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- OBSERVABILITY -->
+        <section class="module" id="observability">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Observability & Monitoring</h2>
+                    <p>Visibility into every request through your gateway</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The API gateway is the single point through which all traffic flows—making it the ideal place to capture observability data. Every request that enters your system passes through the gateway, giving you <strong>100% visibility</strong> into traffic patterns, latency distributions, error rates, and security events without instrumenting individual services.</p>
+                <p>Modern observability follows the <strong>"three pillars"</strong> approach: metrics for aggregated numerical data, logs for detailed event records, and traces for request flow visualization. Gateways generate all three, correlating them with unique request IDs that propagate through the entire request lifecycle. This enables powerful debugging workflows—start with a metric anomaly, drill into relevant logs, then trace the exact path of problematic requests.</p>
+            </div>
+            
+            <div class="observability-grid">
+                <div class="observability-card">
+                    <div class="observability-header">
+                        <span class="observability-icon">📈</span>
+                        <span class="observability-title">Key Metrics</span>
+                    </div>
+                    <ul class="observability-list">
+                        <li><strong>Request Rate</strong> — Requests per second by API, client, status code</li>
+                        <li><strong>Latency Percentiles</strong> — P50, P95, P99 response times</li>
+                        <li><strong>Error Rate</strong> — 4xx and 5xx responses by endpoint</li>
+                        <li><strong>Throughput</strong> — Bytes in/out, payload sizes</li>
+                        <li><strong>Connection Pool</strong> — Active connections, pool utilization</li>
+                        <li><strong>Rate Limiting</strong> — Requests limited, quota remaining</li>
+                        <li><strong>Cache Hit Ratio</strong> — Percentage of cached responses</li>
+                        <li><strong>Circuit Breaker State</strong> — Open/closed/half-open per service</li>
+                    </ul>
+                </div>
+                <div class="observability-card">
+                    <div class="observability-header">
+                        <span class="observability-icon">📝</span>
+                        <span class="observability-title">Structured Logging</span>
+                    </div>
+                    <ul class="observability-list">
+                        <li><strong>Request ID</strong> — Unique identifier for correlation</li>
+                        <li><strong>Timestamp</strong> — Request start and completion times</li>
+                        <li><strong>Client Info</strong> — IP, user agent, API key identifier</li>
+                        <li><strong>Route Details</strong> — Path, method, matched route</li>
+                        <li><strong>Upstream Info</strong> — Target service, response time</li>
+                        <li><strong>Auth Context</strong> — User ID, roles, token claims</li>
+                        <li><strong>Response</strong> — Status code, body size, headers</li>
+                        <li><strong>Errors</strong> — Exception details, stack traces</li>
+                    </ul>
+                </div>
+                <div class="observability-card">
+                    <div class="observability-header">
+                        <span class="observability-icon">🔍</span>
+                        <span class="observability-title">Distributed Tracing</span>
+                    </div>
+                    <ul class="observability-list">
+                        <li><strong>Trace Context</strong> — W3C Trace Context propagation</li>
+                        <li><strong>Span Creation</strong> — Gateway creates parent span</li>
+                        <li><strong>Context Injection</strong> — Headers forwarded to services</li>
+                        <li><strong>Timing Breakdown</strong> — DNS, connect, TLS, TTFB</li>
+                        <li><strong>Service Graph</strong> — Automatic topology discovery</li>
+                        <li><strong>Error Attribution</strong> — Which service caused the failure</li>
+                        <li><strong>Latency Analysis</strong> — Where time is spent</li>
+                        <li><strong>Dependency Mapping</strong> — Service relationships</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Alerting Best Practices -->
+            <div class="subsection">
+                <h3 class="subsection-title">🚨 Alerting Strategy</h3>
+                <div class="alert-grid">
+                    <div class="alert-card critical">
+                        <div class="alert-level">CRITICAL</div>
+                        <div class="alert-title">Page Immediately</div>
+                        <ul>
+                            <li>Gateway availability &lt; 99.9%</li>
+                            <li>P99 latency &gt; 5s for &gt; 2 min</li>
+                            <li>Error rate &gt; 10% for &gt; 1 min</li>
+                            <li>All circuit breakers open</li>
+                        </ul>
+                    </div>
+                    <div class="alert-card warning">
+                        <div class="alert-level">WARNING</div>
+                        <div class="alert-title">Investigate Soon</div>
+                        <ul>
+                            <li>P95 latency 2x baseline</li>
+                            <li>Error rate &gt; 1% for &gt; 5 min</li>
+                            <li>Rate limiting &gt; 5% of requests</li>
+                            <li>Connection pool &gt; 80%</li>
+                        </ul>
+                    </div>
+                    <div class="alert-card info">
+                        <div class="alert-level">INFO</div>
+                        <div class="alert-title">Review Periodically</div>
+                        <ul>
+                            <li>Traffic patterns changed</li>
+                            <li>New API versions deployed</li>
+                            <li>Certificate expiring in 30d</li>
+                            <li>Config drift detected</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS COMPARISON -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Gateway Tools Comparison</h2>
+                    <p>Popular API gateway solutions</p>
+                </div>
+            </div>
+            
+            <div class="tools-table-container">
+                <div class="tools-table-header">
+                    <h3>🔍 Feature Comparison</h3>
+                </div>
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Gateway</th>
+                            <th>Type</th>
+                            <th>Best For</th>
+                            <th>Key Features</th>
+                            <th>Pricing</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🦍</span> Kong</span></td>
+                            <td><span class="badge badge-oss">OSS + Enterprise</span></td>
+                            <td>Cloud-native, Kubernetes</td>
+                            <td>Plugin ecosystem, declarative config</td>
+                            <td>Free / Enterprise</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🟡</span> AWS API Gateway</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>AWS-native applications</td>
+                            <td>Lambda integration, WebSocket</td>
+                            <td>Pay per request</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">⚫</span> Apigee</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>Enterprise, API monetization</td>
+                            <td>Developer portal, analytics</td>
+                            <td>Enterprise pricing</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔵</span> Azure API Management</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Azure-native applications</td>
+                            <td>Policy engine, versioning</td>
+                            <td>Tiered pricing</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🟢</span> NGINX</span></td>
+                            <td><span class="badge badge-oss">OSS + Plus</span></td>
+                            <td>High performance, flexibility</td>
+                            <td>Lua scripting, caching</td>
+                            <td>Free / NGINX Plus</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🚀</span> Envoy</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Service mesh, sidecar proxy</td>
+                            <td>xDS APIs, observability</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔷</span> Traefik</span></td>
+                            <td><span class="badge badge-oss">OSS + Enterprise</span></td>
+                            <td>Docker, Kubernetes ingress</td>
+                            <td>Auto-discovery, Let's Encrypt</td>
+                            <td>Free / Enterprise</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🟣</span> Tyk</span></td>
+                            <td><span class="badge badge-oss">OSS + Enterprise</span></td>
+                            <td>Full lifecycle management</td>
+                            <td>GraphQL, gRPC support</td>
+                            <td>Free / Enterprise</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CONFIGURATION EXAMPLE -->
+        <section class="module" id="config">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Configuration Example</h2>
+                    <p>Kong Gateway declarative configuration</p>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-block-header">
+                    <span class="code-block-title">kong.yml - Declarative Configuration</span>
+                    <span class="code-block-lang">YAML</span>
+                </div>
+                <div class="code-block-content">
+                    <pre><span class="code-comment"># Kong Gateway Configuration</span>
+<span class="code-property">_format_version</span>: <span class="code-string">"3.0"</span>
+
+<span class="code-property">services</span>:
+  - <span class="code-property">name</span>: <span class="code-string">users-api</span>
+    <span class="code-property">url</span>: <span class="code-string">http://users-service:8080</span>
+    <span class="code-property">routes</span>:
+      - <span class="code-property">name</span>: <span class="code-string">users-route</span>
+        <span class="code-property">paths</span>:
+          - <span class="code-string">/api/v1/users</span>
+        <span class="code-property">strip_path</span>: <span class="code-keyword">false</span>
+    <span class="code-property">plugins</span>:
+      - <span class="code-property">name</span>: <span class="code-string">rate-limiting</span>
+        <span class="code-property">config</span>:
+          <span class="code-property">minute</span>: <span class="code-string">100</span>
+          <span class="code-property">policy</span>: <span class="code-string">redis</span>
+          <span class="code-property">redis_host</span>: <span class="code-string">redis</span>
+      
+      - <span class="code-property">name</span>: <span class="code-string">jwt</span>
+        <span class="code-property">config</span>:
+          <span class="code-property">claims_to_verify</span>:
+            - <span class="code-string">exp</span>
+          <span class="code-property">key_claim_name</span>: <span class="code-string">iss</span>
+      
+      - <span class="code-property">name</span>: <span class="code-string">request-transformer</span>
+        <span class="code-property">config</span>:
+          <span class="code-property">add</span>:
+            <span class="code-property">headers</span>:
+              - <span class="code-string">X-Request-ID:$(uuid)</span>
+              - <span class="code-string">X-Forwarded-Service:users-api</span>
+
+  - <span class="code-property">name</span>: <span class="code-string">orders-api</span>
+    <span class="code-property">url</span>: <span class="code-string">http://orders-service:8080</span>
+    <span class="code-property">routes</span>:
+      - <span class="code-property">name</span>: <span class="code-string">orders-route</span>
+        <span class="code-property">paths</span>:
+          - <span class="code-string">/api/v1/orders</span>
+    <span class="code-property">plugins</span>:
+      - <span class="code-property">name</span>: <span class="code-string">rate-limiting</span>
+        <span class="code-property">config</span>:
+          <span class="code-property">minute</span>: <span class="code-string">50</span>
+      
+      - <span class="code-property">name</span>: <span class="code-string">cors</span>
+        <span class="code-property">config</span>:
+          <span class="code-property">origins</span>:
+            - <span class="code-string">https://app.example.com</span>
+          <span class="code-property">methods</span>:
+            - <span class="code-string">GET</span>
+            - <span class="code-string">POST</span>
+            - <span class="code-string">PUT</span>
+            - <span class="code-string">DELETE</span>
+          <span class="code-property">headers</span>:
+            - <span class="code-string">Authorization</span>
+            - <span class="code-string">Content-Type</span>
+
+<span class="code-comment"># Global plugins applied to all services</span>
+<span class="code-property">plugins</span>:
+  - <span class="code-property">name</span>: <span class="code-string">prometheus</span>
+  - <span class="code-property">name</span>: <span class="code-string">zipkin</span>
+    <span class="code-property">config</span>:
+      <span class="code-property">http_endpoint</span>: <span class="code-string">http://zipkin:9411/api/v2/spans</span>
+      <span class="code-property">sample_ratio</span>: <span class="code-string">0.1</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Gateway implementation guidelines</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Keep Gateway Stateless</h4>
+                        <p>Store session data in external stores (Redis, Memcached). This enables horizontal scaling and zero-downtime deployments.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Implement Circuit Breakers</h4>
+                        <p>Prevent cascade failures by detecting unhealthy services and failing fast. Allow recovery time before retrying.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Use Declarative Configuration</h4>
+                        <p>Version control your gateway config as code. Enable GitOps workflows for audit trails and rollback capability.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Add Request IDs Early</h4>
+                        <p>Generate unique request IDs at the gateway and propagate through all services for end-to-end tracing.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Cache Aggressively</h4>
+                        <p>Cache responses at the gateway for read-heavy APIs. Reduces backend load and improves latency significantly.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Monitor Gateway Health</h4>
+                        <p>Track latency percentiles, error rates, and throughput. Set up alerts for degradation before it impacts users.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Plan for High Availability</h4>
+                        <p>Deploy multiple gateway instances across availability zones. Use health checks and automatic failover.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Avoid Business Logic</h4>
+                        <p>Keep the gateway focused on cross-cutting concerns. Business logic belongs in services, not the gateway layer.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered gateway operations and optimization</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The <strong>GatewayOps Crew</strong> brings AI-powered automation to API gateway management. These specialized agents continuously monitor gateway health, optimize configurations, detect anomalies, and automate routine operations—freeing your team to focus on architecture and business logic rather than operational firefighting.</p>
+                <p>Gateway operations involve a complex interplay of metrics, logs, and configurations. Human operators struggle to correlate latency spikes with deployment events, identify misconfigured rate limits, or spot security anomalies in real-time. AI agents excel at these pattern recognition tasks, processing thousands of data points per second and surfacing actionable insights before issues impact users.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🚪</div>
+                    <div class="agent-name">GatewayOps Crew</div>
+                    <div class="agent-role">Gateway Management & Optimization</div>
+                    <p class="agent-desc">A coordinated team of specialized agents that monitor, optimize, secure, and automate API gateway operations. Each agent focuses on a specific domain while sharing context for holistic gateway governance.</p>
+                    <ul class="agent-capabilities">
+                        <li>Real-time latency monitoring and anomaly detection</li>
+                        <li>Automatic rate limit tuning based on traffic patterns</li>
+                        <li>Security threat detection and automated blocking</li>
+                        <li>Configuration drift detection and remediation</li>
+                        <li>Capacity planning and scaling recommendations</li>
+                        <li>Incident correlation across services</li>
+                        <li>Automated runbook execution for common issues</li>
+                        <li>Performance regression detection on deployments</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-block-header">
+                        <span class="code-block-title">gateway_ops_crew.py</span>
+                        <span class="code-block-lang">Python</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre><span class="code-comment"># GatewayOps Crew - AI-Powered Gateway Management</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Traffic Analyzer Agent</span>
+traffic_agent = Agent(
+    role=<span class="code-string">"Traffic Pattern Analyzer"</span>,
+    goal=<span class="code-string">"Analyze traffic patterns and detect anomalies"</span>,
+    backstory=<span class="code-string">"""Expert at analyzing API traffic patterns,
+    identifying unusual spikes, and detecting potential
+    DDoS attacks or misbehaving clients."""</span>,
+    llm=llm,
+    tools=[prometheus_query, traffic_analyzer, anomaly_detector]
+)
+
+<span class="code-comment"># Rate Limit Optimizer Agent</span>
+ratelimit_agent = Agent(
+    role=<span class="code-string">"Rate Limit Optimizer"</span>,
+    goal=<span class="code-string">"Optimize rate limits based on usage patterns"</span>,
+    backstory=<span class="code-string">"""Specialist in analyzing API usage patterns
+    and recommending optimal rate limits that balance
+    protection with user experience."""</span>,
+    llm=llm,
+    tools=[usage_analyzer, limit_calculator, config_updater]
+)
+
+<span class="code-comment"># Security Monitor Agent</span>
+security_agent = Agent(
+    role=<span class="code-string">"Gateway Security Monitor"</span>,
+    goal=<span class="code-string">"Detect and respond to security threats"</span>,
+    backstory=<span class="code-string">"""Security expert focused on detecting
+    injection attacks, credential stuffing, and
+    other API-specific threats at the gateway."""</span>,
+    llm=llm,
+    tools=[waf_analyzer, threat_detector, ip_blocker]
+)
+
+<span class="code-comment"># Config Auditor Agent</span>
+config_agent = Agent(
+    role=<span class="code-string">"Configuration Auditor"</span>,
+    goal=<span class="code-string">"Ensure gateway configs follow best practices"</span>,
+    backstory=<span class="code-string">"""Configuration expert who audits gateway
+    settings, detects drift from desired state, and
+    recommends security hardening improvements."""</span>,
+    llm=llm,
+    tools=[config_parser, drift_detector, best_practice_checker]
+)
+
+<span class="code-comment"># Create GatewayOps Crew</span>
+gateway_ops_crew = Crew(
+    agents=[traffic_agent, ratelimit_agent, 
+            security_agent, config_agent],
+    tasks=[
+        Task(description=<span class="code-string">"Analyze last hour traffic"</span>,
+             agent=traffic_agent),
+        Task(description=<span class="code-string">"Review rate limit effectiveness"</span>,
+             agent=ratelimit_agent),
+        Task(description=<span class="code-string">"Scan for security threats"</span>,
+             agent=security_agent),
+        Task(description=<span class="code-string">"Audit current configuration"</span>,
+             agent=config_agent),
+    ],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Use Cases -->
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Agent Use Cases</h3>
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📈</div>
+                        <div class="use-case-content">
+                            <h4>Traffic Spike Response</h4>
+                            <p>Agent detects sudden traffic increase, analyzes if it's legitimate (viral content) or malicious (DDoS), and automatically adjusts rate limits or triggers scaling while alerting the team.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔒</div>
+                        <div class="use-case-content">
+                            <h4>Credential Stuffing Detection</h4>
+                            <p>Security agent identifies patterns consistent with credential stuffing attacks (high auth failure rates from distributed IPs) and automatically enables CAPTCHA or blocks suspicious ranges.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">⚡</div>
+                        <div class="use-case-content">
+                            <h4>Latency Anomaly Investigation</h4>
+                            <p>Traffic agent notices P99 latency spike, correlates with recent deployment, identifies the problematic service, and provides rollback recommendation with supporting evidence.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">⚙️</div>
+                        <div class="use-case-content">
+                            <h4>Configuration Drift Remediation</h4>
+                            <p>Config agent detects that production gateway settings have drifted from Git source of truth, identifies specific differences, and generates PR to reconcile the drift.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat14-integration-apis-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 14.1</div>
+        <a href="cat14-p2-event-architecture.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">14.2 Event Architecture</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

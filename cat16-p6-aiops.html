@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOps & Intelligent Operations | Monitoring & Observability | Category 16 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        .architecture-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .architecture-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .architecture-title { font-size: var(--font-sm); font-weight: 600; }
+        .architecture-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .architecture-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        .capabilities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .capability-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); position: relative; overflow: hidden; transition: all 0.3s; }
+        .capability-card:hover { border-color: var(--cap-color); transform: translateY(-4px); }
+        .capability-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--cap-color); }
+        .capability-card:nth-child(1) { --cap-color: #8B5CF6; }
+        .capability-card:nth-child(2) { --cap-color: #3B82F6; }
+        .capability-card:nth-child(3) { --cap-color: #10B981; }
+        .capability-card:nth-child(4) { --cap-color: #EC4899; }
+        .capability-card:nth-child(5) { --cap-color: #F59E0B; }
+        .capability-card:nth-child(6) { --cap-color: #06B6D4; }
+
+        .capability-title { font-size: var(--font-base); font-weight: 700; color: var(--cap-color); margin-bottom: var(--space-sm); }
+        .capability-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-md); }
+        .capability-examples { font-size: var(--font-xs); color: var(--text-muted); }
+        .capability-examples strong { color: var(--text-secondary); }
+        .anomaly-types { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .anomaly-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .anomaly-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .anomaly-icon { font-size: 24px; }
+        .anomaly-title { font-size: var(--font-base); font-weight: 600; }
+        .anomaly-body { padding: var(--space-lg); }
+        .anomaly-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.7; }
+        .anomaly-detection { font-size: var(--font-xs); color: var(--text-muted); }
+        .anomaly-detection code { background: var(--bg-dark); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: var(--cyan); }
+        .ml-techniques { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .ml-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .ml-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .ml-name::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--violet); }
+        .ml-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; margin-bottom: var(--space-sm); }
+        .ml-use { font-size: 10px; color: var(--cyan); background: var(--bg-dark); padding: 4px 8px; border-radius: 4px; display: inline-block; }
+        .maturity-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .maturity-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .maturity-title { font-size: var(--font-sm); font-weight: 600; }
+        .maturity-levels { display: grid; grid-template-columns: repeat(5, 1fr); }
+        .maturity-level { padding: var(--space-lg); border-right: 1px solid var(--border-color); text-align: center; position: relative; }
+        .maturity-level:last-child { border-right: none; }
+        .maturity-level::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--level-color); }
+        .maturity-level:nth-child(1) { --level-color: #EF4444; }
+        .maturity-level:nth-child(2) { --level-color: #F97316; }
+        .maturity-level:nth-child(3) { --level-color: #F59E0B; }
+        .maturity-level:nth-child(4) { --level-color: #10B981; }
+        .maturity-level:nth-child(5) { --level-color: #8B5CF6; }
+        .maturity-num { font-size: 28px; font-weight: 800; color: var(--level-color); margin-bottom: var(--space-xs); }
+        .maturity-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); }
+        .maturity-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); }
+        .tool-card-header { padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .tool-logo { width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; }
+        .tool-info h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: 2px; }
+        .tool-type { font-size: var(--font-xs); color: var(--text-muted); }
+        .tool-card-body { padding: var(--space-lg); }
+        .tool-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .tool-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tool-feature { font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-full); color: var(--text-muted); }
+        .remediation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .remediation-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .remediation-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .remediation-icon { font-size: 24px; }
+        .remediation-info h4 { font-size: var(--font-sm); font-weight: 600; }
+        .remediation-info span { font-size: var(--font-xs); color: var(--text-muted); }
+        .remediation-body { padding: var(--space-lg); }
+        .remediation-trigger { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); }
+        .remediation-trigger strong { color: var(--danger-red); }
+        .remediation-actions { list-style: none; }
+        .remediation-actions li { font-size: var(--font-xs); color: var(--text-muted); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .remediation-actions li::before { content: '→'; color: var(--success-green); }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-primary); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 1px solid var(--cat-dark); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; }
+        .antipatterns-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .antipattern-card { background: var(--bg-card); border: 1px solid var(--danger-red); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .antipattern-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+        .antipattern-icon { font-size: 20px; }
+        .antipattern-title { font-size: var(--font-sm); font-weight: 600; color: var(--danger-red); }
+        .antipattern-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; margin-bottom: var(--space-md); }
+        .antipattern-fix { font-size: var(--font-xs); color: var(--success-green); display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .antipattern-fix::before { content: '✓'; font-weight: bold; }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-number { color: var(--cyan); }
+        .code-function { color: var(--cat-light); }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .related-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .related-title { font-size: var(--font-base); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-xs); }
+        .related-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, 
+            .capabilities-grid, .tools-grid, .ml-techniques { grid-template-columns: 1fr 1fr; }
+            .anomaly-types, .remediation-grid, .practices-grid, .antipatterns-grid, .related-grid { grid-template-columns: 1fr; }
+            .maturity-levels { grid-template-columns: 1fr; }
+            .maturity-level { border-right: none; border-bottom: 1px solid var(--border-color); }
+        }
+    
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); }
+        .agent-info h3 { font-size: var(--font-xl); margin-bottom: var(--space-md); color: var(--cat-light); }
+        .agent-info > p { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .agent-capability { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) var(--space-md); background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+
+        .agent-code { background: var(--bg-dark); padding: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .code-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { background: var(--bg-card); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: var(--space-md); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+
+    
+        .section-intro { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .section-intro p { color: var(--text-secondary); line-height: 1.8; margin-bottom: var(--space-md); }
+        .section-intro p:last-child { margin-bottom: 0; }
+        .section-intro strong { color: var(--text-primary); }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); border-right: 1px solid var(--border-color); }
+        .agent-avatar { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: var(--space-md); }
+        .agent-name { font-size: var(--font-xl); font-weight: 700; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-md); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-lg); }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); font-size: 10px; }
+        .code-panel { background: var(--bg-dark); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0 var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-tab:hover { color: var(--text-primary); }
+        .code-filename { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: var(--space-lg); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat16-monitoring-observability-overview.html">Monitoring & Observability</a>
+        <span class="sep">/</span>
+        <span class="current">AIOps</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 16</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat16-monitoring-observability-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat16-p1-metrics-monitoring.html"><span class="nav-icon">📈</span> 16.1 Metrics</a></li>
+            <li><a href="cat16-p2-logging.html"><span class="nav-icon">📝</span> 16.2 Logging</a></li>
+            <li><a href="cat16-p3-distributed-tracing.html"><span class="nav-icon">🔗</span> 16.3 Tracing</a></li>
+            <li><a href="cat16-p4-alerting-incidents.html"><span class="nav-icon">🚨</span> 16.4 Alerting</a></li>
+            <li><a href="cat16-p5-apm.html"><span class="nav-icon">⚡</span> 16.5 APM</a></li>
+            <li><a href="cat16-p6-aiops.html" class="active"><span class="nav-icon">🤖</span> 16.6 AIOps</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#pipeline"><span class="nav-icon">🔄</span> AIOps Pipeline</a></li>
+            <li><a href="#capabilities"><span class="nav-icon">⚡</span> Core Capabilities</a></li>
+            <li><a href="#anomalies"><span class="nav-icon">📉</span> Anomaly Types</a></li>
+            <li><a href="#ml"><span class="nav-icon">🧠</span> ML Techniques</a></li>
+            <li><a href="#maturity"><span class="nav-icon">📊</span> Maturity Model</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Platforms</a></li>
+            <li><a href="#remediation"><span class="nav-icon">🔧</span> Auto-Remediation</a></li>
+            <li><a href="#practices"><span class="nav-icon">💡</span> Best Practices</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">🚫</span> Anti-Patterns</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🤖 Page 16.6</div>
+                <h1>AIOps & Intelligent Operations</h1>
+                <p>AIOps applies machine learning to IT operations data—logs, metrics, traces, events—to detect anomalies humans would miss, correlate related alerts into incidents, predict failures before they occur, and automate remediation.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">90%</div>
+                    <div class="hero-metric-label">Alert Noise Reduction</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">MTTR</div>
+                    <div class="hero-metric-label">Faster Resolution</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">ML</div>
+                    <div class="hero-metric-label">Dynamic Baselines</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Auto</div>
+                    <div class="hero-metric-label">Self-Healing Systems</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AIOPS PIPELINE DIAGRAM -->
+        <section class="module" id="pipeline">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>The AIOps Pipeline</h2>
+                    <p>From raw telemetry to intelligent action</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>AIOps platforms ingest massive volumes of operational data—millions of metrics, billions of log lines, thousands of traces per minute. Traditional monitoring can't scale to this volume. Machine learning models process this data to surface what matters: anomalies that deviate from learned baselines, clusters of related alerts that form a single incident, and patterns that predict future failures.</p>
+                <p>The goal is to shift from reactive firefighting to proactive operations: detect issues before users notice, understand root cause faster, and automate routine remediation so engineers focus on high-value work.</p>
+            </div>
+            
+            <div class="architecture-container">
+                <div class="architecture-header">
+                    <div class="architecture-title">🤖 AIOps Data Flow & Intelligence Pipeline</div>
+                    <div class="architecture-badge">ML-POWERED</div>
+                </div>
+                <div class="architecture-canvas">
+                    <svg viewBox="0 0 900 420" style="width: 100%; height: 420px;">
+                        <defs>
+                            <filter id="glowBlue"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowViolet"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowAmber"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <linearGradient id="mlGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#8B5CF6"/>
+                                <stop offset="100%" style="stop-color:#EC4899"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- DATA SOURCES BOX - x:20-140 -->
+                        <rect x="20" y="40" width="120" height="280" rx="12" fill="rgba(59,130,246,0.08)" stroke="#3B82F6" stroke-width="2"/>
+                        <text x="80" y="65" fill="#60A5FA" font-size="10" font-weight="600" text-anchor="middle">DATA SOURCES</text>
+                        
+                        <rect x="30" y="80" width="100" height="36" rx="5" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="80" y="96" fill="#60A5FA" font-size="9" text-anchor="middle">📊 Metrics</text>
+                        <text x="80" y="108" fill="#6a6a7a" font-size="7" text-anchor="middle">1M+ datapoints/min</text>
+                        
+                        <rect x="30" y="124" width="100" height="36" rx="5" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="80" y="140" fill="#60A5FA" font-size="9" text-anchor="middle">📝 Logs</text>
+                        <text x="80" y="152" fill="#6a6a7a" font-size="7" text-anchor="middle">10B+ lines/day</text>
+                        
+                        <rect x="30" y="168" width="100" height="36" rx="5" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="80" y="184" fill="#60A5FA" font-size="9" text-anchor="middle">🔗 Traces</text>
+                        <text x="80" y="196" fill="#6a6a7a" font-size="7" text-anchor="middle">100K+ spans/sec</text>
+                        
+                        <rect x="30" y="212" width="100" height="36" rx="5" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="80" y="228" fill="#60A5FA" font-size="9" text-anchor="middle">🔔 Events</text>
+                        <text x="80" y="240" fill="#6a6a7a" font-size="7" text-anchor="middle">Deploys, changes</text>
+                        
+                        <rect x="30" y="256" width="100" height="36" rx="5" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="80" y="272" fill="#60A5FA" font-size="9" text-anchor="middle">🗺️ Topology</text>
+                        <text x="80" y="284" fill="#6a6a7a" font-size="7" text-anchor="middle">Dependencies</text>
+                        
+                        <!-- ML ENGINE BOX - x:200-440 -->
+                        <rect x="200" y="60" width="240" height="240" rx="14" fill="rgba(139,92,246,0.1)" stroke="url(#mlGrad)" stroke-width="3"/>
+                        <text x="320" y="88" fill="#A78BFA" font-size="11" font-weight="700" text-anchor="middle">🧠 ML ENGINE</text>
+                        
+                        <rect x="212" y="100" width="105" height="55" rx="5" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="264" y="118" fill="#A78BFA" font-size="8" font-weight="600" text-anchor="middle">Anomaly Detection</text>
+                        <text x="264" y="132" fill="#6a6a7a" font-size="7" text-anchor="middle">Dynamic baselines</text>
+                        <text x="264" y="144" fill="#6a6a7a" font-size="7" text-anchor="middle">Multivariate analysis</text>
+                        
+                        <rect x="323" y="100" width="105" height="55" rx="5" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="375" y="118" fill="#A78BFA" font-size="8" font-weight="600" text-anchor="middle">Alert Correlation</text>
+                        <text x="375" y="132" fill="#6a6a7a" font-size="7" text-anchor="middle">Clustering algorithms</text>
+                        <text x="375" y="144" fill="#6a6a7a" font-size="7" text-anchor="middle">Topology-aware</text>
+                        
+                        <rect x="212" y="163" width="105" height="55" rx="5" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="264" y="181" fill="#F472B6" font-size="8" font-weight="600" text-anchor="middle">Root Cause Analysis</text>
+                        <text x="264" y="195" fill="#6a6a7a" font-size="7" text-anchor="middle">Causal inference</text>
+                        <text x="264" y="207" fill="#6a6a7a" font-size="7" text-anchor="middle">Change correlation</text>
+                        
+                        <rect x="323" y="163" width="105" height="55" rx="5" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="375" y="181" fill="#F472B6" font-size="8" font-weight="600" text-anchor="middle">Predictive Analytics</text>
+                        <text x="375" y="195" fill="#6a6a7a" font-size="7" text-anchor="middle">Failure forecasting</text>
+                        <text x="375" y="207" fill="#6a6a7a" font-size="7" text-anchor="middle">Capacity planning</text>
+                        
+                        <rect x="264" y="226" width="105" height="45" rx="5" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                        <text x="316" y="246" fill="#22D3EE" font-size="8" font-weight="600" text-anchor="middle">NLP Processing</text>
+                        <text x="316" y="260" fill="#6a6a7a" font-size="7" text-anchor="middle">Log pattern mining</text>
+                        
+                        <!-- INTELLIGENCE BOX - x:500-640 -->
+                        <rect x="500" y="40" width="140" height="280" rx="12" fill="rgba(16,185,129,0.08)" stroke="#10B981" stroke-width="2"/>
+                        <text x="570" y="65" fill="#34D399" font-size="10" font-weight="600" text-anchor="middle">INTELLIGENCE</text>
+                        
+                        <rect x="510" y="80" width="120" height="36" rx="5" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="570" y="96" fill="#34D399" font-size="9" text-anchor="middle">📉 Anomaly Alerts</text>
+                        <text x="570" y="108" fill="#6a6a7a" font-size="7" text-anchor="middle">95% noise reduction</text>
+                        
+                        <rect x="510" y="124" width="120" height="36" rx="5" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="570" y="140" fill="#34D399" font-size="9" text-anchor="middle">🎯 Correlated Incidents</text>
+                        <text x="570" y="152" fill="#6a6a7a" font-size="7" text-anchor="middle">100 alerts → 1 incident</text>
+                        
+                        <rect x="510" y="168" width="120" height="36" rx="5" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="570" y="184" fill="#34D399" font-size="9" text-anchor="middle">🔍 Root Cause</text>
+                        <text x="570" y="196" fill="#6a6a7a" font-size="7" text-anchor="middle">"Deploy at 14:32..."</text>
+                        
+                        <rect x="510" y="212" width="120" height="36" rx="5" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="570" y="228" fill="#34D399" font-size="9" text-anchor="middle">⚠️ Predictions</text>
+                        <text x="570" y="240" fill="#6a6a7a" font-size="7" text-anchor="middle">"Disk full in 4 hours"</text>
+                        
+                        <rect x="510" y="256" width="120" height="36" rx="5" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="570" y="272" fill="#34D399" font-size="9" text-anchor="middle">📊 Insights</text>
+                        <text x="570" y="284" fill="#6a6a7a" font-size="7" text-anchor="middle">Dashboards & reports</text>
+                        
+                        <!-- ACTIONS BOX - x:700-860 -->
+                        <rect x="700" y="90" width="160" height="180" rx="12" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="780" y="115" fill="#FBBF24" font-size="10" font-weight="600" text-anchor="middle">ACTIONS</text>
+                        
+                        <rect x="712" y="130" width="136" height="36" rx="5" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="780" y="146" fill="#FBBF24" font-size="9" text-anchor="middle">📟 Smart Notification</text>
+                        <text x="780" y="158" fill="#6a6a7a" font-size="7" text-anchor="middle">Right team, right channel</text>
+                        
+                        <rect x="712" y="174" width="136" height="36" rx="5" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="780" y="190" fill="#FBBF24" font-size="9" text-anchor="middle">🎫 Ticket Creation</text>
+                        <text x="780" y="202" fill="#6a6a7a" font-size="7" text-anchor="middle">JIRA, ServiceNow, PD</text>
+                        
+                        <rect x="712" y="218" width="136" height="36" rx="5" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                        <text x="780" y="234" fill="#34D399" font-size="9" text-anchor="middle">🔧 Auto-Remediation</text>
+                        <text x="780" y="246" fill="#6a6a7a" font-size="7" text-anchor="middle">Scale, restart, rollback</text>
+                        
+                        <!-- CONNECTING LINES -->
+                        <!-- Line 1: Data Sources (x:140) to ML Engine (x:200) - multiple entry points -->
+                        <path d="M140 98 Q170 98 170 130 Q170 180 200 180" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M140 142 L200 180" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M140 186 L200 180" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M140 230 L200 180" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M140 274 Q170 274 170 230 Q170 180 200 180" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        
+                        <!-- Line 2: ML Engine (x:440) to Intelligence (x:500) -->
+                        <path d="M440 127 L500 98" stroke="#8B5CF6" stroke-width="2" fill="none"/>
+                        <path d="M440 155 L500 142" stroke="#8B5CF6" stroke-width="2" fill="none"/>
+                        <path d="M440 190 L500 186" stroke="#8B5CF6" stroke-width="2" fill="none"/>
+                        <path d="M440 218 L500 230" stroke="#8B5CF6" stroke-width="2" fill="none"/>
+                        <path d="M440 248 L500 274" stroke="#8B5CF6" stroke-width="2" fill="none"/>
+                        
+                        <!-- Line 3: Intelligence (x:640) to Actions (x:700) -->
+                        <path d="M640 98 Q670 98 670 148 L700 148" stroke="#10B981" stroke-width="2" fill="none"/>
+                        <path d="M640 142 L700 148" stroke="#10B981" stroke-width="2" fill="none"/>
+                        <path d="M640 186 L700 192" stroke="#10B981" stroke-width="2" fill="none"/>
+                        <path d="M640 230 L700 236" stroke="#10B981" stroke-width="2" fill="none"/>
+                        <path d="M640 274 Q670 274 670 236 L700 236" stroke="#10B981" stroke-width="2" fill="none"/>
+                        
+                        <!-- Feedback loop -->
+                        <path d="M780 270 L780 380 L320 380 L320 300" stroke="#F59E0B" stroke-width="2" stroke-dasharray="8 4" fill="none"/>
+                        <text x="550" y="396" fill="#F59E0B" font-size="9" text-anchor="middle">Feedback loop: outcomes train models</text>
+                        
+                        <!-- ANIMATED DOTS on the paths -->
+                        <!-- Data to ML - multiple dots on different paths -->
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" path="M140,98 Q170,98 170,130 Q170,180 200,180"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1s" repeatCount="indefinite" begin="0.2s" path="M140,142 L200,180"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="0.8s" repeatCount="indefinite" begin="0.4s" path="M140,186 L200,180"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1s" repeatCount="indefinite" begin="0.6s" path="M140,230 L200,180"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.8s" path="M140,274 Q170,274 170,230 Q170,180 200,180"/>
+                        </circle>
+                        
+                        <!-- ML to Intelligence -->
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowViolet)">
+                            <animateMotion dur="0.8s" repeatCount="indefinite" path="M440,127 L500,98"/>
+                        </circle>
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowViolet)">
+                            <animateMotion dur="0.7s" repeatCount="indefinite" begin="0.15s" path="M440,155 L500,142"/>
+                        </circle>
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowViolet)">
+                            <animateMotion dur="0.6s" repeatCount="indefinite" begin="0.3s" path="M440,190 L500,186"/>
+                        </circle>
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowViolet)">
+                            <animateMotion dur="0.7s" repeatCount="indefinite" begin="0.45s" path="M440,218 L500,230"/>
+                        </circle>
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowViolet)">
+                            <animateMotion dur="0.8s" repeatCount="indefinite" begin="0.6s" path="M440,248 L500,274"/>
+                        </circle>
+                        
+                        <!-- Intelligence to Actions -->
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="1s" repeatCount="indefinite" path="M640,98 Q670,98 670,148 L700,148"/>
+                        </circle>
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="0.7s" repeatCount="indefinite" begin="0.2s" path="M640,142 L700,148"/>
+                        </circle>
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="0.6s" repeatCount="indefinite" begin="0.4s" path="M640,186 L700,192"/>
+                        </circle>
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="0.6s" repeatCount="indefinite" begin="0.6s" path="M640,230 L700,236"/>
+                        </circle>
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="1s" repeatCount="indefinite" begin="0.8s" path="M640,274 Q670,274 670,236 L700,236"/>
+                        </circle>
+                        
+                        <!-- Feedback loop dot -->
+                        <circle r="5" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="4s" repeatCount="indefinite" path="M780,270 L780,380 L320,380 L320,300"/>
+                        </circle>
+                        
+                        <!-- Labels -->
+                        <text x="170" y="175" fill="#3B82F6" font-size="8" font-weight="600">INGEST</text>
+                        <text x="470" y="175" fill="#8B5CF6" font-size="8" font-weight="600">PROCESS</text>
+                        <text x="670" y="175" fill="#10B981" font-size="8" font-weight="600">ACT</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CORE CAPABILITIES -->
+        <section class="module" id="capabilities">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Core AIOps Capabilities</h2>
+                    <p>What machine learning enables in IT operations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>AIOps isn't a single technology but a collection of ML-powered capabilities applied to operations data. Each capability solves a specific problem that traditional monitoring struggles with at scale: dynamic baselines adapt to changing patterns, correlation reduces alert fatigue, and prediction enables proactive response.</p>
+            </div>
+            
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <div class="capability-icon">📉</div>
+                    <div class="capability-title">Anomaly Detection</div>
+                    <div class="capability-desc">ML models learn normal behavior patterns and flag deviations. Unlike static thresholds, dynamic baselines adapt to time-of-day, day-of-week, seasonal patterns, and gradual drift.</div>
+                    <div class="capability-examples"><strong>Example:</strong> Detecting 15% latency increase that's abnormal for Tuesday 2pm, even though it's below your static 500ms threshold.</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🎯</div>
+                    <div class="capability-title">Alert Correlation</div>
+                    <div class="capability-desc">Groups related alerts into single incidents. Uses topology awareness, temporal proximity, and semantic similarity. Reduces hundreds of symptoms to one actionable incident.</div>
+                    <div class="capability-examples"><strong>Example:</strong> 147 alerts across 23 services → 1 incident: "Payment gateway timeout causing cascade."</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔍</div>
+                    <div class="capability-title">Root Cause Analysis</div>
+                    <div class="capability-desc">Identifies probable root cause by correlating incidents with changes (deployments, config updates, infrastructure events). Causal inference models rank likely causes.</div>
+                    <div class="capability-examples"><strong>Example:</strong> "Deploy of order-service v2.3.1 at 14:32 correlates with 94% of error spike."</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔮</div>
+                    <div class="capability-title">Predictive Analytics</div>
+                    <div class="capability-desc">Forecasts future issues before they occur. Time-series models predict resource exhaustion, capacity needs, and failure probability based on historical patterns.</div>
+                    <div class="capability-examples"><strong>Example:</strong> "Database disk will reach 95% in 6 hours at current growth rate."</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">📝</div>
+                    <div class="capability-title">Log Pattern Mining</div>
+                    <div class="capability-desc">NLP models cluster similar log messages, detect new error patterns, and extract structured data from unstructured logs. Reduces billions of logs to meaningful patterns.</div>
+                    <div class="capability-examples"><strong>Example:</strong> New log pattern detected: "Connection refused to redis-cluster-3" appearing 10,000x in last hour.</div>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">🔧</div>
+                    <div class="capability-title">Auto-Remediation</div>
+                    <div class="capability-desc">Triggers automated runbooks for known issues. When ML detects a pattern matching previous incidents, predefined remediation executes without human intervention.</div>
+                    <div class="capability-examples"><strong>Example:</strong> Memory pressure detected → Automatically scale pods from 5 to 8 replicas.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ANOMALY TYPES -->
+        <section class="module" id="anomalies">
+            <div class="module-header">
+                <div class="module-icon">📉</div>
+                <div class="module-info">
+                    <h2>Types of Anomalies</h2>
+                    <p>Understanding what ML models detect</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Not all anomalies are created equal. Point anomalies are single unusual values. Contextual anomalies are only abnormal in specific contexts. Collective anomalies are patterns that are unusual as a group. Understanding these distinctions helps tune detection sensitivity and reduce false positives.</p>
+            </div>
+            
+            <div class="anomaly-types">
+                <div class="anomaly-card">
+                    <div class="anomaly-header">
+                        <div class="anomaly-icon">📍</div>
+                        <div class="anomaly-title">Point Anomaly</div>
+                    </div>
+                    <div class="anomaly-body">
+                        <div class="anomaly-desc">A single data point that is significantly different from the rest of the data. The simplest type to detect—value falls outside expected range regardless of context. Example: CPU suddenly at 100% when historical range is 20-60%.</div>
+                        <div class="anomaly-detection">Detection: <code>|value - mean| > k * std_dev</code> or isolation forest scoring</div>
+                    </div>
+                </div>
+                <div class="anomaly-card">
+                    <div class="anomaly-header">
+                        <div class="anomaly-icon">🕐</div>
+                        <div class="anomaly-title">Contextual Anomaly</div>
+                    </div>
+                    <div class="anomaly-body">
+                        <div class="anomaly-desc">Value is only anomalous in a specific context. 10,000 requests/second is normal during peak hours but anomalous at 3am. Requires time-aware baselines that understand daily, weekly, and seasonal patterns.</div>
+                        <div class="anomaly-detection">Detection: Seasonal decomposition + Prophet/ARIMA forecasting with confidence intervals</div>
+                    </div>
+                </div>
+                <div class="anomaly-card">
+                    <div class="anomaly-header">
+                        <div class="anomaly-icon">📊</div>
+                        <div class="anomaly-title">Collective Anomaly</div>
+                    </div>
+                    <div class="anomaly-body">
+                        <div class="anomaly-desc">A sequence of data points that together constitute an anomaly, even if individual points are normal. Example: gradual 2% increase per hour over 12 hours that's invisible point-by-point but significant cumulatively.</div>
+                        <div class="anomaly-detection">Detection: Change point detection, sliding window analysis, CUSUM algorithms</div>
+                    </div>
+                </div>
+                <div class="anomaly-card">
+                    <div class="anomaly-header">
+                        <div class="anomaly-icon">🔗</div>
+                        <div class="anomaly-title">Multivariate Anomaly</div>
+                    </div>
+                    <div class="anomaly-body">
+                        <div class="anomaly-desc">Anomaly detected by analyzing relationships between multiple metrics. Individual metrics look normal but their combination is unusual. Example: high CPU with low request rate suggests inefficient processing.</div>
+                        <div class="anomaly-detection">Detection: PCA dimensionality reduction, autoencoders, multivariate time series models</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ML TECHNIQUES -->
+        <section class="module" id="ml">
+            <div class="module-header">
+                <div class="module-icon">🧠</div>
+                <div class="module-info">
+                    <h2>ML Techniques in AIOps</h2>
+                    <p>The algorithms powering intelligent operations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>AIOps platforms use a variety of machine learning techniques depending on the problem. Time-series forecasting for prediction, clustering for alert grouping, NLP for log analysis, and graph algorithms for topology-aware correlation. Understanding these techniques helps evaluate platform capabilities.</p>
+            </div>
+            
+            <div class="ml-techniques">
+                <div class="ml-card">
+                    <div class="ml-name">Isolation Forest</div>
+                    <div class="ml-desc">Unsupervised anomaly detection. Isolates anomalies by random partitioning—anomalies require fewer splits to isolate.</div>
+                    <div class="ml-use">Point anomaly detection in metrics</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">Prophet / ARIMA</div>
+                    <div class="ml-desc">Time-series forecasting with seasonality. Predicts expected values accounting for trends, weekly patterns, holidays.</div>
+                    <div class="ml-use">Dynamic baselines, capacity forecasting</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">DBSCAN Clustering</div>
+                    <div class="ml-desc">Density-based clustering that groups points in high-density regions. Doesn't require specifying number of clusters.</div>
+                    <div class="ml-use">Alert correlation, log pattern grouping</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">Autoencoders</div>
+                    <div class="ml-desc">Neural networks trained to reconstruct input. High reconstruction error indicates anomaly—input doesn't match learned patterns.</div>
+                    <div class="ml-use">Multivariate anomaly detection</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">Graph Neural Networks</div>
+                    <div class="ml-desc">Learn patterns over graph-structured data. Understand how issues propagate through service dependencies.</div>
+                    <div class="ml-use">Topology-aware RCA, blast radius</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">LLMs / Transformers</div>
+                    <div class="ml-desc">Large language models for log analysis, incident summarization, and natural language interfaces to observability data.</div>
+                    <div class="ml-use">Log pattern extraction, incident reports</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">Hidden Markov Models</div>
+                    <div class="ml-desc">Probabilistic models for sequences. Detect when system transitions to abnormal states based on observation sequences.</div>
+                    <div class="ml-use">State change detection, failure modes</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">Causal Inference</div>
+                    <div class="ml-desc">Statistical methods to infer cause-effect relationships from observational data, beyond mere correlation.</div>
+                    <div class="ml-use">Root cause ranking, change impact</div>
+                </div>
+                <div class="ml-card">
+                    <div class="ml-name">Reinforcement Learning</div>
+                    <div class="ml-desc">Learns optimal actions through trial and error. Improves remediation decisions based on outcomes.</div>
+                    <div class="ml-use">Auto-remediation optimization</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MATURITY MODEL -->
+        <section class="module" id="maturity">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>AIOps Maturity Model</h2>
+                    <p>The journey from reactive to autonomous operations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Most organizations don't jump straight to autonomous operations. The journey progresses through stages: from basic monitoring, to ML-assisted detection, to automated correlation, to predictive capabilities, and finally to self-healing systems. Each stage builds on the previous, requiring both technology and organizational readiness.</p>
+            </div>
+            
+            <div class="maturity-container">
+                <div class="maturity-header">
+                    <div class="maturity-title">AIOps Maturity Levels</div>
+                </div>
+                <div class="maturity-levels">
+                    <div class="maturity-level">
+                        <div class="maturity-num">1</div>
+                        <div class="maturity-name">Reactive</div>
+                        <div class="maturity-desc">Static thresholds. Manual investigation. Alert storms. MTTR measured in hours. Fire-fighting mode.</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="maturity-num">2</div>
+                        <div class="maturity-name">Proactive</div>
+                        <div class="maturity-desc">Dynamic baselines. Anomaly detection. Reduced false positives. Some alert correlation. MTTR in minutes.</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="maturity-num">3</div>
+                        <div class="maturity-name">Predictive</div>
+                        <div class="maturity-desc">Failure forecasting. Capacity prediction. Automated RCA. Correlated incidents. Proactive capacity scaling.</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="maturity-num">4</div>
+                        <div class="maturity-name">Automated</div>
+                        <div class="maturity-desc">Runbook automation. Auto-remediation for known issues. Self-service for common tasks. Human-in-loop for unknowns.</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="maturity-num">5</div>
+                        <div class="maturity-name">Autonomous</div>
+                        <div class="maturity-desc">Self-healing systems. ML-driven decisions. Continuous optimization. Humans handle only novel situations.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>AIOps Platforms</h2>
+                    <p>Leading solutions for intelligent operations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>AIOps platforms range from standalone point solutions to comprehensive suites integrated with observability stacks. Some focus on specific capabilities like anomaly detection or log analytics; others provide end-to-end AIOps with auto-remediation. Consider whether you need a best-of-breed approach or a unified platform.</p>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #1BA8F1, #0288D1);">Dy</div>
+                        <div class="tool-info">
+                            <h4>Dynatrace Davis AI</h4>
+                            <div class="tool-type">Enterprise • Full Platform</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Causation-based AI engine. Automatic root cause analysis across full stack. Topology-aware correlation. Problem detection without configuration. Industry leader for enterprise AIOps.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Automatic RCA</span>
+                            <span class="tool-feature">Smartscape Topology</span>
+                            <span class="tool-feature">Davis Score</span>
+                            <span class="tool-feature">Auto-Remediation</span>
+                            <span class="tool-feature">Hypermodal AI</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">Dd</div>
+                        <div class="tool-info">
+                            <h4>Datadog Watchdog</h4>
+                            <div class="tool-type">SaaS • Integrated AIOps</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">ML-powered anomaly detection across all Datadog data. Automatic root cause analysis linking APM, logs, and infrastructure. Watchdog Insights surface issues proactively.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Watchdog Alerts</span>
+                            <span class="tool-feature">RCA Insights</span>
+                            <span class="tool-feature">Anomaly Detection</span>
+                            <span class="tool-feature">Forecast Monitors</span>
+                            <span class="tool-feature">Log Patterns</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #00CEC9, #00BFA5);">NR</div>
+                        <div class="tool-info">
+                            <h4>New Relic AI</h4>
+                            <div class="tool-type">SaaS • Full Stack</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Applied Intelligence for alert correlation and incident management. Proactive detection with anomaly NRQL queries. Errors Inbox groups errors intelligently. New NRAI natural language interface.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Applied Intelligence</span>
+                            <span class="tool-feature">Incident Intelligence</span>
+                            <span class="tool-feature">NRAI Chat</span>
+                            <span class="tool-feature">Anomaly Detection</span>
+                            <span class="tool-feature">Errors Inbox</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #6366F1, #4F46E5);">Sp</div>
+                        <div class="tool-info">
+                            <h4>Splunk IT Service Intelligence</h4>
+                            <div class="tool-type">Enterprise • ITSI</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Service-centric AIOps with ML-powered event analytics. Predictive analytics for IT services. Episode reviews correlate events. Deep integration with Splunk platform for log-based AI.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Service Analyzer</span>
+                            <span class="tool-feature">Episode Review</span>
+                            <span class="tool-feature">Predictive Analytics</span>
+                            <span class="tool-feature">Adaptive Thresholds</span>
+                            <span class="tool-feature">Glass Tables</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #000000, #333333);">MQ</div>
+                        <div class="tool-info">
+                            <h4>Moogsoft</h4>
+                            <div class="tool-type">Standalone AIOps</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Purpose-built AIOps platform. Situation correlation using patented algorithms. Integrates with existing monitoring stack. Strong focus on noise reduction and alert correlation.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Situation Room</span>
+                            <span class="tool-feature">Alert Clustering</span>
+                            <span class="tool-feature">Probable Root Cause</span>
+                            <span class="tool-feature">Workflow Automation</span>
+                            <span class="tool-feature">Integrations Hub</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #059669, #10B981);">BM</div>
+                        <div class="tool-info">
+                            <h4>BigPanda</h4>
+                            <div class="tool-type">Event Correlation</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Event correlation and automation platform. Open Integration Hub connects 150+ tools. Change correlation links incidents to deployments. Strong ServiceNow and PagerDuty integration.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Open Box ML</span>
+                            <span class="tool-feature">Unified Console</span>
+                            <span class="tool-feature">Change Intelligence</span>
+                            <span class="tool-feature">Auto-Share</span>
+                            <span class="tool-feature">ServiceNow Sync</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #E11D48, #F43F5E);">PD</div>
+                        <div class="tool-info">
+                            <h4>PagerDuty AIOps</h4>
+                            <div class="tool-type">Incident Management</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">AIOps integrated into incident management workflow. Event Intelligence reduces noise. Past Incidents surface similar issues. Runbook automation for remediation.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Event Intelligence</span>
+                            <span class="tool-feature">Past Incidents</span>
+                            <span class="tool-feature">Intelligent Triage</span>
+                            <span class="tool-feature">Runbook Automation</span>
+                            <span class="tool-feature">Auto-Pause</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #FF6B6B, #EE5A5A);">OC</div>
+                        <div class="tool-info">
+                            <h4>OpsClarity (Lightbend)</h4>
+                            <div class="tool-type">Open Source Focused</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Intelligent monitoring for microservices. Deep Akka and reactive systems support. Automatic discovery and topology mapping. Good for cloud-native JVM workloads.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Auto Discovery</span>
+                            <span class="tool-feature">Akka Support</span>
+                            <span class="tool-feature">Health Rules</span>
+                            <span class="tool-feature">Anomaly Detection</span>
+                            <span class="tool-feature">Topology Maps</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #5865F2, #7289DA);">El</div>
+                        <div class="tool-info">
+                            <h4>Elastic ML</h4>
+                            <div class="tool-type">Open Source • ELK Stack</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Unsupervised ML built into Elastic Stack. Anomaly detection on any indexed data. Log categorization groups similar messages. Good for organizations with existing ELK investment.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Anomaly Detection Jobs</span>
+                            <span class="tool-feature">Log Categorization</span>
+                            <span class="tool-feature">Data Frame Analytics</span>
+                            <span class="tool-feature">Inference API</span>
+                            <span class="tool-feature">Alerting Integration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AUTO-REMEDIATION -->
+        <section class="module" id="remediation">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Auto-Remediation Patterns</h2>
+                    <p>Common automated responses to detected issues</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Auto-remediation executes predefined runbooks when specific conditions are detected. Start with low-risk, high-confidence scenarios: restarting pods, scaling horizontally, clearing caches. As confidence grows, expand to more complex remediations. Always maintain human oversight for critical systems and novel situations.</p>
+            </div>
+            
+            <div class="remediation-grid">
+                <div class="remediation-card">
+                    <div class="remediation-header">
+                        <div class="remediation-icon">📈</div>
+                        <div class="remediation-info">
+                            <h4>Horizontal Pod Autoscaling</h4>
+                            <span>Kubernetes • Low Risk</span>
+                        </div>
+                    </div>
+                    <div class="remediation-body">
+                        <div class="remediation-trigger"><strong>Trigger:</strong> CPU > 80% for 5 minutes OR request latency P99 > SLO threshold</div>
+                        <ul class="remediation-actions">
+                            <li>Increase replica count by 50% (max 3x current)</li>
+                            <li>Wait for pods to become ready</li>
+                            <li>Verify latency returns to normal</li>
+                            <li>Scale down after 15 minutes of low utilization</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="remediation-card">
+                    <div class="remediation-header">
+                        <div class="remediation-icon">🔄</div>
+                        <div class="remediation-info">
+                            <h4>Pod Restart on OOMKilled</h4>
+                            <span>Kubernetes • Low Risk</span>
+                        </div>
+                    </div>
+                    <div class="remediation-body">
+                        <div class="remediation-trigger"><strong>Trigger:</strong> Pod terminated with OOMKilled reason OR memory > 95% sustained</div>
+                        <ul class="remediation-actions">
+                            <li>Capture heap dump if configured</li>
+                            <li>Delete pod to trigger restart</li>
+                            <li>If 3+ restarts in 30 minutes, alert human</li>
+                            <li>Open ticket for memory leak investigation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="remediation-card">
+                    <div class="remediation-header">
+                        <div class="remediation-icon">🗑️</div>
+                        <div class="remediation-info">
+                            <h4>Disk Space Cleanup</h4>
+                            <span>Infrastructure • Medium Risk</span>
+                        </div>
+                    </div>
+                    <div class="remediation-body">
+                        <div class="remediation-trigger"><strong>Trigger:</strong> Disk usage > 85% OR predicted to reach 95% in 4 hours</div>
+                        <ul class="remediation-actions">
+                            <li>Clear /tmp files older than 24 hours</li>
+                            <li>Rotate and compress logs older than 7 days</li>
+                            <li>Clear apt/yum cache</li>
+                            <li>If still > 90%, page on-call for manual review</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="remediation-card">
+                    <div class="remediation-header">
+                        <div class="remediation-icon">🔙</div>
+                        <div class="remediation-info">
+                            <h4>Deployment Rollback</h4>
+                            <span>CI/CD • Higher Risk</span>
+                        </div>
+                    </div>
+                    <div class="remediation-body">
+                        <div class="remediation-trigger"><strong>Trigger:</strong> Error rate > 5% within 10 minutes of deployment OR P99 latency 2x baseline</div>
+                        <ul class="remediation-actions">
+                            <li>Pause any ongoing rollout</li>
+                            <li>Rollback to previous known-good version</li>
+                            <li>Notify deployment author via Slack</li>
+                            <li>Create incident ticket with error samples</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="remediation-card">
+                    <div class="remediation-header">
+                        <div class="remediation-icon">🔌</div>
+                        <div class="remediation-info">
+                            <h4>Circuit Breaker Activation</h4>
+                            <span>Application • Medium Risk</span>
+                        </div>
+                    </div>
+                    <div class="remediation-body">
+                        <div class="remediation-trigger"><strong>Trigger:</strong> Downstream service error rate > 50% OR timeout rate > 30%</div>
+                        <ul class="remediation-actions">
+                            <li>Open circuit breaker to failing dependency</li>
+                            <li>Return cached/fallback response if available</li>
+                            <li>Alert dependent service owners</li>
+                            <li>Attempt half-open probe every 30 seconds</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="remediation-card">
+                    <div class="remediation-header">
+                        <div class="remediation-icon">🌐</div>
+                        <div class="remediation-info">
+                            <h4>DNS Failover</h4>
+                            <span>Infrastructure • Higher Risk</span>
+                        </div>
+                    </div>
+                    <div class="remediation-body">
+                        <div class="remediation-trigger"><strong>Trigger:</strong> Primary region health check failures > 3 consecutive OR availability < 99%</div>
+                        <ul class="remediation-actions">
+                            <li>Update Route53/CloudFlare weights</li>
+                            <li>Shift traffic to secondary region</li>
+                            <li>Verify secondary region health</li>
+                            <li>Page SRE team for primary investigation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Implementing AIOps effectively</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Start with Data Quality</h4>
+                        <p>ML is only as good as input data. Ensure consistent metric collection, structured logging, and accurate topology mapping before enabling AIOps features. Garbage in, garbage out.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Begin with Detection, Not Action</h4>
+                        <p>Start with anomaly detection and correlation before auto-remediation. Build trust in ML accuracy. Review false positives and negatives. Add automation gradually.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Provide Feedback Loops</h4>
+                        <p>Mark alerts as true/false positives. Close incidents with root cause tags. This feedback trains models and improves accuracy over time. Invest in labeling during early adoption.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Integrate with Change Management</h4>
+                        <p>Feed deployment events, config changes, and infrastructure updates into AIOps. Change correlation is the key to fast RCA. No change data = limited root cause insight.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Define Clear Escalation Paths</h4>
+                        <p>Automation should know when to stop. Define thresholds for human escalation: repeated failures, unknown scenarios, critical systems. Keep humans in the loop for novel situations.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Start with Low-Risk Remediations</h4>
+                        <p>Begin auto-remediation with reversible, low-impact actions: horizontal scaling, cache clearing, pod restarts. Build confidence before enabling rollbacks or failovers.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Measure AIOps Effectiveness</h4>
+                        <p>Track metrics: alert noise reduction %, MTTD improvement, MTTR improvement, false positive rate, auto-remediation success rate. Demonstrate ROI to justify investment.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Maintain Model Transparency</h4>
+                        <p>Understand why models flag anomalies. Black-box ML erodes trust. Choose platforms that explain decisions. Engineers need to understand and validate AI recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ANTI-PATTERNS -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">🚫</div>
+                <div class="module-info">
+                    <h2>Anti-Patterns to Avoid</h2>
+                    <p>Common AIOps implementation mistakes</p>
+                </div>
+            </div>
+            
+            <div class="antipatterns-grid">
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🎯</span>
+                        <span class="antipattern-title">Over-Trusting AI Recommendations</span>
+                    </div>
+                    <div class="antipattern-desc">Blindly accepting ML outputs without validation. Models can be wrong, especially for novel situations. Auto-remediation without guardrails causes cascading failures.</div>
+                    <div class="antipattern-fix">Maintain human oversight. Set confidence thresholds. Require approval for high-risk actions. Review model decisions regularly.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📊</span>
+                        <span class="antipattern-title">Insufficient Training Data</span>
+                    </div>
+                    <div class="antipattern-desc">Enabling ML features before collecting enough historical data. Models need weeks or months of data to learn normal patterns. Premature deployment = high false positive rate.</div>
+                    <div class="antipattern-fix">Collect baseline data for 2-4 weeks minimum. Start in detection-only mode. Tune sensitivity based on observed accuracy.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔄</span>
+                        <span class="antipattern-title">Ignoring Feedback Loops</span>
+                    </div>
+                    <div class="antipattern-desc">Not labeling alerts as true/false positives. Not tagging incident root causes. Without feedback, models can't improve. Accuracy stagnates or degrades over time.</div>
+                    <div class="antipattern-fix">Build feedback into incident workflow. Require root cause selection on incident close. Review and label anomaly alerts weekly.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🏝️</span>
+                        <span class="antipattern-title">Siloed AIOps Deployment</span>
+                    </div>
+                    <div class="antipattern-desc">AIOps platform disconnected from observability stack. Duplicate data collection. Missing context. Correlation limited to subset of signals.</div>
+                    <div class="antipattern-fix">Integrate AIOps with existing metrics, logs, traces. Feed change events. Connect to incident management. Unified data → better correlation.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">⚡</span>
+                        <span class="antipattern-title">Automating Everything Too Fast</span>
+                    </div>
+                    <div class="antipattern-desc">Rushing to Level 5 maturity. Auto-remediating complex scenarios without proven accuracy. One bad automated rollback can cause major outages.</div>
+                    <div class="antipattern-fix">Progress through maturity levels sequentially. Prove each capability before expanding. Maintain kill switches for all automation.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📉</span>
+                        <span class="antipattern-title">Alert Fatigue from ML Alerts</span>
+                    </div>
+                    <div class="antipattern-desc">ML detects every statistical deviation. Too many low-severity anomaly alerts. Teams start ignoring ML insights. Worse than the original alert storm.</div>
+                    <div class="antipattern-fix">Tune sensitivity aggressively. Focus on actionable anomalies. Suppress noisy patterns. Quality over quantity of detections.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered intelligent operations</p>
+                </div>
+            </div>
+            
+            <div class="section-intro">
+                <p>The AIOpsEngineer agent automates the complex task of <strong>intelligent operations design and ML-powered monitoring</strong> by analyzing your observability stack, identifying noise reduction opportunities, and designing correlation rules that group related alerts into actionable incidents. It continuously evaluates anomaly detection accuracy and tunes sensitivity thresholds.</p>
+                <p>The agent integrates with major AIOps platforms to analyze alert patterns, builds topology-aware correlation graphs, and uses causal inference to identify probable root causes. It provides <strong>maturity assessments</strong> for your AIOps journey and designs auto-remediation workflows with appropriate guardrails and escalation paths.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🧠</div>
+                    <div class="agent-name">AIOpsEngineer</div>
+                    <div class="agent-role">Intelligent Operations & ML</div>
+                    <p class="agent-desc">Designs anomaly detection baselines, creates alert correlation rules, and builds auto-remediation workflows. Evaluates ML models for time-series forecasting and provides ROI analysis for AIOps investments. Integrates with Datadog, Dynatrace, Moogsoft, and PagerDuty for platform-specific configuration.</p>
+                    <ul class="agent-capabilities">
+                        <li>Anomaly detection configuration</li>
+                        <li>Alert correlation rule design</li>
+                        <li>Auto-remediation workflows</li>
+                        <li>ML model selection guidance</li>
+                        <li>Maturity assessment & roadmap</li>
+                        <li>Integration architecture</li>
+                        <li>ROI & KPI measurement</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">aiops_engineer_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># AIOps Engineering Automation Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Tool
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Anomaly detection tuner tool</span>
+anomaly_tuner = Tool(
+    name=<span class="code-string">"anomaly_tuner"</span>,
+    description=<span class="code-string">"""Analyzes metric patterns to
+    configure dynamic baselines and tune
+    detection sensitivity thresholds"""</span>,
+    func=tune_anomaly_detection
+)
+
+<span class="code-comment"># Correlation rule designer tool</span>
+correlation_designer = Tool(
+    name=<span class="code-string">"correlation_designer"</span>,
+    description=<span class="code-string">"""Creates topology-aware rules
+    to group related alerts into single
+    actionable incidents"""</span>,
+    func=design_correlation_rules
+)
+
+<span class="code-comment"># Remediation workflow builder</span>
+remediation_builder = Tool(
+    name=<span class="code-string">"remediation_builder"</span>,
+    description=<span class="code-string">"""Designs auto-remediation with
+    guardrails, rollback procedures, and
+    human escalation triggers"""</span>,
+    func=build_remediation_workflow
+)
+
+<span class="code-comment"># Maturity assessor tool</span>
+maturity_assessor = Tool(
+    name=<span class="code-string">"maturity_assessor"</span>,
+    description=<span class="code-string">"""Evaluates AIOps maturity level
+    and provides roadmap to advance from
+    reactive to autonomous operations"""</span>,
+    func=assess_maturity
+)
+
+aiops_engineer_agent = Agent(
+    role=<span class="code-string">"AIOps Strategy Engineer"</span>,
+    goal=<span class="code-string">"""Design intelligent automation for
+    IT operations using ML techniques"""</span>,
+    backstory=<span class="code-string">"""Expert in ML-powered operations
+    with experience implementing AIOps at
+    scale across enterprise environments."""</span>,
+    llm=llm,
+    tools=[anomaly_tuner, correlation_designer,
+           remediation_builder, maturity_assessor],
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RELATED -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring observability</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat16-p4-alerting-incidents.html" class="related-card">
+                    <div class="related-num">16.4</div>
+                    <div class="related-title">Alerting & Incident Management</div>
+                    <div class="related-desc">SLO-based alerting, on-call, and incident workflows</div>
+                </a>
+                <a href="cat16-p5-apm.html" class="related-card">
+                    <div class="related-num">16.5</div>
+                    <div class="related-title">Application Performance Monitoring</div>
+                    <div class="related-desc">Deep application visibility with traces and profiling</div>
+                </a>
+                <a href="cat16-p1-metrics-monitoring.html" class="related-card">
+                    <div class="related-num">16.1</div>
+                    <div class="related-title">Metrics & Monitoring</div>
+                    <div class="related-desc">Prometheus, Grafana, and time series fundamentals</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat16-p5-apm.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">16.5 APM</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 16.6</div>
+        <a href="cat16-monitoring-observability-overview.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

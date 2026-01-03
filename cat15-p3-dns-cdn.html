@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS & CDN | Networking | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #06B6D4;
+            --page-light: #22D3EE;
+            --page-glow: rgba(6, 182, 212, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+        .overview-content ul { margin-left: 20px; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .overview-content strong { color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DNS RESOLUTION DIAGRAM - ANIMATED QUERY PATH
+        ═══════════════════════════════════════════════════════════════ */
+        .dns-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .dns-diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .dns-diagram-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .dns-diagram-badge { font-size: 11px; padding: 4px 10px; background: var(--page-glow); color: var(--page-light); border-radius: 9999px; border: 1px solid var(--page-primary); }
+        
+        .dns-visual { position: relative; height: 320px; margin: 16px 0; }
+        .dns-svg { width: 100%; height: 100%; }
+        
+        .dns-svg .server-circle { fill: var(--bg-card); stroke: var(--border-color); stroke-width: 2; }
+        .dns-svg .server-circle.active { stroke: var(--page-primary); fill: var(--page-glow); }
+        .dns-svg .server-icon { font-size: 24px; text-anchor: middle; dominant-baseline: middle; }
+        .dns-svg .server-label { fill: var(--text-primary); font-size: 11px; font-weight: 600; text-anchor: middle; }
+        .dns-svg .server-detail { fill: var(--text-muted); font-size: 9px; text-anchor: middle; }
+        .dns-svg .server-num { fill: var(--page-light); font-size: 10px; font-weight: 700; text-anchor: middle; }
+        
+        .dns-svg .query-path { fill: none; stroke: var(--page-primary); stroke-width: 2; stroke-dasharray: 6 3; opacity: 0.5; }
+        .dns-svg .response-path { fill: none; stroke: var(--green); stroke-width: 2; stroke-dasharray: 6 3; opacity: 0.5; }
+        
+        .dns-svg .query-dot { fill: var(--page-light); filter: drop-shadow(0 0 4px var(--page-primary)); }
+        .dns-svg .response-dot { fill: var(--green); filter: drop-shadow(0 0 4px var(--green)); }
+        
+        .dns-svg .step-badge { fill: var(--page-glow); stroke: var(--page-primary); stroke-width: 1; }
+        
+        .dns-query-box { position: absolute; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--page-primary); border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--page-light); white-space: nowrap; }
+        .dns-query-box.question { top: 50px; left: 50%; transform: translateX(-50%); }
+        .dns-query-box.answer { bottom: 30px; left: 50%; transform: translateX(-50%); border-color: var(--green); color: var(--green); }
+        
+        .dns-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .dns-stat { text-align: center; padding: 10px; background: var(--bg-card); border-radius: 8px; }
+        .dns-stat-value { font-size: 16px; font-weight: 700; color: var(--page-light); }
+        .dns-stat-label { font-size: 10px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CDN EDGE NETWORK - WORLD MAP VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .cdn-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; position: relative; overflow: hidden; }
+        .cdn-diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cdn-diagram-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .cdn-legend { display: flex; gap: 16px; }
+        .cdn-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .cdn-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .cdn-legend-dot.edge { background: var(--page-primary); box-shadow: 0 0 8px var(--page-primary); }
+        .cdn-legend-dot.origin { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        
+        .cdn-map-container { position: relative; width: 100%; padding-bottom: 50%; background: linear-gradient(180deg, rgba(6, 182, 212, 0.03) 0%, transparent 100%); border-radius: 8px; overflow: hidden; }
+        .cdn-map-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .cdn-map-svg .continent { fill: rgba(42, 42, 62, 0.8); stroke: rgba(6, 182, 212, 0.3); stroke-width: 0.5; }
+        .cdn-map-svg .grid-line { stroke: rgba(6, 182, 212, 0.1); stroke-width: 0.5; }
+        
+        .cdn-map-svg .edge-pop { fill: var(--page-primary); filter: drop-shadow(0 0 4px var(--page-primary)); }
+        .cdn-map-svg .edge-pop-pulse { fill: var(--page-primary); opacity: 0; animation: pop-pulse 2s ease-out infinite; }
+        @keyframes pop-pulse { 0% { opacity: 0.6; r: 4; } 100% { opacity: 0; r: 16; } }
+        
+        .cdn-map-svg .origin-server { fill: var(--green); filter: drop-shadow(0 0 6px var(--green)); }
+        .cdn-map-svg .origin-pulse { fill: var(--green); opacity: 0; animation: origin-pulse 2s ease-out infinite; }
+        @keyframes origin-pulse { 0% { opacity: 0.6; r: 6; } 100% { opacity: 0; r: 24; } }
+        
+        .cdn-map-svg .connection-line { stroke: var(--page-primary); stroke-width: 1; opacity: 0.3; stroke-dasharray: 4 2; }
+        .cdn-map-svg .data-packet { fill: var(--page-light); }
+        
+        .cdn-map-svg .pop-label { font-size: 8px; fill: var(--text-secondary); text-anchor: middle; pointer-events: none; }
+        
+        .cdn-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .cdn-stat { text-align: center; padding: 12px; background: var(--bg-card); border-radius: 8px; }
+        .cdn-stat-value { font-size: 20px; font-weight: 700; color: var(--page-light); }
+        .cdn-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RECORD TYPE CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .record-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .record-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; transition: all 0.2s; }
+        .record-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .record-type { font-size: 18px; font-weight: 700; color: var(--page-light); margin-bottom: 6px; font-family: monospace; }
+        .record-name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .record-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .record-example { font-size: 10px; font-family: monospace; padding: 6px 8px; background: var(--bg-card); border-radius: 4px; color: var(--text-muted); word-break: break-all; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ROUTING POLICIES
+        ═══════════════════════════════════════════════════════════════ */
+        .routing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .routing-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; transition: all 0.2s; }
+        .routing-card:hover { border-color: var(--page-primary); }
+        .routing-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .routing-icon { width: 40px; height: 40px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .routing-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .routing-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .routing-use { font-size: 11px; color: var(--text-muted); padding: 8px 10px; background: var(--bg-card); border-radius: 6px; }
+        .routing-use strong { color: var(--page-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CDN FEATURES GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .feature-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .feature-card:hover { border-color: var(--page-primary); }
+        .feature-icon { font-size: 24px; margin-bottom: 10px; }
+        .feature-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .feature-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PROVIDER COMPARISON TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .compare-table th { text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { color: var(--text-muted); }
+        .compare-table th.aws { color: var(--aws-orange); }
+        .compare-table th.azure { color: var(--azure-blue); }
+        .compare-table th.gcp { color: var(--gcp-blue); }
+        .compare-table th.cf { color: #F6821F; }
+        .compare-table td { padding: 12px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .compare-table .feature { font-weight: 500; color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CACHING STRATEGIES
+        ═══════════════════════════════════════════════════════════════ */
+        .cache-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .cache-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; }
+        .cache-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .cache-icon { width: 36px; height: 36px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .cache-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .cache-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .cache-code { font-size: 11px; font-family: monospace; padding: 10px 12px; background: var(--bg-card); border-radius: 6px; color: var(--text-muted); overflow-x: auto; }
+        .cache-code .key { color: var(--page-light); }
+        .cache-code .value { color: var(--green); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PERFORMANCE METRICS
+        ═══════════════════════════════════════════════════════════════ */
+        .perf-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+        .perf-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .perf-value { font-size: 24px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; }
+        .perf-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+        .perf-bar { height: 4px; background: var(--bg-card); border-radius: 2px; overflow: hidden; }
+        .perf-fill { height: 100%; background: linear-gradient(90deg, var(--page-primary), var(--page-light)); border-radius: 2px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 18px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .practice-card:hover { border-color: var(--page-primary); }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RELATED PAGES
+        ═══════════════════════════════════════════════════════════════ */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-content { grid-template-columns: 1fr; }
+            .record-grid { grid-template-columns: repeat(2, 1fr); }
+            .routing-grid { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .cache-grid { grid-template-columns: 1fr; }
+            .perf-grid { grid-template-columns: repeat(3, 1fr); }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: 1fr; }
+            .cdn-world { grid-template-columns: 1fr; }
+            .dns-flow { justify-content: center; }
+            .cdn-map-container { padding-bottom: 60%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat15-networking-overview.html">Networking</a>
+        <span class="sep">/</span>
+        <span class="current">DNS & CDN</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🌐 Category 15</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat15-networking-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat15-p1-network-architecture.html"><span class="nav-icon">🏗️</span> 15.1 Network Architecture</a></li>
+            <li><a href="cat15-p2-load-balancing.html"><span class="nav-icon">⚖️</span> 15.2 Load Balancing</a></li>
+            <li><a href="cat15-p3-dns-cdn.html" class="active"><span class="nav-icon">🌍</span> 15.3 DNS & CDN</a></li>
+            <li><a href="cat15-p4-vpn-connectivity.html"><span class="nav-icon">🔒</span> 15.4 VPN & Connectivity</a></li>
+            <li><a href="cat15-p5-network-security.html"><span class="nav-icon">🛡️</span> 15.5 Network Security</a></li>
+            <li><a href="cat15-p6-service-mesh.html"><span class="nav-icon">🕸️</span> 15.6 Service Mesh</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#dns-resolution"><span class="nav-icon">🔍</span> DNS Resolution</a></li>
+            <li><a href="#record-types"><span class="nav-icon">📝</span> Record Types</a></li>
+            <li><a href="#routing-policies"><span class="nav-icon">🔀</span> Routing Policies</a></li>
+            <li><a href="#cdn-edge"><span class="nav-icon">🌐</span> CDN Edge Network</a></li>
+            <li><a href="#cdn-features"><span class="nav-icon">⚡</span> CDN Features</a></li>
+            <li><a href="#caching"><span class="nav-icon">💾</span> Caching Strategies</a></li>
+            <li><a href="#cloud-compare"><span class="nav-icon">☁️</span> Provider Comparison</a></li>
+            <li><a href="#performance"><span class="nav-icon">📊</span> Performance</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🌍 Page 15.3</div>
+                <h1>DNS & CDN</h1>
+                <p>Global traffic routing with DNS and content delivery at the edge. Reduce latency, improve availability, and scale globally with intelligent name resolution and caching strategies.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;50ms</div>
+                    <div class="hero-metric-label">DNS Lookup</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">300+</div>
+                    <div class="hero-metric-label">Edge POPs</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">99.99%</div>
+                    <div class="hero-metric-label">Availability</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">~70%</div>
+                    <div class="hero-metric-label">Origin Offload</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Understanding DNS and content delivery networks</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is DNS?</h3>
+                    <p>The Domain Name System (DNS) translates human-readable domain names (example.com) into IP addresses (93.184.216.34) that computers use to route traffic. It's the internet's phonebook—critical infrastructure that every request depends on.</p>
+                    <p>Modern DNS does more than simple lookups: <strong>geographic routing</strong> sends users to nearby servers, <strong>health checks</strong> route around failures, and <strong>weighted policies</strong> enable gradual deployments and A/B testing.</p>
+                </div>
+                <div>
+                    <h3>What is a CDN?</h3>
+                    <p>A Content Delivery Network (CDN) caches and serves content from edge locations close to users. Instead of every request traveling to your origin server, static assets (images, CSS, JS) are served from the nearest edge point of presence (POP).</p>
+                    <p>Benefits include: <strong>lower latency</strong> (content served closer to users), <strong>reduced origin load</strong> (70%+ requests served from cache), <strong>DDoS protection</strong> (attacks absorbed at edge), and <strong>global scale</strong> without infrastructure in every region.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>How DNS and CDN Work Together</h3>
+                    <p>DNS and CDN are complementary technologies that work together for optimal content delivery. When a user requests your site, DNS resolves your domain to the nearest CDN edge location using anycast or geographic routing. The edge POP then serves cached content directly or fetches from origin if needed. This combination—intelligent DNS routing plus edge caching—is the foundation of modern global content delivery. Major CDN providers (CloudFront, Cloudflare, Akamai, Fastly) integrate DNS and CDN into unified platforms for seamless global distribution.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DNS RESOLUTION -->
+        <section class="module" id="dns-resolution">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>DNS Resolution Process</h2>
+                    <p>How domain names become IP addresses</p>
+                </div>
+            </div>
+
+            <div class="dns-diagram">
+                <div class="dns-diagram-header">
+                    <div class="dns-diagram-title">🌐 DNS Query Flow</div>
+                    <div class="dns-diagram-badge">Recursive Resolution</div>
+                </div>
+                
+                <div class="dns-visual">
+                    <svg class="dns-svg" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid meet">
+                        <!-- Query paths (cyan) -->
+                        <path class="query-path" d="M 100 260 L 100 180" />
+                        <path class="query-path" d="M 100 140 Q 100 80, 200 80 L 280 80" />
+                        <path class="query-path" d="M 360 80 L 440 80" />
+                        <path class="query-path" d="M 520 80 L 600 80 Q 700 80, 700 140" />
+                        
+                        <!-- Response paths (green) -->
+                        <path class="response-path" d="M 700 180 Q 700 220, 600 220 L 200 220 Q 100 220, 100 260" />
+                        
+                        <!-- Animated query dots -->
+                        <circle class="query-dot" r="5">
+                            <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0.15;0.15;0.35;0.35;0.55;0.55;0.75;0.75;1;1" keyTimes="0;0.15;0.25;0.35;0.45;0.55;0.65;0.75;0.85;0.95;1" path="M 100 260 L 100 140 Q 100 80, 200 80 L 280 80 M 360 80 L 440 80 M 520 80 L 600 80 Q 700 80, 700 160"/>
+                        </circle>
+                        <circle class="query-dot" r="5">
+                            <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.1;0.15;0.85;1" dur="4s" repeatCount="indefinite"/>
+                            <animateMotion dur="4s" repeatCount="indefinite" path="M 100 260 L 100 160 Q 100 80, 280 80 L 440 80 Q 520 80, 600 80 Q 700 80, 700 160"/>
+                        </circle>
+                        
+                        <!-- Animated response dot -->
+                        <circle class="response-dot" r="5">
+                            <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.7;0.75;0.95;1" dur="4s" repeatCount="indefinite"/>
+                            <animateMotion dur="4s" repeatCount="indefinite" begin="2.8s" path="M 700 180 Q 700 220, 600 220 L 200 220 Q 100 220, 100 260"/>
+                        </circle>
+                        
+                        <!-- User/Browser -->
+                        <g transform="translate(100, 280)">
+                            <circle class="server-circle active" r="35" cx="0" cy="0"/>
+                            <text class="server-icon" x="0" y="-5">💻</text>
+                            <text class="server-label" x="0" y="55">Browser</text>
+                            <text class="server-detail" x="0" y="68">Your device</text>
+                        </g>
+                        
+                        <!-- Recursive Resolver -->
+                        <g transform="translate(100, 140)">
+                            <circle class="server-circle" r="35" cx="0" cy="0"/>
+                            <circle class="step-badge" r="10" cx="25" cy="-25"/>
+                            <text class="server-num" x="25" y="-22">1</text>
+                            <text class="server-icon" x="0" y="-5">🔄</text>
+                            <text class="server-label" x="0" y="55">Resolver</text>
+                            <text class="server-detail" x="0" y="68">ISP / 8.8.8.8</text>
+                        </g>
+                        
+                        <!-- Root Server -->
+                        <g transform="translate(320, 80)">
+                            <circle class="server-circle" r="35" cx="0" cy="0"/>
+                            <circle class="step-badge" r="10" cx="25" cy="-25"/>
+                            <text class="server-num" x="25" y="-22">2</text>
+                            <text class="server-icon" x="0" y="-5">🌍</text>
+                            <text class="server-label" x="0" y="55">Root</text>
+                            <text class="server-detail" x="0" y="68">13 servers</text>
+                        </g>
+                        
+                        <!-- TLD Server -->
+                        <g transform="translate(480, 80)">
+                            <circle class="server-circle" r="35" cx="0" cy="0"/>
+                            <circle class="step-badge" r="10" cx="25" cy="-25"/>
+                            <text class="server-num" x="25" y="-22">3</text>
+                            <text class="server-icon" x="0" y="-5">🏢</text>
+                            <text class="server-label" x="0" y="55">TLD</text>
+                            <text class="server-detail" x="0" y="68">.com .net .org</text>
+                        </g>
+                        
+                        <!-- Authoritative Server -->
+                        <g transform="translate(700, 160)">
+                            <circle class="server-circle" r="35" cx="0" cy="0"/>
+                            <circle class="step-badge" r="10" cx="25" cy="-25"/>
+                            <text class="server-num" x="25" y="-22">4</text>
+                            <text class="server-icon" x="0" y="-5">🎯</text>
+                            <text class="server-label" x="0" y="55">Authoritative</text>
+                            <text class="server-detail" x="0" y="68">Your DNS</text>
+                        </g>
+                        
+                        <!-- Query label -->
+                        <g transform="translate(250, 50)">
+                            <rect x="-60" y="-12" width="120" height="24" rx="4" fill="var(--bg-card)" stroke="var(--page-primary)" stroke-width="1"/>
+                            <text fill="var(--page-light)" font-size="10" text-anchor="middle" y="4" font-family="monospace">example.com?</text>
+                        </g>
+                        
+                        <!-- Response label -->
+                        <g transform="translate(400, 245)">
+                            <rect x="-70" y="-12" width="140" height="24" rx="4" fill="var(--bg-card)" stroke="var(--green)" stroke-width="1"/>
+                            <text fill="var(--green)" font-size="10" text-anchor="middle" y="4" font-family="monospace">→ 93.184.216.34</text>
+                        </g>
+                        
+                        <!-- Arrow indicators on paths -->
+                        <polygon points="100,175 95,185 105,185" fill="var(--page-primary)" opacity="0.7"/>
+                        <polygon points="295,80 285,75 285,85" fill="var(--page-primary)" opacity="0.7"/>
+                        <polygon points="455,80 445,75 445,85" fill="var(--page-primary)" opacity="0.7"/>
+                        <polygon points="700,145 695,155 705,155" fill="var(--page-primary)" opacity="0.7"/>
+                        <polygon points="100,255 95,245 105,245" fill="var(--green)" opacity="0.7"/>
+                    </svg>
+                </div>
+                
+                <div class="dns-stats">
+                    <div class="dns-stat">
+                        <div class="dns-stat-value">&lt;50ms</div>
+                        <div class="dns-stat-label">Typical Lookup</div>
+                    </div>
+                    <div class="dns-stat">
+                        <div class="dns-stat-value">300s</div>
+                        <div class="dns-stat-label">Default TTL</div>
+                    </div>
+                    <div class="dns-stat">
+                        <div class="dns-stat-value">13</div>
+                        <div class="dns-stat-label">Root Servers</div>
+                    </div>
+                    <div class="dns-stat">
+                        <div class="dns-stat-value">~90%</div>
+                        <div class="dns-stat-label">Cache Hit Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Recursive vs Iterative</h3>
+                    <p><strong>Recursive</strong>: Resolver does all the work, querying each level and returning the final answer. Used by end clients. The resolver caches results for the TTL duration.</p>
+                    <p><strong>Iterative</strong>: Each server returns a referral to the next level. Used between DNS servers. More control but requires multiple round trips.</p>
+                </div>
+                <div>
+                    <h3>TTL (Time to Live)</h3>
+                    <p>TTL determines how long DNS responses are cached. Lower TTL (60s) enables faster changes but increases query load. Higher TTL (86400s) reduces queries but delays propagation.</p>
+                    <p><strong>Best practice</strong>: Use moderate TTL (300-3600s) normally, lower to 60s before planned changes, then raise again after propagation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECORD TYPES -->
+        <section class="module" id="record-types">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>DNS Record Types</h2>
+                    <p>Common record types and their purposes</p>
+                </div>
+            </div>
+
+            <div class="record-grid">
+                <div class="record-card">
+                    <div class="record-type">A</div>
+                    <div class="record-name">Address Record</div>
+                    <div class="record-desc">Maps domain to IPv4 address. Most fundamental record type for web hosting.</div>
+                    <div class="record-example">example.com → 93.184.216.34</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">AAAA</div>
+                    <div class="record-name">IPv6 Address</div>
+                    <div class="record-desc">Maps domain to IPv6 address. Required for IPv6-only networks and dual-stack.</div>
+                    <div class="record-example">example.com → 2606:2800:220:1:...</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">CNAME</div>
+                    <div class="record-name">Canonical Name</div>
+                    <div class="record-desc">Alias one domain to another. Cannot be used at zone apex (root domain).</div>
+                    <div class="record-example">www.example.com → example.com</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">ALIAS</div>
+                    <div class="record-name">ALIAS/ANAME</div>
+                    <div class="record-desc">Like CNAME but works at zone apex. Provider-specific (Route 53, Cloudflare).</div>
+                    <div class="record-example">example.com → d123.cloudfront.net</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">MX</div>
+                    <div class="record-name">Mail Exchange</div>
+                    <div class="record-desc">Specifies mail servers with priority. Lower number = higher priority.</div>
+                    <div class="record-example">10 mail1.example.com</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">TXT</div>
+                    <div class="record-name">Text Record</div>
+                    <div class="record-desc">Arbitrary text data. Used for SPF, DKIM, domain verification, and more.</div>
+                    <div class="record-example">v=spf1 include:_spf.google.com ~all</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">NS</div>
+                    <div class="record-name">Name Server</div>
+                    <div class="record-desc">Delegates zone to authoritative name servers. Set at registrar.</div>
+                    <div class="record-example">ns1.provider.com</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-type">SRV</div>
+                    <div class="record-name">Service Record</div>
+                    <div class="record-desc">Defines location of services with port and priority. Used for SIP, XMPP, etc.</div>
+                    <div class="record-example">_sip._tcp 10 5 5060 sip.example.com</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Security Records</h3>
+                    <ul>
+                        <li><strong>CAA</strong> — Specifies which CAs can issue certificates for your domain</li>
+                        <li><strong>DNSKEY/DS</strong> — DNSSEC records for cryptographic verification</li>
+                        <li><strong>DMARC</strong> — Email authentication policy (TXT record)</li>
+                        <li><strong>DKIM</strong> — Email signing verification (TXT record)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Zone Apex Considerations</h3>
+                    <p>The zone apex (root domain without www) cannot use CNAME records per RFC. Solutions include:</p>
+                    <ul>
+                        <li><strong>ALIAS/ANAME</strong> — Provider-specific (Route 53, Cloudflare, DNSimple)</li>
+                        <li><strong>CNAME flattening</strong> — Cloudflare resolves CNAME at query time</li>
+                        <li><strong>A record</strong> — Point directly to IP (requires static IP)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROUTING POLICIES -->
+        <section class="module" id="routing-policies">
+            <div class="module-header">
+                <div class="module-icon">🔀</div>
+                <div class="module-info">
+                    <h2>DNS Routing Policies</h2>
+                    <p>Intelligent traffic distribution strategies</p>
+                </div>
+            </div>
+
+            <div class="routing-grid">
+                <div class="routing-card">
+                    <div class="routing-header">
+                        <div class="routing-icon">🎯</div>
+                        <div class="routing-name">Simple</div>
+                    </div>
+                    <div class="routing-desc">Returns a single value or multiple values in random order. Basic DNS behavior with no intelligence.</div>
+                    <div class="routing-use"><strong>Use for:</strong> Single server, simple setups without failover requirements</div>
+                </div>
+                <div class="routing-card">
+                    <div class="routing-header">
+                        <div class="routing-icon">⚖️</div>
+                        <div class="routing-name">Weighted</div>
+                    </div>
+                    <div class="routing-desc">Distributes traffic based on assigned weights. 70/30 split sends 70% to one endpoint. Enables gradual rollouts.</div>
+                    <div class="routing-use"><strong>Use for:</strong> Blue/green deployments, canary releases, A/B testing</div>
+                </div>
+                <div class="routing-card">
+                    <div class="routing-header">
+                        <div class="routing-icon">🌍</div>
+                        <div class="routing-name">Geolocation</div>
+                    </div>
+                    <div class="routing-desc">Routes based on user's geographic location (country, continent, state). Different IPs for different regions.</div>
+                    <div class="routing-use"><strong>Use for:</strong> Regional content, compliance (data residency), localized experiences</div>
+                </div>
+                <div class="routing-card">
+                    <div class="routing-header">
+                        <div class="routing-icon">📍</div>
+                        <div class="routing-name">Geoproximity</div>
+                    </div>
+                    <div class="routing-desc">Routes to nearest endpoint with optional bias. Bias expands or shrinks geographic coverage area.</div>
+                    <div class="routing-use"><strong>Use for:</strong> Latency optimization, shifting traffic between regions</div>
+                </div>
+                <div class="routing-card">
+                    <div class="routing-header">
+                        <div class="routing-icon">⚡</div>
+                        <div class="routing-name">Latency-Based</div>
+                    </div>
+                    <div class="routing-desc">Routes to endpoint with lowest network latency from user's location. Measured by DNS provider continuously.</div>
+                    <div class="routing-use"><strong>Use for:</strong> Global applications requiring lowest latency to users</div>
+                </div>
+                <div class="routing-card">
+                    <div class="routing-header">
+                        <div class="routing-icon">💚</div>
+                        <div class="routing-name">Failover</div>
+                    </div>
+                    <div class="routing-desc">Active-passive configuration with health checks. Primary serves traffic; secondary activates on failure.</div>
+                    <div class="routing-use"><strong>Use for:</strong> Disaster recovery, high availability with standby</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CDN EDGE NETWORK -->
+        <section class="module" id="cdn-edge">
+            <div class="module-header">
+                <div class="module-icon">🌐</div>
+                <div class="module-info">
+                    <h2>CDN Edge Network</h2>
+                    <p>Global distribution of content at the edge</p>
+                </div>
+            </div>
+
+            <div class="cdn-diagram">
+                <div class="cdn-diagram-header">
+                    <div class="cdn-diagram-title">🗺️ Global Edge Network</div>
+                    <div class="cdn-legend">
+                        <div class="cdn-legend-item"><div class="cdn-legend-dot edge"></div> Edge POP</div>
+                        <div class="cdn-legend-item"><div class="cdn-legend-dot origin"></div> Origin</div>
+                        <div class="cdn-legend-item"><div class="cdn-legend-dot" style="background: #FBBF24; box-shadow: 0 0 8px #FBBF24;"></div> Data Flow</div>
+                    </div>
+                </div>
+                
+                <div class="cdn-map-container" style="position: relative; width: 100%; padding-bottom: 50%; border-radius: 8px; overflow: hidden; background: #0d1520;">
+                    <!-- Real world map as background -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Equirectangular-projection.jpg" 
+                         alt="World Map" 
+                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; filter: saturate(0.5) brightness(0.6) hue-rotate(160deg);">
+                    
+                    <!-- SVG overlay for POPs and connections -->
+                    <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="glowStrong">
+                                <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="glowYellow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        
+                        <!-- Connection lines from origin (285, 165) to each POP -->
+                        <g stroke="rgba(6,182,212,0.4)" stroke-width="1.5" stroke-dasharray="6 4" fill="none">
+                            <!-- To US West -->
+                            <path d="M 285 165 Q 200 140, 160 120"/><!-- SEA -->
+                            <path d="M 285 165 Q 220 160, 172 155"/><!-- LAX -->
+                            <!-- To US Central/South -->
+                            <path d="M 285 165 Q 260 160, 230 158"/><!-- DFW -->
+                            <path d="M 285 165 Q 280 175, 278 178"/><!-- MIA -->
+                            <!-- To Europe -->
+                            <path d="M 285 165 Q 390 100, 500 108"/><!-- LON -->
+                            <path d="M 285 165 Q 400 90, 528 111"/><!-- FRA -->
+                            <path d="M 285 165 Q 380 110, 483 103"/><!-- DUB -->
+                            <path d="M 285 165 Q 420 70, 550 86"/><!-- STO -->
+                            <!-- To Asia -->
+                            <path d="M 285 165 Q 500 100, 703 197"/><!-- BOM -->
+                            <path d="M 285 165 Q 550 80, 853 147"/><!-- SEL -->
+                            <path d="M 285 165 Q 580 90, 889 150"/><!-- TYO -->
+                            <path d="M 285 165 Q 550 150, 789 247"/><!-- SIN -->
+                            <path d="M 285 165 Q 550 120, 817 189"/><!-- HKG -->
+                            <!-- To Australia -->
+                            <path d="M 285 165 Q 550 320, 919 344"/><!-- SYD -->
+                            <!-- To South America -->
+                            <path d="M 285 165 Q 310 260, 370 317"/><!-- GRU -->
+                            <path d="M 285 165 Q 280 280, 303 342"/><!-- SCL -->
+                        </g>
+                        
+                        <!-- Animated data packets - YELLOW/GOLD color -->
+                        <g>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="2.8s" repeatCount="indefinite" path="M 285 165 Q 390 100, 500 108"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="4s" repeatCount="indefinite" path="M 285 165 Q 580 90, 889 150"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="2.2s" repeatCount="indefinite" path="M 285 165 Q 200 140, 160 120"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="5s" repeatCount="indefinite" path="M 285 165 Q 550 320, 919 344"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="3.2s" repeatCount="indefinite" path="M 285 165 Q 400 90, 528 111"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="3.8s" repeatCount="indefinite" path="M 285 165 Q 550 80, 853 147"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="3s" repeatCount="indefinite" path="M 285 165 Q 310 260, 370 317"/>
+                            </circle>
+                            <circle r="5" fill="#FBBF24" filter="url(#glowYellow)">
+                                <animateMotion dur="4.2s" repeatCount="indefinite" path="M 285 165 Q 550 150, 789 247"/>
+                            </circle>
+                        </g>
+                        
+                        <!-- North America POPs -->
+                        <g filter="url(#glow)">
+                            <circle cx="160" cy="120" r="5" fill="#06B6D4"/><text x="160" y="108" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">SEA</text>
+                            <circle cx="172" cy="155" r="6" fill="#06B6D4"/><text x="158" y="155" fill="#a0aec0" font-size="10" text-anchor="end" font-weight="500">LAX</text>
+                            <circle cx="258" cy="133" r="5" fill="#06B6D4"/><text x="258" y="121" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">CHI</text>
+                            <circle cx="295" cy="136" r="6" fill="#06B6D4"/><text x="310" y="136" fill="#a0aec0" font-size="10" text-anchor="start" font-weight="500">NYC</text>
+                            <circle cx="230" cy="158" r="5" fill="#06B6D4"/><text x="230" y="172" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">DFW</text>
+                            <circle cx="278" cy="178" r="5" fill="#06B6D4"/><text x="278" y="192" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">MIA</text>
+                            <circle cx="267" cy="155" r="4" fill="#06B6D4"/><text x="267" y="169" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">ATL</text>
+                            <circle cx="280" cy="128" r="4" fill="#06B6D4"/><text x="280" y="116" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">TOR</text>
+                        </g>
+                        
+                        <!-- Europe POPs -->
+                        <g filter="url(#glow)">
+                            <circle cx="500" cy="108" r="6" fill="#06B6D4"/><text x="500" y="96" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">LON</text>
+                            <circle cx="483" cy="103" r="4" fill="#06B6D4"/><text x="470" y="103" fill="#a0aec0" font-size="9" text-anchor="end" font-weight="500">DUB</text>
+                            <circle cx="514" cy="105" r="5" fill="#06B6D4"/><text x="514" y="93" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">AMS</text>
+                            <circle cx="506" cy="118" r="5" fill="#06B6D4"/><text x="506" y="132" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">PAR</text>
+                            <circle cx="528" cy="111" r="6" fill="#06B6D4"/><text x="542" y="111" fill="#a0aec0" font-size="10" text-anchor="start" font-weight="500">FRA</text>
+                            <circle cx="550" cy="86" r="4" fill="#06B6D4"/><text x="550" y="74" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">STO</text>
+                            <circle cx="489" cy="139" r="4" fill="#06B6D4"/><text x="489" y="153" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">MAD</text>
+                            <circle cx="525" cy="128" r="4" fill="#06B6D4"/><text x="525" y="142" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">MIL</text>
+                        </g>
+                        
+                        <!-- Asia POPs -->
+                        <g filter="url(#glow)">
+                            <circle cx="703" cy="197" r="5" fill="#06B6D4"/><text x="703" y="211" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">BOM</text>
+                            <circle cx="789" cy="247" r="6" fill="#06B6D4"/><text x="789" y="261" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">SIN</text>
+                            <circle cx="817" cy="189" r="5" fill="#06B6D4"/><text x="817" y="203" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">HKG</text>
+                            <circle cx="889" cy="150" r="6" fill="#06B6D4"/><text x="903" y="150" fill="#a0aec0" font-size="10" text-anchor="start" font-weight="500">TYO</text>
+                            <circle cx="853" cy="147" r="5" fill="#06B6D4"/><text x="853" y="135" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">SEL</text>
+                            <circle cx="875" cy="158" r="4" fill="#06B6D4"/><text x="875" y="172" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">OSA</text>
+                        </g>
+                        
+                        <!-- Australia POPs -->
+                        <g filter="url(#glow)">
+                            <circle cx="919" cy="344" r="6" fill="#06B6D4"/><text x="933" y="344" fill="#a0aec0" font-size="10" text-anchor="start" font-weight="500">SYD</text>
+                            <circle cx="903" cy="360" r="4" fill="#06B6D4"/><text x="903" y="374" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">MEL</text>
+                        </g>
+                        
+                        <!-- South America POPs -->
+                        <g filter="url(#glow)">
+                            <circle cx="370" cy="317" r="5" fill="#06B6D4"/><text x="370" y="331" fill="#a0aec0" font-size="10" text-anchor="middle" font-weight="500">GRU</text>
+                            <circle cx="303" cy="342" r="4" fill="#06B6D4"/><text x="303" y="356" fill="#a0aec0" font-size="9" text-anchor="middle" font-weight="500">SCL</text>
+                        </g>
+                        
+                        <!-- Origin Server (Virginia) -->
+                        <g>
+                            <circle cx="285" cy="165" r="24" fill="#10B981" opacity="0.15">
+                                <animate attributeName="r" values="16;28;16" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.25;0.05;0.25" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="285" cy="165" r="10" fill="#10B981" filter="url(#glowStrong)"/>
+                            <text x="285" y="152" fill="#10B981" font-size="11" font-weight="700" text-anchor="middle">ORIGIN</text>
+                        </g>
+                    </svg>
+                </div>
+                
+                <div class="cdn-stats">
+                    <div class="cdn-stat">
+                        <div class="cdn-stat-value">300+</div>
+                        <div class="cdn-stat-label">Edge POPs</div>
+                    </div>
+                    <div class="cdn-stat">
+                        <div class="cdn-stat-value">6</div>
+                        <div class="cdn-stat-label">Continents</div>
+                    </div>
+                    <div class="cdn-stat">
+                        <div class="cdn-stat-value">&lt;30ms</div>
+                        <div class="cdn-stat-label">Avg Latency</div>
+                    </div>
+                    <div class="cdn-stat">
+                        <div class="cdn-stat-value">99.99%</div>
+                        <div class="cdn-stat-label">Uptime SLA</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CDN FEATURES -->
+        <section class="module" id="cdn-features">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>CDN Features</h2>
+                    <p>Beyond simple caching</p>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <div class="feature-name">Edge Caching</div>
+                    <div class="feature-desc">Store content at 300+ edge locations. Serve static assets without origin requests. 70%+ cache hit ratio.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-name">SSL/TLS Termination</div>
+                    <div class="feature-desc">Handle HTTPS at edge. Free managed certificates. TLS 1.3 support. Reduce origin CPU load.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-name">DDoS Protection</div>
+                    <div class="feature-desc">Absorb attacks at edge. Layer 3/4/7 protection. No additional cost. Always-on mitigation.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔥</div>
+                    <div class="feature-name">WAF Integration</div>
+                    <div class="feature-desc">Web Application Firewall at edge. Block SQLi, XSS, bots. Managed rule sets. Custom rules.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <div class="feature-name">Compression</div>
+                    <div class="feature-desc">Gzip/Brotli compression at edge. Reduce bandwidth 60-80%. Automatic based on Accept-Encoding.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🖼️</div>
+                    <div class="feature-name">Image Optimization</div>
+                    <div class="feature-desc">Resize, convert (WebP/AVIF), compress images on-the-fly. Device-aware delivery.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-name">HTTP/2 & HTTP/3</div>
+                    <div class="feature-desc">Multiplexing, header compression, server push. QUIC protocol for faster connections.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-name">Edge Compute</div>
+                    <div class="feature-desc">Run code at edge (Lambda@Edge, Workers). A/B testing, personalization, auth at edge.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📹</div>
+                    <div class="feature-name">Video Streaming</div>
+                    <div class="feature-desc">HLS/DASH delivery. Adaptive bitrate. Live and VOD support. Low-latency streaming.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <div class="feature-name">Origin Shield</div>
+                    <div class="feature-desc">Extra caching layer between edge and origin. Reduces origin load during cache misses.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-name">Real-time Analytics</div>
+                    <div class="feature-desc">Request logs, cache hit ratio, bandwidth, errors. Instant visibility into CDN performance.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚫</div>
+                    <div class="feature-name">Cache Invalidation</div>
+                    <div class="feature-desc">Purge cached content globally in seconds. Wildcard purges. Programmatic API access.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CACHING STRATEGIES -->
+        <section class="module" id="caching">
+            <div class="module-header">
+                <div class="module-icon">💾</div>
+                <div class="module-info">
+                    <h2>Caching Strategies</h2>
+                    <p>Optimize cache behavior for your content</p>
+                </div>
+            </div>
+
+            <div class="cache-grid">
+                <div class="cache-card">
+                    <div class="cache-header">
+                        <div class="cache-icon">🖼️</div>
+                        <div class="cache-title">Static Assets (Long TTL)</div>
+                    </div>
+                    <div class="cache-desc">Images, fonts, CSS, JS with cache-busting URLs (hash in filename). Cache for 1 year since URL changes on content change.</div>
+                    <div class="cache-code"><span class="key">Cache-Control:</span> <span class="value">public, max-age=31536000, immutable</span></div>
+                </div>
+                <div class="cache-card">
+                    <div class="cache-header">
+                        <div class="cache-icon">📄</div>
+                        <div class="cache-title">HTML Pages (Short TTL)</div>
+                    </div>
+                    <div class="cache-desc">Dynamic content that changes frequently. Short cache allows quick updates while still benefiting from edge delivery.</div>
+                    <div class="cache-code"><span class="key">Cache-Control:</span> <span class="value">public, max-age=300, s-maxage=600</span></div>
+                </div>
+                <div class="cache-card">
+                    <div class="cache-header">
+                        <div class="cache-icon">🔐</div>
+                        <div class="cache-title">Private Content</div>
+                    </div>
+                    <div class="cache-desc">User-specific content that should never be cached at CDN edge. Only browser caching allowed.</div>
+                    <div class="cache-code"><span class="key">Cache-Control:</span> <span class="value">private, max-age=0, no-store</span></div>
+                </div>
+                <div class="cache-card">
+                    <div class="cache-header">
+                        <div class="cache-icon">🔄</div>
+                        <div class="cache-title">Stale-While-Revalidate</div>
+                    </div>
+                    <div class="cache-desc">Serve stale content while fetching fresh version in background. Users never wait for origin. Best of both worlds.</div>
+                    <div class="cache-code"><span class="key">Cache-Control:</span> <span class="value">max-age=60, stale-while-revalidate=3600</span></div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Cache-Control Directives</h3>
+                    <ul>
+                        <li><strong>public</strong> — Can be cached by CDN and browser</li>
+                        <li><strong>private</strong> — Browser only, not CDN</li>
+                        <li><strong>max-age</strong> — Seconds content is fresh (browser)</li>
+                        <li><strong>s-maxage</strong> — Seconds for shared caches (CDN)</li>
+                        <li><strong>no-cache</strong> — Must revalidate before serving</li>
+                        <li><strong>no-store</strong> — Never cache anywhere</li>
+                        <li><strong>immutable</strong> — Content will never change</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Cache Key Considerations</h3>
+                    <p>CDNs cache by URL + headers (like Accept-Encoding). Consider what varies:</p>
+                    <ul>
+                        <li><strong>Query strings</strong> — Include in cache key or ignore?</li>
+                        <li><strong>Cookies</strong> — Usually excluded (causes low hit ratio)</li>
+                        <li><strong>Headers</strong> — Vary on Accept-Encoding, Accept-Language</li>
+                        <li><strong>Device type</strong> — Mobile vs desktop versions</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROVIDER COMPARISON -->
+        <section class="module" id="cloud-compare">
+            <div class="module-header">
+                <div class="module-icon">☁️</div>
+                <div class="module-info">
+                    <h2>Provider Comparison</h2>
+                    <p>DNS and CDN offerings across providers</p>
+                </div>
+            </div>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th class="aws">AWS</th>
+                        <th class="azure">Azure</th>
+                        <th class="gcp">GCP</th>
+                        <th class="cf">Cloudflare</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature">DNS Service</td>
+                        <td>Route 53</td>
+                        <td>Azure DNS</td>
+                        <td>Cloud DNS</td>
+                        <td>Cloudflare DNS</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">CDN Service</td>
+                        <td>CloudFront</td>
+                        <td>Azure CDN / Front Door</td>
+                        <td>Cloud CDN</td>
+                        <td>Cloudflare CDN</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Edge Locations</td>
+                        <td>450+ POPs</td>
+                        <td>180+ POPs</td>
+                        <td>200+ POPs</td>
+                        <td>300+ POPs</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">DNS SLA</td>
+                        <td>100%</td>
+                        <td>100%</td>
+                        <td>100%</td>
+                        <td>100%</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">GeoDNS</td>
+                        <td>✓ Geolocation</td>
+                        <td>✓ Traffic Manager</td>
+                        <td>✓ Geo routing</td>
+                        <td>✓ Load balancing</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Latency Routing</td>
+                        <td>✓</td>
+                        <td>✓ Performance</td>
+                        <td>Limited</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Health Checks</td>
+                        <td>✓ Built-in</td>
+                        <td>✓ Built-in</td>
+                        <td>Via LB</td>
+                        <td>✓ Built-in</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Edge Compute</td>
+                        <td>Lambda@Edge</td>
+                        <td>Azure Functions</td>
+                        <td>Cloud Functions</td>
+                        <td>Workers</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Free Tier</td>
+                        <td>Limited</td>
+                        <td>Limited</td>
+                        <td>Limited</td>
+                        <td>Generous free plan</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">DDoS Protection</td>
+                        <td>Shield (extra)</td>
+                        <td>DDoS Protection</td>
+                        <td>Cloud Armor</td>
+                        <td>Included</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- PERFORMANCE METRICS -->
+        <section class="module" id="performance">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Performance Metrics</h2>
+                    <p>Key indicators for DNS and CDN health</p>
+                </div>
+            </div>
+
+            <div class="perf-grid">
+                <div class="perf-card">
+                    <div class="perf-value">98.5%</div>
+                    <div class="perf-label">Cache Hit Ratio</div>
+                    <div class="perf-bar"><div class="perf-fill" style="width: 98.5%;"></div></div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-value">23ms</div>
+                    <div class="perf-label">Edge Latency</div>
+                    <div class="perf-bar"><div class="perf-fill" style="width: 15%;"></div></div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-value">145ms</div>
+                    <div class="perf-label">Origin Latency</div>
+                    <div class="perf-bar"><div class="perf-fill" style="width: 45%;"></div></div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-value">0.02%</div>
+                    <div class="perf-label">Error Rate</div>
+                    <div class="perf-bar"><div class="perf-fill" style="width: 2%;"></div></div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-value">2.3TB</div>
+                    <div class="perf-label">Daily Bandwidth</div>
+                    <div class="perf-bar"><div class="perf-fill" style="width: 70%;"></div></div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-value">12M</div>
+                    <div class="perf-label">Daily Requests</div>
+                    <div class="perf-bar"><div class="perf-fill" style="width: 60%;"></div></div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>DNS Metrics to Monitor</h3>
+                    <ul>
+                        <li><strong>Query latency</strong> — Time to resolve (target &lt;50ms)</li>
+                        <li><strong>NXDOMAIN rate</strong> — Failed lookups (typos, attacks)</li>
+                        <li><strong>Query volume</strong> — Requests per second by record</li>
+                        <li><strong>Propagation time</strong> — Time for changes to go global</li>
+                        <li><strong>Health check status</strong> — Failover trigger events</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>CDN Metrics to Monitor</h3>
+                    <ul>
+                        <li><strong>Cache hit ratio</strong> — Target 90%+ for static content</li>
+                        <li><strong>Origin requests</strong> — Minimize cache misses</li>
+                        <li><strong>Bandwidth</strong> — Data transferred from edge</li>
+                        <li><strong>Error rate</strong> — 4xx/5xx responses (target &lt;1%)</li>
+                        <li><strong>TTFB</strong> — Time to first byte at edge vs origin</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for DNS and CDN optimization</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Use Appropriate TTLs</h4>
+                        <p>Match TTL to content change frequency. Static assets: 1 year with cache-busting URLs. Dynamic content: 5-15 minutes. Lower TTL before planned changes, raise after. Default 300s is a good starting point for most records.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Implement Health Checks</h4>
+                        <p>Configure DNS health checks to route around failures automatically. Check application endpoints (/health), not just TCP. Set appropriate intervals (30s) and thresholds (2-3 failures). Test failover regularly.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Maximize Cache Hit Ratio</h4>
+                        <p>Target 90%+ cache hit ratio for static content. Use consistent URLs, remove unnecessary query strings from cache key. Analyze cache misses to identify optimization opportunities. Enable Origin Shield for popular content.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Use Cache-Busting for Deploys</h4>
+                        <p>Include content hash in filenames (app.a1b2c3.js) rather than query strings. Enables long TTLs while ensuring users get new versions. Works with all CDNs and proxies. Most build tools support this automatically.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Enable Compression</h4>
+                        <p>Enable Brotli (preferred) and Gzip at the CDN edge. Reduces bandwidth 60-80% for text content. Most CDNs handle this automatically based on Accept-Encoding header. Don't compress already-compressed formats (JPEG, PNG).</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Implement DNSSEC</h4>
+                        <p>Enable DNSSEC to cryptographically sign DNS records, preventing spoofing and cache poisoning attacks. Most managed DNS providers support one-click enablement. Also configure CAA records to restrict certificate issuance.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Use Multiple DNS Providers</h4>
+                        <p>For critical applications, use multiple DNS providers (e.g., Route 53 + Cloudflare) for redundancy. Requires careful NS record management and synchronization. Consider DNS failover services for automatic switching.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Monitor and Alert</h4>
+                        <p>Set up monitoring for DNS resolution time, cache hit ratio, origin errors, and bandwidth. Alert on anomalies like sudden cache hit drops or increased origin load. Use real user monitoring (RUM) for actual user experience data.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered DNS and CDN optimization</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🌍 GlobalDeliveryOptimizer</h3>
+                    <p>Analyzes traffic patterns, user locations, and content types to recommend optimal DNS routing policies and CDN caching strategies. Generates Terraform configurations and cache policies.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🔀</span> DNS routing policy recommendation</div>
+                        <div class="agent-capability"><span class="capability-icon">💾</span> Cache-Control header optimization</div>
+                        <div class="agent-capability"><span class="capability-icon">🌐</span> Edge location analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Cache hit ratio improvement</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Terraform/CloudFormation generation</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">cdn_optimizer_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Initialize CDN optimization tools</span>
+traffic_analyzer = TrafficAnalyzerTool()
+cache_optimizer = CacheOptimizerTool()
+dns_config_gen = DNSConfigGeneratorTool()
+
+<span class="code-comment"># Global Delivery Optimizer Agent</span>
+cdn_optimizer = Agent(
+    role=<span class="code-string">"CDN & DNS Specialist"</span>,
+    goal=<span class="code-string">"""Optimize global content delivery 
+    through DNS routing and edge caching."""</span>,
+    tools=[traffic_analyzer, cache_optimizer, dns_config_gen],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Optimization Task</span>
+optimize_task = Task(
+    description=<span class="code-string">"""
+    1. Analyze traffic patterns by region
+    2. Recommend DNS routing policy
+    3. Optimize Cache-Control headers
+    4. Configure edge caching rules
+    5. Generate Terraform configuration
+    6. Create monitoring dashboards
+    """</span>,
+    agent=cdn_optimizer
+)
+
+crew = Crew(agents=[cdn_optimizer], tasks=[optimize_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring networking</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat15-p2-load-balancing.html" class="related-card">
+                    <div class="related-icon">⚖️</div>
+                    <div class="related-title">Load Balancing</div>
+                    <div class="related-desc">L4/L7 load balancers and traffic distribution</div>
+                </a>
+                <a href="cat15-p4-vpn-connectivity.html" class="related-card">
+                    <div class="related-icon">🔒</div>
+                    <div class="related-title">VPN & Connectivity</div>
+                    <div class="related-desc">Site-to-site VPN and hybrid connectivity</div>
+                </a>
+                <a href="cat15-p5-network-security.html" class="related-card">
+                    <div class="related-icon">🛡️</div>
+                    <div class="related-title">Network Security</div>
+                    <div class="related-desc">Firewalls, WAF, and zero-trust architecture</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat15-p2-load-balancing.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">15.2 Load Balancing</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 15</div>
+        <a href="cat15-p4-vpn-connectivity.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">15.4 VPN & Connectivity</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

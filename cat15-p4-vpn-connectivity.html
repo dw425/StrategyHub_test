@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN & Connectivity | Networking | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #8B5CF6;
+            --page-light: #A78BFA;
+            --page-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        .vpn-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .vpn-diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .vpn-diagram-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .vpn-diagram-badge { font-size: 11px; padding: 4px 10px; background: var(--page-glow); color: var(--page-light); border-radius: 9999px; border: 1px solid var(--page-primary); }
+        .vpn-legend { display: flex; gap: 16px; }
+        .vpn-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .vpn-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .vpn-legend-dot.encrypted { background: var(--page-primary); box-shadow: 0 0 8px var(--page-primary); }
+        .vpn-legend-dot.endpoint { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .vpn-legend-dot.data { background: #FBBF24; box-shadow: 0 0 8px #FBBF24; }
+
+        .vpn-types-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .vpn-type-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; transition: all 0.2s; }
+        .vpn-type-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .vpn-type-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .vpn-type-icon { width: 40px; height: 40px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .vpn-type-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .vpn-type-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .vpn-type-specs { display: flex; flex-wrap: wrap; gap: 6px; }
+        .vpn-spec { font-size: 10px; padding: 3px 8px; background: var(--bg-card); border-radius: 4px; color: var(--text-muted); }
+
+        .protocols-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .protocol-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .protocol-card:hover { border-color: var(--page-primary); }
+        .protocol-name { font-size: 14px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; font-family: monospace; }
+        .protocol-type { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+        .protocol-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+        .connectivity-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .connectivity-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .connectivity-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .connectivity-title { display: flex; align-items: center; gap: 10px; }
+        .connectivity-title h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .connectivity-badge { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .connectivity-badge.aws { background: rgba(255, 153, 0, 0.15); color: var(--aws-orange); }
+        .connectivity-badge.azure { background: rgba(0, 120, 212, 0.15); color: var(--azure-blue); }
+        .connectivity-badge.gcp { background: rgba(66, 133, 244, 0.15); color: var(--gcp-blue); }
+        .connectivity-badge.hybrid { background: var(--page-glow); color: var(--page-light); }
+        .connectivity-features { list-style: none; }
+        .connectivity-features li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .connectivity-features li:last-child { border-bottom: none; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VPN TOOLS GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .vpn-tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .vpn-tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+        .vpn-tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .vpn-tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .vpn-tool-logo { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; }
+        .vpn-tool-logo.nord { background: linear-gradient(135deg, #4687FF, #3366CC); }
+        .vpn-tool-logo.express { background: linear-gradient(135deg, #DA3940, #B22A30); }
+        .vpn-tool-logo.surfshark { background: linear-gradient(135deg, #1ECAD3, #178F96); }
+        .vpn-tool-logo.proton { background: linear-gradient(135deg, #6D4AFF, #8B6AFF); }
+        .vpn-tool-logo.cyberghost { background: linear-gradient(135deg, #FFCE00, #E5B800); color: #000; }
+        .vpn-tool-logo.private { background: linear-gradient(135deg, #52B44B, #3D8B37); }
+        .vpn-tool-logo.mullvad { background: linear-gradient(135deg, #44AFA8, #2D8C86); }
+        .vpn-tool-logo.tailscale { background: linear-gradient(135deg, #242424, #444444); }
+        .vpn-tool-logo.wireguard { background: linear-gradient(135deg, #88171A, #5C0F11); }
+        .vpn-tool-info h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .vpn-tool-type { font-size: 11px; color: var(--text-muted); }
+        .vpn-tool-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .vpn-tool-stats { display: flex; gap: 12px; margin-bottom: 12px; }
+        .vpn-tool-stat { text-align: center; flex: 1; padding: 8px; background: var(--bg-card); border-radius: 6px; }
+        .vpn-tool-stat-value { font-size: 14px; font-weight: 700; color: var(--page-light); }
+        .vpn-tool-stat-label { font-size: 9px; color: var(--text-muted); }
+        .vpn-tool-features { display: flex; flex-wrap: wrap; gap: 4px; }
+        .vpn-tool-feature { font-size: 9px; padding: 2px 6px; background: var(--bg-card); border-radius: 3px; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SCORECARD
+        ═══════════════════════════════════════════════════════════════ */
+        .scorecard { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .scorecard-header { display: grid; grid-template-columns: 2fr repeat(6, 1fr); background: var(--bg-card-alt); padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+        .scorecard-header span { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; }
+        .scorecard-header span:first-child { text-align: left; }
+        .scorecard-row { display: grid; grid-template-columns: 2fr repeat(6, 1fr); padding: 14px 16px; border-bottom: 1px solid var(--border-color); transition: background 0.2s; }
+        .scorecard-row:hover { background: var(--bg-hover); }
+        .scorecard-row:last-child { border-bottom: none; }
+        .scorecard-provider { display: flex; align-items: center; gap: 10px; }
+        .scorecard-logo { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .scorecard-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .scorecard-cell { display: flex; align-items: center; justify-content: center; }
+        .score-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; min-width: 40px; text-align: center; }
+        .score-badge.excellent { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .score-badge.good { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .score-badge.average { background: rgba(245, 158, 11, 0.15); color: var(--yellow); }
+        .score-badge.poor { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+        .score-overall { font-size: 14px; font-weight: 700; color: var(--page-light); }
+
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .compare-table th { text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { color: var(--text-muted); }
+        .compare-table th.aws { color: var(--aws-orange); }
+        .compare-table th.azure { color: var(--azure-blue); }
+        .compare-table th.gcp { color: var(--gcp-blue); }
+        .compare-table td { padding: 12px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .compare-table .feature { font-weight: 500; color: var(--text-primary); }
+
+        .perf-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+        .perf-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .perf-value { font-size: 24px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; }
+        .perf-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+        .perf-bar { height: 4px; background: var(--bg-card); border-radius: 2px; overflow: hidden; }
+        .perf-fill { height: 100%; background: linear-gradient(90deg, var(--page-primary), var(--page-light)); border-radius: 2px; }
+
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 18px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .practice-card:hover { border-color: var(--page-primary); }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-content { grid-template-columns: 1fr; }
+            .vpn-types-grid { grid-template-columns: 1fr; }
+            .vpn-tools-grid { grid-template-columns: 1fr; }
+            .protocols-grid { grid-template-columns: repeat(2, 1fr); }
+            .connectivity-grid { grid-template-columns: 1fr; }
+            .perf-grid { grid-template-columns: repeat(3, 1fr); }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: 1fr; }
+            .scorecard-header, .scorecard-row { grid-template-columns: 2fr repeat(3, 1fr); }
+            .scorecard-header span:nth-child(n+5), .scorecard-row .scorecard-cell:nth-child(n+5) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat15-networking-overview.html">Networking</a>
+        <span class="sep">/</span>
+        <span class="current">VPN & Connectivity</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🌐 Category 15</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat15-networking-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat15-p1-network-architecture.html"><span class="nav-icon">🏗️</span> 15.1 Network Architecture</a></li>
+            <li><a href="cat15-p2-load-balancing.html"><span class="nav-icon">⚖️</span> 15.2 Load Balancing</a></li>
+            <li><a href="cat15-p3-dns-cdn.html"><span class="nav-icon">🌍</span> 15.3 DNS & CDN</a></li>
+            <li><a href="cat15-p4-vpn-connectivity.html" class="active"><span class="nav-icon">🔒</span> 15.4 VPN & Connectivity</a></li>
+            <li><a href="cat15-p5-network-security.html"><span class="nav-icon">🛡️</span> 15.5 Network Security</a></li>
+            <li><a href="cat15-p6-service-mesh.html"><span class="nav-icon">🕸️</span> 15.6 Service Mesh</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🔗</span> VPN Architecture</a></li>
+            <li><a href="#vpn-types"><span class="nav-icon">🔀</span> VPN Types</a></li>
+            <li><a href="#vpn-tools"><span class="nav-icon">🛠️</span> VPN Tools</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📊</span> Scorecard</a></li>
+            <li><a href="#protocols"><span class="nav-icon">🔐</span> Protocols</a></li>
+            <li><a href="#direct-connect"><span class="nav-icon">⚡</span> Direct Connect</a></li>
+            <li><a href="#cloud-compare"><span class="nav-icon">☁️</span> Provider Comparison</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🔒 Page 15.4</div>
+                <h1>VPN & Connectivity</h1>
+                <p>Secure encrypted tunnels connecting on-premises infrastructure, cloud environments, and remote users. From consumer VPNs to enterprise Direct Connect lines for hybrid architectures.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">AES-256</div>
+                    <div class="hero-metric-label">Encryption</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">99.95%</div>
+                    <div class="hero-metric-label">Uptime SLA</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;10ms</div>
+                    <div class="hero-metric-label">Direct Connect</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">100 Gbps</div>
+                    <div class="hero-metric-label">Max Bandwidth</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Understanding VPN types and connectivity options</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>Why VPN & Connectivity Matters</h3>
+                    <p>Modern enterprises require secure, reliable connectivity between distributed resources. VPNs create encrypted tunnels over public networks, while dedicated connections like AWS Direct Connect provide private, low-latency paths to cloud resources.</p>
+                    <p>The right connectivity strategy balances <strong>security requirements</strong>, <strong>performance needs</strong>, <strong>cost considerations</strong>, and <strong>operational complexity</strong> to enable hybrid and multi-cloud architectures.</p>
+                </div>
+                <div>
+                    <h3>Key Connectivity Patterns</h3>
+                    <p><strong>Site-to-Site VPN:</strong> Connects entire networks over IPsec tunnels. Ideal for linking data centers to cloud VPCs or connecting multiple office locations securely.</p>
+                    <p><strong>Client VPN:</strong> Provides secure remote access for individual users to corporate resources from any location with certificate or SAML authentication.</p>
+                    <p><strong>Direct Connect:</strong> Dedicated physical connections bypassing the public internet for consistent performance and reduced data transfer costs.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Hybrid Connectivity Architecture</h3>
+                    <p>Most enterprises use a combination of connectivity options. Direct Connect or ExpressRoute provides the primary high-bandwidth, low-latency path for production traffic, while site-to-site VPN serves as a backup or for lower-priority traffic. Client VPN enables remote workers to securely access both on-premises and cloud resources. Transit Gateway or Virtual WAN acts as a central hub connecting multiple VPCs, on-premises networks, and VPN connections through a single point—simplifying network topology and routing management.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>VPN Architecture</h2>
+                    <p>How encrypted tunnels connect distributed networks</p>
+                </div>
+            </div>
+            <div class="vpn-diagram">
+                <div class="vpn-diagram-header">
+                    <div class="vpn-diagram-title">🔒 Site-to-Site VPN Connection</div>
+                    <div class="vpn-legend">
+                        <div class="vpn-legend-item"><div class="vpn-legend-dot encrypted"></div> Encrypted Tunnel</div>
+                        <div class="vpn-legend-item"><div class="vpn-legend-dot endpoint"></div> VPN Endpoint</div>
+                        <div class="vpn-legend-item"><div class="vpn-legend-dot data"></div> Data Flow</div>
+                    </div>
+                </div>
+                <svg viewBox="0 0 900 260" style="width: 100%; height: 260px;">
+                    <defs>
+                        <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        <linearGradient id="tunnelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.8"/>
+                            <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:1"/>
+                            <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.8"/>
+                        </linearGradient>
+                        <pattern id="tunnelPattern" width="20" height="10" patternUnits="userSpaceOnUse">
+                            <rect width="20" height="10" fill="none"/>
+                            <path d="M 0 5 L 10 0 L 20 5 L 10 10 Z" fill="rgba(139,92,246,0.3)"/>
+                        </pattern>
+                    </defs>
+                    <rect x="20" y="40" width="240" height="180" rx="12" fill="rgba(59,130,246,0.1)" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5 3"/>
+                    <text x="140" y="65" fill="#60A5FA" font-size="12" font-weight="600" text-anchor="middle">ON-PREMISES DATA CENTER</text>
+                    <rect x="50" y="90" width="60" height="50" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="80" y="115" fill="#60A5FA" font-size="18" text-anchor="middle">🖥️</text>
+                    <text x="80" y="132" fill="#a0a0b0" font-size="9" text-anchor="middle">Servers</text>
+                    <rect x="130" y="90" width="60" height="50" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="160" y="115" fill="#60A5FA" font-size="18" text-anchor="middle">💾</text>
+                    <text x="160" y="132" fill="#a0a0b0" font-size="9" text-anchor="middle">Storage</text>
+                    <rect x="80" y="160" width="100" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                    <text x="130" y="180" fill="#10B981" font-size="14" text-anchor="middle">🔐</text>
+                    <text x="130" y="195" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">VPN Gateway</text>
+                    <circle cx="180" cy="182" r="6" fill="#10B981" filter="url(#glow)"/>
+                    <rect x="280" y="115" width="340" height="50" rx="25" fill="url(#tunnelPattern)" stroke="url(#tunnelGrad)" stroke-width="3"/>
+                    <text x="450" y="145" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">🔒 IPsec Encrypted Tunnel (AES-256)</text>
+                    <circle r="6" fill="#FBBF24" filter="url(#glow)">
+                        <animateMotion dur="2s" repeatCount="indefinite" path="M 180 182 L 280 140 L 620 140 L 720 182"/>
+                    </circle>
+                    <circle r="6" fill="#FBBF24" filter="url(#glow)">
+                        <animateMotion dur="2s" repeatCount="indefinite" begin="1s" path="M 720 182 L 620 140 L 280 140 L 180 182"/>
+                    </circle>
+                    <text x="450" y="95" fill="#6a6a7a" font-size="28" text-anchor="middle">☁️</text>
+                    <text x="450" y="195" fill="#6a6a7a" font-size="10" text-anchor="middle">Public Internet</text>
+                    <rect x="640" y="40" width="240" height="180" rx="12" fill="rgba(139,92,246,0.1)" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="5 3"/>
+                    <text x="760" y="65" fill="#A78BFA" font-size="12" font-weight="600" text-anchor="middle">CLOUD VPC (AWS/Azure/GCP)</text>
+                    <rect x="720" y="160" width="100" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                    <text x="770" y="180" fill="#10B981" font-size="14" text-anchor="middle">🔐</text>
+                    <text x="770" y="195" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">VPN Gateway</text>
+                    <circle cx="720" cy="182" r="6" fill="#10B981" filter="url(#glow)"/>
+                    <rect x="660" y="90" width="60" height="50" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                    <text x="690" y="115" fill="#A78BFA" font-size="18" text-anchor="middle">🖥️</text>
+                    <text x="690" y="132" fill="#a0a0b0" font-size="9" text-anchor="middle">EC2/VMs</text>
+                    <rect x="740" y="90" width="60" height="50" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                    <text x="770" y="115" fill="#A78BFA" font-size="18" text-anchor="middle">🗄️</text>
+                    <text x="770" y="132" fill="#a0a0b0" font-size="9" text-anchor="middle">RDS/DB</text>
+                    <rect x="820" y="90" width="50" height="50" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                    <text x="845" y="115" fill="#A78BFA" font-size="18" text-anchor="middle">📦</text>
+                    <text x="845" y="132" fill="#a0a0b0" font-size="9" text-anchor="middle">S3</text>
+                </svg>
+            </div>
+        </section>
+
+        <section class="module" id="vpn-types">
+            <div class="module-header">
+                <div class="module-icon">🔀</div>
+                <div class="module-info">
+                    <h2>VPN Types</h2>
+                    <p>Different VPN configurations for various use cases</p>
+                </div>
+            </div>
+            <div class="vpn-types-grid">
+                <div class="vpn-type-card">
+                    <div class="vpn-type-header"><div class="vpn-type-icon">🏢</div><div class="vpn-type-title">Site-to-Site VPN</div></div>
+                    <div class="vpn-type-desc">Connects entire networks over IPsec tunnels. Ideal for data center to cloud VPC or linking multiple office locations securely.</div>
+                    <div class="vpn-type-specs"><span class="vpn-spec">IPsec/IKEv2</span><span class="vpn-spec">BGP Routing</span><span class="vpn-spec">1.25 Gbps</span><span class="vpn-spec">HA Tunnels</span></div>
+                </div>
+                <div class="vpn-type-card">
+                    <div class="vpn-type-header"><div class="vpn-type-icon">👤</div><div class="vpn-type-title">Client VPN</div></div>
+                    <div class="vpn-type-desc">Enables remote users to securely access cloud resources from anywhere. Supports certificate and SAML authentication with split-tunnel.</div>
+                    <div class="vpn-type-specs"><span class="vpn-spec">OpenVPN</span><span class="vpn-spec">SAML Auth</span><span class="vpn-spec">MFA Support</span><span class="vpn-spec">Split Tunnel</span></div>
+                </div>
+                <div class="vpn-type-card">
+                    <div class="vpn-type-header"><div class="vpn-type-icon">🌐</div><div class="vpn-type-title">Transit Gateway</div></div>
+                    <div class="vpn-type-desc">Centralized hub connecting multiple VPCs and on-premises networks. Simplifies topology with single gateway for all connections.</div>
+                    <div class="vpn-type-specs"><span class="vpn-spec">Hub-Spoke</span><span class="vpn-spec">50 Gbps</span><span class="vpn-spec">ECMP</span><span class="vpn-spec">5000 VPCs</span></div>
+                </div>
+                <div class="vpn-type-card">
+                    <div class="vpn-type-header"><div class="vpn-type-icon">🔗</div><div class="vpn-type-title">VPC Peering</div></div>
+                    <div class="vpn-type-desc">Direct private connectivity between VPCs without traversing internet. Traffic stays on cloud provider's private backbone.</div>
+                    <div class="vpn-type-specs"><span class="vpn-spec">Private IPs</span><span class="vpn-spec">No Gateway</span><span class="vpn-spec">Cross-Region</span><span class="vpn-spec">Cross-Account</span></div>
+                </div>
+                <div class="vpn-type-card">
+                    <div class="vpn-type-header"><div class="vpn-type-icon">🔌</div><div class="vpn-type-title">PrivateLink</div></div>
+                    <div class="vpn-type-desc">Access cloud services privately without internet exposure. Creates private endpoints in your VPC for S3, DynamoDB, or SaaS apps.</div>
+                    <div class="vpn-type-specs"><span class="vpn-spec">No Public IP</span><span class="vpn-spec">Service Mesh</span><span class="vpn-spec">SaaS Access</span><span class="vpn-spec">DNS Integration</span></div>
+                </div>
+                <div class="vpn-type-card">
+                    <div class="vpn-type-header"><div class="vpn-type-icon">⚡</div><div class="vpn-type-title">Direct Connect</div></div>
+                    <div class="vpn-type-desc">Dedicated physical connection bypassing public internet entirely. Consistent performance, reduced bandwidth costs, enhanced security.</div>
+                    <div class="vpn-type-specs"><span class="vpn-spec">Dedicated Port</span><span class="vpn-spec">100 Gbps</span><span class="vpn-spec">&lt;10ms Latency</span><span class="vpn-spec">BGP</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VPN TOOLS -->
+        <section class="module" id="vpn-tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>VPN Tools & Services</h2>
+                    <p>Popular consumer, enterprise, and open-source VPN solutions</p>
+                </div>
+            </div>
+            <div class="vpn-tools-grid">
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo nord">N</div>
+                        <div class="vpn-tool-info">
+                            <h4>NordVPN</h4>
+                            <div class="vpn-tool-type">Consumer / Business</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Industry-leading consumer VPN with Double VPN, Onion over VPN, and threat protection. NordLayer offers enterprise solutions.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">6,400+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">111</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">6</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">NordLynx</span><span class="vpn-tool-feature">Kill Switch</span><span class="vpn-tool-feature">Split Tunnel</span><span class="vpn-tool-feature">No Logs</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo express">E</div>
+                        <div class="vpn-tool-info">
+                            <h4>ExpressVPN</h4>
+                            <div class="vpn-tool-type">Consumer Premium</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Premium VPN known for speed and reliability. Lightway protocol offers fast connections. TrustedServer runs entirely in RAM.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">3,000+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">105</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">8</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">Lightway</span><span class="vpn-tool-feature">RAM-only</span><span class="vpn-tool-feature">Audited</span><span class="vpn-tool-feature">Router App</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo surfshark">S</div>
+                        <div class="vpn-tool-info">
+                            <h4>Surfshark</h4>
+                            <div class="vpn-tool-type">Consumer Budget</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Budget-friendly VPN with unlimited simultaneous connections. CleanWeb blocks ads and malware. Nexus optimizes server routing.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">3,200+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">100</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">∞</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">Unlimited</span><span class="vpn-tool-feature">CleanWeb</span><span class="vpn-tool-feature">MultiHop</span><span class="vpn-tool-feature">Camouflage</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo proton">P</div>
+                        <div class="vpn-tool-info">
+                            <h4>ProtonVPN</h4>
+                            <div class="vpn-tool-type">Privacy-Focused</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Swiss-based privacy VPN from Proton Mail team. Secure Core routes through multiple countries. NetShield blocks malware and trackers.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">4,600+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">91</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">10</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">Secure Core</span><span class="vpn-tool-feature">NetShield</span><span class="vpn-tool-feature">Open Source</span><span class="vpn-tool-feature">Free Tier</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo mullvad">M</div>
+                        <div class="vpn-tool-info">
+                            <h4>Mullvad VPN</h4>
+                            <div class="vpn-tool-type">Anonymous</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Anonymous VPN requiring no email or personal info. Fixed €5/month pricing. Account numbers instead of usernames. Cash payment accepted.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">700+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">46</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">5</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">No Account</span><span class="vpn-tool-feature">Fixed Price</span><span class="vpn-tool-feature">WireGuard</span><span class="vpn-tool-feature">Audited</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo tailscale">T</div>
+                        <div class="vpn-tool-info">
+                            <h4>Tailscale</h4>
+                            <div class="vpn-tool-type">Enterprise Mesh</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Zero-config mesh VPN built on WireGuard. Creates secure networks between devices without complex configuration. SSO integration.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">P2P</div><div class="vpn-tool-stat-label">Mesh</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">100</div><div class="vpn-tool-stat-label">Free Devices</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">SSO</div><div class="vpn-tool-stat-label">Auth</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">Mesh VPN</span><span class="vpn-tool-feature">Zero Config</span><span class="vpn-tool-feature">ACLs</span><span class="vpn-tool-feature">MagicDNS</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo wireguard">W</div>
+                        <div class="vpn-tool-info">
+                            <h4>WireGuard</h4>
+                            <div class="vpn-tool-type">Open Source Protocol</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Modern VPN protocol with ~4,000 lines of code vs 100,000+ for OpenVPN. Built into Linux kernel. Basis for many commercial VPNs.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">4K</div><div class="vpn-tool-stat-label">Lines of Code</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">Kernel</div><div class="vpn-tool-stat-label">Linux</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">Free</div><div class="vpn-tool-stat-label">Open Source</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">ChaCha20</span><span class="vpn-tool-feature">Curve25519</span><span class="vpn-tool-feature">Audited</span><span class="vpn-tool-feature">Fast</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo cyberghost">C</div>
+                        <div class="vpn-tool-info">
+                            <h4>CyberGhost</h4>
+                            <div class="vpn-tool-type">Consumer Streaming</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Large server network optimized for streaming. Dedicated IPs available. NoSpy servers in Romania. 45-day money-back guarantee.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">11,500+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">100</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">7</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">Streaming</span><span class="vpn-tool-feature">Dedicated IP</span><span class="vpn-tool-feature">NoSpy</span><span class="vpn-tool-feature">45-day Trial</span></div>
+                </div>
+
+                <div class="vpn-tool-card">
+                    <div class="vpn-tool-header">
+                        <div class="vpn-tool-logo private">P</div>
+                        <div class="vpn-tool-info">
+                            <h4>Private Internet Access</h4>
+                            <div class="vpn-tool-type">Consumer Value</div>
+                        </div>
+                    </div>
+                    <div class="vpn-tool-desc">Long-established VPN with proven no-logs policy (court-verified). Open-source apps. MACE blocks ads, trackers, and malware.</div>
+                    <div class="vpn-tool-stats">
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">35,000+</div><div class="vpn-tool-stat-label">Servers</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">91</div><div class="vpn-tool-stat-label">Countries</div></div>
+                        <div class="vpn-tool-stat"><div class="vpn-tool-stat-value">∞</div><div class="vpn-tool-stat-label">Devices</div></div>
+                    </div>
+                    <div class="vpn-tool-features"><span class="vpn-tool-feature">Court Verified</span><span class="vpn-tool-feature">MACE</span><span class="vpn-tool-feature">Open Source</span><span class="vpn-tool-feature">Port Forward</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCORECARD -->
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>VPN Scorecard</h2>
+                    <p>Comparative ratings across key metrics</p>
+                </div>
+            </div>
+            <div class="scorecard">
+                <div class="scorecard-header">
+                    <span>Provider</span>
+                    <span>Speed</span>
+                    <span>Privacy</span>
+                    <span>Security</span>
+                    <span>Ease of Use</span>
+                    <span>Value</span>
+                    <span>Overall</span>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo nord">N</div><span class="scorecard-name">NordVPN</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.2</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.4</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">9.1</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo express">E</div><span class="scorecard-name">ExpressVPN</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.3</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.4</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.9</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo surfshark">S</div><span class="scorecard-name">Surfshark</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.7</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.2</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">9.0</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo proton">P</div><span class="scorecard-name">ProtonVPN</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.6</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.9</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo mullvad">M</div><span class="scorecard-name">Mullvad</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">10</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.9</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo tailscale">T</div><span class="scorecard-name">Tailscale</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.2</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">9.2</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo cyberghost">C</div><span class="scorecard-name">CyberGhost</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.3</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.3</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.2</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.8</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo private">P</div><span class="scorecard-name">PIA</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.3</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.8</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="protocols">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Encryption & Protocols</h2>
+                    <p>Security standards protecting VPN traffic</p>
+                </div>
+            </div>
+            <div class="protocols-grid">
+                <div class="protocol-card"><div class="protocol-name">IPsec</div><div class="protocol-type">Network Layer</div><div class="protocol-desc">Industry standard for site-to-site. AES-256, SHA-256, PFS with DH groups 14-24.</div></div>
+                <div class="protocol-card"><div class="protocol-name">IKEv2</div><div class="protocol-type">Key Exchange</div><div class="protocol-desc">Modern key exchange with MOBIKE for mobile. Faster reconnection than IKEv1.</div></div>
+                <div class="protocol-card"><div class="protocol-name">OpenVPN</div><div class="protocol-type">SSL/TLS</div><div class="protocol-desc">Open-source using TLS. Highly configurable, any port, UDP or TCP.</div></div>
+                <div class="protocol-card"><div class="protocol-name">WireGuard</div><div class="protocol-type">Modern VPN</div><div class="protocol-desc">Lightweight, fast, ChaCha20. Minimal attack surface ~4000 lines of code.</div></div>
+                <div class="protocol-card"><div class="protocol-name">AES-256-GCM</div><div class="protocol-type">Encryption</div><div class="protocol-desc">Military-grade symmetric encryption. GCM provides auth + encryption in one pass.</div></div>
+                <div class="protocol-card"><div class="protocol-name">SHA-384/512</div><div class="protocol-type">Integrity</div><div class="protocol-desc">Cryptographic hash ensuring data hasn't been tampered during transit.</div></div>
+                <div class="protocol-card"><div class="protocol-name">PFS (DH)</div><div class="protocol-type">Key Security</div><div class="protocol-desc">Perfect Forward Secrecy ensures compromised keys don't expose past sessions.</div></div>
+                <div class="protocol-card"><div class="protocol-name">MACsec</div><div class="protocol-type">Layer 2</div><div class="protocol-desc">IEEE 802.1AE for point-to-point on Direct Connect and dedicated lines.</div></div>
+            </div>
+        </section>
+
+        <section class="module" id="direct-connect">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Direct Connect Architecture</h2>
+                    <p>Dedicated physical connectivity to cloud providers</p>
+                </div>
+            </div>
+            <div class="vpn-diagram">
+                <div class="vpn-diagram-header">
+                    <div class="vpn-diagram-title">🏢 Enterprise to Cloud Direct Connection</div>
+                    <div class="vpn-diagram-badge">Dedicated Line</div>
+                </div>
+                <svg viewBox="0 0 900 220" style="width: 100%; height: 220px;">
+                    <defs>
+                        <linearGradient id="fiberGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#F59E0B"/>
+                            <stop offset="50%" style="stop-color:#FBBF24"/>
+                            <stop offset="100%" style="stop-color:#F59E0B"/>
+                        </linearGradient>
+                        <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#8B5CF6"/>
+                            <stop offset="100%" style="stop-color:#A78BFA"/>
+                        </linearGradient>
+                        <filter id="glowYellow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    
+                    <!-- Customer Data Center -->
+                    <rect x="30" y="50" width="140" height="100" rx="10" fill="rgba(59,130,246,0.1)" stroke="#3B82F6" stroke-width="2"/>
+                    <text x="100" y="80" fill="#60A5FA" font-size="24" text-anchor="middle">🏢</text>
+                    <text x="100" y="105" fill="#60A5FA" font-size="11" font-weight="600" text-anchor="middle">Customer</text>
+                    <text x="100" y="120" fill="#60A5FA" font-size="11" font-weight="600" text-anchor="middle">Data Center</text>
+                    <text x="100" y="140" fill="#6a6a7a" font-size="9" text-anchor="middle">Customer Router</text>
+
+                    <!-- Connection Line 1 -->
+                    <line x1="170" y1="100" x2="260" y2="100" stroke="#FBBF24" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="170" y1="100" x2="260" y2="100" stroke="url(#fiberGrad2)" stroke-width="4" stroke-linecap="round"/>
+                    <text x="215" y="80" fill="#FBBF24" font-size="9" text-anchor="middle">Fiber Cross-Connect</text>
+
+                    <!-- Colocation -->
+                    <rect x="260" y="50" width="140" height="100" rx="10" fill="rgba(245,158,11,0.1)" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="330" y="80" fill="#FBBF24" font-size="24" text-anchor="middle">🏛️</text>
+                    <text x="330" y="105" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle">Colocation</text>
+                    <text x="330" y="120" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle">Facility</text>
+                    <text x="330" y="140" fill="#6a6a7a" font-size="9" text-anchor="middle">Equinix / CoreSite</text>
+
+                    <!-- Connection Line 2 -->
+                    <line x1="400" y1="100" x2="490" y2="100" stroke="#FBBF24" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="400" y1="100" x2="490" y2="100" stroke="url(#fiberGrad2)" stroke-width="4" stroke-linecap="round"/>
+                    <text x="445" y="80" fill="#FBBF24" font-size="9" text-anchor="middle">Provider Port</text>
+
+                    <!-- Cloud Edge -->
+                    <rect x="490" y="50" width="140" height="100" rx="10" fill="rgba(139,92,246,0.1)" stroke="#8B5CF6" stroke-width="2"/>
+                    <text x="560" y="80" fill="#A78BFA" font-size="24" text-anchor="middle">🌐</text>
+                    <text x="560" y="105" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">Cloud Provider</text>
+                    <text x="560" y="120" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">Edge Router</text>
+                    <text x="560" y="140" fill="#6a6a7a" font-size="9" text-anchor="middle">Direct Connect Loc</text>
+
+                    <!-- Connection Line 3 - Purple for private backbone -->
+                    <line x1="630" y1="100" x2="720" y2="100" stroke="#8B5CF6" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="630" y1="100" x2="720" y2="100" stroke="url(#purpleGrad)" stroke-width="4" stroke-linecap="round"/>
+
+                    <!-- Cloud Region -->
+                    <rect x="720" y="50" width="150" height="100" rx="10" fill="rgba(139,92,246,0.1)" stroke="#8B5CF6" stroke-width="2"/>
+                    <text x="795" y="80" fill="#A78BFA" font-size="24" text-anchor="middle">☁️</text>
+                    <text x="795" y="105" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">Cloud Region</text>
+                    <text x="795" y="120" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">(VPCs/VNets)</text>
+                    <text x="795" y="140" fill="#6a6a7a" font-size="9" text-anchor="middle">Private Gateway</text>
+
+                    <!-- Animated packets -->
+                    <circle r="6" fill="#FBBF24" filter="url(#glowYellow)">
+                        <animateMotion dur="3s" repeatCount="indefinite" path="M 170 100 L 260 100 L 400 100 L 490 100 L 630 100 L 795 100"/>
+                    </circle>
+                    <circle r="6" fill="#A78BFA">
+                        <animateMotion dur="3s" repeatCount="indefinite" begin="1.5s" path="M 795 100 L 630 100 L 490 100 L 400 100 L 260 100 L 170 100"/>
+                    </circle>
+
+                    <!-- Speed indicators -->
+                    <text x="215" y="180" fill="#6a6a7a" font-size="10" text-anchor="middle">1-100 Gbps</text>
+                    <text x="445" y="180" fill="#6a6a7a" font-size="10" text-anchor="middle">Dedicated Port</text>
+                    <text x="675" y="180" fill="#6a6a7a" font-size="10" text-anchor="middle">Private Backbone</text>
+                </svg>
+            </div>
+            <div class="connectivity-grid">
+                <div class="connectivity-card">
+                    <div class="connectivity-header"><div class="connectivity-title"><span>⚡</span><h4>AWS Direct Connect</h4></div><span class="connectivity-badge aws">AWS</span></div>
+                    <ul class="connectivity-features">
+                        <li><span>📊</span> 1, 10, or 100 Gbps dedicated ports</li>
+                        <li><span>🔗</span> Hosted connections from 50 Mbps</li>
+                        <li><span>🌍</span> 100+ Direct Connect locations globally</li>
+                        <li><span>💰</span> Reduced data transfer costs vs internet</li>
+                        <li><span>🔐</span> MACsec encryption available</li>
+                        <li><span>🔄</span> Direct Connect Gateway for multi-region</li>
+                    </ul>
+                </div>
+                <div class="connectivity-card">
+                    <div class="connectivity-header"><div class="connectivity-title"><span>⚡</span><h4>Azure ExpressRoute</h4></div><span class="connectivity-badge azure">Azure</span></div>
+                    <ul class="connectivity-features">
+                        <li><span>📊</span> 50 Mbps to 100 Gbps circuits</li>
+                        <li><span>🔗</span> ExpressRoute Direct for 100G</li>
+                        <li><span>🌍</span> Global Reach connects circuits</li>
+                        <li><span>🔐</span> Private & Microsoft peering</li>
+                        <li><span>📍</span> 70+ peering locations worldwide</li>
+                        <li><span>🔄</span> FastPath for optimized routing</li>
+                    </ul>
+                </div>
+                <div class="connectivity-card">
+                    <div class="connectivity-header"><div class="connectivity-title"><span>⚡</span><h4>GCP Cloud Interconnect</h4></div><span class="connectivity-badge gcp">GCP</span></div>
+                    <ul class="connectivity-features">
+                        <li><span>📊</span> Dedicated: 10 or 100 Gbps</li>
+                        <li><span>🔗</span> Partner: 50 Mbps to 50 Gbps</li>
+                        <li><span>🌍</span> 150+ colocation facilities</li>
+                        <li><span>💰</span> 50-80% egress discount</li>
+                        <li><span>🔐</span> MACsec for dedicated connections</li>
+                        <li><span>📊</span> 99.99% SLA with redundancy</li>
+                    </ul>
+                </div>
+                <div class="connectivity-card">
+                    <div class="connectivity-header"><div class="connectivity-title"><span>🔀</span><h4>Multi-Cloud Connectivity</h4></div><span class="connectivity-badge hybrid">Hybrid</span></div>
+                    <ul class="connectivity-features">
+                        <li><span>🌐</span> Megaport, PacketFabric, Equinix Fabric</li>
+                        <li><span>🔗</span> Connect AWS, Azure, GCP from one port</li>
+                        <li><span>⚡</span> Software-defined networking</li>
+                        <li><span>📊</span> On-demand bandwidth scaling</li>
+                        <li><span>🔐</span> Virtual cross-connects</li>
+                        <li><span>💰</span> Pay-as-you-go pricing</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="cloud-compare">
+            <div class="module-header">
+                <div class="module-icon">☁️</div>
+                <div class="module-info">
+                    <h2>Provider Comparison</h2>
+                    <p>VPN and connectivity options across major cloud providers</p>
+                </div>
+            </div>
+            <table class="compare-table">
+                <thead><tr><th>Feature</th><th class="aws">AWS</th><th class="azure">Azure</th><th class="gcp">GCP</th></tr></thead>
+                <tbody>
+                    <tr><td class="feature">Site-to-Site VPN</td><td>AWS Site-to-Site VPN</td><td>Azure VPN Gateway</td><td>Cloud VPN</td></tr>
+                    <tr><td class="feature">VPN Bandwidth</td><td>1.25 Gbps per tunnel</td><td>10 Gbps (VpnGw5)</td><td>3 Gbps per tunnel</td></tr>
+                    <tr><td class="feature">Client VPN</td><td>AWS Client VPN</td><td>Point-to-Site VPN</td><td>BeyondCorp / IAP</td></tr>
+                    <tr><td class="feature">Direct Connect</td><td>Direct Connect</td><td>ExpressRoute</td><td>Cloud Interconnect</td></tr>
+                    <tr><td class="feature">Max Bandwidth</td><td>100 Gbps</td><td>100 Gbps</td><td>100 Gbps</td></tr>
+                    <tr><td class="feature">Global Backbone</td><td>Global Accelerator</td><td>Global Reach</td><td>Premium Tier Network</td></tr>
+                    <tr><td class="feature">Transit Hub</td><td>Transit Gateway</td><td>Virtual WAN</td><td>Network Connectivity Center</td></tr>
+                    <tr><td class="feature">Private Service Access</td><td>PrivateLink</td><td>Private Link</td><td>Private Service Connect</td></tr>
+                    <tr><td class="feature">Encryption</td><td>AES-256, MACsec</td><td>AES-256, IPsec</td><td>AES-256, MACsec</td></tr>
+                    <tr><td class="feature">SLA (Direct)</td><td>99.99% (redundant)</td><td>99.95%</td><td>99.99% (redundant)</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Recommendations for secure, reliable connectivity</p>
+                </div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card"><div class="practice-num">1</div><div class="practice-content"><h4>Redundant Tunnels</h4><p>Always configure dual tunnels to separate availability zones. Use BGP with ECMP for automatic failover. Test failover scenarios quarterly.</p></div></div>
+                <div class="practice-card"><div class="practice-num">2</div><div class="practice-content"><h4>Strong Encryption</h4><p>Use AES-256-GCM with SHA-384+ for integrity. Enable Perfect Forward Secrecy with DH Group 20+. Rotate keys every 90 days.</p></div></div>
+                <div class="practice-card"><div class="practice-num">3</div><div class="practice-content"><h4>Monitor Everything</h4><p>Track tunnel state, throughput, latency, and packet loss. Alert on tunnel flaps (&gt;3/hour), latency spikes (&gt;100ms), throughput drops.</p></div></div>
+                <div class="practice-card"><div class="practice-num">4</div><div class="practice-content"><h4>BGP Best Practices</h4><p>Use BGP for dynamic routing instead of static routes. Configure AS path prepending for traffic engineering. Set keepalive to 10/30s.</p></div></div>
+                <div class="practice-card"><div class="practice-num">5</div><div class="practice-content"><h4>Cost Optimization</h4><p>Use Direct Connect for high-volume traffic (break-even ~1-5 TB/month). Keep VPN as backup. Consider hosted connections.</p></div></div>
+                <div class="practice-card"><div class="practice-num">6</div><div class="practice-content"><h4>Zero Trust Integration</h4><p>Don't rely solely on VPN for security. Implement identity-aware proxies, micro-segmentation, and MFA for all connections.</p></div></div>
+            </div>
+        </section>
+
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>SecureConnectAdvisor</h2>
+                    <p>VPN & connectivity specialist agent</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🔐 SecureConnectAdvisor</h3>
+                    <p>Specialized agent for designing and optimizing VPN and hybrid connectivity architectures. Analyzes traffic patterns, recommends encryption settings, and generates infrastructure-as-code for multi-cloud connectivity.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🔧</span> VPN configuration optimization</div>
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Bandwidth and latency analysis</div>
+                        <div class="agent-capability"><span class="capability-icon">💰</span> Direct Connect cost modeling</div>
+                        <div class="agent-capability"><span class="capability-icon">🔐</span> Encryption best practices</div>
+                        <div class="agent-capability"><span class="capability-icon">🌐</span> Multi-cloud connectivity design</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Terraform/CloudFormation generation</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">vpn-config.tf</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">resource</span> <span class="code-string">"aws_vpn_gateway"</span> <span class="code-string">"main"</span> {
+  vpc_id = aws_vpc.main.id
+  tags = { Name = <span class="code-string">"prod-vpn-gateway"</span> }
+}
+
+<span class="code-keyword">resource</span> <span class="code-string">"aws_customer_gateway"</span> <span class="code-string">"dc"</span> {
+  bgp_asn    = <span class="code-string">65000</span>
+  ip_address = <span class="code-string">"203.0.113.1"</span>
+  type       = <span class="code-string">"ipsec.1"</span>
+}
+
+<span class="code-keyword">resource</span> <span class="code-string">"aws_vpn_connection"</span> <span class="code-string">"main"</span> {
+  vpn_gateway_id      = aws_vpn_gateway.main.id
+  customer_gateway_id = aws_customer_gateway.dc.id
+  type                = <span class="code-string">"ipsec.1"</span>
+  static_routes_only  = <span class="code-keyword">false</span>
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring networking</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat15-p3-dns-cdn.html" class="related-card"><div class="related-icon">🌍</div><div class="related-title">DNS & CDN</div><div class="related-desc">Global traffic routing and content delivery</div></a>
+                <a href="cat15-p5-network-security.html" class="related-card"><div class="related-icon">🛡️</div><div class="related-title">Network Security</div><div class="related-desc">Firewalls, WAF, and zero-trust architecture</div></a>
+                <a href="cat15-p6-service-mesh.html" class="related-card"><div class="related-icon">🕸️</div><div class="related-title">Service Mesh</div><div class="related-desc">Microservices networking and observability</div></a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat15-p3-dns-cdn.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous</div><div class="footer-link-title">15.3 DNS & CDN</div></div></a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 15</div>
+        <a href="cat15-p5-network-security.html" class="footer-link"><div><div class="footer-link-label">Next</div><div class="footer-link-title">15.5 Network Security</div></div><span>→</span></a>
+    </div>
+</footer>
+
+</body>
+</html>

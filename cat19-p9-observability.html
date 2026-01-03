@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observability & Evals | Emerging Technologies | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --page-primary: #F59E0B;
+            --page-light: #FBBF24;
+            --page-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .header-tagline { font-size: 13px; color: var(--text-muted); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--page-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--page-glow); color: var(--page-light); border-left-color: var(--page-light); }
+        .nav-icon { width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content ul { list-style: none; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); padding: 4px 0; padding-left: 20px; position: relative; }
+        .overview-content li::before { content: '•'; position: absolute; left: 0; color: var(--page-light); }
+        .overview-content strong { color: var(--text-primary); }
+        .overview-full { grid-column: 1 / -1; }
+
+        .comparison-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .comparison-table th, .comparison-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        .comparison-table th { background: var(--bg-dark); color: var(--text-primary); font-weight: 600; }
+        .comparison-table td { color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .table-highlight { color: var(--page-light) !important; font-weight: 600; }
+
+        .sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .sw-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .sw-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .sw-title.green { color: var(--green); }
+        .sw-title.yellow { color: var(--yellow); }
+        .sw-list { list-style: none; }
+        .sw-list li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; padding-left: 16px; position: relative; }
+        .sw-card.strengths .sw-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); }
+        .sw-card.weaknesses .sw-list li::before { content: '⚠'; position: absolute; left: 0; color: var(--yellow); font-size: 11px; }
+
+        .deep-dive { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+        .deep-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .deep-icon { font-size: 28px; }
+        .deep-title { font-size: 18px; font-weight: 600; }
+        .deep-subtitle { font-size: 12px; color: var(--text-muted); }
+        .deep-body { padding: 24px; }
+        .deep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .deep-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .deep-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .deep-section ul { list-style: none; }
+        .deep-section li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; padding-left: 20px; position: relative; }
+        .deep-section li::before { content: '→'; position: absolute; left: 0; color: var(--page-light); }
+
+        /* Observability Stack Visualization */
+        .obs-stack { background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(245, 158, 11, 0.05) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+        .obs-stack-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--page-light); text-align: center; }
+        .obs-stack-subtitle { font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 28px; }
+        .obs-layers { display: flex; flex-direction: column; gap: 12px; max-width: 800px; margin: 0 auto; }
+        .obs-layer { display: grid; grid-template-columns: 140px 1fr; gap: 20px; align-items: center; padding: 16px 20px; border-radius: 10px; border-left: 4px solid; }
+        .obs-layer:nth-child(1) { background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), transparent); border-left-color: var(--red); }
+        .obs-layer:nth-child(2) { background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), transparent); border-left-color: var(--yellow); }
+        .obs-layer:nth-child(3) { background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), transparent); border-left-color: var(--blue); }
+        .obs-layer:nth-child(4) { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), transparent); border-left-color: var(--purple); }
+        .obs-layer:nth-child(5) { background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), transparent); border-left-color: var(--green); }
+        .obs-layer-name { font-size: 14px; font-weight: 600; }
+        .obs-layer-desc { font-size: 12px; color: var(--text-secondary); }
+        .obs-layer-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .obs-layer-tag { padding: 3px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; font-size: 10px; color: var(--text-muted); }
+
+        /* Trace Visualization */
+        .trace-viz { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .trace-viz-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--page-light); text-align: center; }
+        .trace-viz-subtitle { font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+        .trace-timeline { position: relative; padding-left: 60px; }
+        .trace-ruler { position: absolute; left: 0; top: 0; bottom: 0; width: 50px; display: flex; flex-direction: column; justify-content: space-between; font-size: 10px; color: var(--text-muted); text-align: right; padding-right: 10px; }
+        .trace-spans { display: flex; flex-direction: column; gap: 8px; }
+        .trace-span { display: flex; align-items: center; gap: 12px; }
+        .trace-span-label { width: 120px; font-size: 12px; font-weight: 500; text-align: right; flex-shrink: 0; }
+        .trace-span-bar-container { flex: 1; height: 28px; background: var(--bg-card); border-radius: 4px; position: relative; overflow: hidden; }
+        .trace-span-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 10px; color: white; position: absolute; }
+        .trace-span-bar.query { background: linear-gradient(90deg, var(--green), #34D399); left: 0; width: 8%; }
+        .trace-span-bar.embed { background: linear-gradient(90deg, var(--blue), #60A5FA); left: 8%; width: 5%; }
+        .trace-span-bar.retrieve { background: linear-gradient(90deg, var(--purple), #A78BFA); left: 13%; width: 12%; }
+        .trace-span-bar.rerank { background: linear-gradient(90deg, var(--yellow), #FBBF24); left: 25%; width: 8%; }
+        .trace-span-bar.llm { background: linear-gradient(90deg, var(--red), #F87171); left: 33%; width: 67%; }
+        .trace-span-duration { font-size: 11px; color: var(--text-muted); width: 60px; text-align: right; }
+        .trace-legend { display: flex; justify-content: center; gap: 20px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .trace-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+        .trace-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+        /* Eval Results Dashboard */
+        .eval-results { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .eval-results-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--page-light); text-align: center; }
+        .eval-results-subtitle { font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+        .eval-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .eval-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .eval-stat-value { font-size: 28px; font-weight: 700; }
+        .eval-stat-value.pass { color: var(--green); }
+        .eval-stat-value.fail { color: var(--red); }
+        .eval-stat-value.warn { color: var(--yellow); }
+        .eval-stat-value.neutral { color: var(--blue); }
+        .eval-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .eval-cases { display: flex; flex-direction: column; gap: 8px; }
+        .eval-case { display: grid; grid-template-columns: 32px 1fr 100px 80px 100px; gap: 12px; align-items: center; padding: 12px 16px; background: var(--bg-card); border-radius: 8px; font-size: 12px; }
+        .eval-case-status { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .eval-case-status.pass { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .eval-case-status.fail { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .eval-case-query { color: var(--text-primary); }
+        .eval-case-metric { color: var(--text-muted); }
+        .eval-case-score { font-weight: 600; }
+        .eval-case-score.good { color: var(--green); }
+        .eval-case-score.bad { color: var(--red); }
+        .eval-case-latency { color: var(--text-muted); }
+
+        /* Cost Tracking */
+        .cost-breakdown { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .cost-breakdown-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; color: var(--page-light); text-align: center; }
+        .cost-bars { display: flex; flex-direction: column; gap: 16px; max-width: 600px; margin: 0 auto; }
+        .cost-bar-row { display: grid; grid-template-columns: 100px 1fr 80px; gap: 12px; align-items: center; }
+        .cost-bar-label { font-size: 12px; font-weight: 500; text-align: right; }
+        .cost-bar-track { height: 24px; background: var(--bg-card); border-radius: 4px; overflow: hidden; }
+        .cost-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; color: white; }
+        .cost-bar-fill.llm { background: linear-gradient(90deg, var(--red), #F87171); }
+        .cost-bar-fill.embed { background: linear-gradient(90deg, var(--blue), #60A5FA); }
+        .cost-bar-fill.vector { background: linear-gradient(90deg, var(--purple), #A78BFA); }
+        .cost-bar-fill.infra { background: linear-gradient(90deg, var(--green), #34D399); }
+        .cost-bar-value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .cost-total { display: flex; justify-content: center; gap: 40px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .cost-total-item { text-align: center; }
+        .cost-total-value { font-size: 24px; font-weight: 700; color: var(--page-light); }
+        .cost-total-label { font-size: 11px; color: var(--text-muted); }
+
+        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); }
+        .tool-card.featured { border-color: var(--page-primary); background: linear-gradient(135deg, var(--bg-dark), var(--page-glow)); }
+        .tool-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .tool-name { font-size: 15px; font-weight: 600; }
+        .tool-vendor { font-size: 11px; color: var(--text-muted); }
+        .tool-badge { padding: 4px 10px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 9999px; font-size: 11px; color: var(--page-light); font-weight: 600; }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+        .tool-features { font-size: 11px; color: var(--text-muted); }
+
+        .strategy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .strategy-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .strategy-icon { font-size: 24px; margin-bottom: 12px; }
+        .strategy-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .strategy-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .strategy-when { font-size: 12px; color: var(--text-muted); }
+
+        .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .metric-icon { font-size: 28px; margin-bottom: 12px; }
+        .metric-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .metric-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+        .metric-target { font-size: 11px; color: var(--page-light); margin-top: 8px; font-weight: 600; }
+
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 16px; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .practice-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        .checklist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px; }
+        .checklist-section { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .checklist-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--page-light); display: flex; align-items: center; gap: 8px; }
+        .checklist-items { display: flex; flex-direction: column; gap: 8px; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-secondary); }
+        .checklist-check { color: var(--green); flex-shrink: 0; margin-top: 2px; }
+
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .ck { color: #FF7B72; }
+        .cs { color: #A5D6FF; }
+        .cf { color: #79C0FF; }
+
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .sw-grid, .deep-grid, .agent-grid { grid-template-columns: 1fr; }
+            .tool-grid, .strategy-grid, .practices-grid, .related-grid, .checklist-grid, .eval-summary, .metric-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="header-tagline">Enterprise Technology Knowledge Base</div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 19</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat19-emerging-technologies-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat19-p1-foundation-models.html"><span class="nav-icon">🧠</span> 19.1 Foundation Models</a></li>
+            <li><a href="cat19-p2-agentic-ai.html"><span class="nav-icon">🤖</span> 19.2 Agentic AI</a></li>
+            <li><a href="cat19-p3-multimodal-ai.html"><span class="nav-icon">🎨</span> 19.3 Multimodal AI</a></li>
+            <li><a href="cat19-p4-ai-coding.html"><span class="nav-icon">💻</span> 19.4 AI Coding Tools</a></li>
+            <li><a href="cat19-p5-edge-ai.html"><span class="nav-icon">📱</span> 19.5 Edge & On-Device</a></li>
+            <li><a href="cat19-p6-ai-infrastructure.html"><span class="nav-icon">🖥️</span> 19.6 AI Infrastructure</a></li>
+            <li><a href="cat19-p7-ai-safety.html"><span class="nav-icon">🛡️</span> 19.7 AI Safety & Governance</a></li>
+            <li><a href="cat19-p8-rag-knowledge.html"><span class="nav-icon">📚</span> 19.8 RAG & Knowledge</a></li>
+            <li><a href="cat19-p9-observability.html" class="active"><span class="nav-icon">📊</span> 19.9 Observability & Evals</a></li>
+            <li><a href="cat19-p10-enterprise-adoption.html"><span class="nav-icon">🏢</span> 19.10 Enterprise Adoption</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#stack"><span class="nav-icon">📚</span> Observability Stack</a></li>
+            <li><a href="#tracing"><span class="nav-icon">🔍</span> Tracing & Logging</a></li>
+            <li><a href="#evals"><span class="nav-icon">✅</span> Evaluations</a></li>
+            <li><a href="#metrics"><span class="nav-icon">📈</span> Key Metrics</a></li>
+            <li><a href="#cost"><span class="nav-icon">💰</span> Cost Tracking</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools & Platforms</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#checklist"><span class="nav-icon">📋</span> Implementation</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">📊 Page 19.9</span>
+                <h1>Observability & Evals</h1>
+                <p>You can't improve what you can't measure. LLM observability gives you visibility into model behavior, latency, costs, and quality. Evaluations systematically test your AI systems to catch regressions, measure improvements, and build confidence before deployment.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">~40%</div><div class="hero-metric-label">Issues Caught Pre-Deploy</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">3-5x</div><div class="hero-metric-label">Faster Debugging</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">~25%</div><div class="hero-metric-label">Cost Reduction</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;1 min</div><div class="hero-metric-label">Issue Detection</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Understanding LLM observability and evaluation</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is LLM Observability?</h3>
+                    <p><strong>LLM Observability</strong> is the practice of collecting, analyzing, and acting on data about your AI system's behavior in production. Unlike traditional software where you monitor uptime and error rates, LLM systems require monitoring output quality, hallucination rates, latency distributions, token usage, and cost per query.</p>
+                    <p>Observability answers: What did the model actually do? Why did it fail? How much did it cost? Is quality degrading over time?</p>
+                </div>
+                <div>
+                    <h3>What are Evals?</h3>
+                    <p><strong>Evaluations (Evals)</strong> are systematic tests that measure AI system quality. Unlike unit tests with binary pass/fail, evals often measure quality on a spectrum—relevance scores, factual accuracy, tone appropriateness. They run on test datasets before deployment and continuously in production.</p>
+                    <p>Evals answer: Is this change an improvement? Will this prompt work in production? Is the model still performing as expected?</p>
+                </div>
+            </div>
+
+            <div class="sw-grid">
+                <div class="sw-card strengths">
+                    <div class="sw-title green">✓ Why Observability Matters</div>
+                    <ul class="sw-list">
+                        <li><strong>Catch issues early:</strong> Detect quality regressions before users complain</li>
+                        <li><strong>Debug faster:</strong> Trace exactly what happened on any request</li>
+                        <li><strong>Control costs:</strong> Track token usage and optimize expensive calls</li>
+                        <li><strong>Build confidence:</strong> Know your system works before deploying changes</li>
+                        <li><strong>Comply with audits:</strong> Log all inputs/outputs for regulated industries</li>
+                        <li><strong>Improve continuously:</strong> Data-driven optimization of prompts and retrieval</li>
+                    </ul>
+                </div>
+                <div class="sw-card weaknesses">
+                    <div class="sw-title yellow">⚠ Common Challenges</div>
+                    <ul class="sw-list">
+                        <li><strong>Non-determinism:</strong> Same input can produce different outputs</li>
+                        <li><strong>Subjective quality:</strong> "Good" responses are hard to define automatically</li>
+                        <li><strong>Scale of data:</strong> Logging every token is expensive at high volume</li>
+                        <li><strong>Privacy concerns:</strong> User inputs may contain sensitive data</li>
+                        <li><strong>Eval maintenance:</strong> Test sets drift as product evolves</li>
+                        <li><strong>LLM-as-judge bias:</strong> Using LLMs to evaluate LLMs has limitations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Observability Stack -->
+        <section class="module" id="stack">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>The Observability Stack</h2>
+                    <p>Layers of LLM monitoring</p>
+                </div>
+            </div>
+
+            <div class="obs-stack">
+                <div class="obs-stack-title">LLM Observability Layers</div>
+                <div class="obs-stack-subtitle">From raw logs to actionable insights</div>
+                <div class="obs-layers">
+                    <div class="obs-layer">
+                        <div>
+                            <div class="obs-layer-name">🚨 Alerting</div>
+                            <div class="obs-layer-desc">Proactive notifications when metrics breach thresholds</div>
+                        </div>
+                        <div class="obs-layer-tools">
+                            <span class="obs-layer-tag">PagerDuty</span>
+                            <span class="obs-layer-tag">Slack</span>
+                            <span class="obs-layer-tag">Custom webhooks</span>
+                        </div>
+                    </div>
+                    <div class="obs-layer">
+                        <div>
+                            <div class="obs-layer-name">📊 Dashboards</div>
+                            <div class="obs-layer-desc">Visualize trends, compare experiments, monitor KPIs</div>
+                        </div>
+                        <div class="obs-layer-tools">
+                            <span class="obs-layer-tag">Grafana</span>
+                            <span class="obs-layer-tag">DataDog</span>
+                            <span class="obs-layer-tag">Platform UIs</span>
+                        </div>
+                    </div>
+                    <div class="obs-layer">
+                        <div>
+                            <div class="obs-layer-name">📈 Metrics</div>
+                            <div class="obs-layer-desc">Aggregate statistics: latency, cost, quality scores, throughput</div>
+                        </div>
+                        <div class="obs-layer-tools">
+                            <span class="obs-layer-tag">Prometheus</span>
+                            <span class="obs-layer-tag">CloudWatch</span>
+                            <span class="obs-layer-tag">Custom metrics</span>
+                        </div>
+                    </div>
+                    <div class="obs-layer">
+                        <div>
+                            <div class="obs-layer-name">🔍 Tracing</div>
+                            <div class="obs-layer-desc">End-to-end request flow across components (RAG, tools, LLM)</div>
+                        </div>
+                        <div class="obs-layer-tools">
+                            <span class="obs-layer-tag">LangSmith</span>
+                            <span class="obs-layer-tag">Phoenix</span>
+                            <span class="obs-layer-tag">OpenTelemetry</span>
+                        </div>
+                    </div>
+                    <div class="obs-layer">
+                        <div>
+                            <div class="obs-layer-name">📝 Logging</div>
+                            <div class="obs-layer-desc">Raw inputs, outputs, metadata, errors for every request</div>
+                        </div>
+                        <div class="obs-layer-tools">
+                            <span class="obs-layer-tag">S3/GCS</span>
+                            <span class="obs-layer-tag">Elasticsearch</span>
+                            <span class="obs-layer-tag">Database</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tracing -->
+        <section class="module" id="tracing">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>Tracing & Logging</h2>
+                    <p>Following requests through your system</p>
+                </div>
+            </div>
+
+            <div class="trace-viz">
+                <div class="trace-viz-title">Anatomy of an LLM Request Trace</div>
+                <div class="trace-viz-subtitle">Visualizing where time goes in a RAG pipeline (1,850ms total)</div>
+                <div class="trace-spans">
+                    <div class="trace-span">
+                        <div class="trace-span-label">Query Processing</div>
+                        <div class="trace-span-bar-container">
+                            <div class="trace-span-bar query">150ms</div>
+                        </div>
+                        <div class="trace-span-duration">150ms (8%)</div>
+                    </div>
+                    <div class="trace-span">
+                        <div class="trace-span-label">Embedding</div>
+                        <div class="trace-span-bar-container">
+                            <div class="trace-span-bar embed">85ms</div>
+                        </div>
+                        <div class="trace-span-duration">85ms (5%)</div>
+                    </div>
+                    <div class="trace-span">
+                        <div class="trace-span-label">Vector Search</div>
+                        <div class="trace-span-bar-container">
+                            <div class="trace-span-bar retrieve">220ms</div>
+                        </div>
+                        <div class="trace-span-duration">220ms (12%)</div>
+                    </div>
+                    <div class="trace-span">
+                        <div class="trace-span-label">Reranking</div>
+                        <div class="trace-span-bar-container">
+                            <div class="trace-span-bar rerank">145ms</div>
+                        </div>
+                        <div class="trace-span-duration">145ms (8%)</div>
+                    </div>
+                    <div class="trace-span">
+                        <div class="trace-span-label">LLM Generation</div>
+                        <div class="trace-span-bar-container">
+                            <div class="trace-span-bar llm">1,250ms</div>
+                        </div>
+                        <div class="trace-span-duration">1,250ms (67%)</div>
+                    </div>
+                </div>
+                <div class="trace-legend">
+                    <div class="trace-legend-item"><div class="trace-legend-dot" style="background: var(--green);"></div> Query Processing</div>
+                    <div class="trace-legend-item"><div class="trace-legend-dot" style="background: var(--blue);"></div> Embedding</div>
+                    <div class="trace-legend-item"><div class="trace-legend-dot" style="background: var(--purple);"></div> Vector Search</div>
+                    <div class="trace-legend-item"><div class="trace-legend-dot" style="background: var(--yellow);"></div> Reranking</div>
+                    <div class="trace-legend-item"><div class="trace-legend-dot" style="background: var(--red);"></div> LLM (67% of time)</div>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">📋</div>
+                    <div>
+                        <div class="deep-title">What to Log</div>
+                        <div class="deep-subtitle">Essential data for debugging and analysis</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>Request Data</h4>
+                            <ul>
+                                <li><strong>Trace ID:</strong> Unique identifier linking all spans</li>
+                                <li><strong>User ID:</strong> Who made the request (anonymized if needed)</li>
+                                <li><strong>Timestamp:</strong> When the request started</li>
+                                <li><strong>Input:</strong> User query or prompt (consider PII masking)</li>
+                                <li><strong>Context:</strong> Retrieved documents, conversation history</li>
+                                <li><strong>Model:</strong> Which model version was used</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>Response Data</h4>
+                            <ul>
+                                <li><strong>Output:</strong> Model response text</li>
+                                <li><strong>Latency:</strong> Total and per-component timing</li>
+                                <li><strong>Tokens:</strong> Input/output token counts</li>
+                                <li><strong>Cost:</strong> Calculated cost for this request</li>
+                                <li><strong>Quality scores:</strong> Any automated eval metrics</li>
+                                <li><strong>Errors:</strong> Exceptions, rate limits, timeouts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evaluations -->
+        <section class="module" id="evals">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Evaluations (Evals)</h2>
+                    <p>Systematically testing AI quality</p>
+                </div>
+            </div>
+
+            <div class="eval-results">
+                <div class="eval-results-title">Eval Run Dashboard</div>
+                <div class="eval-results-subtitle">Test suite results from latest deployment candidate</div>
+                <div class="eval-summary">
+                    <div class="eval-stat">
+                        <div class="eval-stat-value pass">87%</div>
+                        <div class="eval-stat-label">Pass Rate</div>
+                    </div>
+                    <div class="eval-stat">
+                        <div class="eval-stat-value neutral">142</div>
+                        <div class="eval-stat-label">Test Cases</div>
+                    </div>
+                    <div class="eval-stat">
+                        <div class="eval-stat-value fail">18</div>
+                        <div class="eval-stat-label">Failures</div>
+                    </div>
+                    <div class="eval-stat">
+                        <div class="eval-stat-value warn">+2.3%</div>
+                        <div class="eval-stat-label">vs. Baseline</div>
+                    </div>
+                </div>
+                <div class="eval-cases">
+                    <div class="eval-case">
+                        <div class="eval-case-status pass">✓</div>
+                        <div class="eval-case-query">"What's the refund policy for enterprise?"</div>
+                        <div class="eval-case-metric">Faithfulness</div>
+                        <div class="eval-case-score good">0.94</div>
+                        <div class="eval-case-latency">1.2s</div>
+                    </div>
+                    <div class="eval-case">
+                        <div class="eval-case-status pass">✓</div>
+                        <div class="eval-case-query">"How do I integrate with Salesforce?"</div>
+                        <div class="eval-case-metric">Relevance</div>
+                        <div class="eval-case-score good">0.89</div>
+                        <div class="eval-case-latency">1.8s</div>
+                    </div>
+                    <div class="eval-case">
+                        <div class="eval-case-status fail">✗</div>
+                        <div class="eval-case-query">"What were Q3 revenue numbers?"</div>
+                        <div class="eval-case-metric">Correctness</div>
+                        <div class="eval-case-score bad">0.42</div>
+                        <div class="eval-case-latency">2.1s</div>
+                    </div>
+                    <div class="eval-case">
+                        <div class="eval-case-status pass">✓</div>
+                        <div class="eval-case-query">"Explain the API rate limits"</div>
+                        <div class="eval-case-metric">Completeness</div>
+                        <div class="eval-case-score good">0.91</div>
+                        <div class="eval-case-latency">1.4s</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="strategy-grid">
+                <div class="strategy-card">
+                    <div class="strategy-icon">🤖</div>
+                    <div class="strategy-title">LLM-as-Judge</div>
+                    <div class="strategy-desc">Use a powerful LLM (GPT-4, Claude) to evaluate outputs. Provide rubrics and criteria. Fast and scalable but has biases—tends to prefer verbose responses.</div>
+                    <div class="strategy-when"><strong>Best for:</strong> Relevance, tone, completeness, following instructions</div>
+                </div>
+                <div class="strategy-card">
+                    <div class="strategy-icon">👥</div>
+                    <div class="strategy-title">Human Evaluation</div>
+                    <div class="strategy-desc">Domain experts rate outputs. Gold standard for quality but expensive and slow. Use for high-stakes decisions and calibrating automated metrics.</div>
+                    <div class="strategy-when"><strong>Best for:</strong> Ground truth, edge cases, calibrating LLM-as-judge</div>
+                </div>
+                <div class="strategy-card">
+                    <div class="strategy-icon">📐</div>
+                    <div class="strategy-title">Heuristic Metrics</div>
+                    <div class="strategy-desc">Rule-based checks: response length, format validation, keyword presence, regex patterns. Fast and deterministic. Good for basic quality gates.</div>
+                    <div class="strategy-when"><strong>Best for:</strong> Format compliance, length limits, required content</div>
+                </div>
+                <div class="strategy-card">
+                    <div class="strategy-icon">🔬</div>
+                    <div class="strategy-title">Retrieval Metrics</div>
+                    <div class="strategy-desc">Measure RAG retrieval quality: recall@k, precision@k, MRR. Requires labeled "relevant documents" for each test query.</div>
+                    <div class="strategy-when"><strong>Best for:</strong> RAG systems, search quality, context relevance</div>
+                </div>
+            </div>
+
+            <div class="deep-dive">
+                <div class="deep-header">
+                    <div class="deep-icon">📊</div>
+                    <div>
+                        <div class="deep-title">Building an Eval Suite</div>
+                        <div class="deep-subtitle">Creating effective test datasets</div>
+                    </div>
+                </div>
+                <div class="deep-body">
+                    <div class="deep-grid">
+                        <div class="deep-section">
+                            <h4>Dataset Construction</h4>
+                            <ul>
+                                <li><strong>Sample production queries:</strong> Real user questions from logs</li>
+                                <li><strong>Create golden answers:</strong> Human-verified correct responses</li>
+                                <li><strong>Tag relevant docs:</strong> Which documents should be retrieved</li>
+                                <li><strong>Include edge cases:</strong> Ambiguous, adversarial, out-of-scope queries</li>
+                                <li><strong>Cover query types:</strong> Factual, how-to, comparison, multi-hop</li>
+                                <li><strong>Size:</strong> Start with 50-100, grow to 500+ for production</li>
+                            </ul>
+                        </div>
+                        <div class="deep-section">
+                            <h4>Running Evals</h4>
+                            <ul>
+                                <li><strong>CI/CD integration:</strong> Run on every PR that touches prompts</li>
+                                <li><strong>Baseline comparison:</strong> Always compare against current production</li>
+                                <li><strong>Regression detection:</strong> Alert if scores drop below threshold</li>
+                                <li><strong>A/B analysis:</strong> Statistical significance for improvements</li>
+                                <li><strong>Version tracking:</strong> Link results to prompt/model versions</li>
+                                <li><strong>Failure review:</strong> Human review of failed test cases</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Metrics -->
+        <section class="module" id="metrics">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Key Metrics</h2>
+                    <p>What to measure in LLM systems</p>
+                </div>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-name">Faithfulness</div>
+                    <div class="metric-desc">Is the response supported by retrieved context? Catches hallucinations.</div>
+                    <div class="metric-target">Target: &gt;90%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-name">Correctness</div>
+                    <div class="metric-desc">Is the answer factually accurate? Requires ground truth labels.</div>
+                    <div class="metric-target">Target: &gt;85%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔍</div>
+                    <div class="metric-name">Relevance</div>
+                    <div class="metric-desc">Does the response actually address the question asked?</div>
+                    <div class="metric-target">Target: &gt;85%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📄</div>
+                    <div class="metric-name">Recall@k</div>
+                    <div class="metric-desc">What % of relevant docs appear in top-k retrieval results?</div>
+                    <div class="metric-target">Target: &gt;80%</div>
+                </div>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-name">Latency P95</div>
+                    <div class="metric-desc">95th percentile response time. Slow responses hurt UX.</div>
+                    <div class="metric-target">Target: &lt;3s</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-name">Cost per Query</div>
+                    <div class="metric-desc">Average $ spent on tokens per user request.</div>
+                    <div class="metric-target">Target: &lt;$0.05</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">❌</div>
+                    <div class="metric-name">Error Rate</div>
+                    <div class="metric-desc">% of requests that fail (timeouts, rate limits, exceptions).</div>
+                    <div class="metric-target">Target: &lt;1%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">👍</div>
+                    <div class="metric-name">User Feedback</div>
+                    <div class="metric-desc">Thumbs up/down ratio from users on responses.</div>
+                    <div class="metric-target">Target: &gt;80% positive</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost Tracking -->
+        <section class="module" id="cost">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>Cost Tracking</h2>
+                    <p>Understanding and optimizing spend</p>
+                </div>
+            </div>
+
+            <div class="cost-breakdown">
+                <div class="cost-breakdown-title">Monthly Cost Breakdown ($12,450)</div>
+                <div class="cost-bars">
+                    <div class="cost-bar-row">
+                        <div class="cost-bar-label">LLM Tokens</div>
+                        <div class="cost-bar-track">
+                            <div class="cost-bar-fill llm" style="width: 72%;">$8,964</div>
+                        </div>
+                        <div class="cost-bar-value">72%</div>
+                    </div>
+                    <div class="cost-bar-row">
+                        <div class="cost-bar-label">Embeddings</div>
+                        <div class="cost-bar-track">
+                            <div class="cost-bar-fill embed" style="width: 8%;">$996</div>
+                        </div>
+                        <div class="cost-bar-value">8%</div>
+                    </div>
+                    <div class="cost-bar-row">
+                        <div class="cost-bar-label">Vector DB</div>
+                        <div class="cost-bar-track">
+                            <div class="cost-bar-fill vector" style="width: 12%;">$1,494</div>
+                        </div>
+                        <div class="cost-bar-value">12%</div>
+                    </div>
+                    <div class="cost-bar-row">
+                        <div class="cost-bar-label">Infrastructure</div>
+                        <div class="cost-bar-track">
+                            <div class="cost-bar-fill infra" style="width: 8%;">$996</div>
+                        </div>
+                        <div class="cost-bar-value">8%</div>
+                    </div>
+                </div>
+                <div class="cost-total">
+                    <div class="cost-total-item">
+                        <div class="cost-total-value">248K</div>
+                        <div class="cost-total-label">Total Queries</div>
+                    </div>
+                    <div class="cost-total-item">
+                        <div class="cost-total-value">$0.05</div>
+                        <div class="cost-total-label">Avg Cost/Query</div>
+                    </div>
+                    <div class="cost-total-item">
+                        <div class="cost-total-value">18.2M</div>
+                        <div class="cost-total-label">Tokens Used</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Cost Optimization Strategies</h3>
+                    <ul>
+                        <li><strong>Model tiering:</strong> Use cheaper models for simple queries, expensive for complex</li>
+                        <li><strong>Prompt compression:</strong> Reduce context length while preserving quality</li>
+                        <li><strong>Caching:</strong> Cache responses for repeated or similar queries</li>
+                        <li><strong>Batch processing:</strong> Combine requests where latency permits</li>
+                        <li><strong>Output limits:</strong> Set max_tokens appropriate to use case</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Cost Alerting</h3>
+                    <ul>
+                        <li><strong>Budget thresholds:</strong> Alert at 80% of monthly budget</li>
+                        <li><strong>Anomaly detection:</strong> Flag unusual spikes in token usage</li>
+                        <li><strong>Per-user limits:</strong> Prevent runaway usage from single users</li>
+                        <li><strong>Cost attribution:</strong> Track spend by feature, team, or customer</li>
+                        <li><strong>Forecast trending:</strong> Predict month-end spend from current rate</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Observability and evaluation solutions</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card featured">
+                    <div class="tool-header">
+                        <div><div class="tool-name">LangSmith</div><div class="tool-vendor">LangChain</div></div>
+                        <span class="tool-badge">Most Integrated</span>
+                    </div>
+                    <div class="tool-desc">Full observability platform for LangChain apps. Tracing, evals, prompt hub, playground. Deep integration with LangChain ecosystem.</div>
+                    <div class="tool-features"><strong>Strengths:</strong> LangChain native, prompt versioning, datasets</div>
+                </div>
+                <div class="tool-card featured">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Phoenix</div><div class="tool-vendor">Arize AI</div></div>
+                        <span class="tool-badge">Open Source</span>
+                    </div>
+                    <div class="tool-desc">Open-source observability for LLMs. Tracing, evals, embeddings analysis. Works with any framework. Self-host or cloud.</div>
+                    <div class="tool-features"><strong>Strengths:</strong> Open source, framework agnostic, embedding viz</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Weights & Biases</div><div class="tool-vendor">W&B</div></div>
+                    </div>
+                    <div class="tool-desc">ML experiment tracking extended to LLMs. Traces, prompts, evals with powerful comparison tools. Great for ML teams.</div>
+                    <div class="tool-features"><strong>Strengths:</strong> Experiment tracking, team collaboration</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Braintrust</div><div class="tool-vendor">Braintrust</div></div>
+                    </div>
+                    <div class="tool-desc">Evals-focused platform. Strong on prompt management, scoring, and CI/CD integration. Built for eval-driven development.</div>
+                    <div class="tool-features"><strong>Strengths:</strong> Eval-first, prompt management, CI/CD</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Langfuse</div><div class="tool-vendor">Langfuse</div></div>
+                    </div>
+                    <div class="tool-desc">Open-source LLM engineering platform. Tracing, analytics, evals. Self-host or cloud. Growing community.</div>
+                    <div class="tool-features"><strong>Strengths:</strong> Open source, self-hostable, cost tracking</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">Helicone</div><div class="tool-vendor">Helicone</div></div>
+                    </div>
+                    <div class="tool-desc">Proxy-based observability. Add one line to log all LLM calls. Simple setup, cost tracking, caching.</div>
+                    <div class="tool-features"><strong>Strengths:</strong> Easy setup, proxy-based, caching built-in</div>
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Tracing</th>
+                        <th>Evals</th>
+                        <th>Cost Tracking</th>
+                        <th>Open Source</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>LangSmith</strong></td>
+                        <td class="table-highlight">✓ Excellent</td>
+                        <td class="table-highlight">✓ Built-in</td>
+                        <td>✓ Yes</td>
+                        <td>No</td>
+                        <td>LangChain users</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phoenix</strong></td>
+                        <td>✓ Good</td>
+                        <td>✓ Built-in</td>
+                        <td>✓ Yes</td>
+                        <td class="table-highlight">✓ Yes</td>
+                        <td>Open source needs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Weights & Biases</strong></td>
+                        <td>✓ Good</td>
+                        <td>✓ Good</td>
+                        <td>✓ Yes</td>
+                        <td>No</td>
+                        <td>ML teams</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Braintrust</strong></td>
+                        <td>✓ Basic</td>
+                        <td class="table-highlight">✓ Excellent</td>
+                        <td>✓ Yes</td>
+                        <td>No</td>
+                        <td>Eval-first teams</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Langfuse</strong></td>
+                        <td>✓ Good</td>
+                        <td>✓ Good</td>
+                        <td class="table-highlight">✓ Excellent</td>
+                        <td class="table-highlight">✓ Yes</td>
+                        <td>Self-hosting</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Effective observability and evaluation</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div>
+                        <div class="practice-title">Log Everything (Carefully)</div>
+                        <div class="practice-desc">Capture all inputs, outputs, and metadata. But implement PII masking, set retention policies, and consider sampling at high volume.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div>
+                        <div class="practice-title">Eval Before You Ship</div>
+                        <div class="practice-desc">Run evals on every change that touches prompts, retrieval, or model versions. Block deploys that regress below baseline.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div>
+                        <div class="practice-title">Monitor Production Continuously</div>
+                        <div class="practice-desc">Quality can drift even without code changes. Run daily evals on production samples. Alert on degradation.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div>
+                        <div class="practice-title">Version Everything</div>
+                        <div class="practice-desc">Track prompt versions, model versions, eval dataset versions. You need to know exactly what produced a result.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div>
+                        <div class="practice-title">Combine Eval Methods</div>
+                        <div class="practice-desc">Use heuristics for basic checks, LLM-as-judge for nuance, and human review for calibration and edge cases.</div>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div>
+                        <div class="practice-title">Close the Feedback Loop</div>
+                        <div class="practice-desc">Use production failures to expand eval datasets. Every bug becomes a test case. Continuously improve coverage.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Checklist -->
+        <section class="module" id="checklist">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Implementation Checklist</h2>
+                    <p>Getting started with observability</p>
+                </div>
+            </div>
+
+            <div class="checklist-grid">
+                <div class="checklist-section">
+                    <div class="checklist-title">🔧 Week 1: Foundation</div>
+                    <div class="checklist-items">
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Choose observability platform (LangSmith, Phoenix, etc.)</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Instrument your LLM calls with tracing</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Set up basic logging of inputs/outputs</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Configure PII masking if handling sensitive data</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Create dashboard with latency and error metrics</div>
+                    </div>
+                </div>
+                <div class="checklist-section">
+                    <div class="checklist-title">📊 Week 2: Metrics</div>
+                    <div class="checklist-items">
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Implement cost tracking per request</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Add user feedback collection (thumbs up/down)</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Set up alerts for error rate spikes</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Configure latency P95 monitoring</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Create budget alerts for cost overruns</div>
+                    </div>
+                </div>
+                <div class="checklist-section">
+                    <div class="checklist-title">✅ Week 3: Evals</div>
+                    <div class="checklist-items">
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Create initial eval dataset (50+ queries)</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Define quality criteria and scoring rubrics</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Implement LLM-as-judge evaluator</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Run baseline eval and record scores</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Integrate evals into CI/CD pipeline</div>
+                    </div>
+                </div>
+                <div class="checklist-section">
+                    <div class="checklist-title">🚀 Week 4: Production</div>
+                    <div class="checklist-items">
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Set up continuous production evals</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Create alert thresholds for quality regression</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Establish human review process for failures</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Document runbooks for common issues</div>
+                        <div class="checklist-item"><span class="checklist-check">☐</span> Schedule weekly eval dataset expansion</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>Automated observability and evaluation agent</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-bottom: 24px;">
+                <div>
+                    <h3>📊 ObservabilityAgent</h3>
+                    <p>An intelligent agent that monitors your LLM systems, runs evaluations, identifies quality regressions, and generates improvement recommendations. Integrates with your observability platform to provide continuous automated oversight.</p>
+                </div>
+                <div>
+                    <h3>When to Deploy</h3>
+                    <ul>
+                        <li><strong>Production monitoring:</strong> Continuous quality checks on live traffic</li>
+                        <li><strong>Pre-deploy validation:</strong> Automated eval gates in CI/CD</li>
+                        <li><strong>Incident response:</strong> Rapid diagnosis when issues arise</li>
+                        <li><strong>Cost optimization:</strong> Identify expensive patterns and suggest fixes</li>
+                        <li><strong>Dataset curation:</strong> Automatically expand eval sets from failures</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tool-grid" style="margin-bottom: 24px;">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">TraceFetcher</div><div class="tool-vendor">Monitoring Tool</div></div>
+                    </div>
+                    <div class="tool-desc">Retrieves traces from your observability platform. Filters by time, error status, latency thresholds, or custom attributes.</div>
+                    <div class="tool-features"><strong>Output:</strong> Filtered trace data for analysis</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">EvalRunner</div><div class="tool-vendor">Quality Tool</div></div>
+                    </div>
+                    <div class="tool-desc">Executes eval suites against model outputs. Supports LLM-as-judge, heuristic checks, and retrieval metrics.</div>
+                    <div class="tool-features"><strong>Output:</strong> Pass/fail results with scores</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">FailureAnalyzer</div><div class="tool-vendor">Diagnosis Tool</div></div>
+                    </div>
+                    <div class="tool-desc">Analyzes failed evals and production errors to identify root causes—bad retrieval, prompt issues, or model limitations.</div>
+                    <div class="tool-features"><strong>Output:</strong> Failure categorization and fix suggestions</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">CostAnalyzer</div><div class="tool-vendor">Optimization Tool</div></div>
+                    </div>
+                    <div class="tool-desc">Analyzes token usage patterns and identifies optimization opportunities—caching candidates, prompt compression, model tiering.</div>
+                    <div class="tool-features"><strong>Output:</strong> Cost reduction recommendations</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">DatasetExpander</div><div class="tool-vendor">Curation Tool</div></div>
+                    </div>
+                    <div class="tool-desc">Converts production failures and edge cases into eval dataset entries. Generates golden answers for human review.</div>
+                    <div class="tool-features"><strong>Output:</strong> New eval cases for review</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div><div class="tool-name">AlertManager</div><div class="tool-vendor">Notification Tool</div></div>
+                    </div>
+                    <div class="tool-desc">Sends alerts via Slack, PagerDuty, or email when quality metrics breach thresholds or anomalies are detected.</div>
+                    <div class="tool-features"><strong>Output:</strong> Formatted alerts with context</div>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-code">
+                    <div class="code-header">observability_agent.py</div>
+                    <div class="code-content">
+<pre><span class="ck">from</span> crewai <span class="ck">import</span> Agent, Task, Crew
+<span class="ck">from</span> langchain_anthropic <span class="ck">import</span> ChatAnthropic
+<span class="ck">from</span> obs_tools <span class="ck">import</span> (
+    TraceFetcher, EvalRunner, FailureAnalyzer,
+    CostAnalyzer, DatasetExpander, AlertManager
+)
+
+<span class="cf"># Initialize the Observability Agent</span>
+obs_agent = Agent(
+    role=<span class="cs">"LLM Observability Engineer"</span>,
+    goal=<span class="cs">"""Monitor LLM systems, run evaluations,
+    identify quality issues, and recommend fixes"""</span>,
+    backstory=<span class="cs">"""You are an expert in LLM 
+    observability, evaluation frameworks, and 
+    production monitoring. You analyze traces,
+    run evals, diagnose failures, and optimize
+    cost and quality."""</span>,
+    tools=[
+        TraceFetcher(),
+        EvalRunner(),
+        FailureAnalyzer(),
+        CostAnalyzer(),
+        DatasetExpander(),
+        AlertManager()
+    ],
+    llm=ChatAnthropic(model=<span class="cs">"claude-sonnet-4-20250514"</span>),
+    verbose=<span class="ck">True</span>
+)
+
+<span class="cf"># Daily monitoring task</span>
+daily_monitor = Task(
+    description=<span class="cs">"""
+    Run daily observability checks:
+    
+    1. Fetch traces from last 24 hours
+    2. Run eval suite on sample of requests
+    3. Identify any quality regressions
+    4. Analyze cost trends and anomalies
+    5. Generate report with recommendations
+    
+    Alert if:
+    - Eval pass rate < 85%
+    - P95 latency > 3 seconds
+    - Error rate > 2%
+    - Cost up > 20% week-over-week
+    """</span>,
+    agent=obs_agent,
+    expected_output=<span class="cs">"Daily observability report"</span>
+)</pre>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">incident_response.py</div>
+                    <div class="code-content">
+<pre><span class="cf"># Incident response task</span>
+incident_task = Task(
+    description=<span class="cs">"""
+    Investigate quality incident:
+    
+    1. Fetch recent traces with errors
+    2. Identify failure patterns
+    3. Run targeted evals to confirm scope
+    4. Diagnose root cause:
+       - Retrieval issues?
+       - Prompt problems?
+       - Model behavior change?
+    5. Recommend immediate fixes
+    6. Create eval cases from failures
+    """</span>,
+    agent=obs_agent,
+    expected_output=<span class="cs">"Incident report with RCA"</span>
+)
+
+<span class="cf"># Pre-deploy validation</span>
+deploy_gate = Task(
+    description=<span class="cs">"""
+    Validate deployment candidate:
+    
+    1. Run full eval suite against candidate
+    2. Compare scores to production baseline
+    3. Flag any regressions > 5%
+    4. Check latency impact
+    5. Estimate cost change
+    6. Generate deploy/no-deploy recommendation
+    """</span>,
+    agent=obs_agent,
+    expected_output=<span class="cs">"Deploy gate decision"</span>
+)
+
+<span class="ck">async def</span> <span class="cf">run_monitoring</span>():
+    crew = Crew(
+        agents=[obs_agent],
+        tasks=[daily_monitor],
+        verbose=<span class="ck">True</span>
+    )
+    <span class="ck">return await</span> crew.kickoff_async()</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-top: 24px;">
+                <div>
+                    <h3>Example Agent Outputs</h3>
+                    <ul>
+                        <li><strong>Daily report:</strong> "Eval pass rate 89% (↑2% from yesterday). 3 new failures in financial queries—retrieval missing Q4 earnings docs. Recommended: re-index investor relations folder."</li>
+                        <li><strong>Incident diagnosis:</strong> "Root cause: prompt regression in commit abc123. Response quality dropped 15% on comparison queries. Recommended: revert to previous prompt version."</li>
+                        <li><strong>Cost alert:</strong> "Token usage up 35% this week. Primary driver: new summarization feature averaging 2.1K output tokens. Recommended: add max_tokens=500 limit."</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Integration Patterns</h3>
+                    <ul>
+                        <li><strong>Scheduled runs:</strong> Daily monitoring at 6 AM, weekly deep analysis</li>
+                        <li><strong>CI/CD gates:</strong> Block deploys that fail eval threshold</li>
+                        <li><strong>Alert response:</strong> Auto-trigger on PagerDuty incidents</li>
+                        <li><strong>Slack bot:</strong> Query agent for ad-hoc analysis</li>
+                        <li><strong>Dashboard integration:</strong> Feed recommendations to Notion/Confluence</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Related Topics</h2>
+                    <p>Continue exploring</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat19-p8-rag-knowledge.html" class="related-card">
+                    <div class="related-icon">📚</div>
+                    <div class="related-title">RAG & Knowledge</div>
+                    <div class="related-desc">Systems that need observability most</div>
+                </a>
+                <a href="cat19-p7-ai-safety.html" class="related-card">
+                    <div class="related-icon">🛡️</div>
+                    <div class="related-title">AI Safety & Governance</div>
+                    <div class="related-desc">Monitoring for safety compliance</div>
+                </a>
+                <a href="cat19-p10-enterprise-adoption.html" class="related-card">
+                    <div class="related-icon">🏢</div>
+                    <div class="related-title">Enterprise Adoption</div>
+                    <div class="related-desc">Production-ready AI deployment</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat19-p8-rag-knowledge.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">19.8 RAG & Knowledge</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 19.9</div>
+        <a href="cat19-p10-enterprise-adoption.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">19.10 Enterprise Adoption</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

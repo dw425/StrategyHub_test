@@ -1,0 +1,2438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundation Models | Emerging Technologies | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EC4899;
+            --cat-light: #F472B6;
+            --cat-dark: #DB2777;
+            --cat-glow: rgba(236, 72, 153, 0.15);
+            --page-primary: #EC4899;
+            --page-light: #F472B6;
+            --page-glow: rgba(236, 72, 153, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --teal: #14B8A6;
+            
+            /* Company colors */
+            --openai: #10A37F;
+            --anthropic: #D4A574;
+            --google: #4285F4;
+            --meta: #0668E1;
+            --mistral: #F97316;
+            --deepseek: #06B6D4;
+            --xai: #1DA1F2;
+            
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+        .overview-content ul { margin-left: 20px; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .overview-content strong { color: var(--text-primary); }
+
+        /* MODEL CARDS */
+        .models-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .model-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .model-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--model-color, var(--page-primary)); }
+        .model-card:hover { border-color: var(--model-color, var(--page-primary)); transform: translateY(-2px); }
+        .model-card.openai { --model-color: var(--openai); }
+        .model-card.anthropic { --model-color: var(--anthropic); }
+        .model-card.google { --model-color: var(--google); }
+        .model-card.meta { --model-color: var(--meta); }
+        .model-card.mistral { --model-color: var(--mistral); }
+        .model-card.deepseek { --model-color: var(--deepseek); }
+        .model-card.xai { --model-color: var(--xai); }
+        
+        .model-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .model-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .model-company { font-size: 12px; color: var(--text-muted); }
+        .model-badge { padding: 4px 10px; border-radius: 9999px; font-size: 10px; font-weight: 600; }
+        .model-badge.frontier { background: var(--page-glow); color: var(--page-light); border: 1px solid var(--page-primary); }
+        .model-badge.reasoning { background: rgba(139, 92, 246, 0.15); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.3); }
+        .model-badge.open { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .model-badge.multimodal { background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+        
+        .model-stats { display: flex; gap: 20px; margin-bottom: 12px; }
+        .model-stat-value { font-size: 15px; font-weight: 600; color: var(--page-light); }
+        .model-stat-label { font-size: 10px; color: var(--text-muted); }
+        
+        .model-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        
+        .model-capabilities { display: flex; flex-wrap: wrap; gap: 6px; }
+        .capability-tag { padding: 3px 8px; background: var(--bg-card); border-radius: 4px; font-size: 10px; color: var(--text-muted); }
+        .capability-tag.strong { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+
+        /* BENCHMARK TABLE */
+        .benchmark-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+        .benchmark-table th { text-align: left; padding: 12px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .benchmark-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .benchmark-table tr:hover td { background: var(--bg-hover); }
+        .benchmark-table .model-name-cell { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+        .benchmark-table .score { font-weight: 600; font-family: monospace; }
+        .benchmark-table .score.best { color: var(--green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .benchmark-table .score.good { color: var(--page-light); }
+        .benchmark-table .company-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+        .benchmark-table .company-tag.openai { background: rgba(16, 163, 127, 0.15); color: var(--openai); }
+        .benchmark-table .company-tag.anthropic { background: rgba(212, 165, 116, 0.15); color: var(--anthropic); }
+        .benchmark-table .company-tag.google { background: rgba(66, 133, 244, 0.15); color: var(--google); }
+        .benchmark-table .company-tag.meta { background: rgba(6, 104, 225, 0.15); color: var(--meta); }
+
+        /* PRICING TABLE */
+        .pricing-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+        .pricing-table th { text-align: left; padding: 12px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .pricing-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .pricing-table tr:hover td { background: var(--bg-hover); }
+        .pricing-table .price { font-family: monospace; color: var(--green); }
+        .pricing-table .price.expensive { color: var(--yellow); }
+        .pricing-table .price.premium { color: var(--red); }
+
+        /* COMPARISON GRID */
+        .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .compare-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .compare-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .compare-logo { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white; }
+        .compare-logo.openai { background: var(--openai); }
+        .compare-logo.anthropic { background: var(--anthropic); }
+        .compare-logo.google { background: var(--google); }
+        .compare-title { font-size: 15px; font-weight: 600; }
+        .compare-items { display: flex; flex-direction: column; gap: 10px; }
+        .compare-item { display: flex; justify-content: space-between; font-size: 12px; }
+        .compare-item-label { color: var(--text-muted); }
+        .compare-item-value { color: var(--text-primary); font-weight: 500; }
+
+        /* SELECTION GUIDE */
+        .selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .selection-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .selection-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .selection-icon { width: 40px; height: 40px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .selection-title { font-size: 15px; font-weight: 600; }
+        .selection-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .selection-recommend { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 6px; }
+        .selection-recommend::before { content: '✓'; }
+
+        /* TIMELINE */
+        .timeline { position: relative; padding-left: 30px; margin-bottom: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
+        .timeline-item { position: relative; padding-bottom: 24px; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--page-primary); border: 2px solid var(--bg-dark); }
+        .timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .timeline-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .timeline-desc { font-size: 13px; color: var(--text-secondary); }
+
+        /* CALLOUT */
+        .callout { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; display: flex; gap: 16px; }
+        .callout.info { border-left: 4px solid var(--blue); }
+        .callout.warning { border-left: 4px solid var(--yellow); }
+        .callout.success { border-left: 4px solid var(--green); }
+        .callout-icon { font-size: 24px; }
+        .callout-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .callout-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* BEST PRACTICES */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+
+        /* RELATED PAGES */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-content, .models-grid, .selection-grid, .practices-grid, .agent-grid { grid-template-columns: 1fr; }
+            .compare-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat19-emerging-technologies-overview.html">Emerging Technologies</a>
+        <span class="sep">/</span>
+        <span class="current">Foundation Models</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 19</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat19-emerging-technologies-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat19-p1-foundation-models.html" class="active"><span class="nav-icon">🧠</span> 19.1 Foundation Models</a></li>
+            <li><a href="cat19-p2-agentic-ai.html"><span class="nav-icon">🤖</span> 19.2 Agentic AI</a></li>
+            <li><a href="cat19-p3-multimodal-ai.html"><span class="nav-icon">🎨</span> 19.3 Multimodal AI</a></li>
+            <li><a href="cat19-p4-ai-coding.html"><span class="nav-icon">💻</span> 19.4 AI Coding Tools</a></li>
+            <li><a href="cat19-p5-edge-ai.html"><span class="nav-icon">📱</span> 19.5 Edge & On-Device</a></li>
+            <li><a href="cat19-p6-ai-infrastructure.html"><span class="nav-icon">🖥️</span> 19.6 AI Infrastructure</a></li>
+            <li><a href="cat19-p7-ai-safety.html"><span class="nav-icon">🛡️</span> 19.7 AI Safety & Governance</a></li>
+            <li><a href="cat19-p8-rag-knowledge.html"><span class="nav-icon">📚</span> 19.8 RAG & Knowledge</a></li>
+            <li><a href="cat19-p9-observability.html"><span class="nav-icon">📊</span> 19.9 Observability & Evals</a></li>
+            <li><a href="cat19-p10-enterprise-adoption.html"><span class="nav-icon">🏢</span> 19.10 Enterprise Adoption</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#why-matter"><span class="nav-icon">⚡</span> Why They Matter</a></li>
+            <li><a href="#stack"><span class="nav-icon">📚</span> The FM Stack</a></li>
+            <li><a href="#paradigm"><span class="nav-icon">🔄</span> Paradigm Shift</a></li>
+            <li><a href="#how-work"><span class="nav-icon">⚙️</span> How They Work</a></li>
+            <li><a href="#industry-impact"><span class="nav-icon">🏭</span> Industry Impact</a></li>
+            <li><a href="#strategy"><span class="nav-icon">♟️</span> Strategic Implications</a></li>
+            <li><a href="#capabilities-deep"><span class="nav-icon">🎯</span> Core Capabilities</a></li>
+            <li><a href="#history"><span class="nav-icon">📜</span> Historical Journey</a></li>
+            <li><a href="#economics"><span class="nav-icon">💵</span> Economics</a></li>
+            <li><a href="#critical-layer"><span class="nav-icon">🔑</span> The Critical Layer</a></li>
+            <li><a href="#limitations"><span class="nav-icon">⚠️</span> Limitations</a></li>
+            <li><a href="#future"><span class="nav-icon">🔮</span> Future Trajectory</a></li>
+            <li><a href="#frontier"><span class="nav-icon">🏆</span> Frontier Models</a></li>
+            <li><a href="#reasoning"><span class="nav-icon">🧠</span> Reasoning Models</a></li>
+            <li><a href="#opensource"><span class="nav-icon">🔓</span> Open Source</a></li>
+            <li><a href="#benchmarks"><span class="nav-icon">📊</span> Benchmarks</a></li>
+            <li><a href="#capabilities"><span class="nav-icon">⚙️</span> Provider Features</a></li>
+            <li><a href="#pricing"><span class="nav-icon">💰</span> Pricing</a></li>
+            <li><a href="#selection"><span class="nav-icon">🎯</span> Selection Guide</a></li>
+            <li><a href="#timeline"><span class="nav-icon">📅</span> Release Timeline</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🧠 Page 19.1</div>
+                <h1>Foundation Models</h1>
+                <p>Comprehensive guide to frontier and open-source large language models. Compare capabilities, benchmarks, pricing, and learn how to select the right model for your use case.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">7+</div>
+                    <div class="hero-metric-label">Major AI Labs</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">2M</div>
+                    <div class="hero-metric-label">Max Context</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">-90%</div>
+                    <div class="hero-metric-label">Cost Since 2023</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">o3</div>
+                    <div class="hero-metric-label">Latest Frontier</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Understanding the foundation model landscape</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What are Foundation Models?</h3>
+                    <p>Foundation models are large-scale AI models trained on broad data that can be adapted to a wide range of downstream tasks. The term encompasses Large Language Models (LLMs), multimodal models, and specialized models for code, images, and other domains.</p>
+                    <p>These models serve as the <strong>foundation</strong> upon which applications are built—from chatbots and coding assistants to complex agentic systems and enterprise automation.</p>
+                </div>
+                <div>
+                    <h3>Key Characteristics</h3>
+                    <ul>
+                        <li><strong>Scale</strong> — Billions to trillions of parameters</li>
+                        <li><strong>Emergent Abilities</strong> — Capabilities that arise at scale</li>
+                        <li><strong>Few-shot Learning</strong> — Adapt with minimal examples</li>
+                        <li><strong>Transfer Learning</strong> — Knowledge applies across tasks</li>
+                        <li><strong>Instruction Following</strong> — Respond to natural language</li>
+                        <li><strong>Tool Use</strong> — Interact with external systems</li>
+                    </ul>
+                </div>
+                <div class="overview-full">
+                    <h3>The Current Landscape</h3>
+                    <p>The foundation model space has evolved rapidly. <strong>OpenAI</strong> leads in consumer reach and reasoning with GPT-4o and o1/o3. <strong>Anthropic</strong> focuses on safety and long context with Claude. <strong>Google</strong> pushes multimodal boundaries with Gemini. <strong>Meta</strong> drives open-source with Llama. Meanwhile, <strong>Mistral</strong>, <strong>DeepSeek</strong>, and others challenge incumbents on cost and efficiency. The emergence of <strong>reasoning models</strong> (o1, o3) represents a paradigm shift, using extended inference-time compute for complex problem-solving.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY FOUNDATION MODELS MATTER -->
+        <section class="module" id="why-matter">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Why Foundation Models Are Critical</h2>
+                    <p>The paradigm shift reshaping technology and business</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">🔮</div>
+                <div class="callout-content">
+                    <h4>The Most Important Technology of Our Era</h4>
+                    <p>Foundation models represent the most significant technological shift since the internet. They are not just another tool—they are <strong>general-purpose reasoning engines</strong> that can understand, generate, and transform information across virtually every domain. For the first time in history, we have machines that can engage with human knowledge in a meaningful way.</p>
+                </div>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🧱</div>
+                        <div class="selection-title">They Are the New Platform Layer</div>
+                    </div>
+                    <p class="selection-desc">Just as operating systems became the platform for desktop software, and cloud became the platform for web apps, foundation models are becoming the <strong>platform layer for intelligent applications</strong>. Every AI-powered product—from Copilots to autonomous agents—is built on top of these models. Control the foundation, control the ecosystem.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🎯</div>
+                        <div class="selection-title">General Intelligence vs. Narrow AI</div>
+                    </div>
+                    <p class="selection-desc">Previous AI required building specialized models for each task—separate models for translation, summarization, classification. Foundation models are <strong>general-purpose</strong>: one model handles thousands of tasks. This collapses the cost and complexity of AI development by orders of magnitude.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">💡</div>
+                        <div class="selection-title">Emergent Capabilities</div>
+                    </div>
+                    <p class="selection-desc">At sufficient scale, foundation models develop <strong>capabilities that weren't explicitly trained</strong>. They learn to reason, plan, use tools, write code, and even exhibit theory of mind. These emergent abilities make them surprisingly versatile—and their full potential is still being discovered.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🌊</div>
+                        <div class="selection-title">The Knowledge Compression Effect</div>
+                    </div>
+                    <p class="selection-desc">A single foundation model compresses <strong>trillions of tokens of human knowledge</strong> into queryable form. It's like having instant access to millions of books, papers, and codebases—but with the ability to synthesize and apply that knowledge, not just retrieve it.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">⚙️</div>
+                        <div class="selection-title">Automation of Cognitive Work</div>
+                    </div>
+                    <p class="selection-desc">For the first time, we can automate <strong>cognitive tasks at scale</strong>: writing, analysis, coding, research, customer support, decision-making. This isn't automating repetitive physical labor—it's automating the work of knowledge workers, lawyers, developers, and analysts.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🔗</div>
+                        <div class="selection-title">The Glue for Agentic Systems</div>
+                    </div>
+                    <p class="selection-desc">Foundation models enable <strong>AI agents</strong> that can plan, reason, use tools, and accomplish complex goals autonomously. The model serves as the "brain" that orchestrates actions—browsing the web, writing code, calling APIs, making decisions. Without strong foundation models, agents can't function.</p>
+                </div>
+            </div>
+
+            <div class="overview-content" style="margin-top: 24px;">
+                <div class="overview-full">
+                    <h3>The Economic Transformation</h3>
+                    <p>Foundation models are driving one of the fastest technology adoption curves in history. <strong>ChatGPT reached 100 million users in 2 months</strong>—faster than any product before it. Enterprise adoption is accelerating: 72% of enterprises now use generative AI in some capacity, up from 55% just a year ago. The total addressable market for AI software is projected to reach <strong>$1 trillion by 2030</strong>.</p>
+                    <p>But the economic impact goes beyond software revenue. Foundation models are <strong>productivity multipliers</strong>. Studies show 30-50% productivity gains for developers using AI coding tools. Customer support automation reduces costs by 60-80%. Legal document review that took weeks now takes hours. Every knowledge-intensive process is being re-examined through the lens of AI augmentation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE FOUNDATION MODEL STACK -->
+        <section class="module" id="stack">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>The Foundation Model Stack</h2>
+                    <p>How foundation models fit into the AI ecosystem</p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">🏗️</div>
+                <div class="callout-content">
+                    <h4>Understanding the Stack is Critical for Strategy</h4>
+                    <p>Just as understanding the cloud stack (IaaS → PaaS → SaaS) was essential for cloud strategy, understanding the foundation model stack is essential for AI strategy. Where you play in this stack determines your competitive position, build/buy decisions, and technology partnerships.</p>
+                </div>
+            </div>
+
+            <table class="benchmark-table">
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>What It Is</th>
+                        <th>Key Players</th>
+                        <th>Your Decision</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="model-name-cell">🔧 Hardware / Compute</td>
+                        <td>GPUs, TPUs, AI accelerators that train and run models</td>
+                        <td>NVIDIA, Google TPU, AWS Trainium, AMD</td>
+                        <td>Cloud vs. on-prem, which chips to bet on</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🧠 Foundation Models</td>
+                        <td>The pre-trained models themselves (GPT-4, Claude, Llama)</td>
+                        <td>OpenAI, Anthropic, Google, Meta, Mistral</td>
+                        <td>Which models to use, single vs. multi-vendor</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🔌 Model APIs & Platforms</td>
+                        <td>APIs to access models, fine-tuning, deployment platforms</td>
+                        <td>OpenAI API, Azure OpenAI, Bedrock, Vertex AI</td>
+                        <td>Direct API vs. cloud provider, lock-in tradeoffs</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🛠️ Orchestration & Tooling</td>
+                        <td>Frameworks for building AI apps (RAG, agents, chains)</td>
+                        <td>LangChain, LlamaIndex, CrewAI, Semantic Kernel</td>
+                        <td>Framework choice, build vs. buy orchestration</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">📊 Observability & Eval</td>
+                        <td>Monitoring, tracing, evaluation, prompt management</td>
+                        <td>LangSmith, Langfuse, Arize, Weights & Biases</td>
+                        <td>Which tools for production monitoring</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🚀 Applications</td>
+                        <td>End-user products built on foundation models</td>
+                        <td>ChatGPT, Claude.ai, Copilot, Custom Apps</td>
+                        <td>Buy SaaS vs. build custom applications</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Model Layer = Strategic Choice</h4>
+                        <p>Your choice of foundation model affects everything downstream—capabilities, costs, latency, and vendor lock-in. This is the most consequential architectural decision.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Abstraction Enables Flexibility</h4>
+                        <p>Build abstraction layers between your application and specific models. This lets you switch providers, A/B test models, and optimize costs without rewriting code.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Differentiation Moves Up</h4>
+                        <p>As foundation models commoditize, differentiation shifts to orchestration, data, and applications. Your proprietary data and workflows become the moat, not the base model.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Multi-Model is the Future</h4>
+                        <p>No single model excels at everything. Production systems increasingly route to different models based on task, cost, and latency requirements. Design for multi-model from day one.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE PARADIGM SHIFT -->
+        <section class="module" id="paradigm">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>The Paradigm Shift</h2>
+                    <p>How foundation models change everything about software</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>From Rules to Learning</h3>
+                    <p>Traditional software is <strong>explicitly programmed</strong>: developers write rules that define exactly what the system does. If you want it to handle a new case, you write new code. This approach has built the modern world, but it hits limits when dealing with ambiguity, natural language, or tasks too complex to specify.</p>
+                    <p>Foundation models are <strong>learned systems</strong>: they acquire capabilities by observing patterns in data. Nobody programmed GPT-4 to write poetry or debug code—it learned these abilities from seeing billions of examples. This means they can handle tasks that would be impossible to explicitly program.</p>
+                </div>
+                <div>
+                    <h3>From Narrow to General</h3>
+                    <p>Traditional ML required <strong>separate models for each task</strong>: one model for sentiment analysis, another for translation, another for classification. Each needed its own training data, pipeline, and maintenance. Scaling meant multiplying complexity.</p>
+                    <p>Foundation models are <strong>general-purpose</strong>: a single model handles thousands of tasks via natural language instructions. Want it to translate? Just ask. Summarize? Just ask. This collapses the complexity of building AI systems by orders of magnitude.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>From Static to Adaptive</h3>
+                    <p>Traditional software gives the <strong>same output for the same input</strong>—deterministic and predictable. Foundation models are <strong>contextually adaptive</strong>: they adjust their behavior based on instructions, examples, and conversation history. This enables a level of flexibility that was previously impossible. The same model can be a coding assistant, a writing tutor, a research analyst, or a customer service agent—depending entirely on how you prompt it.</p>
+                </div>
+            </div>
+
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo" style="background: var(--text-muted);">📋</div>
+                        <div class="compare-title">Traditional Software</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Logic</span><span class="compare-item-value">Explicitly coded</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Scope</span><span class="compare-item-value">Single purpose</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Interface</span><span class="compare-item-value">Structured APIs</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Updates</span><span class="compare-item-value">Code changes</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Handling ambiguity</span><span class="compare-item-value">Fails or errors</span></div>
+                        <div class="compare-item"><span class="compare-item-label">New capabilities</span><span class="compare-item-value">Requires development</span></div>
+                    </div>
+                </div>
+
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo" style="background: var(--text-muted);">🤖</div>
+                        <div class="compare-title">Traditional ML</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Logic</span><span class="compare-item-value">Learned from data</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Scope</span><span class="compare-item-value">Single task</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Interface</span><span class="compare-item-value">Feature vectors</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Updates</span><span class="compare-item-value">Retrain model</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Handling ambiguity</span><span class="compare-item-value">Confidence scores</span></div>
+                        <div class="compare-item"><span class="compare-item-label">New capabilities</span><span class="compare-item-value">New model needed</span></div>
+                    </div>
+                </div>
+
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo" style="background: var(--page-primary);">🧠</div>
+                        <div class="compare-title">Foundation Models</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Logic</span><span class="compare-item-value">Emergent from scale</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Scope</span><span class="compare-item-value">General purpose</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Interface</span><span class="compare-item-value">Natural language</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Updates</span><span class="compare-item-value">Change prompts</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Handling ambiguity</span><span class="compare-item-value">Reasons through it</span></div>
+                        <div class="compare-item"><span class="compare-item-label">New capabilities</span><span class="compare-item-value">Just ask differently</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW FOUNDATION MODELS WORK -->
+        <section class="module" id="how-work">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>How Foundation Models Work</h2>
+                    <p>The technology behind the capabilities</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>The Transformer Architecture</h3>
+                    <p>All modern foundation models are built on the <strong>Transformer architecture</strong>, introduced in 2017. The key innovation is the <strong>attention mechanism</strong>, which allows every part of the input to attend to every other part. This lets the model capture long-range dependencies and contextual relationships that previous architectures couldn't.</p>
+                    <p>Transformers are also highly <strong>parallelizable</strong>, meaning they can be trained efficiently on thousands of GPUs simultaneously—enabling the massive scale that makes foundation models possible.</p>
+                </div>
+                <div>
+                    <h3>Training at Scale</h3>
+                    <p>Foundation models are trained on <strong>trillions of tokens</strong> of text from the internet, books, code repositories, and other sources. The training objective is deceptively simple: <strong>predict the next token</strong>. But at sufficient scale, this simple objective produces remarkable capabilities.</p>
+                    <p>Training costs range from <strong>$10M to $100M+</strong> for frontier models, requiring thousands of high-end GPUs running for months. This creates significant barriers to entry.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>The Scaling Laws</h3>
+                    <p>Research has discovered consistent <strong>scaling laws</strong>: model performance improves predictably as you increase parameters, data, and compute. Double the compute, get a predictable improvement in capabilities. This has driven the race to ever-larger models—and gives us confidence that capabilities will continue improving as compute grows.</p>
+                </div>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">📖</div>
+                        <div class="selection-title">Pre-training</div>
+                    </div>
+                    <p class="selection-desc">The model learns general knowledge by predicting next tokens on trillions of words from the internet, books, and code. This is the expensive part—costing tens of millions of dollars for frontier models.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🎯</div>
+                        <div class="selection-title">Instruction Tuning</div>
+                    </div>
+                    <p class="selection-desc">The base model is fine-tuned on instruction-response pairs to follow directions. This transforms it from a text predictor into an assistant that can answer questions and complete tasks.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">👥</div>
+                        <div class="selection-title">RLHF / Constitutional AI</div>
+                    </div>
+                    <p class="selection-desc">Human feedback (or AI feedback) trains the model to give helpful, harmless, honest responses. This is what makes models safe and aligned with human preferences.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🔧</div>
+                        <div class="selection-title">Specialization (Optional)</div>
+                    </div>
+                    <p class="selection-desc">Additional fine-tuning for specific domains (legal, medical, coding) or capabilities (tool use, long context). Can be done by the provider or by customers with their own data.</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">🧪</div>
+                <div class="callout-content">
+                    <h4>Why "Emergent Abilities" Matter</h4>
+                    <p>At certain scales, models suddenly acquire capabilities that weren't present at smaller scales—like the ability to do arithmetic, follow complex instructions, or reason about code. These <strong>emergent abilities</strong> aren't explicitly trained; they arise spontaneously from scale. This is why scaling continues: we don't know what new capabilities will emerge at the next scale, but history suggests something will.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- INDUSTRY TRANSFORMATION -->
+        <section class="module" id="industry-impact">
+            <div class="module-header">
+                <div class="module-icon">🏭</div>
+                <div class="module-info">
+                    <h2>Industry Transformation</h2>
+                    <p>How foundation models are reshaping every sector</p>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-icon">📊</div>
+                <div class="callout-content">
+                    <h4>The Numbers Are Staggering</h4>
+                    <p>McKinsey estimates generative AI could add <strong>$2.6-4.4 trillion annually</strong> to the global economy. That's equivalent to adding another United Kingdom to world GDP. The impact spans virtually every industry and function—this isn't hype, it's the largest technological transformation since the internet.</p>
+                </div>
+            </div>
+
+            <table class="benchmark-table">
+                <thead>
+                    <tr>
+                        <th>Industry</th>
+                        <th>Transformation</th>
+                        <th>Key Use Cases</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="model-name-cell">💻 Software Development</td>
+                        <td>AI pair programming becomes standard</td>
+                        <td>Code generation, debugging, documentation, testing</td>
+                        <td class="score best">30-55% productivity gain</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">📞 Customer Service</td>
+                        <td>AI handles majority of interactions</td>
+                        <td>Chatbots, email triage, call summarization, agent assist</td>
+                        <td class="score best">60-80% cost reduction</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">⚖️ Legal</td>
+                        <td>Document review and drafting automated</td>
+                        <td>Contract analysis, research, due diligence, drafting</td>
+                        <td class="score good">40-60% time savings</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🏥 Healthcare</td>
+                        <td>Clinical documentation and decision support</td>
+                        <td>Note generation, diagnosis support, patient communication</td>
+                        <td class="score good">2-3 hours/day saved per clinician</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">💰 Financial Services</td>
+                        <td>Analysis and compliance automation</td>
+                        <td>Research synthesis, risk analysis, regulatory compliance</td>
+                        <td class="score good">30-50% efficiency gain</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">📣 Marketing</td>
+                        <td>Content creation at scale</td>
+                        <td>Copy generation, personalization, campaign ideation</td>
+                        <td class="score good">5-10x content output</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🎓 Education</td>
+                        <td>Personalized tutoring for everyone</td>
+                        <td>Adaptive learning, homework help, content creation</td>
+                        <td class="score">Democratized access</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">🔬 Research & Science</td>
+                        <td>Accelerated discovery and synthesis</td>
+                        <td>Literature review, hypothesis generation, data analysis</td>
+                        <td class="score good">60% faster discovery</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content" style="margin-top: 24px;">
+                <div>
+                    <h3>The Horizontal Impact</h3>
+                    <p>Beyond industry-specific transformation, foundation models affect <strong>every knowledge work function</strong>: writing, analysis, research, communication, planning. Any job that involves producing or consuming text is being augmented. This horizontal impact is why the economic projections are so large—it's not one industry, it's all of them simultaneously.</p>
+                </div>
+                <div>
+                    <h3>The Speed of Change</h3>
+                    <p>Unlike previous technology shifts that took decades, AI adoption is happening in <strong>months</strong>. ChatGPT reached 100M users faster than any product in history. Enterprises are deploying AI at unprecedented speed because the barrier to entry is low (API calls) and the value is immediate (productivity gains from day one). Companies that wait risk falling years behind in months.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STRATEGIC IMPLICATIONS -->
+        <section class="module" id="strategy">
+            <div class="module-header">
+                <div class="module-icon">♟️</div>
+                <div class="module-info">
+                    <h2>Strategic Implications</h2>
+                    <p>What foundation models mean for business strategy</p>
+                </div>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🏆</div>
+                        <div class="selection-title">Competitive Advantage Shifts</div>
+                    </div>
+                    <p class="selection-desc">When everyone has access to the same powerful AI, competitive advantage shifts to <strong>proprietary data</strong>, <strong>unique workflows</strong>, and <strong>speed of implementation</strong>. The model itself becomes a commodity; how you apply it becomes the differentiator.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">⚡</div>
+                        <div class="selection-title">Speed Becomes Critical</div>
+                    </div>
+                    <p class="selection-desc">AI capabilities improve monthly. Companies that move slowly will find themselves competing against AI-augmented competitors. The cost of experimentation is low; the cost of waiting is high. <strong>Start now, iterate fast.</strong></p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🔌</div>
+                        <div class="selection-title">Build vs. Buy Evolves</div>
+                    </div>
+                    <p class="selection-desc">You don't build your own foundation model (too expensive). But you do need to build AI-native workflows, custom integrations, and domain-specific applications. The question becomes: <strong>buy the model, build the application</strong>.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">📊</div>
+                        <div class="selection-title">Data Strategy Becomes AI Strategy</div>
+                    </div>
+                    <p class="selection-desc">The value of your data increases dramatically when it can be used to customize AI behavior. Clean, structured, proprietary data becomes a <strong>strategic asset</strong>. Invest in data quality, governance, and accessibility.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">👥</div>
+                        <div class="selection-title">Workforce Transformation</div>
+                    </div>
+                    <p class="selection-desc">AI doesn't replace workers wholesale—it augments them. But it changes <strong>what skills matter</strong>. Prompting, AI orchestration, and human-AI collaboration become critical competencies. Invest in training, not just technology.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🔒</div>
+                        <div class="selection-title">Risk Management is Non-Negotiable</div>
+                    </div>
+                    <p class="selection-desc">AI introduces new risks: hallucinations, data leakage, compliance issues, bias. You need <strong>guardrails, monitoring, and governance</strong> from day one. Moving fast doesn't mean moving recklessly.</p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⚠️</div>
+                <div class="callout-content">
+                    <h4>The Cost of Inaction</h4>
+                    <p>Companies that delay AI adoption don't just miss out on efficiency gains—they face existential competitive risk. If your competitor can serve customers at 60% lower cost, produce content at 10x speed, and ship software twice as fast, how long can you compete? <strong>AI adoption is no longer optional; it's a survival requirement.</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CORE CAPABILITIES -->
+        <section class="module" id="capabilities-deep">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Core Capabilities Explained</h2>
+                    <p>What foundation models can actually do—and how well</p>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Language Understanding</div>
+                            <div class="model-company">Reading & Comprehension</div>
+                        </div>
+                        <span class="model-badge frontier">Core</span>
+                    </div>
+                    <p class="model-desc">Parse complex documents, extract information, understand nuance, follow instructions. The foundation of all other capabilities. Modern models understand context across 100K+ tokens.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Document Analysis</span>
+                        <span class="capability-tag strong">Q&A</span>
+                        <span class="capability-tag">Summarization</span>
+                        <span class="capability-tag">Classification</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Language Generation</div>
+                            <div class="model-company">Writing & Content Creation</div>
+                        </div>
+                        <span class="model-badge frontier">Core</span>
+                    </div>
+                    <p class="model-desc">Generate coherent, contextually appropriate text in any style or format. From emails to essays to code documentation. Quality now often indistinguishable from human writing.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Content Writing</span>
+                        <span class="capability-tag strong">Email/Comms</span>
+                        <span class="capability-tag">Creative</span>
+                        <span class="capability-tag">Technical Docs</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Code Generation</div>
+                            <div class="model-company">Programming & Development</div>
+                        </div>
+                        <span class="model-badge frontier">Core</span>
+                    </div>
+                    <p class="model-desc">Write, debug, refactor, and explain code across all major languages. Top models score 90%+ on HumanEval. Practical productivity gains of 30-55% for developers.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Code Writing</span>
+                        <span class="capability-tag strong">Debugging</span>
+                        <span class="capability-tag">Refactoring</span>
+                        <span class="capability-tag">Explanation</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Reasoning & Analysis</div>
+                            <div class="model-company">Logic & Problem-Solving</div>
+                        </div>
+                        <span class="model-badge reasoning">Advanced</span>
+                    </div>
+                    <p class="model-desc">Multi-step logical reasoning, mathematical problem-solving, strategic analysis. Reasoning models (o1, o3) achieve PhD-level performance on science benchmarks.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Math</span>
+                        <span class="capability-tag strong">Logic</span>
+                        <span class="capability-tag">Planning</span>
+                        <span class="capability-tag">Strategy</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Vision Understanding</div>
+                            <div class="model-company">Image & Document Analysis</div>
+                        </div>
+                        <span class="model-badge multimodal">Multimodal</span>
+                    </div>
+                    <p class="model-desc">Analyze images, charts, diagrams, screenshots, and documents. Extract text (OCR), understand visual relationships, describe scenes. Critical for document processing workflows.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Document OCR</span>
+                        <span class="capability-tag strong">Charts</span>
+                        <span class="capability-tag">Screenshots</span>
+                        <span class="capability-tag">Scene Analysis</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Tool Use & Agents</div>
+                            <div class="model-company">External System Integration</div>
+                        </div>
+                        <span class="model-badge reasoning">Advanced</span>
+                    </div>
+                    <p class="model-desc">Call APIs, execute code, browse the web, interact with databases. Enables autonomous agents that accomplish multi-step tasks. The frontier of current development.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Function Calling</span>
+                        <span class="capability-tag strong">APIs</span>
+                        <span class="capability-tag">Computer Use</span>
+                        <span class="capability-tag">Browsing</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-icon">📈</div>
+                <div class="callout-content">
+                    <h4>Capability Trajectory</h4>
+                    <p>Foundation model capabilities have been improving at roughly <strong>2-3x per year</strong>. Tasks that were impossible in 2022 (complex reasoning, long-context understanding, reliable tool use) are now production-ready. Extrapolating this curve, capabilities that seem futuristic today—autonomous research, end-to-end software development, complex multi-agent coordination—may be viable within 1-2 years.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE HISTORICAL JOURNEY -->
+        <section class="module" id="history">
+            <div class="module-header">
+                <div class="module-icon">📜</div>
+                <div class="module-info">
+                    <h2>The Journey to Foundation Models</h2>
+                    <p>How we got here—and why it took so long</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>The AI Winters</h3>
+                    <p>AI research began in the 1950s with enormous optimism—researchers predicted human-level AI within 20 years. Instead, the field hit repeated walls. <strong>Symbolic AI</strong> (1960s-80s) tried to encode human knowledge as rules but couldn't handle the real world's complexity. <strong>Expert systems</strong> (1980s) showed promise but were brittle and expensive to maintain.</p>
+                    <p>Each wave of hype was followed by an <strong>"AI winter"</strong>—periods where funding dried up and researchers abandoned the field. The lesson: intelligence was far harder than anyone expected.</p>
+                </div>
+                <div>
+                    <h3>The Deep Learning Revolution</h3>
+                    <p>Everything changed in 2012 when <strong>AlexNet</strong> won the ImageNet competition by a massive margin using deep neural networks and GPUs. Suddenly, the approach that had been dismissed as "just curve fitting" was producing results no other method could match.</p>
+                    <p>The key insight: with enough data and compute, neural networks could <strong>learn representations</strong> that humans couldn't design. The era of hand-crafted features was over; the era of learned features had begun.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>The Transformer Moment (2017)</h3>
+                    <p>The 2017 paper "Attention Is All You Need" introduced the <strong>Transformer architecture</strong>. Its key innovation—the attention mechanism—let models process sequences in parallel while capturing long-range dependencies. This was both more powerful and more efficient than previous approaches. Within two years, Transformers had taken over NLP. Within five years, they would reshape the entire field of AI.</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2017</div>
+                    <div class="timeline-title">Transformer Architecture</div>
+                    <div class="timeline-desc">"Attention Is All You Need" paper. Google researchers introduce the architecture that would power all future foundation models.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2018</div>
+                    <div class="timeline-title">BERT & GPT-1</div>
+                    <div class="timeline-desc">First successful large language models. BERT revolutionizes NLP benchmarks. GPT-1 shows generative potential with 117M parameters.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2019</div>
+                    <div class="timeline-title">GPT-2</div>
+                    <div class="timeline-desc">1.5B parameters. OpenAI initially withholds release due to "misuse concerns"—the first sign of emergent capabilities causing alarm.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2020</div>
+                    <div class="timeline-title">GPT-3</div>
+                    <div class="timeline-desc">175B parameters. The "few-shot learning" breakthrough. One model handles thousands of tasks via prompting. The foundation model era begins.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2022</div>
+                    <div class="timeline-title">ChatGPT Launch</div>
+                    <div class="timeline-desc">RLHF makes models conversational and helpful. 100M users in 2 months. AI goes mainstream overnight.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-title">GPT-4 & Multimodal</div>
+                    <div class="timeline-desc">Vision capabilities. Passing professional exams. Claude, Gemini, and Llama 2 enter the race. Competition intensifies.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-title">Reasoning Models</div>
+                    <div class="timeline-desc">o1 introduces inference-time compute scaling. PhD-level reasoning. Claude 3, Gemini 1.5, Llama 3 raise the bar across providers.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2025</div>
+                    <div class="timeline-title">Agentic Era Begins</div>
+                    <div class="timeline-desc">o3, Claude 4, Gemini 2.0. Computer use, autonomous agents, and multi-modal native models. Enterprise adoption accelerates.</div>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">💡</div>
+                <div class="callout-content">
+                    <h4>Why It Happened Now</h4>
+                    <p>Three things converged: <strong>1) Compute</strong>—GPUs designed for gaming became perfect for neural networks, and cloud made massive compute accessible. <strong>2) Data</strong>—the internet created an unprecedented corpus of human knowledge and writing. <strong>3) Algorithms</strong>—Transformers provided an architecture that could actually use all that compute and data effectively. Remove any one of these, and foundation models don't happen.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE ECONOMICS OF FOUNDATION MODELS -->
+        <section class="module" id="economics">
+            <div class="module-header">
+                <div class="module-icon">💵</div>
+                <div class="module-info">
+                    <h2>The Economics of Foundation Models</h2>
+                    <p>The costs, investments, and market dynamics</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Training Costs: The Barrier to Entry</h3>
+                    <p>Training a frontier model costs <strong>$50M-$500M+</strong> when you factor in compute, data, and researcher salaries. GPT-4 reportedly cost over $100M to train. This creates an oligopoly: only well-funded labs can play at the frontier.</p>
+                    <p>But costs are context-dependent. Training a specialized model or fine-tuning an existing one costs orders of magnitude less. The question isn't "can you train a foundation model" but "should you train one, or use existing ones?"</p>
+                </div>
+                <div>
+                    <h3>Inference Costs: Where the Money Goes</h3>
+                    <p>For most organizations, <strong>inference costs dominate</strong>—the ongoing expense of running models in production. This is where pricing matters. At $15/million tokens (GPT-4o output), processing 10 million requests/month with 1K tokens each costs $150,000/month. Choosing the right model for the task is critical economics.</p>
+                    <p>Costs are falling fast: <strong>~90% reduction since 2023</strong>. What cost $1 then costs $0.10 now. This trend continues.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>The Investment Landscape</h3>
+                    <p>The foundation model space has attracted unprecedented investment: OpenAI valued at <strong>$150B+</strong>, Anthropic at <strong>$60B+</strong>, xAI at <strong>$40B+</strong>. Total AI investment in 2024 exceeded <strong>$97 billion</strong>. This capital funds the compute and talent needed for frontier research—but also creates pressure to monetize, shaping product decisions across the industry.</p>
+                </div>
+            </div>
+
+            <table class="benchmark-table">
+                <thead>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>Frontier Model</th>
+                        <th>Mid-tier Model</th>
+                        <th>Open Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="model-name-cell">Training Cost</td>
+                        <td>$50M - $500M+</td>
+                        <td>$5M - $50M</td>
+                        <td>Free (use pre-trained)</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">Fine-tuning Cost</td>
+                        <td>$10K - $1M</td>
+                        <td>$1K - $100K</td>
+                        <td>$100 - $10K</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">API Cost (per 1M tokens)</td>
+                        <td>$15 - $60</td>
+                        <td>$1 - $10</td>
+                        <td>$0 (self-hosted)</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">Self-Hosting (per month)</td>
+                        <td>N/A (not available)</td>
+                        <td>N/A (not available)</td>
+                        <td>$5K - $50K</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">Team Required</td>
+                        <td>100+ researchers</td>
+                        <td>10-50 engineers</td>
+                        <td>1-10 engineers</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="selection-grid">
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">📉</div>
+                        <div class="selection-title">Deflation is Real</div>
+                    </div>
+                    <p class="selection-desc">Model prices drop 50-70% annually. Performance improves simultaneously. This means: <strong>don't over-optimize for today's costs</strong>—they'll be much lower next year. Focus on building the right architecture and workflows.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">⚖️</div>
+                        <div class="selection-title">Total Cost of Ownership</div>
+                    </div>
+                    <p class="selection-desc">API costs are just one component. Factor in: development time, prompt engineering, monitoring, error handling, latency requirements, and the cost of mistakes. Cheaper isn't always cheaper.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🎯</div>
+                        <div class="selection-title">Right-Size Your Models</div>
+                    </div>
+                    <p class="selection-desc">80% of queries don't need frontier models. Route simple tasks to cheap, fast models. Reserve expensive models for complex work. <strong>Tiered routing can cut costs 60-80%</strong>.</p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🔄</div>
+                        <div class="selection-title">Build vs. Buy Math</div>
+                    </div>
+                    <p class="selection-desc">Self-hosting Llama 3.1 405B requires 8x H100 GPUs (~$30K/month). Break-even vs. API depends on volume. Below 100M tokens/month, APIs usually win. Above that, do the math.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY FOUNDATION MODELS ARE THE CRITICAL LAYER -->
+        <section class="module" id="critical-layer">
+            <div class="module-header">
+                <div class="module-icon">🔑</div>
+                <div class="module-info">
+                    <h2>Why Foundation Models Are THE Critical Layer</h2>
+                    <p>Understanding why everything depends on them</p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⚠️</div>
+                <div class="callout-content">
+                    <h4>This is Not Hyperbole</h4>
+                    <p>Foundation models are to AI what operating systems are to computing, what electricity is to industry, what the internet is to communication. They are <strong>general-purpose enabling technology</strong> upon which everything else is built. Understanding why is essential for strategy.</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>The Intelligence Infrastructure</h3>
+                    <p>Every AI application—chatbots, coding assistants, search engines, autonomous agents, content generators, analysts—runs on foundation models. They provide the <strong>core intelligence</strong> that makes everything else possible. Without them, you're back to rule-based systems that can't handle real-world complexity.</p>
+                    <p>This is why the AI industry has consolidated around a few model providers. Building a great AI product means building on top of great foundation models. The model layer is the critical dependency.</p>
+                </div>
+                <div>
+                    <h3>The Capability Ceiling</h3>
+                    <p>Your AI application can never be smarter than the foundation model it uses. If the model can't reason well, your agent can't reason well. If the model hallucinates, your product hallucinates. <strong>The model's capabilities are your capability ceiling</strong>.</p>
+                    <p>This creates strategic dependency. When OpenAI releases a better model, every product built on GPT gets better overnight. When a model has a flaw, every product inherits that flaw. Your fate is tied to your model provider's roadmap.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>The Platform Parallel</h3>
+                    <p>Think about how operating systems (Windows, iOS, Android) became the platforms that controlled the computing ecosystem. App developers had to play by platform rules; platforms captured most of the value. <strong>Foundation models are becoming the platform layer for AI</strong>. They set the rules: what's possible, what's allowed, what performs well. Model providers are the new platform gatekeepers. Understanding this power dynamic is essential for AI strategy.</p>
+                </div>
+            </div>
+
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo" style="background: var(--blue);">🖥️</div>
+                        <div class="compare-title">OS as Platform (1990s-2000s)</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Platform</span><span class="compare-item-value">Windows, Mac OS</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Gatekeepers</span><span class="compare-item-value">Microsoft, Apple</span></div>
+                        <div class="compare-item"><span class="compare-item-label">App developers</span><span class="compare-item-value">Build on top</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Value capture</span><span class="compare-item-value">Platform + key apps</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Switching cost</span><span class="compare-item-value">High (ecosystem)</span></div>
+                    </div>
+                </div>
+
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo" style="background: var(--cyan);">☁️</div>
+                        <div class="compare-title">Cloud as Platform (2010s)</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Platform</span><span class="compare-item-value">AWS, Azure, GCP</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Gatekeepers</span><span class="compare-item-value">Amazon, Microsoft, Google</span></div>
+                        <div class="compare-item"><span class="compare-item-label">App developers</span><span class="compare-item-value">Deploy on cloud</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Value capture</span><span class="compare-item-value">Infrastructure + services</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Switching cost</span><span class="compare-item-value">Medium (services)</span></div>
+                    </div>
+                </div>
+
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo" style="background: var(--page-primary);">🧠</div>
+                        <div class="compare-title">Foundation Models (2020s)</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Platform</span><span class="compare-item-value">GPT, Claude, Gemini, Llama</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Gatekeepers</span><span class="compare-item-value">OpenAI, Anthropic, Google, Meta</span></div>
+                        <div class="compare-item"><span class="compare-item-label">App developers</span><span class="compare-item-value">Build AI apps</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Value capture</span><span class="compare-item-value">Model + applications</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Switching cost</span><span class="compare-item-value">Low-Medium (prompts)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Everything Flows Through Models</h4>
+                        <p>Every AI feature, every intelligent automation, every copilot runs on a foundation model. They are the source of the intelligence that powers the entire ecosystem.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Model Quality = Product Quality</h4>
+                        <p>If the model is good, your product can be good. If the model is bad, no amount of product work can fix it. The model is your quality ceiling.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Model Improvements Flow Downstream</h4>
+                        <p>When your model provider ships an upgrade, every product built on that model improves instantly—for free. This is the leverage of building on strong foundations.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Dependency Creates Strategic Risk</h4>
+                        <p>Your business depends on model providers' continued operation, pricing, and policies. Multi-provider strategies and open-source options hedge this risk.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIMITATIONS AND CHALLENGES -->
+        <section class="module" id="limitations">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Limitations & Challenges</h2>
+                    <p>What foundation models can't do—and the problems that remain</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Hallucinations</h3>
+                    <p>Models confidently generate false information. They don't "know" what they don't know. This is a fundamental architectural issue, not a bug to be fixed. Mitigations exist (RAG, citations, grounding) but the problem persists. <strong>Never deploy models where hallucinations are unacceptable without verification layers.</strong></p>
+                </div>
+                <div>
+                    <h3>Reasoning Limits</h3>
+                    <p>Despite impressive benchmarks, models still fail at tasks requiring genuine logical reasoning, especially novel problems outside training distribution. Reasoning models (o1, o3) improve this significantly but don't solve it completely. <strong>Models approximate reasoning; they don't truly reason.</strong></p>
+                </div>
+                <div>
+                    <h3>Knowledge Cutoff</h3>
+                    <p>Models only know what was in their training data, which has a cutoff date. They don't learn from conversations or update their knowledge. For current events, real-time data, or recent developments, <strong>you need retrieval (RAG) or tool use</strong>.</p>
+                </div>
+                <div>
+                    <h3>Context Window Limits</h3>
+                    <p>Even with 200K-2M token windows, models have <strong>"lost in the middle" problems</strong>—information in the middle of long contexts is often ignored. Very long context also increases cost and latency. Context windows are large but not infinite.</p>
+                </div>
+                <div>
+                    <h3>Consistency & Reliability</h3>
+                    <p>Same prompt can give different outputs. Models may behave differently on edge cases. This <strong>non-determinism</strong> makes testing hard and can cause production issues. Structured outputs and lower temperatures help but don't eliminate the issue.</p>
+                </div>
+                <div>
+                    <h3>Cost at Scale</h3>
+                    <p>While costs are falling, high-volume applications still face significant expenses. Processing billions of tokens monthly can cost millions of dollars. <strong>Cost optimization is a real engineering discipline</strong>, not an afterthought.</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">🔮</div>
+                <div class="callout-content">
+                    <h4>The Trajectory of Limitations</h4>
+                    <p>Most of these limitations have been improving rapidly. Hallucinations are less frequent with newer models. Reasoning is better with o1/o3. Context windows have grown 100x in two years. <strong>Assume today's limitations will be significantly reduced in 12-24 months</strong>—but don't build products that depend on problems being solved until they actually are.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE FUTURE TRAJECTORY -->
+        <section class="module" id="future">
+            <div class="module-header">
+                <div class="module-icon">🔮</div>
+                <div class="module-info">
+                    <h2>The Future Trajectory</h2>
+                    <p>Where foundation models are headed</p>
+                </div>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🧠</div>
+                        <div class="selection-title">Reasoning Gets Better</div>
+                    </div>
+                    <p class="selection-desc">The o1/o3 paradigm—using inference-time compute for reasoning—is just beginning. Expect models that can think for minutes or hours on hard problems, achieving PhD+ level performance across domains. <strong>Complex reasoning becomes reliable.</strong></p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🤖</div>
+                        <div class="selection-title">Agents Become Real</div>
+                    </div>
+                    <p class="selection-desc">Models that can reliably use computers, browse the web, write and execute code, and accomplish multi-step goals with minimal supervision. <strong>AI goes from answering questions to completing tasks.</strong></p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🌐</div>
+                        <div class="selection-title">Truly Multimodal</div>
+                    </div>
+                    <p class="selection-desc">Models that natively understand and generate text, images, audio, video, and code—all in one. Not bolted-on capabilities but unified understanding. <strong>The same model handles any modality.</strong></p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">📱</div>
+                        <div class="selection-title">On-Device Everywhere</div>
+                    </div>
+                    <p class="selection-desc">Small, efficient models running locally on phones, laptops, and edge devices. Private, fast, offline-capable AI. <strong>Intelligence embedded in every device.</strong></p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">💰</div>
+                        <div class="selection-title">Costs Collapse</div>
+                    </div>
+                    <p class="selection-desc">Current GPT-4 level capabilities at 1% of today's cost. What's expensive today becomes essentially free. <strong>AI becomes a utility like electricity.</strong></p>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🎯</div>
+                        <div class="selection-title">Specialization Increases</div>
+                    </div>
+                    <p class="selection-desc">Domain-specific models for medicine, law, finance, science—trained on proprietary data with expert knowledge. <strong>General models for general tasks, specialized models for specialized tasks.</strong></p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⏱️</div>
+                <div class="callout-content">
+                    <h4>The Timeline is Compressed</h4>
+                    <p>In AI, things that seem 5 years away often arrive in 18 months. GPT-4 level performance was "years away" in 2021—it arrived in 2023. Autonomous agents were "years away" in 2023—they're arriving now. <strong>Plan for capabilities arriving faster than you expect.</strong> Build architectures that can absorb rapid capability improvements.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FRONTIER MODELS -->
+        <section class="module" id="frontier">
+            <div class="module-header">
+                <div class="module-icon">🏆</div>
+                <div class="module-info">
+                    <h2>Frontier Models</h2>
+                    <p>State-of-the-art proprietary models from major AI labs</p>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card openai">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">GPT-4o</div>
+                            <div class="model-company">OpenAI</div>
+                        </div>
+                        <span class="model-badge multimodal">Multimodal</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Omni</div><div class="model-stat-label">Modality</div></div>
+                        <div><div class="model-stat-value">$2.50</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">OpenAI's flagship multimodal model. Native text, vision, and audio understanding with fast inference. The workhorse for most production applications.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Text</span>
+                        <span class="capability-tag strong">Vision</span>
+                        <span class="capability-tag strong">Audio</span>
+                        <span class="capability-tag">Function Calling</span>
+                        <span class="capability-tag">JSON Mode</span>
+                    </div>
+                </div>
+
+                <div class="model-card anthropic">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Claude 3.5 Sonnet</div>
+                            <div class="model-company">Anthropic</div>
+                        </div>
+                        <span class="model-badge frontier">Frontier</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">200K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Multi</div><div class="model-stat-label">Modality</div></div>
+                        <div><div class="model-stat-value">$3.00</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">Best-in-class for coding, analysis, and long-form content. Excels at following complex instructions with nuanced, thoughtful responses.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Coding</span>
+                        <span class="capability-tag strong">Analysis</span>
+                        <span class="capability-tag">Vision</span>
+                        <span class="capability-tag">Tool Use</span>
+                        <span class="capability-tag">Computer Use</span>
+                    </div>
+                </div>
+
+                <div class="model-card google">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Gemini 2.0 Flash</div>
+                            <div class="model-company">Google DeepMind</div>
+                        </div>
+                        <span class="model-badge multimodal">Multimodal</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">1M+</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Omni</div><div class="model-stat-label">Modality</div></div>
+                        <div><div class="model-stat-value">$0.10</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">Native multimodal with the largest context window. Real-time audio/video understanding, extremely cost-effective for high-volume applications.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Long Context</span>
+                        <span class="capability-tag strong">Video</span>
+                        <span class="capability-tag">Audio</span>
+                        <span class="capability-tag">Vision</span>
+                        <span class="capability-tag">Realtime</span>
+                    </div>
+                </div>
+
+                <div class="model-card anthropic">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Claude 4 Opus</div>
+                            <div class="model-company">Anthropic</div>
+                        </div>
+                        <span class="model-badge frontier">Frontier</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">200K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Multi</div><div class="model-stat-label">Modality</div></div>
+                        <div><div class="model-stat-value">$15.00</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">Most capable Claude model for complex professional tasks. Extended agentic capabilities, deep reasoning, and sophisticated analysis.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Reasoning</span>
+                        <span class="capability-tag strong">Agentic</span>
+                        <span class="capability-tag">Vision</span>
+                        <span class="capability-tag">Tool Use</span>
+                        <span class="capability-tag">Computer Use</span>
+                    </div>
+                </div>
+
+                <div class="model-card xai">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Grok-2</div>
+                            <div class="model-company">xAI</div>
+                        </div>
+                        <span class="model-badge frontier">Frontier</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Multi</div><div class="model-stat-label">Modality</div></div>
+                        <div><div class="model-stat-value">$2.00</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">xAI's flagship model with real-time X (Twitter) integration. Competitive performance with unique access to social data streams.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag">Text</span>
+                        <span class="capability-tag">Vision</span>
+                        <span class="capability-tag strong">Real-time Data</span>
+                        <span class="capability-tag">Function Calling</span>
+                    </div>
+                </div>
+
+                <div class="model-card mistral">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Mistral Large 2</div>
+                            <div class="model-company">Mistral AI</div>
+                        </div>
+                        <span class="model-badge frontier">Frontier</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">123B</div><div class="model-stat-label">Parameters</div></div>
+                        <div><div class="model-stat-value">$2.00</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">European AI champion. Strong multilingual support, excellent function calling, competitive pricing. Popular for EU data residency requirements.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Multilingual</span>
+                        <span class="capability-tag">Coding</span>
+                        <span class="capability-tag">Function Calling</span>
+                        <span class="capability-tag">EU Data</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- REASONING MODELS -->
+        <section class="module" id="reasoning">
+            <div class="module-header">
+                <div class="module-icon">🧠</div>
+                <div class="module-info">
+                    <h2>Reasoning Models</h2>
+                    <p>Extended inference-time compute for complex problem-solving</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">💡</div>
+                <div class="callout-content">
+                    <h4>The Reasoning Paradigm Shift</h4>
+                    <p>Reasoning models represent a fundamental change in how LLMs approach complex problems. Instead of generating answers in a single forward pass, they use chain-of-thought reasoning with extended "thinking" time—trading compute for accuracy on math, coding, and scientific problems.</p>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card openai">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">o3</div>
+                            <div class="model-company">OpenAI</div>
+                        </div>
+                        <span class="model-badge reasoning">Reasoning</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">200K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">SOTA</div><div class="model-stat-label">Reasoning</div></div>
+                        <div><div class="model-stat-value">High</div><div class="model-stat-label">Compute</div></div>
+                    </div>
+                    <p class="model-desc">OpenAI's most advanced reasoning model. Near-human performance on ARC-AGI benchmark. Excels at mathematical proofs, scientific reasoning, and complex multi-step problems.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Math</span>
+                        <span class="capability-tag strong">Science</span>
+                        <span class="capability-tag strong">Coding</span>
+                        <span class="capability-tag">Chain-of-Thought</span>
+                        <span class="capability-tag">Extended Thinking</span>
+                    </div>
+                </div>
+
+                <div class="model-card openai">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">o1</div>
+                            <div class="model-company">OpenAI</div>
+                        </div>
+                        <span class="model-badge reasoning">Reasoning</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">200K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">PhD</div><div class="model-stat-label">Level</div></div>
+                        <div><div class="model-stat-value">$15.00</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">First-generation reasoning model. PhD-level performance on GPQA benchmark. Ideal for complex STEM problems, code debugging, and strategic analysis.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">STEM</span>
+                        <span class="capability-tag strong">Code Debug</span>
+                        <span class="capability-tag">Planning</span>
+                        <span class="capability-tag">Analysis</span>
+                    </div>
+                </div>
+
+                <div class="model-card openai">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">o3-mini</div>
+                            <div class="model-company">OpenAI</div>
+                        </div>
+                        <span class="model-badge reasoning">Reasoning</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Fast</div><div class="model-stat-label">Inference</div></div>
+                        <div><div class="model-stat-value">$1.10</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">Cost-effective reasoning model. Configurable compute levels (low/medium/high). Excellent for coding tasks where speed matters more than maximum capability.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Coding</span>
+                        <span class="capability-tag">Math</span>
+                        <span class="capability-tag">Configurable</span>
+                        <span class="capability-tag">Cost-effective</span>
+                    </div>
+                </div>
+
+                <div class="model-card deepseek">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">DeepSeek-R1</div>
+                            <div class="model-company">DeepSeek</div>
+                        </div>
+                        <span class="model-badge reasoning">Reasoning</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">64K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">Open</div><div class="model-stat-label">Weights</div></div>
+                        <div><div class="model-stat-value">$0.55</div><div class="model-stat-label">/1M input</div></div>
+                    </div>
+                    <p class="model-desc">Open-source reasoning model competitive with o1. Demonstrates that reasoning capabilities can emerge without massive resources. MIT licensed.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Open Source</span>
+                        <span class="capability-tag">Math</span>
+                        <span class="capability-tag">Coding</span>
+                        <span class="capability-tag">Self-hostable</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⚠️</div>
+                <div class="callout-content">
+                    <h4>When to Use Reasoning Models</h4>
+                    <p><strong>Use reasoning models for:</strong> Complex math, scientific analysis, multi-step coding problems, strategic planning, formal proofs. <strong>Don't use for:</strong> Simple Q&A, content generation, conversational AI, high-throughput applications. Reasoning models are slower and more expensive—reserve them for problems that truly benefit from extended thinking.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPEN SOURCE MODELS -->
+        <section class="module" id="opensource">
+            <div class="module-header">
+                <div class="module-icon">🔓</div>
+                <div class="module-info">
+                    <h2>Open Source Models</h2>
+                    <p>Open-weight models for self-hosting and customization</p>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card meta">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Llama 3.2 405B</div>
+                            <div class="model-company">Meta</div>
+                        </div>
+                        <span class="model-badge open">Open Source</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">405B</div><div class="model-stat-label">Parameters</div></div>
+                        <div><div class="model-stat-value">Free</div><div class="model-stat-label">License</div></div>
+                    </div>
+                    <p class="model-desc">Largest open model, competitive with GPT-4. Llama Community License allows commercial use. Gold standard for enterprise self-hosting.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Self-host</span>
+                        <span class="capability-tag strong">Fine-tune</span>
+                        <span class="capability-tag">Multilingual</span>
+                        <span class="capability-tag">Commercial OK</span>
+                    </div>
+                </div>
+
+                <div class="model-card meta">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Llama 3.2 Vision</div>
+                            <div class="model-company">Meta</div>
+                        </div>
+                        <span class="model-badge open">Open Source</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">11B/90B</div><div class="model-stat-label">Sizes</div></div>
+                        <div><div class="model-stat-value">Multi</div><div class="model-stat-label">Modal</div></div>
+                    </div>
+                    <p class="model-desc">First open multimodal Llama. Image understanding capabilities. Available in 11B (edge) and 90B (datacenter) variants.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Vision</span>
+                        <span class="capability-tag">Self-host</span>
+                        <span class="capability-tag">Edge Deploy</span>
+                        <span class="capability-tag">Fine-tune</span>
+                    </div>
+                </div>
+
+                <div class="model-card deepseek">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">DeepSeek V3</div>
+                            <div class="model-company">DeepSeek</div>
+                        </div>
+                        <span class="model-badge open">Open Source</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">671B</div><div class="model-stat-label">Total Params</div></div>
+                        <div><div class="model-stat-value">37B</div><div class="model-stat-label">Active</div></div>
+                    </div>
+                    <p class="model-desc">Massive MoE model with GPT-4 level performance at fraction of training cost. MIT license. Only 37B parameters active per token.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">MoE</span>
+                        <span class="capability-tag strong">Efficient</span>
+                        <span class="capability-tag">MIT License</span>
+                        <span class="capability-tag">Coding</span>
+                    </div>
+                </div>
+
+                <div class="model-card mistral">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Mixtral 8x22B</div>
+                            <div class="model-company">Mistral AI</div>
+                        </div>
+                        <span class="model-badge open">Open Source</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">64K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">176B</div><div class="model-stat-label">Total</div></div>
+                        <div><div class="model-stat-value">44B</div><div class="model-stat-label">Active</div></div>
+                    </div>
+                    <p class="model-desc">Mixture-of-experts architecture. Apache 2.0 license. Excellent multilingual support and function calling. European AI leader.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">MoE</span>
+                        <span class="capability-tag strong">Multilingual</span>
+                        <span class="capability-tag">Apache 2.0</span>
+                        <span class="capability-tag">Function Calling</span>
+                    </div>
+                </div>
+
+                <div class="model-card google">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Gemma 2 27B</div>
+                            <div class="model-company">Google</div>
+                        </div>
+                        <span class="model-badge open">Open Source</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">8K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">27B</div><div class="model-stat-label">Parameters</div></div>
+                        <div><div class="model-stat-value">2B/9B</div><div class="model-stat-label">Also Avail</div></div>
+                    </div>
+                    <p class="model-desc">Google's open model family. Best-in-class at smaller sizes. Gemma 2B ideal for edge deployment. Research-friendly license.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Efficient</span>
+                        <span class="capability-tag">Edge Ready</span>
+                        <span class="capability-tag">Research</span>
+                        <span class="capability-tag">Multiple Sizes</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Qwen 2.5 72B</div>
+                            <div class="model-company">Alibaba</div>
+                        </div>
+                        <span class="model-badge open">Open Source</span>
+                    </div>
+                    <div class="model-stats">
+                        <div><div class="model-stat-value">128K</div><div class="model-stat-label">Context</div></div>
+                        <div><div class="model-stat-value">72B</div><div class="model-stat-label">Parameters</div></div>
+                        <div><div class="model-stat-value">Strong</div><div class="model-stat-label">Code/Math</div></div>
+                    </div>
+                    <p class="model-desc">Top Chinese open model. Exceptional coding and math performance. Apache 2.0 license. Available in sizes from 0.5B to 72B.</p>
+                    <div class="model-capabilities">
+                        <span class="capability-tag strong">Coding</span>
+                        <span class="capability-tag strong">Math</span>
+                        <span class="capability-tag">Long Context</span>
+                        <span class="capability-tag">Apache 2.0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BENCHMARKS -->
+        <section class="module" id="benchmarks">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Benchmark Comparison</h2>
+                    <p>Performance across standard evaluation suites</p>
+                </div>
+            </div>
+
+            <table class="benchmark-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>MMLU</th>
+                        <th>HumanEval</th>
+                        <th>MATH</th>
+                        <th>GPQA</th>
+                        <th>ARC-AGI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="model-name-cell">o3 (high compute)<span class="company-tag openai">OpenAI</span></td>
+                        <td class="score good">—</td>
+                        <td class="score good">—</td>
+                        <td class="score best">96.7%</td>
+                        <td class="score best">87.7%</td>
+                        <td class="score best">87.5%</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">o1<span class="company-tag openai">OpenAI</span></td>
+                        <td class="score best">92.3%</td>
+                        <td class="score best">94.8%</td>
+                        <td class="score good">94.8%</td>
+                        <td class="score good">78.0%</td>
+                        <td class="score">32%</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">GPT-4o<span class="company-tag openai">OpenAI</span></td>
+                        <td class="score good">88.7%</td>
+                        <td class="score good">90.2%</td>
+                        <td class="score">76.6%</td>
+                        <td class="score">53.6%</td>
+                        <td class="score">—</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">Claude 3.5 Sonnet<span class="company-tag anthropic">Anthropic</span></td>
+                        <td class="score good">88.7%</td>
+                        <td class="score best">93.7%</td>
+                        <td class="score">78.3%</td>
+                        <td class="score">59.4%</td>
+                        <td class="score">—</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">Gemini 2.0 Flash<span class="company-tag google">Google</span></td>
+                        <td class="score good">87.5%</td>
+                        <td class="score">85.4%</td>
+                        <td class="score">77.8%</td>
+                        <td class="score">—</td>
+                        <td class="score">—</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">Llama 3.1 405B<span class="company-tag meta">Meta</span></td>
+                        <td class="score good">88.6%</td>
+                        <td class="score">89.0%</td>
+                        <td class="score">73.8%</td>
+                        <td class="score">51.1%</td>
+                        <td class="score">—</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name-cell">DeepSeek V3<span class="company-tag" style="background: rgba(6, 182, 212, 0.15); color: var(--cyan);">DeepSeek</span></td>
+                        <td class="score good">87.1%</td>
+                        <td class="score">88.4%</td>
+                        <td class="score good">90.2%</td>
+                        <td class="score">59.1%</td>
+                        <td class="score">—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout info">
+                <div class="callout-icon">📈</div>
+                <div class="callout-content">
+                    <h4>Understanding Benchmarks</h4>
+                    <p><strong>MMLU:</strong> Multitask language understanding across 57 subjects. <strong>HumanEval:</strong> Python coding problems. <strong>MATH:</strong> Competition math problems. <strong>GPQA:</strong> Graduate-level science questions. <strong>ARC-AGI:</strong> Abstract reasoning and novel problem-solving. Note: Benchmarks have limitations—real-world performance often differs.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROVIDER FEATURES -->
+        <section class="module" id="capabilities">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Provider Feature Comparison</h2>
+                    <p>API features and capabilities across major providers</p>
+                </div>
+            </div>
+
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo openai">O</div>
+                        <div class="compare-title">OpenAI</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Max Context</span><span class="compare-item-value">200K (o1)</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Vision</span><span class="compare-item-value">✓ Native</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Audio</span><span class="compare-item-value">✓ Realtime API</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Function Calling</span><span class="compare-item-value">✓ Excellent</span></div>
+                        <div class="compare-item"><span class="compare-item-label">JSON Mode</span><span class="compare-item-value">✓ Structured</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Reasoning</span><span class="compare-item-value">✓ o1/o3</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Fine-tuning</span><span class="compare-item-value">✓ GPT-4o</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Batch API</span><span class="compare-item-value">✓ 50% off</span></div>
+                    </div>
+                </div>
+
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo anthropic">A</div>
+                        <div class="compare-title">Anthropic</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Max Context</span><span class="compare-item-value">200K</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Vision</span><span class="compare-item-value">✓ Native</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Audio</span><span class="compare-item-value">— Not yet</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Function Calling</span><span class="compare-item-value">✓ Tool Use</span></div>
+                        <div class="compare-item"><span class="compare-item-label">JSON Mode</span><span class="compare-item-value">✓ Structured</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Computer Use</span><span class="compare-item-value">✓ Beta</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Fine-tuning</span><span class="compare-item-value">— Enterprise</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Batch API</span><span class="compare-item-value">✓ 50% off</span></div>
+                    </div>
+                </div>
+
+                <div class="compare-card">
+                    <div class="compare-card-header">
+                        <div class="compare-logo google">G</div>
+                        <div class="compare-title">Google</div>
+                    </div>
+                    <div class="compare-items">
+                        <div class="compare-item"><span class="compare-item-label">Max Context</span><span class="compare-item-value">2M (Gemini)</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Vision</span><span class="compare-item-value">✓ Native</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Audio</span><span class="compare-item-value">✓ Native</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Video</span><span class="compare-item-value">✓ Native</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Function Calling</span><span class="compare-item-value">✓ Good</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Grounding</span><span class="compare-item-value">✓ Search</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Fine-tuning</span><span class="compare-item-value">✓ Vertex AI</span></div>
+                        <div class="compare-item"><span class="compare-item-label">Caching</span><span class="compare-item-value">✓ Context</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING -->
+        <section class="module" id="pricing">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>Pricing Comparison</h2>
+                    <p>Cost per million tokens across models (as of Jan 2026)</p>
+                </div>
+            </div>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Input $/1M</th>
+                        <th>Output $/1M</th>
+                        <th>Context</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gemini 2.0 Flash</strong></td>
+                        <td class="price">$0.10</td>
+                        <td class="price">$0.40</td>
+                        <td>1M</td>
+                        <td>Best value for high volume</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DeepSeek V3</strong></td>
+                        <td class="price">$0.27</td>
+                        <td class="price">$1.10</td>
+                        <td>128K</td>
+                        <td>API pricing, self-host free</td>
+                    </tr>
+                    <tr>
+                        <td><strong>o3-mini (low)</strong></td>
+                        <td class="price">$1.10</td>
+                        <td class="price">$4.40</td>
+                        <td>128K</td>
+                        <td>Configurable compute</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPT-4o</strong></td>
+                        <td class="price">$2.50</td>
+                        <td class="price">$10.00</td>
+                        <td>128K</td>
+                        <td>Batch: 50% discount</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claude 3.5 Sonnet</strong></td>
+                        <td class="price">$3.00</td>
+                        <td class="price">$15.00</td>
+                        <td>200K</td>
+                        <td>Best for coding</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemini 1.5 Pro</strong></td>
+                        <td class="price">$3.50</td>
+                        <td class="price">$10.50</td>
+                        <td>2M</td>
+                        <td>Longest context</td>
+                    </tr>
+                    <tr>
+                        <td><strong>o1</strong></td>
+                        <td class="price expensive">$15.00</td>
+                        <td class="price expensive">$60.00</td>
+                        <td>200K</td>
+                        <td>Reasoning model</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claude 4 Opus</strong></td>
+                        <td class="price expensive">$15.00</td>
+                        <td class="price expensive">$75.00</td>
+                        <td>200K</td>
+                        <td>Most capable Claude</td>
+                    </tr>
+                    <tr>
+                        <td><strong>o3 (high)</strong></td>
+                        <td class="price premium">$$$</td>
+                        <td class="price premium">$$$</td>
+                        <td>200K</td>
+                        <td>Pricing TBD, very expensive</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout success">
+                <div class="callout-icon">💡</div>
+                <div class="callout-content">
+                    <h4>Cost Optimization Tips</h4>
+                    <p><strong>1. Use tiered models:</strong> Route simple queries to cheaper models. <strong>2. Batch API:</strong> 50% discount for non-urgent requests. <strong>3. Caching:</strong> Google's context caching, prompt caching reduces costs. <strong>4. Smaller models:</strong> Gemini Flash, Claude Haiku for straightforward tasks. <strong>5. Self-host open models:</strong> Llama, DeepSeek for high volume.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SELECTION GUIDE -->
+        <section class="module" id="selection">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Model Selection Guide</h2>
+                    <p>Choosing the right model for your use case</p>
+                </div>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">💬</div>
+                        <div class="selection-title">Conversational AI / Chatbots</div>
+                    </div>
+                    <p class="selection-desc">Customer support, virtual assistants, general Q&A. Need good instruction following, safety, and reasonable cost.</p>
+                    <div class="selection-recommend">GPT-4o, Claude 3.5 Sonnet, Gemini 2.0 Flash</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">💻</div>
+                        <div class="selection-title">Code Generation & Review</div>
+                    </div>
+                    <p class="selection-desc">Writing code, debugging, code review, refactoring. Need strong coding benchmarks and tool use.</p>
+                    <div class="selection-recommend">Claude 3.5 Sonnet, o3-mini, GPT-4o</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">📊</div>
+                        <div class="selection-title">Data Analysis & Research</div>
+                    </div>
+                    <p class="selection-desc">Analyzing documents, extracting insights, research synthesis. Need long context and reasoning.</p>
+                    <div class="selection-recommend">Gemini 1.5 Pro (long docs), Claude 3.5 Sonnet, o1</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🧮</div>
+                        <div class="selection-title">Math & Scientific Problems</div>
+                    </div>
+                    <p class="selection-desc">Complex calculations, proofs, scientific reasoning. Need strong MATH and GPQA performance.</p>
+                    <div class="selection-recommend">o1, o3, DeepSeek-R1</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🖼️</div>
+                        <div class="selection-title">Vision & Document Processing</div>
+                    </div>
+                    <p class="selection-desc">Image understanding, OCR, document analysis, charts. Need strong vision capabilities.</p>
+                    <div class="selection-recommend">GPT-4o, Claude 3.5 Sonnet, Gemini 2.0</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🎙️</div>
+                        <div class="selection-title">Voice & Real-time</div>
+                    </div>
+                    <p class="selection-desc">Voice assistants, real-time conversation, audio processing. Need native audio and low latency.</p>
+                    <div class="selection-recommend">GPT-4o Realtime API, Gemini 2.0 Live</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🏭</div>
+                        <div class="selection-title">High Volume / Cost-Sensitive</div>
+                    </div>
+                    <p class="selection-desc">Processing millions of requests. Need lowest cost with acceptable quality.</p>
+                    <div class="selection-recommend">Gemini 2.0 Flash, Llama 3.2 (self-host), DeepSeek V3</div>
+                </div>
+
+                <div class="selection-card">
+                    <div class="selection-header">
+                        <div class="selection-icon">🔒</div>
+                        <div class="selection-title">Privacy / Self-Hosting</div>
+                    </div>
+                    <p class="selection-desc">Data cannot leave premises. Need open weights for local deployment.</p>
+                    <div class="selection-recommend">Llama 3.2, DeepSeek V3, Mixtral, Qwen 2.5</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section class="module" id="timeline">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Model Timeline</h2>
+                    <p>Key releases and milestones in the foundation model era</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">December 2025</div>
+                    <div class="timeline-title">OpenAI o3 Announced</div>
+                    <div class="timeline-desc">Near-human performance on ARC-AGI benchmark. Represents major leap in reasoning capabilities.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">December 2025</div>
+                    <div class="timeline-title">Google Gemini 2.0 Launch</div>
+                    <div class="timeline-desc">Native multimodal with real-time audio/video. Project Astra agentic capabilities.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">November 2025</div>
+                    <div class="timeline-title">DeepSeek V3 Released</div>
+                    <div class="timeline-desc">671B MoE model with GPT-4 level performance. Trained for under $6M, MIT licensed.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">October 2025</div>
+                    <div class="timeline-title">Claude 4 Family Launched</div>
+                    <div class="timeline-desc">Claude 4 Opus with extended agentic capabilities and improved reasoning.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">September 2024</div>
+                    <div class="timeline-title">OpenAI o1 Released</div>
+                    <div class="timeline-desc">First "reasoning model" using extended inference-time compute. PhD-level on GPQA.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">June 2024</div>
+                    <div class="timeline-title">Claude 3.5 Sonnet</div>
+                    <div class="timeline-desc">Sets new standard for coding benchmarks. Introduces Artifacts feature.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">May 2024</div>
+                    <div class="timeline-title">GPT-4o Launch</div>
+                    <div class="timeline-desc">Native multimodal "omni" model. Real-time voice conversation capabilities.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">April 2024</div>
+                    <div class="timeline-title">Meta Llama 3 Released</div>
+                    <div class="timeline-desc">Open-source models up to 70B. Later expanded to 405B.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for working with foundation models</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Start with the Right Model Size</h4>
+                        <p>Don't default to the largest model. Test smaller models first—they're often sufficient and much cheaper. Use tiered routing for production.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Implement Model Fallbacks</h4>
+                        <p>Never rely on a single provider. Implement fallback chains (e.g., Claude → GPT-4o → Gemini) for resilience and cost optimization.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Use Structured Outputs</h4>
+                        <p>Leverage JSON mode and structured output features. Reduces parsing errors and improves reliability for production systems.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Monitor and Evaluate Continuously</h4>
+                        <p>Track quality metrics, latency, and costs. Set up automated evals to detect model degradation or behavior changes.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Optimize Prompts Before Scaling</h4>
+                        <p>Invest time in prompt engineering. A well-crafted prompt can outperform a larger model with a poor prompt.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Consider Total Cost of Ownership</h4>
+                        <p>API costs are just part of the equation. Factor in development time, maintenance, latency requirements, and scaling needs.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Stay Current but Don't Chase Every Release</h4>
+                        <p>New models launch constantly. Evaluate thoughtfully—switching costs are real. Upgrade when benefits clearly outweigh migration effort.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Build Model-Agnostic Architectures</h4>
+                        <p>Abstract model calls behind interfaces. Makes switching providers and A/B testing straightforward without code changes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered model evaluation and selection</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🧠 ModelAnalyst</h3>
+                    <p>An AI agent specialized in analyzing foundation models, comparing benchmarks, evaluating pricing, and recommending optimal model choices based on use case requirements. Tracks releases across all major providers and generates cost projections.</p>
+                    
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> Compare benchmark performance (MMLU, HumanEval, MATH)</div>
+                        <div class="agent-capability"><span class="capability-icon">💰</span> Calculate cost projections for production workloads</div>
+                        <div class="agent-capability"><span class="capability-icon">🎯</span> Recommend models based on use case requirements</div>
+                        <div class="agent-capability"><span class="capability-icon">📈</span> Track model releases and capability updates</div>
+                        <div class="agent-capability"><span class="capability-icon">⚡</span> Evaluate latency, throughput, and rate limits</div>
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> Design multi-provider fallback strategies</div>
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Analyze capability gaps for specific tasks</div>
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Generate model comparison reports</div>
+                    </div>
+                </div>
+
+                <div class="agent-code">
+                    <div class="code-header">model_analyst_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-comment"># Foundation Model Analyst Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> model_tools <span class="code-keyword">import</span> (
+    BenchmarkLookup, PricingCalculator,
+    LatencyTester, CapabilityMatrix,
+    ReleaseTracker, CostProjector
+)
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Initialize specialized tools</span>
+benchmark_lookup = BenchmarkLookup(sources=[<span class="code-string">"mmlu"</span>, <span class="code-string">"humaneval"</span>, <span class="code-string">"math"</span>])
+pricing_calc = PricingCalculator(providers=[<span class="code-string">"openai"</span>, <span class="code-string">"anthropic"</span>, <span class="code-string">"google"</span>])
+latency_tester = LatencyTester(regions=[<span class="code-string">"us-east"</span>, <span class="code-string">"eu-west"</span>])
+capability_matrix = CapabilityMatrix()
+release_tracker = ReleaseTracker()
+cost_projector = CostProjector()
+
+model_analyst = Agent(
+    role=<span class="code-string">"Foundation Model Analyst"</span>,
+    goal=<span class="code-string">"""Evaluate and recommend optimal foundation 
+    models based on use case requirements, benchmarks, 
+    and total cost of ownership"""</span>,
+    backstory=<span class="code-string">"""Expert in LLM evaluation with deep 
+    knowledge of model capabilities across OpenAI, 
+    Anthropic, Google, Meta, and emerging providers. 
+    Specializes in benchmark interpretation and 
+    production deployment patterns."""</span>,
+    llm=llm,
+    tools=[
+        benchmark_lookup, pricing_calc, latency_tester,
+        capability_matrix, release_tracker, cost_projector
+    ],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">evaluate_models</span>(requirements: <span class="code-keyword">dict</span>) -> <span class="code-keyword">dict</span>:
+    <span class="code-string">"""Evaluate models for a specific use case."""</span>
+    
+    task = Task(
+        description=<span class="code-string">f"""
+        Analyze requirements and recommend models:
+        
+        1. REQUIREMENTS ANALYSIS
+           - Parse use case: {requirements['use_case']}
+           - Volume: {requirements['monthly_requests']}
+           - Latency needs: {requirements['max_latency_ms']}ms
+           - Quality bar: {requirements['quality_tier']}
+        
+        2. BENCHMARK COMPARISON
+           - Pull relevant benchmarks for task type
+           - Rank models by capability match
+           - Note capability gaps
+        
+        3. COST PROJECTION
+           - Calculate monthly cost per model
+           - Include input/output token ratios
+           - Factor in caching opportunities
+        
+        4. RECOMMENDATIONS
+           - Primary model selection
+           - Fallback chain (3 providers)
+           - Cost optimization strategies
+           - Implementation considerations
+        """</span>,
+        agent=model_analyst,
+        expected_output=<span class="code-string">"Model recommendation report"</span>
+    )
+    
+    crew = Crew(agents=[model_analyst], tasks=[task])
+    result = <span class="code-keyword">await</span> crew.kickoff_async()
+    
+    <span class="code-keyword">return</span> {
+        <span class="code-string">"primary_model"</span>: result.primary,
+        <span class="code-string">"fallback_chain"</span>: result.fallbacks,
+        <span class="code-string">"monthly_cost_est"</span>: result.cost,
+        <span class="code-string">"benchmark_scores"</span>: result.benchmarks,
+        <span class="code-string">"recommendations"</span>: result.recommendations
+    }</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Related Topics</h2>
+                    <p>Continue exploring emerging technologies</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat19-p2-agentic-ai.html" class="related-card">
+                    <div class="related-icon">🤖</div>
+                    <div class="related-title">Agentic AI</div>
+                    <div class="related-desc">Build autonomous agents with tool use and multi-step reasoning</div>
+                </a>
+                <a href="cat19-p3-multimodal-ai.html" class="related-card">
+                    <div class="related-icon">🎨</div>
+                    <div class="related-title">Multimodal AI</div>
+                    <div class="related-desc">Vision, audio, and video understanding and generation</div>
+                </a>
+                <a href="cat19-p6-ai-infrastructure.html" class="related-card">
+                    <div class="related-icon">🖥️</div>
+                    <div class="related-title">AI Infrastructure</div>
+                    <div class="related-desc">GPUs, inference optimization, and deployment platforms</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-nav">
+        <a href="cat19-emerging-technologies-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">19. Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 19.1</div>
+        <a href="cat19-p2-agentic-ai.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">19.2 Agentic AI</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

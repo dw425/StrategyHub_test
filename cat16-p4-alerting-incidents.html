@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerting & Incident Management | Monitoring & Observability | Category 16 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        .architecture-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .architecture-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .architecture-title { font-size: var(--font-sm); font-weight: 600; }
+        .architecture-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.3); animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .architecture-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        .severity-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .severity-card { background: var(--bg-card); border: 2px solid var(--severity-color); border-radius: var(--radius-xl); padding: var(--space-lg); position: relative; overflow: hidden; transition: all 0.3s; }
+        .severity-card:hover { transform: translateY(-4px); }
+        .severity-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--severity-color); }
+        .severity-card.critical { --severity-color: #DC2626; }
+        .severity-card.high { --severity-color: #F97316; }
+        .severity-card.warning { --severity-color: #FBBF24; }
+        .severity-card.info { --severity-color: #3B82F6; }
+        .severity-badge { display: inline-block; padding: 4px 12px; background: var(--severity-color); color: white; border-radius: var(--radius-full); font-size: var(--font-xs); font-weight: 700; margin-bottom: var(--space-md); }
+        .severity-title { font-size: var(--font-lg); font-weight: 700; margin-bottom: var(--space-sm); }
+        .severity-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .severity-meta { font-size: var(--font-xs); color: var(--text-muted); }
+        .severity-meta span { display: block; margin-bottom: 4px; }
+        .alert-anatomy { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .alert-anatomy h3 { font-size: var(--font-lg); margin-bottom: var(--space-lg); color: var(--cat-light); }
+        .alert-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .alert-field { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-md); }
+        .alert-field-name { font-size: var(--font-sm); font-weight: 600; color: var(--cyan); margin-bottom: var(--space-xs); font-family: monospace; }
+        .alert-field-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); }
+        .tool-card-header { padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .tool-logo { width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; }
+        .tool-info h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: 2px; }
+        .tool-type { font-size: var(--font-xs); color: var(--text-muted); }
+        .tool-card-body { padding: var(--space-lg); }
+        .tool-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .tool-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tool-feature { font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-full); color: var(--text-muted); }
+        .lifecycle-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .lifecycle-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .lifecycle-title { font-size: var(--font-sm); font-weight: 600; }
+        .lifecycle-stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+        .lifecycle-stage { padding: var(--space-lg); text-align: center; border-right: 1px solid var(--border-color); position: relative; }
+        .lifecycle-stage:last-child { border-right: none; }
+        .lifecycle-stage::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 20px; z-index: 1; }
+        .lifecycle-stage:last-child::after { display: none; }
+        .stage-num { width: 32px; height: 32px; background: var(--stage-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: white; margin: 0 auto var(--space-sm); }
+        .lifecycle-stage:nth-child(1) { --stage-color: #EF4444; }
+        .lifecycle-stage:nth-child(2) { --stage-color: #F97316; }
+        .lifecycle-stage:nth-child(3) { --stage-color: #FBBF24; }
+        .lifecycle-stage:nth-child(4) { --stage-color: #10B981; }
+        .lifecycle-stage:nth-child(5) { --stage-color: #3B82F6; }
+        .stage-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .stage-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .oncall-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .oncall-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .oncall-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .oncall-icon { font-size: 24px; }
+        .oncall-title { font-size: var(--font-base); font-weight: 600; }
+        .oncall-body { padding: var(--space-lg); }
+        .oncall-list { list-style: none; }
+        .oncall-list li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .oncall-list li:last-child { border-bottom: none; }
+        .oncall-list li::before { content: '•'; color: var(--cat-light); font-weight: bold; }
+        .runbook-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+        .runbook-section h3 { font-size: var(--font-lg); margin-bottom: var(--space-lg); color: var(--cat-light); }
+        .runbook-template { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .runbook-template pre { font-family: 'Monaco', monospace; font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin: 0; overflow-x: auto; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-number { color: var(--cyan); }
+        .slo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .slo-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .slo-card:hover { border-color: var(--cat-primary); }
+        .slo-value { font-size: var(--font-2xl); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .slo-label { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); }
+        .slo-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-primary); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 1px solid var(--cat-dark); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; }
+        .antipatterns-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .antipattern-card { background: var(--bg-card); border: 1px solid var(--danger-red); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .antipattern-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+        .antipattern-icon { font-size: 20px; }
+        .antipattern-title { font-size: var(--font-sm); font-weight: 600; color: var(--danger-red); }
+        .antipattern-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; margin-bottom: var(--space-md); }
+        .antipattern-fix { font-size: var(--font-xs); color: var(--success-green); display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .antipattern-fix::before { content: '✓'; font-weight: bold; }
+        .scorecard-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .scorecard-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .scorecard-title { font-size: var(--font-sm); font-weight: 600; }
+        .scorecard-table { width: 100%; border-collapse: collapse; }
+        .scorecard-table th, .scorecard-table td { padding: var(--space-md) var(--space-lg); text-align: left; border-bottom: 1px solid var(--border-color); }
+        .scorecard-table th { font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; background: var(--bg-card-alt); }
+        .scorecard-table tr:last-child td { border-bottom: none; }
+        .scorecard-table td { font-size: var(--font-sm); }
+        .scorecard-table tr:hover td { background: var(--bg-hover); }
+        .score-cell { display: flex; align-items: center; gap: 8px; }
+        .score-bar { height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden; width: 50px; }
+        .score-fill { height: 100%; border-radius: 4px; }
+        .score-fill.high { background: var(--success-green); }
+        .score-fill.medium { background: var(--warning-yellow); }
+        .score-fill.low { background: var(--danger-red); }
+        .score-num { font-size: var(--font-xs); color: var(--text-secondary); font-weight: 600; min-width: 24px; }
+        .tool-name-cell { display: flex; align-items: center; gap: var(--space-sm); }
+        .tool-mini-logo { width: 24px; height: 24px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; }
+        .agent-card { display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); display: flex; flex-direction: column; justify-content: center; }
+        .agent-badge { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .agent-title { font-size: var(--font-xl); font-weight: 700; margin-bottom: var(--space-md); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .agent-capability { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: var(--font-sm); color: var(--text-secondary); }
+        .cap-icon { font-size: 16px; width: 20px; text-align: center; }
+        .agent-code { background: var(--bg-dark); padding: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .code-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-block { background: var(--bg-card); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: var(--space-md); overflow-x: auto; max-height: 400px; overflow-y: auto; }
+        .code-block pre { font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .related-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .related-title { font-size: var(--font-base); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-xs); }
+        .related-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .agent-card { grid-template-columns: 1fr; }
+            .severity-grid { grid-template-columns: 1fr 1fr; }
+            .tools-grid, .oncall-grid, .practices-grid, .antipatterns-grid, .alert-fields, .slo-grid, .related-grid { grid-template-columns: 1fr; }
+            .lifecycle-stages { grid-template-columns: 1fr; }
+            .lifecycle-stage { border-right: none; border-bottom: 1px solid var(--border-color); }
+            .lifecycle-stage::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat16-monitoring-observability-overview.html">Monitoring & Observability</a>
+        <span class="sep">/</span>
+        <span class="current">Alerting & Incidents</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 16</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat16-monitoring-observability-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat16-p1-metrics-monitoring.html"><span class="nav-icon">📈</span> 16.1 Metrics</a></li>
+            <li><a href="cat16-p2-logging.html"><span class="nav-icon">📝</span> 16.2 Logging</a></li>
+            <li><a href="cat16-p3-distributed-tracing.html"><span class="nav-icon">🔗</span> 16.3 Tracing</a></li>
+            <li><a href="cat16-p4-alerting-incidents.html" class="active"><span class="nav-icon">🚨</span> 16.4 Alerting</a></li>
+            <li><a href="cat16-p5-apm.html"><span class="nav-icon">⚡</span> 16.5 APM</a></li>
+            <li><a href="cat16-p6-aiops.html"><span class="nav-icon">🤖</span> 16.6 AIOps</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture</a></li>
+            <li><a href="#severity"><span class="nav-icon">🚦</span> Severity Levels</a></li>
+            <li><a href="#anatomy"><span class="nav-icon">🔬</span> Alert Anatomy</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Platforms</a></li>
+            <li><a href="#lifecycle"><span class="nav-icon">🔄</span> Incident Lifecycle</a></li>
+            <li><a href="#oncall"><span class="nav-icon">📞</span> On-Call Practices</a></li>
+            <li><a href="#runbooks"><span class="nav-icon">📋</span> Runbooks</a></li>
+            <li><a href="#slo"><span class="nav-icon">🎯</span> SLO-Based Alerting</a></li>
+            <li><a href="#practices"><span class="nav-icon">✨</span> Best Practices</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">🚫</span> Anti-Patterns</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📊</span> Scorecard</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🚨 Page 16.4</div>
+                <h1>Alerting & Incident Management</h1>
+                <p>Detect issues before users do, route alerts to the right people, and manage incidents from detection to resolution with structured processes and clear communication.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;5min</div>
+                    <div class="hero-metric-label">Detection Target</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">MTTA</div>
+                    <div class="hero-metric-label">Mean Time to Ack</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">MTTR</div>
+                    <div class="hero-metric-label">Mean Time to Resolve</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">SLO</div>
+                    <div class="hero-metric-label">Error Budget Based</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Alerting Architecture</h2>
+                    <p>How alerts flow from detection to resolution</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Modern alerting systems separate concerns: monitoring tools detect conditions, alert managers deduplicate and route, incident platforms manage response, and communication tools keep stakeholders informed. This separation enables flexibility and prevents vendor lock-in.</p>
+            </div>
+            
+            <div class="architecture-container">
+                <div class="architecture-header">
+                    <div class="architecture-title">🚨 Alert Pipeline Architecture</div>
+                    <div class="architecture-badge">INCIDENT RESPONSE</div>
+                </div>
+                <div class="architecture-canvas">
+                    <svg viewBox="0 0 920 380" style="width: 100%; height: 380px;">
+                        <defs>
+                            <filter id="glowRed"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowAmber"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowBlue"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        </defs>
+                        
+                        <!-- SOURCES -->
+                        <rect x="20" y="40" width="140" height="300" rx="12" fill="rgba(59,130,246,0.05)" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="90" y="65" fill="#60A5FA" font-size="11" font-weight="600" text-anchor="middle">SIGNAL SOURCES</text>
+                        
+                        <rect x="35" y="85" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="90" y="110" fill="#60A5FA" font-size="10" text-anchor="middle">📈 Metrics</text>
+                        <text x="90" y="122" fill="#6a6a7a" font-size="8" text-anchor="middle">Prometheus</text>
+                        
+                        <rect x="35" y="145" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="90" y="170" fill="#34D399" font-size="10" text-anchor="middle">📝 Logs</text>
+                        <text x="90" y="182" fill="#6a6a7a" font-size="8" text-anchor="middle">Elasticsearch</text>
+                        
+                        <rect x="35" y="205" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="90" y="230" fill="#A78BFA" font-size="10" text-anchor="middle">🔗 Traces</text>
+                        <text x="90" y="242" fill="#6a6a7a" font-size="8" text-anchor="middle">Jaeger</text>
+                        
+                        <rect x="35" y="265" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="90" y="290" fill="#F472B6" font-size="10" text-anchor="middle">🌐 Synthetics</text>
+                        <text x="90" y="302" fill="#6a6a7a" font-size="8" text-anchor="middle">Uptime Checks</text>
+                        
+                        <!-- ALERTMANAGER -->
+                        <rect x="200" y="100" width="150" height="180" rx="12" fill="rgba(245,158,11,0.1)" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="275" y="130" fill="#FBBF24" font-size="12" font-weight="700" text-anchor="middle">⚡ Alert Manager</text>
+                        
+                        <rect x="215" y="150" width="120" height="35" rx="4" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="275" y="172" fill="#FBBF24" font-size="9" text-anchor="middle">🔄 Deduplication</text>
+                        
+                        <rect x="215" y="195" width="120" height="35" rx="4" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="275" y="217" fill="#FBBF24" font-size="9" text-anchor="middle">🎯 Routing Rules</text>
+                        
+                        <rect x="215" y="240" width="120" height="30" rx="4" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="275" y="260" fill="#FBBF24" font-size="9" text-anchor="middle">🔕 Silencing</text>
+                        
+                        <!-- INCIDENT PLATFORM -->
+                        <rect x="390" y="70" width="160" height="240" rx="12" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="2"/>
+                        <text x="470" y="100" fill="#F87171" font-size="12" font-weight="700" text-anchor="middle">🚨 Incident Platform</text>
+                        
+                        <rect x="405" y="120" width="130" height="40" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                        <text x="470" y="142" fill="#F87171" font-size="10" text-anchor="middle">📞 On-Call Routing</text>
+                        <text x="470" y="154" fill="#6a6a7a" font-size="8" text-anchor="middle">PagerDuty • Opsgenie</text>
+                        
+                        <rect x="405" y="175" width="130" height="40" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                        <text x="470" y="197" fill="#F87171" font-size="10" text-anchor="middle">📊 Incident Tracking</text>
+                        <text x="470" y="209" fill="#6a6a7a" font-size="8" text-anchor="middle">Status • Timeline</text>
+                        
+                        <rect x="405" y="230" width="130" height="40" rx="6" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                        <text x="470" y="252" fill="#F87171" font-size="10" text-anchor="middle">⬆️ Escalation</text>
+                        <text x="470" y="264" fill="#6a6a7a" font-size="8" text-anchor="middle">Auto-escalate</text>
+                        
+                        <rect x="405" y="280" width="130" height="25" rx="4" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                        <text x="470" y="297" fill="#F87171" font-size="9" text-anchor="middle">📋 Runbooks</text>
+                        
+                        <!-- NOTIFICATION CHANNELS -->
+                        <rect x="590" y="40" width="140" height="300" rx="12" fill="rgba(16,185,129,0.05)" stroke="#10B981" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="660" y="65" fill="#34D399" font-size="11" font-weight="600" text-anchor="middle">NOTIFICATIONS</text>
+                        
+                        <rect x="605" y="85" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#7C3AED" stroke-width="1"/>
+                        <text x="660" y="107" fill="#A78BFA" font-size="10" text-anchor="middle">💬 Slack</text>
+                        <text x="660" y="122" fill="#6a6a7a" font-size="8" text-anchor="middle">#incidents</text>
+                        
+                        <rect x="605" y="145" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#0EA5E9" stroke-width="1"/>
+                        <text x="660" y="167" fill="#38BDF8" font-size="10" text-anchor="middle">📱 SMS/Push</text>
+                        <text x="660" y="182" fill="#6a6a7a" font-size="8" text-anchor="middle">Critical Only</text>
+                        
+                        <rect x="605" y="205" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#F97316" stroke-width="1"/>
+                        <text x="660" y="227" fill="#FB923C" font-size="10" text-anchor="middle">📧 Email</text>
+                        <text x="660" y="242" fill="#6a6a7a" font-size="8" text-anchor="middle">Summaries</text>
+                        
+                        <rect x="605" y="265" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="660" y="287" fill="#F472B6" font-size="10" text-anchor="middle">📞 Voice</text>
+                        <text x="660" y="302" fill="#6a6a7a" font-size="8" text-anchor="middle">P1 Escalation</text>
+                        
+                        <!-- RESPONDERS -->
+                        <rect x="770" y="120" width="130" height="140" rx="12" fill="rgba(6,182,212,0.1)" stroke="#06B6D4" stroke-width="2"/>
+                        <text x="835" y="150" fill="#22D3EE" font-size="11" font-weight="600" text-anchor="middle">👥 RESPONDERS</text>
+                        
+                        <rect x="785" y="170" width="100" height="35" rx="4" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                        <text x="835" y="192" fill="#22D3EE" font-size="9" text-anchor="middle">🔧 On-Call Engineer</text>
+                        
+                        <rect x="785" y="215" width="100" height="35" rx="4" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                        <text x="835" y="237" fill="#22D3EE" font-size="9" text-anchor="middle">👨‍💼 Incident Commander</text>
+                        
+                        <!-- CONNECTIONS -->
+                        <line x1="145" y1="107" x2="200" y2="167" stroke="#3B82F6" stroke-width="2"/>
+                        <line x1="145" y1="167" x2="200" y2="190" stroke="#10B981" stroke-width="2"/>
+                        <line x1="145" y1="227" x2="200" y2="200" stroke="#8B5CF6" stroke-width="2"/>
+                        <line x1="145" y1="287" x2="200" y2="212" stroke="#EC4899" stroke-width="2"/>
+                        
+                        <line x1="350" y1="190" x2="390" y2="190" stroke="#F59E0B" stroke-width="3"/>
+                        
+                        <line x1="550" y1="140" x2="590" y2="107" stroke="#EF4444" stroke-width="2"/>
+                        <line x1="550" y1="167" x2="590" y2="167" stroke="#EF4444" stroke-width="2"/>
+                        <line x1="550" y1="197" x2="590" y2="227" stroke="#EF4444" stroke-width="2"/>
+                        <line x1="550" y1="250" x2="590" y2="287" stroke="#EF4444" stroke-width="2"/>
+                        
+                        <line x1="715" y1="190" x2="770" y2="190" stroke="#10B981" stroke-width="2"/>
+                        
+                        <!-- LABELS -->
+                        <rect x="160" y="165" width="35" height="14" rx="2" fill="#0a0a0f"/>
+                        <text x="177" y="175" fill="#3B82F6" font-size="7" font-weight="600" text-anchor="middle">FIRE</text>
+                        
+                        <rect x="355" y="175" width="30" height="14" rx="2" fill="#0a0a0f"/>
+                        <text x="370" y="185" fill="#F59E0B" font-size="7" font-weight="600" text-anchor="middle">PAGE</text>
+                        
+                        <rect x="555" y="150" width="30" height="14" rx="2" fill="#0a0a0f"/>
+                        <text x="570" y="160" fill="#EF4444" font-size="7" font-weight="600" text-anchor="middle">NOTIFY</text>
+                        
+                        <rect x="725" y="175" width="35" height="14" rx="2" fill="#0a0a0f"/>
+                        <text x="742" y="185" fill="#10B981" font-size="7" font-weight="600" text-anchor="middle">ACK</text>
+                        
+                        <!-- ANIMATED DOTS -->
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 145 107 L 200 167"/>
+                        </circle>
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.3s" path="M 145 167 L 200 190"/>
+                        </circle>
+                        <circle r="5" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="1s" repeatCount="indefinite" path="M 350 190 L 390 190"/>
+                        </circle>
+                        <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" path="M 550 167 L 590 167"/>
+                        </circle>
+                        <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.4s" path="M 550 140 L 590 107"/>
+                        </circle>
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 715 190 L 770 190"/>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SEVERITY LEVELS -->
+        <section class="module" id="severity">
+            <div class="module-header">
+                <div class="module-icon">🚦</div>
+                <div class="module-info">
+                    <h2>Alert Severity Levels</h2>
+                    <p>Standardized priority classification</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Consistent severity levels ensure the right response to every incident. Critical issues page immediately, while lower severities may only notify during business hours. Define clear criteria for each level to prevent alert fatigue and ensure urgent issues get immediate attention.</p>
+            </div>
+            
+            <div class="severity-grid">
+                <div class="severity-card critical">
+                    <div class="severity-badge">P1 / SEV1</div>
+                    <div class="severity-title">Critical</div>
+                    <div class="severity-desc">Complete service outage or data loss. Revenue-impacting. Requires immediate response 24/7.</div>
+                    <div class="severity-meta">
+                        <span>⏱️ Response: 5 min</span>
+                        <span>📞 Page: Always</span>
+                        <span>👥 Team: All hands</span>
+                    </div>
+                </div>
+                <div class="severity-card high">
+                    <div class="severity-badge">P2 / SEV2</div>
+                    <div class="severity-title">High</div>
+                    <div class="severity-desc">Major feature degraded. Significant user impact. Workaround may exist but unacceptable long-term.</div>
+                    <div class="severity-meta">
+                        <span>⏱️ Response: 15 min</span>
+                        <span>📞 Page: 24/7</span>
+                        <span>👥 Team: On-call + lead</span>
+                    </div>
+                </div>
+                <div class="severity-card warning">
+                    <div class="severity-badge">P3 / SEV3</div>
+                    <div class="severity-title">Warning</div>
+                    <div class="severity-desc">Minor feature impact. Performance degradation. Can wait for business hours.</div>
+                    <div class="severity-meta">
+                        <span>⏱️ Response: 4 hours</span>
+                        <span>📞 Page: Business hours</span>
+                        <span>👥 Team: On-call</span>
+                    </div>
+                </div>
+                <div class="severity-card info">
+                    <div class="severity-badge">P4 / SEV4</div>
+                    <div class="severity-title">Info</div>
+                    <div class="severity-desc">Informational. No immediate action required. May indicate future issues.</div>
+                    <div class="severity-meta">
+                        <span>⏱️ Response: Next sprint</span>
+                        <span>📞 Page: Never</span>
+                        <span>👥 Team: Ticket</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ALERT ANATOMY -->
+        <section class="module" id="anatomy">
+            <div class="module-header">
+                <div class="module-icon">🔬</div>
+                <div class="module-info">
+                    <h2>Alert Anatomy</h2>
+                    <p>Components of a well-designed alert</p>
+                </div>
+            </div>
+            
+            <div class="alert-anatomy">
+                <h3>🚨 Alert Structure</h3>
+                <div class="alert-fields">
+                    <div class="alert-field">
+                        <div class="alert-field-name">alert_name</div>
+                        <div class="alert-field-desc">Clear, descriptive name. Example: "HighErrorRate_PaymentService" not "Alert1"</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">severity</div>
+                        <div class="alert-field-desc">P1/Critical, P2/High, P3/Warning, P4/Info. Determines routing and response.</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">description</div>
+                        <div class="alert-field-desc">Human-readable explanation of what triggered and why it matters.</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">expression</div>
+                        <div class="alert-field-desc">The condition that fires the alert. PromQL, LogQL, or platform-specific query.</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">for_duration</div>
+                        <div class="alert-field-desc">How long condition must be true before firing. Prevents flapping. Example: 5m</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">labels</div>
+                        <div class="alert-field-desc">Metadata for routing: team, service, environment, tier. Used by alert manager.</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">runbook_url</div>
+                        <div class="alert-field-desc">Link to troubleshooting steps. Critical for fast resolution by on-call.</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">dashboard_url</div>
+                        <div class="alert-field-desc">Direct link to relevant dashboard for investigation.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Alerting & Incident Platforms</h2>
+                    <p>Tools for the complete incident lifecycle</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #06AC38, #2EB67D);">PD</div>
+                        <div class="tool-info">
+                            <h4>PagerDuty</h4>
+                            <div class="tool-type">Incident Management • Leader</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Industry-leading incident management. On-call scheduling, intelligent routing, AIOps, and full incident lifecycle.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Event Intelligence</span>
+                            <span class="tool-feature">On-Call</span>
+                            <span class="tool-feature">Status Page</span>
+                            <span class="tool-feature">Analytics</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #2684FF, #0052CC);">OG</div>
+                        <div class="tool-info">
+                            <h4>Opsgenie</h4>
+                            <div class="tool-type">Atlassian • Incident Management</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Alert management with deep Atlassian integration. Flexible on-call, routing rules, and Jira integration.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Jira Integration</span>
+                            <span class="tool-feature">On-Call</span>
+                            <span class="tool-feature">Heartbeats</span>
+                            <span class="tool-feature">Teams</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #E01E5A, #ECB22E);">🔔</div>
+                        <div class="tool-info">
+                            <h4>Alertmanager</h4>
+                            <div class="tool-type">Prometheus • Open Source</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Prometheus ecosystem alert handling. Deduplication, grouping, routing, and silencing for metric alerts.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Deduplication</span>
+                            <span class="tool-feature">Grouping</span>
+                            <span class="tool-feature">Routing</span>
+                            <span class="tool-feature">Silencing</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #FF4785, #E91E63);">VT</div>
+                        <div class="tool-info">
+                            <h4>VictorOps (Splunk)</h4>
+                            <div class="tool-type">Splunk On-Call • Enterprise</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Now Splunk On-Call. Incident management with timeline, war rooms, and post-incident reviews.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">War Room</span>
+                            <span class="tool-feature">Timeline</span>
+                            <span class="tool-feature">Splunk Integration</span>
+                            <span class="tool-feature">Mobile</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">GF</div>
+                        <div class="tool-info">
+                            <h4>Grafana Alerting</h4>
+                            <div class="tool-type">Unified Alerting • Open Source</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Unified alerting across all Grafana data sources. Alert rules, notification policies, and contact points.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Multi-Source</span>
+                            <span class="tool-feature">Unified Rules</span>
+                            <span class="tool-feature">Silences</span>
+                            <span class="tool-feature">Contact Points</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">DD</div>
+                        <div class="tool-info">
+                            <h4>Datadog Monitors</h4>
+                            <div class="tool-type">SaaS • Full Platform</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Comprehensive monitoring with anomaly detection, forecasting, and composite monitors across all telemetry.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Anomaly Detection</span>
+                            <span class="tool-feature">Forecasts</span>
+                            <span class="tool-feature">Composite</span>
+                            <span class="tool-feature">SLOs</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #000000, #333333);">🔥</div>
+                        <div class="tool-info">
+                            <h4>FireHydrant</h4>
+                            <div class="tool-type">Incident Management • Modern</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Modern incident management. Automated runbooks, Slack-native workflows, and retrospectives.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Runbooks</span>
+                            <span class="tool-feature">Slack-Native</span>
+                            <span class="tool-feature">Retros</span>
+                            <span class="tool-feature">Status Page</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #5C4EE5, #8B5CF6);">IN</div>
+                        <div class="tool-info">
+                            <h4>incident.io</h4>
+                            <div class="tool-type">Slack-First • Modern</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Slack-first incident management. Declare incidents from Slack, automated workflows, beautiful UI.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Slack-First</span>
+                            <span class="tool-feature">Workflows</span>
+                            <span class="tool-feature">Insights</span>
+                            <span class="tool-feature">Postmortems</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #00C853, #69F0AE);">SP</div>
+                        <div class="tool-info">
+                            <h4>Statuspage</h4>
+                            <div class="tool-type">Atlassian • Status Communication</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Public and private status pages for incident communication. Component status, incident updates, metrics.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Public Pages</span>
+                            <span class="tool-feature">Components</span>
+                            <span class="tool-feature">Subscribers</span>
+                            <span class="tool-feature">Metrics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- INCIDENT LIFECYCLE -->
+        <section class="module" id="lifecycle">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Incident Lifecycle</h2>
+                    <p>From detection to resolution</p>
+                </div>
+            </div>
+            
+            <div class="lifecycle-container">
+                <div class="lifecycle-header">
+                    <div class="lifecycle-title">📊 Incident Response Stages</div>
+                </div>
+                <div class="lifecycle-stages">
+                    <div class="lifecycle-stage">
+                        <div class="stage-num">1</div>
+                        <div class="stage-name">Detection</div>
+                        <div class="stage-desc">Alert fires from monitoring. Automated or user-reported. Clock starts on MTTD.</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-num">2</div>
+                        <div class="stage-desc">On-call acknowledges. Assesses severity. Determines if escalation needed. MTTA measured.</div>
+                        <div class="stage-name">Triage</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-num">3</div>
+                        <div class="stage-name">Mitigate</div>
+                        <div class="stage-desc">Stop the bleeding. Rollback, scale, disable feature. Restore service first.</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-num">4</div>
+                        <div class="stage-name">Resolve</div>
+                        <div class="stage-desc">Fix root cause. Deploy proper fix. Verify resolution. MTTR measured.</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-num">5</div>
+                        <div class="stage-name">Learn</div>
+                        <div class="stage-desc">Blameless postmortem. Document timeline. Create action items. Share learnings.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ON-CALL PRACTICES -->
+        <section class="module" id="oncall">
+            <div class="module-header">
+                <div class="module-icon">📞</div>
+                <div class="module-info">
+                    <h2>On-Call Practices</h2>
+                    <p>Sustainable and effective on-call rotations</p>
+                </div>
+            </div>
+            
+            <div class="oncall-grid">
+                <div class="oncall-card">
+                    <div class="oncall-header">
+                        <div class="oncall-icon">📅</div>
+                        <div class="oncall-title">Rotation Design</div>
+                    </div>
+                    <div class="oncall-body">
+                        <ul class="oncall-list">
+                            <li>1-week rotations balance context and burnout</li>
+                            <li>Minimum 3-4 people per rotation for coverage</li>
+                            <li>Primary + secondary on-call for escalation</li>
+                            <li>Handoff meetings at rotation start</li>
+                            <li>Time off after heavy incident weeks</li>
+                            <li>Compensate for after-hours pages</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="oncall-card">
+                    <div class="oncall-header">
+                        <div class="oncall-icon">📱</div>
+                        <div class="oncall-title">Response Expectations</div>
+                    </div>
+                    <div class="oncall-body">
+                        <ul class="oncall-list">
+                            <li>Acknowledge P1/P2 within 5 minutes</li>
+                            <li>Have laptop and internet access available</li>
+                            <li>Know how to reach secondary and leads</li>
+                            <li>Follow runbooks before escalating</li>
+                            <li>Document actions in incident channel</li>
+                            <li>Escalate early if stuck or overwhelmed</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="oncall-card">
+                    <div class="oncall-header">
+                        <div class="oncall-icon">⬆️</div>
+                        <div class="oncall-title">Escalation Policies</div>
+                    </div>
+                    <div class="oncall-body">
+                        <ul class="oncall-list">
+                            <li>Auto-escalate if no ack in 10 minutes</li>
+                            <li>Escalate to secondary, then team lead</li>
+                            <li>P1: Escalate to incident commander immediately</li>
+                            <li>Cross-team: Know who owns dependencies</li>
+                            <li>Executive escalation path for major outages</li>
+                            <li>Never let pages go unanswered</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="oncall-card">
+                    <div class="oncall-header">
+                        <div class="oncall-icon">🧘</div>
+                        <div class="oncall-title">Sustainable On-Call</div>
+                    </div>
+                    <div class="oncall-body">
+                        <ul class="oncall-list">
+                            <li>Target &lt;2 pages per on-call week</li>
+                            <li>Fix noisy alerts immediately</li>
+                            <li>Track on-call load per person</li>
+                            <li>Rotate through all team members fairly</li>
+                            <li>Budget time for reliability improvements</li>
+                            <li>Celebrate good on-call weeks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RUNBOOKS -->
+        <section class="module" id="runbooks">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Runbooks</h2>
+                    <p>Actionable documentation for incident response</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Every alert should link to a runbook. Runbooks provide step-by-step troubleshooting guides that enable any on-call engineer to diagnose and resolve issues quickly, even if they're unfamiliar with the specific service.</p>
+            </div>
+            
+            <div class="runbook-section">
+                <h3>📋 Runbook Template</h3>
+                <div class="runbook-template">
+<pre><span class="code-keyword"># Alert:</span> <span class="code-string">HighErrorRate_PaymentService</span>
+
+<span class="code-keyword">## Summary</span>
+Payment service error rate exceeds 1% for 5+ minutes.
+This affects checkout flow and revenue.
+
+<span class="code-keyword">## Severity</span>
+P1 - Revenue impacting. Page immediately 24/7.
+
+<span class="code-keyword">## Dashboard</span>
+https://grafana.internal/d/payment-service
+
+<span class="code-keyword">## Quick Diagnosis</span>
+1. Check error rate dashboard - is it rising or stable?
+2. Check recent deployments: `kubectl rollout history`
+3. Check dependent services: Database, Redis, Stripe API
+4. Check for traffic anomalies (DDoS, bot traffic)
+
+<span class="code-keyword">## Common Causes & Fixes</span>
+
+<span class="code-comment">### Bad Deployment</span>
+- Symptoms: Errors started exactly at deploy time
+- Fix: `kubectl rollout undo deployment/payment-service`
+
+<span class="code-comment">### Database Connection Pool Exhausted</span>
+- Symptoms: "connection timeout" in logs
+- Fix: Restart pods: `kubectl rollout restart deployment/payment-service`
+- Long-term: Increase pool size in config
+
+<span class="code-comment">### Stripe API Degradation</span>
+- Symptoms: Stripe errors in logs, status.stripe.com shows issues
+- Fix: Enable payment queue, notify customers
+
+<span class="code-keyword">## Escalation</span>
+- If not resolved in 15 min: Page @payments-lead
+- If data integrity concerns: Page @database-team
+- If suspected security issue: Page @security-oncall
+
+<span class="code-keyword">## Post-Incident</span>
+- Create incident ticket in Jira
+- Schedule postmortem if P1/P2
+- Update this runbook if new failure mode found</pre>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SLO-BASED ALERTING -->
+        <section class="module" id="slo">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>SLO-Based Alerting</h2>
+                    <p>Alert on what matters to users</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Instead of alerting on arbitrary thresholds, SLO-based alerting fires when you're burning through your error budget too fast. This approach focuses on user impact and prevents alert fatigue from non-impacting issues.</p>
+            </div>
+            
+            <div class="slo-grid">
+                <div class="slo-card">
+                    <div class="slo-value">99.9%</div>
+                    <div class="slo-label">Availability SLO</div>
+                    <div class="slo-desc">43.8 minutes of downtime allowed per month. Alert when burn rate exceeds 14.4x (1h window).</div>
+                </div>
+                <div class="slo-card">
+                    <div class="slo-value">200ms</div>
+                    <div class="slo-label">Latency P99 SLO</div>
+                    <div class="slo-desc">99% of requests must complete in 200ms. Alert when burn rate exceeds budget consumption.</div>
+                </div>
+                <div class="slo-card">
+                    <div class="slo-value">0.1%</div>
+                    <div class="slo-label">Error Budget</div>
+                    <div class="slo-desc">Monthly budget for failures. When exhausted, freeze deployments and focus on reliability.</div>
+                </div>
+            </div>
+            
+            <div class="alert-anatomy">
+                <h3>🔥 Burn Rate Alert Example</h3>
+                <div class="alert-fields">
+                    <div class="alert-field">
+                        <div class="alert-field-name">Fast Burn (P1)</div>
+                        <div class="alert-field-desc">14.4x burn rate for 1 hour = 2% budget consumed. Exhausts monthly budget in 2.5 days. Page immediately.</div>
+                    </div>
+                    <div class="alert-field">
+                        <div class="alert-field-name">Slow Burn (P2)</div>
+                        <div class="alert-field-desc">6x burn rate for 6 hours = 5% budget consumed. Exhausts monthly budget in 5 days. Ticket, investigate.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✨</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective alerting</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Every Alert Must Be Actionable</h4>
+                        <p>If there's nothing to do, it shouldn't page. Convert to dashboard or remove entirely.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Every Alert Needs a Runbook</h4>
+                        <p>Link to troubleshooting steps. Enable any on-call engineer to resolve, not just experts.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Alert on Symptoms, Not Causes</h4>
+                        <p>Users care about errors and latency, not CPU. High CPU alone doesn't mean broken.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Use Appropriate Thresholds</h4>
+                        <p>Add duration (for: 5m) to prevent flapping. Set thresholds based on real impact, not arbitrary numbers.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Implement Alert Deduplication</h4>
+                        <p>Group related alerts. Don't page 50 times for one incident. Use alert manager grouping.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Review Alerts Regularly</h4>
+                        <p>Quarterly alert review. Delete unused alerts. Fix noisy ones. Track alert volume trends.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Blameless Postmortems</h4>
+                        <p>Focus on systems, not individuals. Ask "how did the system allow this?" not "who caused this?"</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Track Incident Metrics</h4>
+                        <p>MTTD, MTTA, MTTR. Track trends over time. Set targets and celebrate improvements.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ANTI-PATTERNS -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">🚫</div>
+                <div class="module-info">
+                    <h2>Anti-Patterns to Avoid</h2>
+                    <p>Common alerting mistakes</p>
+                </div>
+            </div>
+            
+            <div class="antipatterns-grid">
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔔</span>
+                        <span class="antipattern-title">Alert Fatigue</span>
+                    </div>
+                    <div class="antipattern-desc">Too many alerts, most non-actionable. Team ignores pages. Real issues get missed.</div>
+                    <div class="antipattern-fix">Every alert actionable. Delete or convert to dashboard if not. Target &lt;2 pages/week.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🖥️</span>
+                        <span class="antipattern-title">Alerting on Resource Metrics</span>
+                    </div>
+                    <div class="antipattern-desc">Paging for high CPU or memory when service is healthy. Wastes time investigating non-issues.</div>
+                    <div class="antipattern-fix">Alert on symptoms (errors, latency). Use resource metrics for capacity planning only.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📋</span>
+                        <span class="antipattern-title">No Runbooks</span>
+                    </div>
+                    <div class="antipattern-desc">Alerts fire with no guidance. On-call spends time figuring out what to do instead of fixing.</div>
+                    <div class="antipattern-fix">Every alert links to runbook. Update runbooks after each incident with new learnings.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">👤</span>
+                        <span class="antipattern-title">Hero Culture</span>
+                    </div>
+                    <div class="antipattern-desc">Same person always handles incidents. Knowledge silos. Burnout. Team doesn't learn.</div>
+                    <div class="antipattern-fix">Rotate on-call fairly. Document everything. Pair on incidents for knowledge sharing.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔇</span>
+                        <span class="antipattern-title">Permanent Silences</span>
+                    </div>
+                    <div class="antipattern-desc">Silencing alerts indefinitely instead of fixing. Known issues accumulate. Eventually bite back.</div>
+                    <div class="antipattern-fix">Time-limit all silences. Create tickets for silenced alerts. Review and resolve.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">👆</span>
+                        <span class="antipattern-title">Blame-Based Postmortems</span>
+                    </div>
+                    <div class="antipattern-desc">Focusing on who made the mistake. People hide issues. Learning doesn't happen.</div>
+                    <div class="antipattern-fix">Blameless culture. Focus on system improvements. "How do we prevent this class of error?"</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SCORECARD -->
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Platform Scorecard</h2>
+                    <p>Comparing incident management platforms</p>
+                </div>
+            </div>
+            
+            <div class="scorecard-container">
+                <div class="scorecard-header">
+                    <div class="scorecard-title">Incident Platform Comparison</div>
+                </div>
+                <table class="scorecard-table">
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>On-Call</th>
+                            <th>Routing</th>
+                            <th>Integrations</th>
+                            <th>Cost</th>
+                            <th>UX</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #06AC38, #2EB67D);">PD</div> PagerDuty</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill low" style="width: 40%"></div></div><span class="score-num">4.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div><span class="score-num">9.0</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.5</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #2684FF, #0052CC);">OG</div> Opsgenie</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div><span class="score-num">9.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div><span class="score-num">9.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div><span class="score-num">8.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 60%"></div></div><span class="score-num">6.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.4</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #5C4EE5, #8B5CF6);">IN</div> incident.io</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div><span class="score-num">8.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 82%"></div></div><span class="score-num">8.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 55%"></div></div><span class="score-num">5.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 96%"></div></div><span class="score-num">9.6</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.2</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #000000, #333333);">🔥</div> FireHydrant</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 82%"></div></div><span class="score-num">8.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 80%"></div></div><span class="score-num">8.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 50%"></div></div><span class="score-num">5.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div><span class="score-num">9.2</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.0</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">GF</div> Grafana Alerting</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 60%"></div></div><span class="score-num">6.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div><span class="score-num">9.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 82%"></div></div><span class="score-num">8.2</span></div></td>
+                            <td><strong style="color: var(--warning-yellow);">7.9</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>IncidentEngineer Agent</h2>
+                    <p>Your AI specialist for alerting and incident management</p>
+                </div>
+            </div>
+            
+            <div class="agent-card">
+                <div class="agent-info">
+                    <div class="agent-badge">🚨 Specialized Agent</div>
+                    <h3 class="agent-title">IncidentEngineer</h3>
+                    <p class="agent-desc">Expert agent for designing alerting strategies, configuring on-call rotations, writing runbooks, and improving incident response processes based on SRE best practices.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="cap-icon">📊</span> Alert rule design & optimization</div>
+                        <div class="agent-capability"><span class="cap-icon">📞</span> On-call rotation setup</div>
+                        <div class="agent-capability"><span class="cap-icon">📋</span> Runbook authoring</div>
+                        <div class="agent-capability"><span class="cap-icon">🎯</span> SLO-based alerting</div>
+                        <div class="agent-capability"><span class="cap-icon">🔄</span> Escalation policy design</div>
+                        <div class="agent-capability"><span class="cap-icon">📝</span> Postmortem facilitation</div>
+                        <div class="agent-capability"><span class="cap-icon">📈</span> Incident metrics analysis</div>
+                        <div class="agent-capability"><span class="cap-icon">🔕</span> Alert fatigue reduction</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">alertmanager-config.yaml</div>
+                    <div class="code-block">
+<pre><span class="code-keyword">global:</span>
+  <span class="code-string">resolve_timeout:</span> <span class="code-number">5m</span>
+  <span class="code-string">slack_api_url:</span> <span class="code-string">'https://hooks.slack.com/...'</span>
+
+<span class="code-keyword">route:</span>
+  <span class="code-string">receiver:</span> <span class="code-string">'default'</span>
+  <span class="code-string">group_by:</span> [<span class="code-string">'alertname'</span>, <span class="code-string">'service'</span>]
+  <span class="code-string">group_wait:</span> <span class="code-number">30s</span>
+  <span class="code-string">group_interval:</span> <span class="code-number">5m</span>
+  <span class="code-string">repeat_interval:</span> <span class="code-number">4h</span>
+  
+  <span class="code-string">routes:</span>
+    <span class="code-comment"># Critical alerts → PagerDuty immediately</span>
+    - <span class="code-string">match:</span>
+        <span class="code-string">severity:</span> <span class="code-string">critical</span>
+      <span class="code-string">receiver:</span> <span class="code-string">'pagerduty-critical'</span>
+      <span class="code-string">group_wait:</span> <span class="code-number">0s</span>
+      <span class="code-string">repeat_interval:</span> <span class="code-number">15m</span>
+    
+    <span class="code-comment"># High severity → PagerDuty</span>
+    - <span class="code-string">match:</span>
+        <span class="code-string">severity:</span> <span class="code-string">high</span>
+      <span class="code-string">receiver:</span> <span class="code-string">'pagerduty-high'</span>
+      <span class="code-string">repeat_interval:</span> <span class="code-number">1h</span>
+    
+    <span class="code-comment"># Warning → Slack only</span>
+    - <span class="code-string">match:</span>
+        <span class="code-string">severity:</span> <span class="code-string">warning</span>
+      <span class="code-string">receiver:</span> <span class="code-string">'slack-warnings'</span>
+      <span class="code-string">repeat_interval:</span> <span class="code-number">24h</span>
+
+<span class="code-keyword">receivers:</span>
+  - <span class="code-string">name:</span> <span class="code-string">'pagerduty-critical'</span>
+    <span class="code-string">pagerduty_configs:</span>
+      - <span class="code-string">service_key:</span> <span class="code-string">'&lt;P1_SERVICE_KEY&gt;'</span>
+        <span class="code-string">severity:</span> <span class="code-string">'critical'</span>
+        <span class="code-string">description:</span> <span class="code-string">'{{ .CommonAnnotations.summary }}'</span>
+        <span class="code-string">details:</span>
+          <span class="code-string">runbook:</span> <span class="code-string">'{{ .CommonAnnotations.runbook_url }}'</span>
+  
+  - <span class="code-string">name:</span> <span class="code-string">'slack-warnings'</span>
+    <span class="code-string">slack_configs:</span>
+      - <span class="code-string">channel:</span> <span class="code-string">'#alerts-warning'</span>
+        <span class="code-string">title:</span> <span class="code-string">'⚠️ {{ .CommonLabels.alertname }}'</span></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RELATED -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring observability</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat16-p3-distributed-tracing.html" class="related-card">
+                    <div class="related-num">16.3</div>
+                    <div class="related-title">Distributed Tracing</div>
+                    <div class="related-desc">Follow requests across services, identify bottlenecks</div>
+                </a>
+                <a href="cat16-p5-apm.html" class="related-card">
+                    <div class="related-num">16.5</div>
+                    <div class="related-title">APM</div>
+                    <div class="related-desc">Application Performance Monitoring and profiling</div>
+                </a>
+                <a href="cat16-p1-metrics-monitoring.html" class="related-card">
+                    <div class="related-num">16.1</div>
+                    <div class="related-title">Metrics & Monitoring</div>
+                    <div class="related-desc">Prometheus, Grafana, time series fundamentals</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat16-p3-distributed-tracing.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">16.3 Tracing</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 16.4</div>
+        <a href="cat16-p5-apm.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">16.5 APM</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

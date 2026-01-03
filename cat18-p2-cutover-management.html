@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cutover Management | 18.2 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --violet: #8B5CF6;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .framework-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .framework-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .framework-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .framework-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .framework-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .concept-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .concept-icon { font-size: 36px; margin-bottom: var(--space-md); }
+        .concept-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .concept-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .table-container table { width: 100%; border-collapse: collapse; }
+        .table-container th { background: var(--bg-card-alt); padding: var(--space-md) var(--space-lg); text-align: left; font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .table-container td { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .table-container tr:last-child td { border-bottom: none; }
+        .table-container tr:hover td { background: var(--bg-hover); }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--font-xs); font-weight: 600; }
+        .status-badge.complete { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+        .status-badge.in-progress { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .status-badge.pending { background: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
+        .status-badge.blocked { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .status-badge.critical { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .status-badge.high { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .status-badge.medium { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+        .status-badge.low { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+        
+        .runbook-container { margin-bottom: var(--space-xl); }
+        .runbook-phase { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: var(--space-md); overflow: hidden; }
+        .runbook-phase-header { padding: var(--space-md) var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .runbook-phase-number { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: #fff; }
+        .runbook-phase-info { flex: 1; }
+        .runbook-phase-title { font-size: var(--font-base); font-weight: 600; }
+        .runbook-phase-timing { font-size: var(--font-xs); color: var(--text-muted); }
+        .runbook-phase-status { font-size: var(--font-sm); }
+        .runbook-tasks { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); }
+        .runbook-task { display: grid; grid-template-columns: 30px 1fr 100px 80px 100px; gap: var(--space-md); align-items: center; padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); font-size: var(--font-sm); }
+        .runbook-task:last-child { border-bottom: none; }
+        .runbook-task-check { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .runbook-task-check.done { background: var(--success-green); color: #fff; }
+        .runbook-task-check.active { background: var(--cat-primary); color: #fff; animation: pulse 1.5s infinite; }
+        .runbook-task-check.waiting { background: var(--bg-dark); border: 2px solid var(--border-color); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .runbook-task-name { color: var(--text-primary); }
+        .runbook-task-owner { color: var(--text-muted); }
+        .runbook-task-duration { color: var(--text-muted); }
+        
+        .rollback-container { background: var(--bg-card); border: 2px solid var(--danger-red); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .rollback-header { padding: var(--space-md) var(--space-lg); background: rgba(239, 68, 68, 0.1); border-bottom: 1px solid var(--danger-red); display: flex; align-items: center; gap: var(--space-md); }
+        .rollback-icon { font-size: 24px; }
+        .rollback-title { font-size: var(--font-base); font-weight: 600; color: var(--danger-red); }
+        .rollback-content { padding: var(--space-lg); }
+        .rollback-triggers { margin-bottom: var(--space-lg); }
+        .rollback-trigger { display: flex; align-items: flex-start; gap: var(--space-md); padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); }
+        .rollback-trigger:last-child { border-bottom: none; }
+        .rollback-trigger-icon { color: var(--danger-red); font-size: 16px; margin-top: 2px; }
+        .rollback-trigger-text { font-size: var(--font-sm); color: var(--text-secondary); }
+        .rollback-trigger-text strong { color: var(--text-primary); }
+        
+        .warroom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .warroom-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .warroom-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .warroom-card-icon { font-size: 24px; }
+        .warroom-card-title { font-size: var(--font-base); font-weight: 600; }
+        .warroom-card-content { font-size: var(--font-sm); color: var(--text-secondary); }
+        .warroom-card-content ul { list-style: none; }
+        .warroom-card-content li { padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .warroom-card-content li::before { content: '•'; color: var(--cat-light); }
+        
+        .proscons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .proscons-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .proscons-card.pros { border-color: var(--success-green); }
+        .proscons-card.cons { border-color: var(--danger-red); }
+        .proscons-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--border-color); }
+        .proscons-card.pros .proscons-title { color: var(--success-green); }
+        .proscons-card.cons .proscons-title { color: var(--danger-red); }
+        .proscons-list { list-style: none; }
+        .proscons-list li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-sm) 0; line-height: 1.6; border-bottom: 1px solid var(--border-color); }
+        .proscons-list li:last-child { border-bottom: none; }
+        .proscons-list li strong { color: var(--text-primary); }
+        
+        .value-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .value-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .value-title { font-size: var(--font-sm); font-weight: 600; }
+        .value-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        .value-metrics { padding: var(--space-lg); display: grid; gap: var(--space-md); }
+        .value-metric { display: grid; grid-template-columns: 120px 1fr 80px; align-items: center; gap: var(--space-md); }
+        .value-metric-label { font-size: var(--font-sm); color: var(--text-secondary); }
+        .value-metric-bar { height: 8px; background: var(--bg-card-alt); border-radius: var(--radius-full); overflow: hidden; }
+        .value-metric-fill { height: 100%; border-radius: var(--radius-full); }
+        .value-metric-fill.low { background: var(--success-green); }
+        .value-metric-fill.medium { background: var(--warning-yellow); }
+        .value-metric-fill.high { background: var(--cat-primary); }
+        .value-metric-fill.critical { background: var(--danger-red); }
+        .value-metric-value { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); text-align: right; }
+        
+        .callout { background: linear-gradient(135deg, var(--cat-glow), transparent); border: 1px solid var(--cat-dark); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-xl); }
+        .callout-title { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .callout-text { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        
+        .callout.danger { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), transparent); border-color: var(--danger-red); }
+        .callout.danger .callout-title { color: var(--danger-red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); border-right: 1px solid var(--border-color); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: var(--font-sm); color: var(--text-secondary); padding: var(--space-xs) 0; display: flex; align-items: center; gap: var(--space-sm); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); font-size: 10px; }
+        .code-panel { background: var(--bg-dark); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0 var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .code-filename { font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: var(--space-lg); overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-function { color: var(--cat-light); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .concepts-grid { grid-template-columns: 1fr; }
+            .warroom-grid { grid-template-columns: 1fr; }
+            .proscons-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .runbook-task { grid-template-columns: 30px 1fr; }
+            .runbook-task-owner, .runbook-task-duration, .runbook-task .status-badge { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat18-implementation-overview.html">Implementation</a>
+        <span class="sep">/</span>
+        <span class="current">Cutover Management</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 18</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat18-implementation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat18-p1-go-live-planning.html"><span class="nav-icon">📋</span> 18.1 Go-Live Planning</a></li>
+            <li><a href="cat18-p2-cutover-management.html" class="active"><span class="nav-icon">⚡</span> 18.2 Cutover Management</a></li>
+            <li><a href="cat18-p3-hypercare.html"><span class="nav-icon">🩺</span> 18.3 Hypercare & Support</a></li>
+            <li><a href="cat18-p4-wave-rollout.html"><span class="nav-icon">🌊</span> 18.4 Wave Rollout</a></li>
+            <li><a href="cat18-p5-post-implementation.html"><span class="nav-icon">📊</span> 18.5 Post-Implementation</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#runbook"><span class="nav-icon">📋</span> Cutover Runbook</a></li>
+            <li><a href="#sequencing"><span class="nav-icon">🔗</span> Task Sequencing</a></li>
+            <li><a href="#warroom"><span class="nav-icon">🎛️</span> War Room Ops</a></li>
+            <li><a href="#rollback"><span class="nav-icon">🔄</span> Rollback Procedures</a></li>
+            <li><a href="#comms"><span class="nav-icon">📢</span> Communication</a></li>
+            <li><a href="#validation"><span class="nav-icon">🔍</span> Validation</a></li>
+            <li><a href="#timing"><span class="nav-icon">📅</span> Timing Strategy</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">⚡ Page 18.2</span>
+                <h1>Cutover Management</h1>
+                <p>Execute flawless cutovers with detailed runbooks, precise task sequencing, war room coordination, and tested rollback procedures. The critical hours that determine success.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">4-12 hrs</div><div class="hero-metric-label">Typical Cutover Window</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">50-200</div><div class="hero-metric-label">Tasks per Cutover</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">15 min</div><div class="hero-metric-label">Target Rollback RTO</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">2-3</div><div class="hero-metric-label">Dress Rehearsals</div></div>
+            </div>
+        </section>
+
+        <!-- CUTOVER RUNBOOK -->
+        <section class="module" id="runbook">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Cutover Runbook Structure</h2>
+                    <p>The master playbook for go-live execution</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The cutover runbook is the definitive guide for go-live execution. It documents every task, dependency, owner, and timing. A well-designed runbook leaves nothing to memory or improvisation. <strong>Every task should be executable by someone who has never done it before</strong>—the runbook is that detailed.</p>
+            </div>
+            
+            <!-- Runbook Visualization -->
+            <div class="framework-container">
+                <div class="framework-header">
+                    <div class="framework-title">⚡ Live Cutover Execution</div>
+                    <div class="framework-badge">T+02:45:00</div>
+                </div>
+                <div class="framework-canvas">
+                    <svg viewBox="0 0 900 380" style="width: 100%; height: auto;">
+                        <defs>
+                            <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#10B981"/>
+                                <stop offset="65%" style="stop-color:#10B981"/>
+                                <stop offset="65%" style="stop-color:#F59E0B"/>
+                                <stop offset="70%" style="stop-color:#F59E0B"/>
+                                <stop offset="70%" style="stop-color:#2a2a3e"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Header -->
+                        <rect x="10" y="10" width="880" height="40" rx="8" fill="#12121a" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="30" y="36" fill="#F59E0B" font-size="14" font-weight="700">🚀 CUTOVER EXECUTION: WAVE 2 GO-LIVE</text>
+                        <text x="450" y="36" fill="#FBBF24" font-size="12">Progress: 65% | ETA: T+04:30:00</text>
+                        <circle cx="820" cy="30" r="10" fill="#10B981">
+                            <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="845" y="34" fill="#34D399" font-size="10" font-weight="600">LIVE</text>
+                        
+                        <!-- Progress bar -->
+                        <rect x="30" y="60" width="840" height="12" rx="6" fill="#1a1a2e"/>
+                        <rect x="30" y="60" width="546" height="12" rx="6" fill="url(#progressGrad)"/>
+                        
+                        <!-- Phase markers on progress bar -->
+                        <g transform="translate(30, 60)">
+                            <line x1="168" y1="0" x2="168" y2="12" stroke="#3B82F6" stroke-width="2"/>
+                            <line x1="336" y1="0" x2="336" y2="12" stroke="#8B5CF6" stroke-width="2"/>
+                            <line x1="504" y1="0" x2="504" y2="12" stroke="#F59E0B" stroke-width="2"/>
+                            <line x1="672" y1="0" x2="672" y2="12" stroke="#10B981" stroke-width="2"/>
+                        </g>
+                        
+                        <!-- Phase 1: Pre-Cutover - COMPLETE -->
+                        <g transform="translate(30, 95)">
+                            <rect width="200" height="120" rx="8" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                            <rect width="200" height="30" rx="8" fill="#10B981"/>
+                            <text x="15" y="20" fill="#fff" font-size="10" font-weight="600">✓ PHASE 1: PRE-CUTOVER</text>
+                            <text x="170" y="20" fill="#6ee7b7" font-size="9">100%</text>
+                            
+                            <g transform="translate(10, 40)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">System health check</text>
+                            </g>
+                            <g transform="translate(10, 60)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">Backup verification</text>
+                            </g>
+                            <g transform="translate(10, 80)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">Team go/no-go</text>
+                            </g>
+                            <text x="100" y="110" text-anchor="middle" fill="#6a6a7a" font-size="8">Duration: 00:45:00</text>
+                        </g>
+                        
+                        <!-- Phase 2: Data Migration - COMPLETE -->
+                        <g transform="translate(245, 95)">
+                            <rect width="200" height="120" rx="8" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                            <rect width="200" height="30" rx="8" fill="#10B981"/>
+                            <text x="15" y="20" fill="#fff" font-size="10" font-weight="600">✓ PHASE 2: DATA</text>
+                            <text x="170" y="20" fill="#6ee7b7" font-size="9">100%</text>
+                            
+                            <g transform="translate(10, 40)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">Legacy read-only</text>
+                            </g>
+                            <g transform="translate(10, 60)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">Delta data sync</text>
+                            </g>
+                            <g transform="translate(10, 80)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">Data validation</text>
+                            </g>
+                            <text x="100" y="110" text-anchor="middle" fill="#6a6a7a" font-size="8">Duration: 01:15:00</text>
+                        </g>
+                        
+                        <!-- Phase 3: System Cutover - IN PROGRESS -->
+                        <g transform="translate(460, 95)">
+                            <rect width="200" height="120" rx="8" fill="#12121a" stroke="#F59E0B" stroke-width="3">
+                                <animate attributeName="stroke-opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect width="200" height="30" rx="8" fill="#F59E0B"/>
+                            <text x="15" y="20" fill="#fff" font-size="10" font-weight="600">◐ PHASE 3: CUTOVER</text>
+                            <text x="170" y="20" fill="#fef3c7" font-size="9">65%</text>
+                            
+                            <g transform="translate(10, 40)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">✓</text>
+                                <text x="22" y="11" fill="#a0a0b0" font-size="9">DNS switch</text>
+                            </g>
+                            <g transform="translate(10, 60)">
+                                <circle cx="8" cy="8" r="6" fill="#F59E0B">
+                                    <animate attributeName="r" values="6;8;6" dur="1s" repeatCount="indefinite"/>
+                                </circle>
+                                <text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8">⟳</text>
+                                <text x="22" y="11" fill="#FBBF24" font-size="9" font-weight="600">SSO integration</text>
+                            </g>
+                            <g transform="translate(10, 80)">
+                                <circle cx="8" cy="8" r="6" fill="#2a2a3e" stroke="#3a3a4e" stroke-width="1"/>
+                                <text x="22" y="11" fill="#6a6a7a" font-size="9">Cache warmup</text>
+                            </g>
+                            <text x="100" y="110" text-anchor="middle" fill="#FBBF24" font-size="8">ETA: 00:30:00</text>
+                        </g>
+                        
+                        <!-- Phase 4: Validation - PENDING -->
+                        <g transform="translate(675, 95)" opacity="0.5">
+                            <rect width="200" height="120" rx="8" fill="#12121a" stroke="#2a2a3e" stroke-width="2"/>
+                            <rect width="200" height="30" rx="8" fill="#2a2a3e"/>
+                            <text x="15" y="20" fill="#6a6a7a" font-size="10" font-weight="600">○ PHASE 4: VALIDATE</text>
+                            <text x="170" y="20" fill="#6a6a7a" font-size="9">0%</text>
+                            
+                            <g transform="translate(10, 40)">
+                                <circle cx="8" cy="8" r="6" fill="#1a1a2e" stroke="#3a3a4e"/>
+                                <text x="22" y="11" fill="#6a6a7a" font-size="9">Smoke tests</text>
+                            </g>
+                            <g transform="translate(10, 60)">
+                                <circle cx="8" cy="8" r="6" fill="#1a1a2e" stroke="#3a3a4e"/>
+                                <text x="22" y="11" fill="#6a6a7a" font-size="9">User validation</text>
+                            </g>
+                            <g transform="translate(10, 80)">
+                                <circle cx="8" cy="8" r="6" fill="#1a1a2e" stroke="#3a3a4e"/>
+                                <text x="22" y="11" fill="#6a6a7a" font-size="9">Go-live announce</text>
+                            </g>
+                            <text x="100" y="110" text-anchor="middle" fill="#6a6a7a" font-size="8">Est: 00:45:00</text>
+                        </g>
+                        
+                        <!-- Current Task Detail -->
+                        <g transform="translate(30, 235)">
+                            <rect width="540" height="130" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="20" y="25" fill="#F59E0B" font-size="11" font-weight="600">🔄 CURRENT TASK: SSO Integration Verification</text>
+                            
+                            <text x="20" y="50" fill="#6a6a7a" font-size="9">Owner:</text>
+                            <text x="80" y="50" fill="#a0a0b0" font-size="9">DevOps Team</text>
+                            <text x="200" y="50" fill="#6a6a7a" font-size="9">Started:</text>
+                            <text x="260" y="50" fill="#a0a0b0" font-size="9">T+02:30:00</text>
+                            <text x="380" y="50" fill="#6a6a7a" font-size="9">Expected:</text>
+                            <text x="450" y="50" fill="#FBBF24" font-size="9">15 min</text>
+                            
+                            <text x="20" y="75" fill="#6a6a7a" font-size="9">Status:</text>
+                            <text x="80" y="75" fill="#FBBF24" font-size="9">Verifying OAuth token refresh across all endpoints</text>
+                            
+                            <text x="20" y="100" fill="#6a6a7a" font-size="9">Dependencies:</text>
+                            <text x="100" y="100" fill="#34D399" font-size="9">✓ DNS propagation complete</text>
+                            <text x="280" y="100" fill="#34D399" font-size="9">✓ SSL certs valid</text>
+                            
+                            <text x="20" y="120" fill="#6a6a7a" font-size="9">Rollback trigger:</text>
+                            <text x="120" y="120" fill="#F87171" font-size="9">&gt;50% auth failures over 5 min window</text>
+                        </g>
+                        
+                        <!-- Team Status -->
+                        <g transform="translate(590, 235)">
+                            <rect width="280" height="130" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                            <text x="20" y="25" fill="#a0a0b0" font-size="11" font-weight="600">👥 WAR ROOM STATUS</text>
+                            
+                            <g transform="translate(20, 40)">
+                                <circle cx="6" cy="6" r="4" fill="#10B981"/>
+                                <text x="18" y="10" fill="#a0a0b0" font-size="9">Cutover Lead: Sarah C.</text>
+                            </g>
+                            <g transform="translate(20, 58)">
+                                <circle cx="6" cy="6" r="4" fill="#10B981"/>
+                                <text x="18" y="10" fill="#a0a0b0" font-size="9">DevOps: 3 engineers active</text>
+                            </g>
+                            <g transform="translate(20, 76)">
+                                <circle cx="6" cy="6" r="4" fill="#10B981"/>
+                                <text x="18" y="10" fill="#a0a0b0" font-size="9">DBA: Miguel R. (standby)</text>
+                            </g>
+                            <g transform="translate(20, 94)">
+                                <circle cx="6" cy="6" r="4" fill="#FBBF24"/>
+                                <text x="18" y="10" fill="#a0a0b0" font-size="9">Vendor: Okta support on call</text>
+                            </g>
+                            <g transform="translate(20, 112)">
+                                <circle cx="6" cy="6" r="4" fill="#10B981"/>
+                                <text x="18" y="10" fill="#a0a0b0" font-size="9">Exec Sponsor: Available</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Runbook Phases -->
+            <div class="runbook-container">
+                <div class="runbook-phase">
+                    <div class="runbook-phase-header">
+                        <div class="runbook-phase-number" style="background: #10B981;">1</div>
+                        <div class="runbook-phase-info">
+                            <div class="runbook-phase-title">Phase 1: Pre-Cutover Validation</div>
+                            <div class="runbook-phase-timing">Duration: 45 min | T-00:45 to T-00:00</div>
+                        </div>
+                        <div class="runbook-phase-status"><span class="status-badge complete">Complete</span></div>
+                    </div>
+                    <div class="runbook-tasks">
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Verify all systems healthy and monitoring active</div>
+                            <div class="runbook-task-owner">Ops Lead</div>
+                            <div class="runbook-task-duration">10 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Confirm backups completed and verified</div>
+                            <div class="runbook-task-owner">DBA</div>
+                            <div class="runbook-task-duration">15 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Team readiness check and final go/no-go</div>
+                            <div class="runbook-task-owner">Cutover Lead</div>
+                            <div class="runbook-task-duration">10 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Send cutover start notification</div>
+                            <div class="runbook-task-owner">Comms Lead</div>
+                            <div class="runbook-task-duration">5 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="runbook-phase">
+                    <div class="runbook-phase-header">
+                        <div class="runbook-phase-number" style="background: #10B981;">2</div>
+                        <div class="runbook-phase-info">
+                            <div class="runbook-phase-title">Phase 2: Data Migration & Sync</div>
+                            <div class="runbook-phase-timing">Duration: 1 hr 15 min | T+00:00 to T+01:15</div>
+                        </div>
+                        <div class="runbook-phase-status"><span class="status-badge complete">Complete</span></div>
+                    </div>
+                    <div class="runbook-tasks">
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Set legacy system to read-only mode</div>
+                            <div class="runbook-task-owner">DBA</div>
+                            <div class="runbook-task-duration">5 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Execute delta data migration</div>
+                            <div class="runbook-task-owner">Data Team</div>
+                            <div class="runbook-task-duration">45 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Run data validation scripts</div>
+                            <div class="runbook-task-owner">Data Team</div>
+                            <div class="runbook-task-duration">20 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Business sign-off on data accuracy</div>
+                            <div class="runbook-task-owner">Business Owner</div>
+                            <div class="runbook-task-duration">10 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="runbook-phase" style="border-color: var(--cat-primary);">
+                    <div class="runbook-phase-header" style="background: var(--cat-glow);">
+                        <div class="runbook-phase-number" style="background: #F59E0B;">3</div>
+                        <div class="runbook-phase-info">
+                            <div class="runbook-phase-title">Phase 3: System Cutover</div>
+                            <div class="runbook-phase-timing">Duration: 1 hr | T+01:15 to T+02:15</div>
+                        </div>
+                        <div class="runbook-phase-status"><span class="status-badge in-progress">In Progress</span></div>
+                    </div>
+                    <div class="runbook-tasks">
+                        <div class="runbook-task">
+                            <div class="runbook-task-check done">✓</div>
+                            <div class="runbook-task-name">Update DNS records to new endpoints</div>
+                            <div class="runbook-task-owner">DevOps</div>
+                            <div class="runbook-task-duration">10 min</div>
+                            <span class="status-badge complete">Done</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check active">⟳</div>
+                            <div class="runbook-task-name" style="color: var(--cat-light); font-weight: 600;">Verify SSO/OAuth integration</div>
+                            <div class="runbook-task-owner">DevOps</div>
+                            <div class="runbook-task-duration">15 min</div>
+                            <span class="status-badge in-progress">Active</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check waiting"></div>
+                            <div class="runbook-task-name">Execute cache warmup procedures</div>
+                            <div class="runbook-task-owner">DevOps</div>
+                            <div class="runbook-task-duration">20 min</div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check waiting"></div>
+                            <div class="runbook-task-name">Enable production traffic routing</div>
+                            <div class="runbook-task-owner">DevOps</div>
+                            <div class="runbook-task-duration">10 min</div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="runbook-phase" style="opacity: 0.6;">
+                    <div class="runbook-phase-header">
+                        <div class="runbook-phase-number" style="background: #3a3a4e;">4</div>
+                        <div class="runbook-phase-info">
+                            <div class="runbook-phase-title">Phase 4: Validation & Go-Live</div>
+                            <div class="runbook-phase-timing">Duration: 45 min | T+02:15 to T+03:00</div>
+                        </div>
+                        <div class="runbook-phase-status"><span class="status-badge pending">Pending</span></div>
+                    </div>
+                    <div class="runbook-tasks">
+                        <div class="runbook-task">
+                            <div class="runbook-task-check waiting"></div>
+                            <div class="runbook-task-name">Execute smoke test suite</div>
+                            <div class="runbook-task-owner">QA Lead</div>
+                            <div class="runbook-task-duration">15 min</div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check waiting"></div>
+                            <div class="runbook-task-name">Business user validation walkthrough</div>
+                            <div class="runbook-task-owner">Business Owner</div>
+                            <div class="runbook-task-duration">20 min</div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                        <div class="runbook-task">
+                            <div class="runbook-task-check waiting"></div>
+                            <div class="runbook-task-name">Final go-live decision and announcement</div>
+                            <div class="runbook-task-owner">Cutover Lead</div>
+                            <div class="runbook-task-duration">10 min</div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="value-container">
+                <div class="value-header">
+                    <div class="value-title">📊 Cutover Management Value Analysis</div>
+                    <div class="value-badge">Investment Profile</div>
+                </div>
+                <div class="value-metrics">
+                    <div class="value-metric">
+                        <div class="value-metric-label">Preparation Effort</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 90%;"></div></div>
+                        <div class="value-metric-value">Very High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Execution Risk</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill critical" style="width: 85%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Coordination Need</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill critical" style="width: 95%;"></div></div>
+                        <div class="value-metric-value">Critical</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Rollback Complexity</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill high" style="width: 75%;"></div></div>
+                        <div class="value-metric-value">High</div>
+                    </div>
+                    <div class="value-metric">
+                        <div class="value-metric-label">Rehearsal Value</div>
+                        <div class="value-metric-bar"><div class="value-metric-fill critical" style="width: 98%;"></div></div>
+                        <div class="value-metric-value">Essential</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TASK SEQUENCING -->
+        <section class="module" id="sequencing">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Task Sequencing & Dependencies</h2>
+                    <p>Critical path management during cutover</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Cutover tasks are rarely independent—most have dependencies that must complete before they can start. Understanding the <strong>critical path</strong> reveals which tasks directly impact total cutover duration. Delays on critical path tasks delay the entire go-live. Non-critical tasks have float and can absorb some delay.</p>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">🔗</div>
+                    <div class="concept-title">Finish-to-Start (FS)</div>
+                    <div class="concept-desc">Task B cannot start until Task A completes. Most common dependency type. Example: Data validation cannot start until migration completes.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">⏱️</div>
+                    <div class="concept-title">Start-to-Start (SS)</div>
+                    <div class="concept-desc">Task B cannot start until Task A starts. Allows parallel execution with offset. Example: Monitoring starts when cutover starts.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-title">Critical Path</div>
+                    <div class="concept-desc">Longest sequence of dependent tasks. Zero float—any delay extends total duration. Must be protected and monitored closely.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <div class="concept-title">Float/Slack</div>
+                    <div class="concept-desc">Time a non-critical task can slip without affecting end date. Tasks with float provide buffer. Use float strategically for risk.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🚧</div>
+                    <div class="concept-title">Blockers</div>
+                    <div class="concept-desc">External dependencies outside team control. Examples: Vendor availability, DNS propagation, certificate issuance. Plan for delays.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">⚡</div>
+                    <div class="concept-title">Parallel Execution</div>
+                    <div class="concept-desc">Independent tasks running simultaneously. Reduces total duration but increases coordination complexity. Requires more staff.</div>
+                </div>
+            </div>
+            
+            <!-- Dependency Matrix -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Duration</th>
+                            <th>Dependencies</th>
+                            <th>Critical Path?</th>
+                            <th>Float</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1.1</strong> System health check</td>
+                            <td>10 min</td>
+                            <td>None (start)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1.2</strong> Backup verification</td>
+                            <td>15 min</td>
+                            <td>1.1 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2.1</strong> Set legacy read-only</td>
+                            <td>5 min</td>
+                            <td>1.3 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2.2</strong> Delta migration</td>
+                            <td>45 min</td>
+                            <td>2.1 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2.3</strong> Data validation</td>
+                            <td>20 min</td>
+                            <td>2.2 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3.1</strong> DNS update</td>
+                            <td>10 min</td>
+                            <td>2.4 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3.2</strong> SSO verification</td>
+                            <td>15 min</td>
+                            <td>3.1 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3.3</strong> Cache warmup</td>
+                            <td>20 min</td>
+                            <td>3.1 (SS +5)</td>
+                            <td>❌ No</td>
+                            <td>15 min</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3.4</strong> Enable traffic</td>
+                            <td>10 min</td>
+                            <td>3.2, 3.3 (FS)</td>
+                            <td>✅ Yes</td>
+                            <td>0 min</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">⚡ Critical Path Protection</div>
+                <div class="callout-text">Critical path tasks deserve extra attention: (1) Assign your best people, (2) Have backups ready for key personnel, (3) Pre-stage all required access and tools, (4) Monitor progress in real-time, (5) Escalate immediately if blocked. A 15-minute delay on critical path = 15-minute delay to go-live.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- WAR ROOM OPERATIONS -->
+        <section class="module" id="warroom">
+            <div class="module-header">
+                <div class="module-icon">🎛️</div>
+                <div class="module-info">
+                    <h2>War Room Operations</h2>
+                    <p>Command center coordination during cutover</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The war room is the nerve center during cutover. It brings together all key stakeholders in one location (physical or virtual) with real-time visibility into progress, issues, and decisions. <strong>Effective war rooms reduce resolution time by 60%</strong> through immediate coordination and decision-making authority.</p>
+            </div>
+            
+            <div class="warroom-grid">
+                <div class="warroom-card">
+                    <div class="warroom-card-header">
+                        <div class="warroom-card-icon">👤</div>
+                        <div class="warroom-card-title">Required Roles</div>
+                    </div>
+                    <div class="warroom-card-content">
+                        <ul>
+                            <li><strong>Cutover Lead</strong> — Overall coordination and decisions</li>
+                            <li><strong>Technical Lead</strong> — System-level troubleshooting</li>
+                            <li><strong>DBA</strong> — Database operations and recovery</li>
+                            <li><strong>DevOps</strong> — Infrastructure and deployment</li>
+                            <li><strong>Business Owner</strong> — Validation and acceptance</li>
+                            <li><strong>Comms Lead</strong> — Stakeholder communications</li>
+                            <li><strong>Scribe</strong> — Real-time documentation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="warroom-card">
+                    <div class="warroom-card-header">
+                        <div class="warroom-card-icon">📊</div>
+                        <div class="warroom-card-title">Dashboard Elements</div>
+                    </div>
+                    <div class="warroom-card-content">
+                        <ul>
+                            <li><strong>Runbook progress</strong> — Tasks complete vs remaining</li>
+                            <li><strong>System health</strong> — All monitored services</li>
+                            <li><strong>Elapsed time</strong> — T+ counter from cutover start</li>
+                            <li><strong>Open blockers</strong> — Issues requiring attention</li>
+                            <li><strong>Rollback status</strong> — Ready/triggered indicator</li>
+                            <li><strong>Team status</strong> — Who's available, who's busy</li>
+                            <li><strong>Next checkpoint</strong> — Upcoming milestone</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="warroom-card">
+                    <div class="warroom-card-header">
+                        <div class="warroom-card-icon">📢</div>
+                        <div class="warroom-card-title">Communication Cadence</div>
+                    </div>
+                    <div class="warroom-card-content">
+                        <ul>
+                            <li><strong>Every 15 min</strong> — Status round-robin in war room</li>
+                            <li><strong>Every 30 min</strong> — Stakeholder update (email/Slack)</li>
+                            <li><strong>At each phase</strong> — Go/No-Go checkpoint</li>
+                            <li><strong>On any blocker</strong> — Immediate escalation</li>
+                            <li><strong>On rollback trigger</strong> — All-hands alert</li>
+                            <li><strong>At go-live</strong> — Success announcement</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="warroom-card">
+                    <div class="warroom-card-header">
+                        <div class="warroom-card-icon">🛠️</div>
+                        <div class="warroom-card-title">Essential Tools</div>
+                    </div>
+                    <div class="warroom-card-content">
+                        <ul>
+                            <li><strong>Video conference</strong> — Zoom/Teams for remote participants</li>
+                            <li><strong>Runbook tracker</strong> — Smartsheet/Jira for task status</li>
+                            <li><strong>Monitoring dashboard</strong> — Datadog/Grafana on big screen</li>
+                            <li><strong>Chat channel</strong> — Slack #cutover-warroom</li>
+                            <li><strong>Incident tracker</strong> — ServiceNow/PagerDuty</li>
+                            <li><strong>Shared doc</strong> — Live decision log</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">🎯 War Room Rules of Engagement</div>
+                <div class="callout-text"><strong>1.</strong> Cutover Lead has final decision authority. <strong>2.</strong> All discussions on-mic (no side conversations). <strong>3.</strong> Status updates must be concise (&lt;30 seconds). <strong>4.</strong> Blockers raised immediately, not at next checkpoint. <strong>5.</strong> Scribe documents every decision. <strong>6.</strong> No one leaves without handoff. <strong>7.</strong> Celebrate milestones, maintain focus.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ROLLBACK PROCEDURES -->
+        <section class="module" id="rollback">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Rollback Procedures</h2>
+                    <p>The safety net for failed cutovers</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Rollback is not failure—it's risk management. A well-executed rollback protects users and the business from extended outages. <strong>Every cutover must have a tested rollback plan with clear triggers.</strong> The decision to rollback should be as structured as the decision to go-live.</p>
+            </div>
+            
+            <div class="rollback-container">
+                <div class="rollback-header">
+                    <div class="rollback-icon">⚠️</div>
+                    <div class="rollback-title">Rollback Trigger Criteria</div>
+                </div>
+                <div class="rollback-content">
+                    <div class="rollback-triggers">
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">🔴</div>
+                            <div class="rollback-trigger-text"><strong>Critical system failure</strong> — Core functionality unavailable for &gt;15 minutes with no clear resolution path</div>
+                        </div>
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">🔴</div>
+                            <div class="rollback-trigger-text"><strong>Data integrity issue</strong> — Evidence of data corruption or loss affecting business operations</div>
+                        </div>
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">🔴</div>
+                            <div class="rollback-trigger-text"><strong>Security incident</strong> — Active security breach or critical vulnerability discovered</div>
+                        </div>
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">🟡</div>
+                            <div class="rollback-trigger-text"><strong>Authentication failure rate</strong> — &gt;50% of login attempts failing over 5-minute window</div>
+                        </div>
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">🟡</div>
+                            <div class="rollback-trigger-text"><strong>Performance degradation</strong> — Response times &gt;10x baseline for &gt;10 minutes</div>
+                        </div>
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">🟡</div>
+                            <div class="rollback-trigger-text"><strong>Integration failure</strong> — Critical downstream system cannot connect after 3 retry attempts</div>
+                        </div>
+                        <div class="rollback-trigger">
+                            <div class="rollback-trigger-icon">⚪</div>
+                            <div class="rollback-trigger-text"><strong>Business decision</strong> — Executive sponsor explicitly requests rollback (regardless of technical status)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rollback Steps -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Step</th>
+                            <th>Action</th>
+                            <th>Owner</th>
+                            <th>Duration</th>
+                            <th>Verification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>R.1</strong></td>
+                            <td>Declare rollback (announce to war room)</td>
+                            <td>Cutover Lead</td>
+                            <td>1 min</td>
+                            <td>All acknowledge</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.2</strong></td>
+                            <td>Stop all in-progress cutover tasks</td>
+                            <td>All teams</td>
+                            <td>2 min</td>
+                            <td>Confirmation from each team</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.3</strong></td>
+                            <td>Revert DNS to legacy endpoints</td>
+                            <td>DevOps</td>
+                            <td>5 min</td>
+                            <td>DNS propagation check</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.4</strong></td>
+                            <td>Re-enable legacy system write access</td>
+                            <td>DBA</td>
+                            <td>3 min</td>
+                            <td>Write test successful</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.5</strong></td>
+                            <td>Restore database from pre-cutover backup (if needed)</td>
+                            <td>DBA</td>
+                            <td>15-30 min</td>
+                            <td>Data integrity check</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.6</strong></td>
+                            <td>Verify legacy system functionality</td>
+                            <td>QA Lead</td>
+                            <td>10 min</td>
+                            <td>Smoke tests pass</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.7</strong></td>
+                            <td>Send rollback notification to stakeholders</td>
+                            <td>Comms Lead</td>
+                            <td>5 min</td>
+                            <td>Notification sent</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R.8</strong></td>
+                            <td>Conduct post-rollback review</td>
+                            <td>Cutover Lead</td>
+                            <td>30 min</td>
+                            <td>Root cause identified</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="callout danger">
+                <div class="callout-title">⚠️ Point of No Return</div>
+                <div class="callout-text">Some cutovers have a <strong>Point of No Return (PONR)</strong>—a task after which rollback is no longer possible or becomes extremely complex. Common PONR scenarios: (1) Financial period close completed in new system, (2) External notifications sent to customers, (3) Regulatory filings submitted. <strong>The PONR must be explicitly identified and communicated before cutover begins.</strong></div>
+            </div>
+            
+            <div class="proscons-grid">
+                <div class="proscons-card pros">
+                    <div class="proscons-title">✅ Cutover Best Practices</div>
+                    <ul class="proscons-list">
+                        <li><strong>Rehearse with timing</strong> — Full dress rehearsal including actual task durations</li>
+                        <li><strong>Pre-stage everything</strong> — All access, tools, scripts ready before T-0</li>
+                        <li><strong>Assign backups</strong> — Every critical role has a named backup person</li>
+                        <li><strong>Document in real-time</strong> — Scribe captures every decision and deviation</li>
+                        <li><strong>Communicate proactively</strong> — Status updates before stakeholders ask</li>
+                        <li><strong>Celebrate milestones</strong> — Acknowledge progress to maintain morale</li>
+                    </ul>
+                </div>
+                <div class="proscons-card cons">
+                    <div class="proscons-title">❌ Cutover Anti-Patterns</div>
+                    <ul class="proscons-list">
+                        <li><strong>Improvising</strong> — Making up tasks or sequence during execution</li>
+                        <li><strong>Hero mode</strong> — One person trying to do everything</li>
+                        <li><strong>Optimism without evidence</strong> — "It'll probably work" on critical tasks</li>
+                        <li><strong>Delayed escalation</strong> — Hoping problems resolve themselves</li>
+                        <li><strong>Parallel side conversations</strong> — Decisions made outside war room</li>
+                        <li><strong>Skipping validation</strong> — Rushing to complete without verification</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- COMMUNICATION -->
+        <section class="module" id="comms">
+            <div class="module-header">
+                <div class="module-icon">📢</div>
+                <div class="module-info">
+                    <h2>Cutover Communications</h2>
+                    <p>Keeping stakeholders informed during execution</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Communication during cutover serves two purposes: <strong>keeping stakeholders informed</strong> and <strong>managing expectations</strong>. Pre-drafted templates for common scenarios (start, progress, issues, success, rollback) enable rapid, consistent communication even under pressure.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Audience</th>
+                            <th>Channel</th>
+                            <th>Timing</th>
+                            <th>Key Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cutover Start</strong></td>
+                            <td>All stakeholders</td>
+                            <td>Email + Slack</td>
+                            <td>T+0:00</td>
+                            <td>"Cutover has begun. System unavailable until ~[ETA]. Updates every 30 min."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Progress Update</strong></td>
+                            <td>Stakeholders + Execs</td>
+                            <td>Slack</td>
+                            <td>Every 30 min</td>
+                            <td>"Phase X complete. Y% overall. On track for [ETA]. No blockers."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Issue Detected</strong></td>
+                            <td>War room + Execs</td>
+                            <td>Slack + Call</td>
+                            <td>Immediately</td>
+                            <td>"Issue: [brief]. Impact: [scope]. Team investigating. ETA: [time]."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Issue Resolved</strong></td>
+                            <td>All stakeholders</td>
+                            <td>Slack</td>
+                            <td>On resolution</td>
+                            <td>"Issue resolved. Cutover resuming. New ETA: [time]."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rollback Decision</strong></td>
+                            <td>All stakeholders</td>
+                            <td>Email + Slack + SMS</td>
+                            <td>Immediately</td>
+                            <td>"Rollback initiated due to [reason]. Legacy system restoring. ETA: [time]."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Go-Live Success</strong></td>
+                            <td>All users</td>
+                            <td>Email + Slack + Intranet</td>
+                            <td>On completion</td>
+                            <td>"Go-live complete! New system active. Support available at [contact]."</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- VALIDATION CHECKLIST -->
+        <section class="module" id="validation">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>Post-Cutover Validation</h2>
+                    <p>Smoke tests and verification procedures</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Validation confirms the cutover succeeded before declaring go-live. A structured smoke test suite covers <strong>critical paths, integrations, and user workflows</strong>. Validation should be time-boxed—if issues emerge, decide quickly whether to fix forward or rollback.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Category</th>
+                            <th>Test Cases</th>
+                            <th>Owner</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>🔐 Authentication</strong></td>
+                            <td>SSO login, password reset, MFA verification, session timeout</td>
+                            <td>Security</td>
+                            <td>5 min</td>
+                            <td><span class="status-badge complete">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>📊 Core Workflows</strong></td>
+                            <td>Create record, update record, delete record, search/filter</td>
+                            <td>QA Lead</td>
+                            <td>10 min</td>
+                            <td><span class="status-badge complete">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🔗 Integrations</strong></td>
+                            <td>API connectivity, data sync, webhook triggers, file transfers</td>
+                            <td>DevOps</td>
+                            <td>15 min</td>
+                            <td><span class="status-badge in-progress">Testing</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>📧 Notifications</strong></td>
+                            <td>Email delivery, SMS alerts, in-app notifications, escalations</td>
+                            <td>QA Lead</td>
+                            <td>5 min</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>📈 Reporting</strong></td>
+                            <td>Dashboard load, report generation, data export, scheduled jobs</td>
+                            <td>Business</td>
+                            <td>10 min</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>⚡ Performance</strong></td>
+                            <td>Page load times, search response, bulk operations, concurrent users</td>
+                            <td>DevOps</td>
+                            <td>10 min</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">✅</div>
+                    <div class="concept-title">Pass Criteria</div>
+                    <div class="concept-desc">All critical tests pass with no P1 issues. P2 issues acceptable if workaround exists. Document any known issues for hypercare team.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">⚠️</div>
+                    <div class="concept-title">Conditional Pass</div>
+                    <div class="concept-desc">Minor issues found but business accepts risk. Document accepted issues, assign owners, set resolution timeline. Proceed with caution.</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🚫</div>
+                    <div class="concept-title">Fail / Rollback</div>
+                    <div class="concept-desc">Critical functionality broken or data integrity compromised. Initiate rollback immediately. Do not proceed hoping issues resolve.</div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">⏱️ Validation Time Box</div>
+                <div class="callout-text">Validation should complete within <strong>45-60 minutes</strong>. If tests are still failing after this window, the decision shifts from "can we fix it?" to "should we rollback?". Extended validation erodes the rollback window and increases risk. Set a hard deadline and stick to it.</div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TIMING & SCHEDULING -->
+        <section class="module" id="timing">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Cutover Timing Strategy</h2>
+                    <p>When to execute for maximum success</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Cutover timing significantly impacts success. The best window balances <strong>minimal user disruption, maximum support availability, and adequate recovery time</strong>. Rushing a cutover to meet an arbitrary deadline is a leading cause of implementation failures.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timing Option</th>
+                            <th>Pros</th>
+                            <th>Cons</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Weekend (Sat-Sun)</strong></td>
+                            <td>Minimal user impact, full recovery time before Monday</td>
+                            <td>Premium pay, fatigue risk, family impact</td>
+                            <td>Large enterprise cutovers, high user impact</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Friday Evening</strong></td>
+                            <td>Weekend buffer, normal work week for prep</td>
+                            <td>Weekend support if issues arise, "Friday curse"</td>
+                            <td>Medium complexity, good support coverage</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tuesday-Wednesday Night</strong></td>
+                            <td>Mid-week recovery, full team available</td>
+                            <td>Shorter recovery window, business disruption</td>
+                            <td>Lower-risk cutovers, follow-the-sun support</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Holiday Weekend</strong></td>
+                            <td>Extended downtime window, low user activity</td>
+                            <td>Reduced staffing, vendor availability issues</td>
+                            <td>Major migrations requiring extended downtime</td>
+                        </tr>
+                        <tr>
+                            <td><strong>End of Month/Quarter</strong></td>
+                            <td>Clean cutoff point, reporting alignment</td>
+                            <td>Often busiest time, highest business risk</td>
+                            <td>Financial systems (with extreme caution)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="warroom-grid">
+                <div class="warroom-card" style="border-top: 3px solid var(--success-green);">
+                    <div class="warroom-card-header">
+                        <div class="warroom-card-icon">✅</div>
+                        <div class="warroom-card-title">Ideal Cutover Window</div>
+                    </div>
+                    <div class="warroom-card-content">
+                        <ul>
+                            <li><strong>Saturday 6am-2pm</strong> for large enterprises</li>
+                            <li>Full day buffer before Monday business</li>
+                            <li>Fresh team (not end of long week)</li>
+                            <li>Vendor support pre-arranged</li>
+                            <li>No competing business events</li>
+                            <li>2+ weeks after month/quarter end</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="warroom-card" style="border-top: 3px solid var(--danger-red);">
+                    <div class="warroom-card-header">
+                        <div class="warroom-card-icon">🚫</div>
+                        <div class="warroom-card-title">Avoid These Windows</div>
+                    </div>
+                    <div class="warroom-card-content">
+                        <ul>
+                            <li><strong>Friday afternoon</strong> — Murphy's Law applies</li>
+                            <li>Month-end close periods</li>
+                            <li>Major company events (earnings, conferences)</li>
+                            <li>Key personnel vacation</li>
+                            <li>Immediately before/after holidays</li>
+                            <li>When vendor support unavailable</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered cutover orchestration</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">⚡</div>
+                    <div class="agent-name">CutoverOrchestrator</div>
+                    <div class="agent-role">Real-Time Execution Coordinator</div>
+                    <div class="agent-desc">Orchestrates cutover execution in real-time, tracking task progress, managing dependencies, monitoring for issues, and coordinating rollback when needed. Provides intelligent recommendations and automates status communications.</div>
+                    <ul class="agent-capabilities">
+                        <li>Real-time runbook task tracking</li>
+                        <li>Dependency chain management</li>
+                        <li>Critical path monitoring</li>
+                        <li>Automated health checks</li>
+                        <li>Rollback trigger detection</li>
+                        <li>Stakeholder communication automation</li>
+                        <li>Decision support recommendations</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tabs">
+                            <div class="code-tab active">Python</div>
+                            <div class="code-tab">Config</div>
+                        </div>
+                        <div class="code-filename">cutover_orchestrator_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># Cutover Orchestration Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Cutover Orchestration Agent</span>
+orchestrator = Agent(
+    role=<span class="code-string">"Cutover Orchestrator"</span>,
+    goal=<span class="code-string">"Execute cutover runbook with precision and manage issues"</span>,
+    backstory=<span class="code-string">"""Expert cutover coordinator with experience 
+    managing hundreds of go-lives. Excels at real-time 
+    decision making, dependency management, and rapid 
+    issue resolution under pressure."""</span>,
+    llm=llm,
+    tools=[
+        runbook_tracker,
+        dependency_manager,
+        health_monitor,
+        rollback_controller,
+        notification_sender
+    ]
+)
+
+<span class="code-comment"># Task execution with rollback awareness</span>
+<span class="code-keyword">async def</span> <span class="code-function">execute_cutover_task</span>(task_id: <span class="code-keyword">str</span>):
+    <span class="code-string">"""Execute a single cutover task with monitoring."""</span>
+    task = Task(
+        description=<span class="code-string">f"""
+        Execute cutover task {task_id}:
+        1. Verify all dependencies complete
+        2. Execute task steps per runbook
+        3. Monitor for rollback triggers
+        4. Validate completion criteria
+        5. Update status and notify stakeholders
+        6. Identify any blockers for next task
+        """</span>,
+        agent=orchestrator,
+        expected_output=<span class="code-string">"Task completion status with metrics"</span>
+    )
+    
+    crew = Crew(agents=[orchestrator], tasks=[task])
+    result = <span class="code-keyword">await</span> crew.kickoff_async()
+    
+    <span class="code-comment"># Check for rollback triggers</span>
+    <span class="code-keyword">if</span> result.rollback_triggered:
+        <span class="code-keyword">await</span> initiate_rollback(result.trigger_reason)
+    
+    <span class="code-keyword">return</span> result</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat18-p1-go-live-planning.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">18.1 Go-Live Planning</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 18.2</div>
+        <a href="cat18-p3-hypercare.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">18.3 Hypercare & Support</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

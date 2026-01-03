@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Architecture | Networking | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #3B82F6;
+            --page-light: #60A5FA;
+            --page-glow: rgba(59, 130, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+        .overview-content ul { margin-left: 20px; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .overview-content strong { color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VPC ARCHITECTURE DIAGRAM
+        ═══════════════════════════════════════════════════════════════ */
+        .vpc-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; position: relative; overflow: hidden; }
+        .vpc-diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .vpc-diagram-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .vpc-diagram-badge { font-size: 11px; padding: 4px 10px; background: var(--page-glow); color: var(--page-light); border-radius: 9999px; border: 1px solid var(--page-primary); }
+        
+        .vpc-container { border: 2px dashed var(--page-primary); border-radius: 16px; padding: 20px; position: relative; background: rgba(59, 130, 246, 0.03); }
+        .vpc-label { position: absolute; top: -12px; left: 20px; background: var(--bg-dark); padding: 0 12px; font-size: 12px; font-weight: 600; color: var(--page-light); }
+        .vpc-cidr { position: absolute; top: -12px; right: 20px; background: var(--bg-dark); padding: 0 12px; font-size: 11px; font-family: monospace; color: var(--text-muted); }
+        
+        .az-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+        .az-column { border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: var(--bg-card); }
+        .az-header { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        
+        .subnet-box { border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid; }
+        .subnet-box:last-child { margin-bottom: 0; }
+        .subnet-box.public { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .subnet-box.private { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); }
+        .subnet-box.data { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3); }
+        .subnet-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .subnet-box.public .subnet-label { color: var(--green); }
+        .subnet-box.private .subnet-label { color: var(--page-light); }
+        .subnet-box.data .subnet-label { color: var(--purple); }
+        .subnet-cidr { font-size: 10px; font-family: monospace; color: var(--text-muted); margin-bottom: 8px; }
+        .subnet-resources { display: flex; flex-wrap: wrap; gap: 4px; }
+        .resource-tag { font-size: 9px; padding: 2px 6px; background: var(--bg-dark); border-radius: 4px; color: var(--text-secondary); }
+        
+        .vpc-gateways { display: flex; justify-content: center; gap: 24px; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-color); }
+        .gateway-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; }
+        .gateway-icon { font-size: 18px; }
+        .gateway-label { font-size: 11px; color: var(--text-secondary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PATTERN CARDS
+        ═══════════════════════════════════════════════════════════════ */
+        .pattern-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .pattern-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .pattern-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .pattern-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .pattern-icon { width: 40px; height: 40px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .pattern-title { font-size: 15px; font-weight: 600; }
+        .pattern-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .pattern-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pattern-tag { font-size: 10px; padding: 3px 8px; background: var(--bg-card); border-radius: 4px; color: var(--text-muted); }
+        .pattern-tag.recommended { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CIDR CALCULATOR
+        ═══════════════════════════════════════════════════════════════ */
+        .cidr-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .cidr-table th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .cidr-table td { padding: 12px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .cidr-table tr:hover td { background: var(--bg-hover); }
+        .cidr-table code { font-family: monospace; background: var(--bg-dark); padding: 2px 6px; border-radius: 4px; color: var(--page-light); }
+        .cidr-table .hosts { color: var(--green); font-weight: 600; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COMPARISON TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .compare-table th { text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { color: var(--text-muted); }
+        .compare-table th.aws { color: var(--aws-orange); }
+        .compare-table th.azure { color: var(--azure-blue); }
+        .compare-table th.gcp { color: var(--gcp-blue); }
+        .compare-table td { padding: 12px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .compare-table .feature { font-weight: 500; color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ROUTING DIAGRAM
+        ═══════════════════════════════════════════════════════════════ */
+        .routing-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .routing-header { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .route-table-visual { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start; }
+        .route-table-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .route-table-header { padding: 10px 14px; background: var(--page-glow); border-bottom: 1px solid var(--border-color); font-size: 12px; font-weight: 600; color: var(--page-light); }
+        .route-entry { display: flex; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border-color); font-size: 11px; }
+        .route-entry:last-child { border-bottom: none; }
+        .route-dest { font-family: monospace; color: var(--text-secondary); }
+        .route-target { color: var(--green); }
+        
+        .route-flow { display: flex; flex-direction: column; gap: 12px; }
+        .route-path { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; }
+        .route-path-icon { font-size: 16px; }
+        .route-path-text { font-size: 12px; color: var(--text-secondary); flex: 1; }
+        .route-path-arrow { color: var(--page-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RELATED PAGES
+        ═══════════════════════════════════════════════════════════════ */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-content { grid-template-columns: 1fr; }
+            .pattern-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: 1fr; }
+            .az-row { grid-template-columns: 1fr; }
+            .route-table-visual { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat15-networking-overview.html">Networking</a>
+        <span class="sep">/</span>
+        <span class="current">Network Architecture</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🌐 Category 15</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat15-networking-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat15-p1-network-architecture.html" class="active"><span class="nav-icon">🏗️</span> 15.1 Network Architecture</a></li>
+            <li><a href="cat15-p2-load-balancing.html"><span class="nav-icon">⚖️</span> 15.2 Load Balancing</a></li>
+            <li><a href="cat15-p3-dns-cdn.html"><span class="nav-icon">🌍</span> 15.3 DNS & CDN</a></li>
+            <li><a href="cat15-p4-vpn-connectivity.html"><span class="nav-icon">🔒</span> 15.4 VPN & Connectivity</a></li>
+            <li><a href="cat15-p5-network-security.html"><span class="nav-icon">🛡️</span> 15.5 Network Security</a></li>
+            <li><a href="cat15-p6-service-mesh.html"><span class="nav-icon">🕸️</span> 15.6 Service Mesh</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#vpc-design"><span class="nav-icon">🏗️</span> VPC Design</a></li>
+            <li><a href="#subnets"><span class="nav-icon">📦</span> Subnet Strategies</a></li>
+            <li><a href="#cidr"><span class="nav-icon">📊</span> CIDR Planning</a></li>
+            <li><a href="#routing"><span class="nav-icon">🔀</span> Routing</a></li>
+            <li><a href="#cloud-compare"><span class="nav-icon">☁️</span> Cloud Comparison</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📐</span> Design Patterns</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🏗️ Page 15.1</div>
+                <h1>Network Architecture</h1>
+                <p>Design patterns for VPCs, subnets, routing tables, and network segmentation across multi-cloud environments. Build resilient, scalable network foundations.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">3-Tier</div>
+                    <div class="hero-metric-label">Standard Pattern</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Multi-AZ</div>
+                    <div class="hero-metric-label">Availability</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">/16</div>
+                    <div class="hero-metric-label">Typical VPC CIDR</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Zero Trust</div>
+                    <div class="hero-metric-label">Security Model</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Foundational concepts for cloud network design</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is Network Architecture?</h3>
+                    <p>Network architecture defines the structure, components, and connectivity patterns of your cloud infrastructure. It encompasses Virtual Private Clouds (VPCs), subnets, routing tables, gateways, and the relationships between them.</p>
+                    <p>Good network architecture enables <strong>scalability</strong> (grow without redesign), <strong>security</strong> (defense in depth), <strong>performance</strong> (low latency paths), and <strong>cost efficiency</strong> (optimized data transfer).</p>
+                </div>
+                <div>
+                    <h3>Key Components</h3>
+                    <ul>
+                        <li><strong>VPC/VNet</strong> — Isolated virtual network in the cloud</li>
+                        <li><strong>Subnets</strong> — Subdivisions of VPC IP address space</li>
+                        <li><strong>Route Tables</strong> — Rules directing network traffic</li>
+                        <li><strong>Gateways</strong> — Entry/exit points (Internet, NAT, VPN)</li>
+                        <li><strong>Security Groups/NACLs</strong> — Firewall rules</li>
+                        <li><strong>Peering/Transit</strong> — Inter-VPC connectivity</li>
+                    </ul>
+                </div>
+                <div class="overview-full">
+                    <h3>Why This Matters</h3>
+                    <p>Network architecture decisions made early are difficult and expensive to change later. IP address conflicts prevent VPC peering. Poor segmentation creates security vulnerabilities. Inadequate capacity planning leads to costly redesigns. Investing time in proper network design pays dividends throughout the infrastructure lifecycle—enabling faster deployments, simpler troubleshooting, and more secure operations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VPC DESIGN -->
+        <section class="module" id="vpc-design">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>VPC Architecture</h2>
+                    <p>Reference design for production workloads</p>
+                </div>
+            </div>
+
+            <div class="vpc-diagram">
+                <div class="vpc-diagram-header">
+                    <div class="vpc-diagram-title">☁️ Production VPC Layout</div>
+                    <div class="vpc-diagram-badge">3-Tier Architecture</div>
+                </div>
+                
+                <div class="vpc-container">
+                    <div class="vpc-label">VPC: Production</div>
+                    <div class="vpc-cidr">10.0.0.0/16 (65,536 IPs)</div>
+                    
+                    <div class="az-row">
+                        <div class="az-column">
+                            <div class="az-header">Availability Zone A</div>
+                            <div class="subnet-box public">
+                                <div class="subnet-label">Public Subnet</div>
+                                <div class="subnet-cidr">10.0.1.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">ALB</span>
+                                    <span class="resource-tag">NAT GW</span>
+                                    <span class="resource-tag">Bastion</span>
+                                </div>
+                            </div>
+                            <div class="subnet-box private">
+                                <div class="subnet-label">Private Subnet</div>
+                                <div class="subnet-cidr">10.0.10.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">EKS Nodes</span>
+                                    <span class="resource-tag">EC2</span>
+                                    <span class="resource-tag">Lambda</span>
+                                </div>
+                            </div>
+                            <div class="subnet-box data">
+                                <div class="subnet-label">Data Subnet</div>
+                                <div class="subnet-cidr">10.0.20.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">RDS</span>
+                                    <span class="resource-tag">ElastiCache</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="az-column">
+                            <div class="az-header">Availability Zone B</div>
+                            <div class="subnet-box public">
+                                <div class="subnet-label">Public Subnet</div>
+                                <div class="subnet-cidr">10.0.2.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">ALB</span>
+                                    <span class="resource-tag">NAT GW</span>
+                                </div>
+                            </div>
+                            <div class="subnet-box private">
+                                <div class="subnet-label">Private Subnet</div>
+                                <div class="subnet-cidr">10.0.11.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">EKS Nodes</span>
+                                    <span class="resource-tag">EC2</span>
+                                    <span class="resource-tag">Lambda</span>
+                                </div>
+                            </div>
+                            <div class="subnet-box data">
+                                <div class="subnet-label">Data Subnet</div>
+                                <div class="subnet-cidr">10.0.21.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">RDS Replica</span>
+                                    <span class="resource-tag">ElastiCache</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="az-column">
+                            <div class="az-header">Availability Zone C</div>
+                            <div class="subnet-box public">
+                                <div class="subnet-label">Public Subnet</div>
+                                <div class="subnet-cidr">10.0.3.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">ALB</span>
+                                </div>
+                            </div>
+                            <div class="subnet-box private">
+                                <div class="subnet-label">Private Subnet</div>
+                                <div class="subnet-cidr">10.0.12.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">EKS Nodes</span>
+                                    <span class="resource-tag">EC2</span>
+                                </div>
+                            </div>
+                            <div class="subnet-box data">
+                                <div class="subnet-label">Data Subnet</div>
+                                <div class="subnet-cidr">10.0.22.0/24</div>
+                                <div class="subnet-resources">
+                                    <span class="resource-tag">RDS Replica</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="vpc-gateways">
+                        <div class="gateway-item">
+                            <span class="gateway-icon">🌐</span>
+                            <span class="gateway-label">Internet Gateway</span>
+                        </div>
+                        <div class="gateway-item">
+                            <span class="gateway-icon">🔒</span>
+                            <span class="gateway-label">NAT Gateway (x2)</span>
+                        </div>
+                        <div class="gateway-item">
+                            <span class="gateway-icon">🔗</span>
+                            <span class="gateway-label">Transit Gateway</span>
+                        </div>
+                        <div class="gateway-item">
+                            <span class="gateway-icon">🏢</span>
+                            <span class="gateway-label">VPN Gateway</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUBNET STRATEGIES -->
+        <section class="module" id="subnets">
+            <div class="module-header">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                    <h2>Subnet Strategies</h2>
+                    <p>Organizing network segments for security and scale</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Public Subnets</h3>
+                    <p>Resources with direct internet access via Internet Gateway. Use for load balancers, bastion hosts, and NAT gateways.</p>
+                    <p><strong>Route:</strong> <code>0.0.0.0/0 → IGW</code></p>
+                    <p><strong>Resources:</strong> ALB/NLB, NAT Gateway, Bastion hosts, Public-facing APIs</p>
+                </div>
+                <div>
+                    <h3>Private Subnets</h3>
+                    <p>Application workloads without direct internet access. Outbound internet via NAT Gateway in public subnet.</p>
+                    <p><strong>Route:</strong> <code>0.0.0.0/0 → NAT-GW</code></p>
+                    <p><strong>Resources:</strong> EC2, EKS nodes, Lambda, containers, backend services</p>
+                </div>
+                <div>
+                    <h3>Data Subnets</h3>
+                    <p>Isolated tier for databases and caches. No internet access—only internal communication.</p>
+                    <p><strong>Route:</strong> <code>Local only (VPC CIDR)</code></p>
+                    <p><strong>Resources:</strong> RDS, ElastiCache, DocumentDB, Elasticsearch</p>
+                </div>
+                <div>
+                    <h3>Sizing Guidelines</h3>
+                    <ul>
+                        <li><strong>/24 subnets</strong> — 251 usable IPs, good for most workloads</li>
+                        <li><strong>/23 subnets</strong> — 507 usable IPs, large EKS clusters</li>
+                        <li><strong>/22 subnets</strong> — 1,019 usable IPs, massive scale</li>
+                        <li>AWS reserves 5 IPs per subnet (first 4 + last 1)</li>
+                        <li>Leave room for growth—subnets can't be resized</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CIDR PLANNING -->
+        <section class="module" id="cidr">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>CIDR Planning</h2>
+                    <p>IP address allocation strategies</p>
+                </div>
+            </div>
+
+            <table class="cidr-table">
+                <thead>
+                    <tr>
+                        <th>CIDR Block</th>
+                        <th>Subnet Mask</th>
+                        <th>Total IPs</th>
+                        <th>Usable IPs</th>
+                        <th>Typical Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/16</code></td>
+                        <td>255.255.0.0</td>
+                        <td>65,536</td>
+                        <td class="hosts">65,531</td>
+                        <td>Large VPC (production)</td>
+                    </tr>
+                    <tr>
+                        <td><code>/20</code></td>
+                        <td>255.255.240.0</td>
+                        <td>4,096</td>
+                        <td class="hosts">4,091</td>
+                        <td>Medium VPC (dev/staging)</td>
+                    </tr>
+                    <tr>
+                        <td><code>/22</code></td>
+                        <td>255.255.252.0</td>
+                        <td>1,024</td>
+                        <td class="hosts">1,019</td>
+                        <td>Large subnet</td>
+                    </tr>
+                    <tr>
+                        <td><code>/24</code></td>
+                        <td>255.255.255.0</td>
+                        <td>256</td>
+                        <td class="hosts">251</td>
+                        <td>Standard subnet</td>
+                    </tr>
+                    <tr>
+                        <td><code>/26</code></td>
+                        <td>255.255.255.192</td>
+                        <td>64</td>
+                        <td class="hosts">59</td>
+                        <td>Small subnet (firewall, TGW)</td>
+                    </tr>
+                    <tr>
+                        <td><code>/28</code></td>
+                        <td>255.255.255.240</td>
+                        <td>16</td>
+                        <td class="hosts">11</td>
+                        <td>Minimum AWS subnet size</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content">
+                <div>
+                    <h3>RFC 1918 Private Ranges</h3>
+                    <ul>
+                        <li><code>10.0.0.0/8</code> — 16M addresses (Class A)</li>
+                        <li><code>172.16.0.0/12</code> — 1M addresses (Class B)</li>
+                        <li><code>192.168.0.0/16</code> — 65K addresses (Class C)</li>
+                    </ul>
+                    <p>Use 10.x.x.x for cloud VPCs. Reserve 172.16.x.x for on-premises to avoid conflicts during hybrid connectivity.</p>
+                </div>
+                <div>
+                    <h3>Planning Tips</h3>
+                    <ul>
+                        <li>Document all CIDR allocations in a central registry</li>
+                        <li>Plan for 3x current capacity to accommodate growth</li>
+                        <li>Reserve IP blocks for future regions/environments</li>
+                        <li>Avoid overlapping with partner/acquired networks</li>
+                        <li>Use IPAM tools for large-scale management</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROUTING -->
+        <section class="module" id="routing">
+            <div class="module-header">
+                <div class="module-icon">🔀</div>
+                <div class="module-info">
+                    <h2>Routing Tables</h2>
+                    <p>Directing traffic between networks</p>
+                </div>
+            </div>
+
+            <div class="routing-diagram">
+                <div class="routing-header">📋 Route Table Examples</div>
+                
+                <div class="route-table-visual">
+                    <div>
+                        <div class="route-table-box">
+                            <div class="route-table-header">Public Subnet Route Table</div>
+                            <div class="route-entry">
+                                <span class="route-dest">10.0.0.0/16</span>
+                                <span class="route-target">local</span>
+                            </div>
+                            <div class="route-entry">
+                                <span class="route-dest">0.0.0.0/0</span>
+                                <span class="route-target">igw-xxxxx</span>
+                            </div>
+                        </div>
+                        
+                        <div class="route-table-box" style="margin-top: 16px;">
+                            <div class="route-table-header">Private Subnet Route Table</div>
+                            <div class="route-entry">
+                                <span class="route-dest">10.0.0.0/16</span>
+                                <span class="route-target">local</span>
+                            </div>
+                            <div class="route-entry">
+                                <span class="route-dest">0.0.0.0/0</span>
+                                <span class="route-target">nat-xxxxx</span>
+                            </div>
+                            <div class="route-entry">
+                                <span class="route-dest">192.168.0.0/16</span>
+                                <span class="route-target">tgw-xxxxx</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="route-flow">
+                        <div class="route-path">
+                            <span class="route-path-icon">🌐</span>
+                            <span class="route-path-text">Internet traffic from public subnet goes directly to Internet Gateway</span>
+                            <span class="route-path-arrow">→ IGW</span>
+                        </div>
+                        <div class="route-path">
+                            <span class="route-path-icon">🔒</span>
+                            <span class="route-path-text">Internet traffic from private subnet routes through NAT Gateway</span>
+                            <span class="route-path-arrow">→ NAT</span>
+                        </div>
+                        <div class="route-path">
+                            <span class="route-path-icon">🏢</span>
+                            <span class="route-path-text">On-premises traffic (192.168.x.x) routes through Transit Gateway</span>
+                            <span class="route-path-arrow">→ TGW</span>
+                        </div>
+                        <div class="route-path">
+                            <span class="route-path-icon">📍</span>
+                            <span class="route-path-text">Local VPC traffic (10.0.x.x) stays within the VPC</span>
+                            <span class="route-path-arrow">→ Local</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLOUD COMPARISON -->
+        <section class="module" id="cloud-compare">
+            <div class="module-header">
+                <div class="module-icon">☁️</div>
+                <div class="module-info">
+                    <h2>Cloud Provider Comparison</h2>
+                    <p>Network architecture across AWS, Azure, and GCP</p>
+                </div>
+            </div>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th class="aws">AWS</th>
+                        <th class="azure">Azure</th>
+                        <th class="gcp">GCP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature">Virtual Network</td>
+                        <td>VPC (regional)</td>
+                        <td>VNet (regional)</td>
+                        <td>VPC (global)</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Subnet Scope</td>
+                        <td>Single AZ</td>
+                        <td>Spans AZs in region</td>
+                        <td>Regional (spans zones)</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Max VPC CIDR</td>
+                        <td>/16 (secondary CIDRs)</td>
+                        <td>/8</td>
+                        <td>/8</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">VPC Peering</td>
+                        <td>VPC Peering (non-transitive)</td>
+                        <td>VNet Peering (non-transitive)</td>
+                        <td>VPC Peering (non-transitive)</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Transit Hub</td>
+                        <td>Transit Gateway</td>
+                        <td>Virtual WAN / Hub</td>
+                        <td>Network Connectivity Center</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">NAT Service</td>
+                        <td>NAT Gateway (per AZ)</td>
+                        <td>NAT Gateway (zonal)</td>
+                        <td>Cloud NAT (regional)</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Firewall Rules</td>
+                        <td>Security Groups + NACLs</td>
+                        <td>NSGs + Azure Firewall</td>
+                        <td>Firewall Rules (VPC-level)</td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Private DNS</td>
+                        <td>Route 53 Private Hosted Zones</td>
+                        <td>Private DNS Zones</td>
+                        <td>Cloud DNS Private Zones</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- DESIGN PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Design Patterns</h2>
+                    <p>Common network architecture approaches</p>
+                </div>
+            </div>
+
+            <div class="pattern-grid">
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🏢</div>
+                        <div class="pattern-title">Hub-and-Spoke</div>
+                    </div>
+                    <div class="pattern-desc">Central hub VPC connects to multiple spoke VPCs. Hub contains shared services (DNS, AD, firewalls). Spokes contain workloads. Transit Gateway enables connectivity.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag recommended">Recommended</span>
+                        <span class="pattern-tag">Enterprise</span>
+                        <span class="pattern-tag">Multi-Account</span>
+                    </div>
+                </div>
+                
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🔗</div>
+                        <div class="pattern-title">Full Mesh</div>
+                    </div>
+                    <div class="pattern-desc">Every VPC peers directly with every other VPC. Simple but doesn't scale—n VPCs need n(n-1)/2 peering connections. Use only for small deployments.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Simple</span>
+                        <span class="pattern-tag">Small Scale</span>
+                        <span class="pattern-tag">Non-Transitive</span>
+                    </div>
+                </div>
+                
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🌐</div>
+                        <div class="pattern-title">Multi-Region</div>
+                    </div>
+                    <div class="pattern-desc">Replicate VPC architecture across regions for DR and latency. Use inter-region peering or Transit Gateway inter-region attachments. Global Accelerator for routing.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag recommended">Recommended</span>
+                        <span class="pattern-tag">HA</span>
+                        <span class="pattern-tag">DR</span>
+                    </div>
+                </div>
+                
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🔒</div>
+                        <div class="pattern-title">Isolated Environments</div>
+                    </div>
+                    <div class="pattern-desc">Separate VPCs per environment (dev/staging/prod) with no connectivity between them. Maximum isolation for compliance. Use separate accounts per environment.</div>
+                    <div class="pattern-tags">
+                        <span class="pattern-tag">Secure</span>
+                        <span class="pattern-tag">Compliance</span>
+                        <span class="pattern-tag">PCI-DSS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for robust network architecture</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Plan CIDR Ranges Carefully</h4>
+                        <p>Document allocations, avoid overlaps with on-prem and partners. Leave room for 3x growth. Use /16 for production VPCs.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Use Multiple Availability Zones</h4>
+                        <p>Deploy subnets across at least 2 AZs (3 recommended). Single-AZ deployments are single points of failure.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Implement 3-Tier Segmentation</h4>
+                        <p>Separate public, private, and data tiers. Each tier has different routing and security requirements.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Use VPC Flow Logs</h4>
+                        <p>Enable flow logs for visibility into traffic patterns, troubleshooting, and security analysis. Send to CloudWatch or S3.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Deploy NAT Gateway Per AZ</h4>
+                        <p>Avoid cross-AZ NAT traffic and single points of failure. Each AZ should have its own NAT Gateway.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Use Transit Gateway for Scale</h4>
+                        <p>Replace mesh peering with Transit Gateway when connecting more than 3-4 VPCs. Simpler management, transitive routing.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Tag Everything</h4>
+                        <p>Consistent tagging enables cost allocation, automation, and compliance. Include environment, owner, and project tags.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Use Infrastructure as Code</h4>
+                        <p>Define networks in Terraform or CloudFormation. Version control, peer review, and repeatable deployments.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered network architecture design</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🏗️ NetworkArchitect</h3>
+                    <p>Analyzes workload requirements, compliance needs, and growth projections to generate optimal VPC designs. Produces Terraform code, CIDR allocation plans, and architecture diagrams.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📐</span> VPC design generation</div>
+                        <div class="agent-capability"><span class="capability-icon">📊</span> CIDR allocation planning</div>
+                        <div class="agent-capability"><span class="capability-icon">🔀</span> Route table configuration</div>
+                        <div class="agent-capability"><span class="capability-icon">☁️</span> Multi-cloud translation</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Terraform code generation</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">network_architect_agent.py</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+<span class="code-comment"># Initialize network design tools</span>
+cidr_calculator = CIDRCalculatorTool()
+terraform_gen = TerraformGeneratorTool()
+diagram_gen = DiagramGeneratorTool()
+
+<span class="code-comment"># Network Architect Agent</span>
+network_architect = Agent(
+    role=<span class="code-string">"Network Architect"</span>,
+    goal=<span class="code-string">"""Design optimal VPC architecture 
+    based on workload requirements."""</span>,
+    tools=[cidr_calculator, terraform_gen, diagram_gen],
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Architecture Design Task</span>
+design_task = Task(
+    description=<span class="code-string">"""
+    1. Analyze workload requirements
+    2. Calculate CIDR allocations
+    3. Design subnet strategy (3-tier)
+    4. Configure routing tables
+    5. Generate Terraform code
+    6. Create architecture diagram
+    """</span>,
+    agent=network_architect
+)
+
+crew = Crew(agents=[network_architect], tasks=[design_task])</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring networking</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat15-p2-load-balancing.html" class="related-card">
+                    <div class="related-icon">⚖️</div>
+                    <div class="related-title">Load Balancing</div>
+                    <div class="related-desc">L4/L7 load balancers, algorithms, and health checks</div>
+                </a>
+                <a href="cat15-p4-vpn-connectivity.html" class="related-card">
+                    <div class="related-icon">🔒</div>
+                    <div class="related-title">VPN & Connectivity</div>
+                    <div class="related-desc">Site-to-site VPN, Direct Connect, and hybrid architectures</div>
+                </a>
+                <a href="cat15-p5-network-security.html" class="related-card">
+                    <div class="related-icon">🛡️</div>
+                    <div class="related-title">Network Security</div>
+                    <div class="related-desc">Firewalls, WAF, and zero-trust architecture</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat15-networking-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Category Overview</div>
+                <div class="footer-link-title">Networking</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 15</div>
+        <a href="cat15-p2-load-balancing.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">15.2 Load Balancing</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

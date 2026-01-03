@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring & Observability | Category 16 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 16 - MONITORING & OBSERVABILITY AMBER */
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --violet: #8B5CF6;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           OBSERVABILITY PILLARS DIAGRAM
+        ═══════════════════════════════════════════════════════════════ */
+        .observability-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .observability-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .observability-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .observability-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        
+        .observability-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; min-height: 420px; }
+
+        /* Three Pillars Grid */
+        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .pillar-card { background: var(--bg-card); border: 2px solid var(--pillar-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; position: relative; overflow: hidden; transition: all 0.3s; }
+        .pillar-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px color-mix(in srgb, var(--pillar-color) 30%, transparent); }
+        .pillar-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--pillar-color); }
+        .pillar-icon { font-size: 48px; margin-bottom: var(--space-md); }
+        .pillar-title { font-size: var(--font-lg); font-weight: 700; color: var(--pillar-color); margin-bottom: var(--space-sm); }
+        .pillar-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); }
+        .pillar-examples { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+        .pillar-example { font-size: 10px; padding: 3px 8px; background: color-mix(in srgb, var(--pillar-color) 15%, transparent); border-radius: var(--radius-sm); color: var(--pillar-color); }
+        
+        .pillar-card.metrics { --pillar-color: #3B82F6; }
+        .pillar-card.logs { --pillar-color: #10B981; }
+        .pillar-card.traces { --pillar-color: #8B5CF6; }
+
+        /* Golden Signals Section */
+        .signals-section { margin-top: var(--space-xl); }
+        .signals-title { font-size: var(--font-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--cat-light); margin-bottom: var(--space-md); text-align: center; }
+        .signals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+        .signal-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-md); text-align: center; transition: all 0.3s; }
+        .signal-card:hover { border-color: var(--cat-primary); background: var(--bg-card-alt); }
+        .signal-icon { font-size: 28px; margin-bottom: var(--space-sm); }
+        .signal-name { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .signal-desc { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS SHOWCASE
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-showcase { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-showcase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .tool-showcase-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-logo { width: 56px; height: 56px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto var(--space-md); }
+        .tool-name { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .tool-category { font-size: var(--font-xs); color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PAGES GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .pages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .page-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; transition: all 0.3s; position: relative; overflow: hidden; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .page-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); opacity: 0; transition: opacity 0.3s; }
+        .page-card:hover::before { opacity: 1; }
+        .page-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-sm); font-weight: 600; }
+        .page-title { font-size: var(--font-lg); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-sm); }
+        .page-desc { font-size: var(--font-sm); color: var(--text-muted); line-height: 1.6; }
+        .page-arrow { position: absolute; right: var(--space-lg); top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--cat-light); opacity: 0; transition: all 0.3s; }
+        .page-card:hover .page-arrow { opacity: 1; right: var(--space-md); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MATURITY MODEL
+        ═══════════════════════════════════════════════════════════════ */
+        .maturity-track { display: flex; gap: 2px; margin-bottom: var(--space-xl); }
+        .maturity-level { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); padding: var(--space-lg); text-align: center; position: relative; transition: all 0.3s; }
+        .maturity-level:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+        .maturity-level:last-child { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .maturity-level:hover { background: var(--bg-card-alt); z-index: 2; }
+        .maturity-level::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--level-color); }
+        .maturity-num { font-size: var(--font-xl); font-weight: 700; color: var(--level-color); margin-bottom: var(--space-xs); }
+        .maturity-name { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-sm); }
+        .maturity-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .maturity-level:nth-child(1) { --level-color: #EF4444; }
+        .maturity-level:nth-child(2) { --level-color: #F97316; }
+        .maturity-level:nth-child(3) { --level-color: #F59E0B; }
+        .maturity-level:nth-child(4) { --level-color: #10B981; }
+        .maturity-level:nth-child(5) { --level-color: #3B82F6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-primary); }
+        .practice-icon { font-size: 32px; margin-bottom: var(--space-md); }
+        .practice-title { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-sm); }
+        .practice-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-card { display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); display: flex; flex-direction: column; justify-content: center; }
+        .agent-badge { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .agent-title { font-size: var(--font-xl); font-weight: 700; margin-bottom: var(--space-md); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); }
+        .agent-capabilities { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .agent-capability { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: var(--font-sm); color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); padding: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .code-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-block { background: var(--bg-card); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: var(--space-md); overflow-x: auto; }
+        .code-block pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .pillars-grid { grid-template-columns: 1fr; }
+            .signals-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-showcase { grid-template-columns: repeat(2, 1fr); }
+            .pages-grid { grid-template-columns: 1fr; }
+            .maturity-track { flex-direction: column; }
+            .maturity-level:first-child, .maturity-level:last-child { border-radius: var(--radius-lg); }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-card { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <span class="current">Monitoring & Observability</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 16</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat16-monitoring-observability-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat16-p1-metrics-monitoring.html"><span class="nav-icon">📈</span> 16.1 Metrics & Monitoring</a></li>
+            <li><a href="cat16-p2-logging.html"><span class="nav-icon">📝</span> 16.2 Logging</a></li>
+            <li><a href="cat16-p3-distributed-tracing.html"><span class="nav-icon">🔗</span> 16.3 Distributed Tracing</a></li>
+            <li><a href="cat16-p4-alerting-incidents.html"><span class="nav-icon">🚨</span> 16.4 Alerting & Incidents</a></li>
+            <li><a href="cat16-p5-apm.html"><span class="nav-icon">⚡</span> 16.5 APM</a></li>
+            <li><a href="cat16-p6-aiops.html"><span class="nav-icon">🤖</span> 16.6 AIOps</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#pillars"><span class="nav-icon">🏛️</span> Three Pillars</a></li>
+            <li><a href="#maturity"><span class="nav-icon">📊</span> Maturity Model</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✨</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+            <li><a href="#pages"><span class="nav-icon">📑</span> Pages</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">📊 Category 16 of 29</div>
+                <h1>Monitoring & Observability</h1>
+                <p>Gain deep visibility into system behavior through metrics, logs, and traces. Build reliable systems with proactive monitoring, intelligent alerting, and rapid incident response.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">3</div>
+                    <div class="hero-metric-label">Pillars of Observability</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">99.9%</div>
+                    <div class="hero-metric-label">SLO Target</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;5min</div>
+                    <div class="hero-metric-label">MTTR Goal</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">4</div>
+                    <div class="hero-metric-label">Golden Signals</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THREE PILLARS -->
+        <section class="module" id="pillars">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Three Pillars of Observability</h2>
+                    <p>The foundational signals for understanding system behavior</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Modern observability goes beyond traditional monitoring by providing the ability to ask arbitrary questions about your system without deploying new code. The three pillars—metrics, logs, and traces—work together to give you complete visibility into distributed systems, enabling you to understand not just <em>what</em> is happening, but <em>why</em> it's happening.</p>
+            </div>
+            
+            <div class="observability-container">
+                <div class="observability-header">
+                    <div class="observability-title">🔭 Unified Observability Architecture</div>
+                    <div class="observability-badge">LIVE DATA FLOW</div>
+                </div>
+                <div class="observability-canvas">
+                    <svg viewBox="0 0 900 380" style="width: 100%; height: 380px;">
+                        <defs>
+                            <filter id="glowBlue"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowGreen"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowPurple"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowAmber"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#D97706"/>
+                                <stop offset="100%" style="stop-color:#FBBF24"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Background Grid -->
+                        <line x1="50" y1="190" x2="850" y2="190" stroke="#2a2a3e" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+                        
+                        <!-- APPLICATIONS (LEFT) -->
+                        <rect x="30" y="40" width="180" height="300" rx="12" fill="rgba(245,158,11,0.05)" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="120" y="65" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle">APPLICATIONS</text>
+                        
+                        <!-- App 1 -->
+                        <rect x="50" y="85" width="140" height="50" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="120" y="107" fill="#60A5FA" font-size="12" text-anchor="middle">🖥️ Web Frontend</text>
+                        <text x="120" y="125" fill="#6a6a7a" font-size="9" text-anchor="middle">React / Next.js</text>
+                        
+                        <!-- App 2 -->
+                        <rect x="50" y="150" width="140" height="50" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="120" y="172" fill="#34D399" font-size="12" text-anchor="middle">⚡ API Gateway</text>
+                        <text x="120" y="190" fill="#6a6a7a" font-size="9" text-anchor="middle">Kong / Envoy</text>
+                        
+                        <!-- App 3 -->
+                        <rect x="50" y="215" width="140" height="50" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="120" y="237" fill="#A78BFA" font-size="12" text-anchor="middle">📦 Microservices</text>
+                        <text x="120" y="255" fill="#6a6a7a" font-size="9" text-anchor="middle">Kubernetes Pods</text>
+                        
+                        <!-- App 4 -->
+                        <rect x="50" y="280" width="140" height="50" rx="8" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="120" y="302" fill="#F472B6" font-size="12" text-anchor="middle">🗄️ Databases</text>
+                        <text x="120" y="320" fill="#6a6a7a" font-size="9" text-anchor="middle">PostgreSQL / Redis</text>
+                        
+                        <!-- THREE PILLARS (MIDDLE) -->
+                        <!-- Metrics Pillar -->
+                        <rect x="280" y="50" width="130" height="90" rx="10" fill="rgba(59,130,246,0.1)" stroke="#3B82F6" stroke-width="2"/>
+                        <text x="345" y="75" fill="#60A5FA" font-size="10" font-weight="600" text-anchor="middle">METRICS</text>
+                        <text x="345" y="100" fill="#60A5FA" font-size="24" text-anchor="middle">📈</text>
+                        <text x="345" y="125" fill="#6a6a7a" font-size="9" text-anchor="middle">Time-series data</text>
+                        
+                        <!-- Logs Pillar -->
+                        <rect x="280" y="155" width="130" height="90" rx="10" fill="rgba(16,185,129,0.1)" stroke="#10B981" stroke-width="2"/>
+                        <text x="345" y="180" fill="#34D399" font-size="10" font-weight="600" text-anchor="middle">LOGS</text>
+                        <text x="345" y="205" fill="#34D399" font-size="24" text-anchor="middle">📝</text>
+                        <text x="345" y="230" fill="#6a6a7a" font-size="9" text-anchor="middle">Structured events</text>
+                        
+                        <!-- Traces Pillar -->
+                        <rect x="280" y="260" width="130" height="90" rx="10" fill="rgba(139,92,246,0.1)" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="345" y="285" fill="#A78BFA" font-size="10" font-weight="600" text-anchor="middle">TRACES</text>
+                        <text x="345" y="310" fill="#A78BFA" font-size="24" text-anchor="middle">🔗</text>
+                        <text x="345" y="335" fill="#6a6a7a" font-size="9" text-anchor="middle">Request flows</text>
+                        
+                        <!-- OBSERVABILITY PLATFORM (CENTER) -->
+                        <rect x="470" y="120" width="160" height="160" rx="16" fill="url(#amberGrad)" opacity="0.15" stroke="#F59E0B" stroke-width="3"/>
+                        <rect x="485" y="135" width="130" height="130" rx="12" fill="#1a1a2e" stroke="#FBBF24" stroke-width="2"/>
+                        <text x="550" y="175" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle">OBSERVABILITY</text>
+                        <text x="550" y="195" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle">PLATFORM</text>
+                        <text x="550" y="225" fill="#FBBF24" font-size="32" text-anchor="middle">🔭</text>
+                        <text x="550" y="250" fill="#6a6a7a" font-size="9" text-anchor="middle">Correlate • Analyze</text>
+                        
+                        <!-- OUTPUTS (RIGHT) -->
+                        <rect x="690" y="40" width="180" height="300" rx="12" fill="rgba(16,185,129,0.05)" stroke="#10B981" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="780" y="65" fill="#34D399" font-size="11" font-weight="600" text-anchor="middle">INSIGHTS & ACTIONS</text>
+                        
+                        <!-- Dashboards -->
+                        <rect x="710" y="85" width="140" height="45" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="780" y="107" fill="#60A5FA" font-size="12" text-anchor="middle">📊 Dashboards</text>
+                        <text x="780" y="122" fill="#6a6a7a" font-size="9" text-anchor="middle">Real-time visibility</text>
+                        
+                        <!-- Alerts -->
+                        <rect x="710" y="145" width="140" height="45" rx="8" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                        <text x="780" y="167" fill="#F87171" font-size="12" text-anchor="middle">🚨 Alerts</text>
+                        <text x="780" y="182" fill="#6a6a7a" font-size="9" text-anchor="middle">Proactive notification</text>
+                        
+                        <!-- RCA -->
+                        <rect x="710" y="205" width="140" height="45" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="780" y="227" fill="#A78BFA" font-size="12" text-anchor="middle">🔍 Root Cause</text>
+                        <text x="780" y="242" fill="#6a6a7a" font-size="9" text-anchor="middle">Fast investigation</text>
+                        
+                        <!-- SLOs -->
+                        <rect x="710" y="265" width="140" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="780" y="287" fill="#34D399" font-size="12" text-anchor="middle">🎯 SLO Tracking</text>
+                        <text x="780" y="302" fill="#6a6a7a" font-size="9" text-anchor="middle">Reliability metrics</text>
+                        
+                        <!-- CONNECTION LINES -->
+                        <!-- Apps to Pillars -->
+                        <line x1="190" y1="110" x2="280" y2="95" stroke="#3B82F6" stroke-width="2" opacity="0.5"/>
+                        <line x1="190" y1="175" x2="280" y2="200" stroke="#10B981" stroke-width="2" opacity="0.5"/>
+                        <line x1="190" y1="240" x2="280" y2="305" stroke="#8B5CF6" stroke-width="2" opacity="0.5"/>
+                        
+                        <!-- Pillars to Platform -->
+                        <line x1="410" y1="95" x2="470" y2="170" stroke="#3B82F6" stroke-width="2" opacity="0.5"/>
+                        <line x1="410" y1="200" x2="470" y2="200" stroke="#10B981" stroke-width="2" opacity="0.5"/>
+                        <line x1="410" y1="305" x2="470" y2="230" stroke="#8B5CF6" stroke-width="2" opacity="0.5"/>
+                        
+                        <!-- Platform to Outputs -->
+                        <line x1="630" y1="170" x2="710" y2="107" stroke="#F59E0B" stroke-width="2" opacity="0.5"/>
+                        <line x1="630" y1="190" x2="710" y2="167" stroke="#F59E0B" stroke-width="2" opacity="0.5"/>
+                        <line x1="630" y1="210" x2="710" y2="227" stroke="#F59E0B" stroke-width="2" opacity="0.5"/>
+                        <line x1="630" y1="230" x2="710" y2="287" stroke="#F59E0B" stroke-width="2" opacity="0.5"/>
+                        
+                        <!-- ANIMATED DATA FLOWS -->
+                        <!-- Metrics flow -->
+                        <circle r="4" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M 190 110 L 280 95 L 410 95 L 470 170"/>
+                        </circle>
+                        <circle r="4" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="2s" repeatCount="indefinite" begin="0.7s" path="M 190 110 L 280 95 L 410 95 L 470 170"/>
+                        </circle>
+                        
+                        <!-- Logs flow -->
+                        <circle r="4" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="2.2s" repeatCount="indefinite" begin="0.3s" path="M 190 175 L 280 200 L 410 200 L 470 200"/>
+                        </circle>
+                        <circle r="4" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="2.2s" repeatCount="indefinite" begin="1s" path="M 190 175 L 280 200 L 410 200 L 470 200"/>
+                        </circle>
+                        
+                        <!-- Traces flow -->
+                        <circle r="4" fill="#8B5CF6" filter="url(#glowPurple)">
+                            <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.5s" path="M 190 240 L 280 305 L 410 305 L 470 230"/>
+                        </circle>
+                        <circle r="4" fill="#8B5CF6" filter="url(#glowPurple)">
+                            <animateMotion dur="2.5s" repeatCount="indefinite" begin="1.2s" path="M 190 240 L 280 305 L 410 305 L 470 230"/>
+                        </circle>
+                        
+                        <!-- Output flows -->
+                        <circle r="4" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 630 190 L 710 167"/>
+                        </circle>
+                        <circle r="4" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s" path="M 630 210 L 710 227"/>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="pillars-grid">
+                <div class="pillar-card metrics">
+                    <div class="pillar-icon">📈</div>
+                    <div class="pillar-title">Metrics</div>
+                    <div class="pillar-desc">Numeric measurements collected at regular intervals. Ideal for dashboards, alerting, and trend analysis.</div>
+                    <div class="pillar-examples">
+                        <span class="pillar-example">CPU %</span>
+                        <span class="pillar-example">Request Rate</span>
+                        <span class="pillar-example">Error Count</span>
+                        <span class="pillar-example">Latency P99</span>
+                    </div>
+                </div>
+                <div class="pillar-card logs">
+                    <div class="pillar-icon">📝</div>
+                    <div class="pillar-title">Logs</div>
+                    <div class="pillar-desc">Timestamped, immutable records of discrete events. Essential for debugging and audit trails.</div>
+                    <div class="pillar-examples">
+                        <span class="pillar-example">Error Stack</span>
+                        <span class="pillar-example">Access Logs</span>
+                        <span class="pillar-example">Audit Trail</span>
+                        <span class="pillar-example">Debug Info</span>
+                    </div>
+                </div>
+                <div class="pillar-card traces">
+                    <div class="pillar-icon">🔗</div>
+                    <div class="pillar-title">Traces</div>
+                    <div class="pillar-desc">End-to-end journey of requests through distributed systems. Critical for understanding latency and dependencies.</div>
+                    <div class="pillar-examples">
+                        <span class="pillar-example">Span ID</span>
+                        <span class="pillar-example">Parent/Child</span>
+                        <span class="pillar-example">Duration</span>
+                        <span class="pillar-example">Service Map</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="signals-section">
+                <div class="signals-title">⚡ The Four Golden Signals</div>
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="signal-icon">📊</div>
+                        <div class="signal-name">Latency</div>
+                        <div class="signal-desc">Time to serve a request (P50, P95, P99)</div>
+                    </div>
+                    <div class="signal-card">
+                        <div class="signal-icon">🚦</div>
+                        <div class="signal-name">Traffic</div>
+                        <div class="signal-desc">Demand on your system (requests/sec)</div>
+                    </div>
+                    <div class="signal-card">
+                        <div class="signal-icon">❌</div>
+                        <div class="signal-name">Errors</div>
+                        <div class="signal-desc">Rate of failed requests (5xx, exceptions)</div>
+                    </div>
+                    <div class="signal-card">
+                        <div class="signal-icon">🔋</div>
+                        <div class="signal-name">Saturation</div>
+                        <div class="signal-desc">System capacity utilization (CPU, memory)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MATURITY MODEL -->
+        <section class="module" id="maturity">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Observability Maturity Model</h2>
+                    <p>Assess and evolve your observability practices</p>
+                </div>
+            </div>
+            
+            <div class="maturity-track">
+                <div class="maturity-level">
+                    <div class="maturity-num">1</div>
+                    <div class="maturity-name">Reactive</div>
+                    <div class="maturity-desc">Basic server monitoring. Alert on symptoms. Manual investigation.</div>
+                </div>
+                <div class="maturity-level">
+                    <div class="maturity-num">2</div>
+                    <div class="maturity-name">Proactive</div>
+                    <div class="maturity-desc">APM deployed. Dashboards for key services. Some automation.</div>
+                </div>
+                <div class="maturity-level">
+                    <div class="maturity-num">3</div>
+                    <div class="maturity-name">Measured</div>
+                    <div class="maturity-desc">SLIs/SLOs defined. Distributed tracing. Error budgets tracked.</div>
+                </div>
+                <div class="maturity-level">
+                    <div class="maturity-num">4</div>
+                    <div class="maturity-name">Optimized</div>
+                    <div class="maturity-desc">Full observability stack. Correlated signals. Fast MTTR.</div>
+                </div>
+                <div class="maturity-level">
+                    <div class="maturity-num">5</div>
+                    <div class="maturity-name">Predictive</div>
+                    <div class="maturity-desc">AIOps integration. Anomaly detection. Self-healing systems.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Observability Tools</h2>
+                    <p>Leading platforms for modern observability</p>
+                </div>
+            </div>
+            
+            <div class="tools-showcase">
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #E6522C, #F05A28);">Pr</div>
+                    <div class="tool-name">Prometheus</div>
+                    <div class="tool-category">Metrics</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">Gr</div>
+                    <div class="tool-name">Grafana</div>
+                    <div class="tool-category">Visualization</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">Dd</div>
+                    <div class="tool-name">Datadog</div>
+                    <div class="tool-category">Full Stack</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #00BCD4, #26C6DA);">Nw</div>
+                    <div class="tool-name">New Relic</div>
+                    <div class="tool-category">APM</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #0063B1, #0078D4);">Sp</div>
+                    <div class="tool-name">Splunk</div>
+                    <div class="tool-category">Logs & SIEM</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #005571, #00A9E0);">EK</div>
+                    <div class="tool-name">Elastic Stack</div>
+                    <div class="tool-category">Search & Logs</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #F89820, #FFB347);">Hc</div>
+                    <div class="tool-name">Honeycomb</div>
+                    <div class="tool-category">Observability</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #00ACD7, #5DC9E2);">Jg</div>
+                    <div class="tool-name">Jaeger</div>
+                    <div class="tool-category">Tracing</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #425CC7, #5A67D8);">OT</div>
+                    <div class="tool-name">OpenTelemetry</div>
+                    <div class="tool-category">Standard</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #F46800, #FF9E57);">Lk</div>
+                    <div class="tool-name">Loki</div>
+                    <div class="tool-category">Logs</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #25C151, #34D058);">Pd</div>
+                    <div class="tool-name">PagerDuty</div>
+                    <div class="tool-category">Incidents</div>
+                </div>
+                <div class="tool-showcase-card">
+                    <div class="tool-logo" style="background: linear-gradient(135deg, #FF5A00, #FF7E00);">Op</div>
+                    <div class="tool-name">Opsgenie</div>
+                    <div class="tool-category">Alerting</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✨</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Proven patterns for effective observability</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-icon">🎯</div>
+                    <div class="practice-title">Start with SLOs</div>
+                    <div class="practice-desc">Define service level objectives before building dashboards. Let SLOs drive what you measure and alert on.</div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-icon">📉</div>
+                    <div class="practice-title">Alert on Symptoms</div>
+                    <div class="practice-desc">Alert on user-facing symptoms, not internal causes. "High latency" > "CPU spike".</div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-icon">🏷️</div>
+                    <div class="practice-title">Consistent Labels</div>
+                    <div class="practice-desc">Use standardized naming conventions across all services for easy correlation and querying.</div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-icon">🔗</div>
+                    <div class="practice-title">Correlate Signals</div>
+                    <div class="practice-desc">Link metrics, logs, and traces with common identifiers (trace ID, request ID) for fast debugging.</div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-icon">📝</div>
+                    <div class="practice-title">Runbook Everything</div>
+                    <div class="practice-desc">Every alert should link to a runbook with investigation steps and remediation actions.</div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-icon">🔄</div>
+                    <div class="practice-title">Iterate on Alerts</div>
+                    <div class="practice-desc">Review alert efficacy regularly. Tune thresholds, eliminate noise, and add context.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>ObservabilityArchitect Agent</h2>
+                    <p>Your AI specialist for monitoring and observability</p>
+                </div>
+            </div>
+            
+            <div class="agent-card">
+                <div class="agent-info">
+                    <div class="agent-badge">🔭 Specialized Agent</div>
+                    <h3 class="agent-title">ObservabilityArchitect</h3>
+                    <p class="agent-desc">Expert agent for designing observability strategies, configuring monitoring tools, and building effective alerting systems.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">📊</span> SLO/SLI design and implementation</div>
+                        <div class="agent-capability"><span class="capability-icon">📈</span> Dashboard and query building</div>
+                        <div class="agent-capability"><span class="capability-icon">🚨</span> Alert rule configuration</div>
+                        <div class="agent-capability"><span class="capability-icon">🔗</span> Distributed tracing setup</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Log pipeline architecture</div>
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Incident investigation guidance</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">prometheus-alerts.yaml</div>
+                    <div class="code-block">
+<pre><span class="code-keyword">groups:</span>
+  - <span class="code-keyword">name:</span> <span class="code-string">slo-alerts</span>
+    <span class="code-keyword">rules:</span>
+      - <span class="code-keyword">alert:</span> <span class="code-string">HighErrorRate</span>
+        <span class="code-keyword">expr:</span> |
+          sum(rate(http_requests_total{
+            status=~"5.."
+          }[5m])) 
+          / 
+          sum(rate(http_requests_total[5m])) 
+          > 0.01
+        <span class="code-keyword">for:</span> <span class="code-string">5m</span>
+        <span class="code-keyword">labels:</span>
+          <span class="code-keyword">severity:</span> <span class="code-string">critical</span>
+        <span class="code-keyword">annotations:</span>
+          <span class="code-keyword">summary:</span> <span class="code-string">"Error rate > 1%"</span>
+          <span class="code-keyword">runbook:</span> <span class="code-string">"docs/runbooks/high-error-rate.md"</span></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Explore This Category</h2>
+                    <p>Deep dives into monitoring and observability topics</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat16-p1-metrics-monitoring.html" class="page-card">
+                    <div class="page-num">Page 16.1</div>
+                    <div class="page-title">Metrics & Monitoring</div>
+                    <div class="page-desc">Time-series metrics, Prometheus, PromQL queries, and metric design patterns</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat16-p2-logging.html" class="page-card">
+                    <div class="page-num">Page 16.2</div>
+                    <div class="page-title">Logging</div>
+                    <div class="page-desc">Centralized logging, ELK Stack, Loki, structured logs, and log aggregation</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat16-p3-distributed-tracing.html" class="page-card">
+                    <div class="page-num">Page 16.3</div>
+                    <div class="page-title">Distributed Tracing</div>
+                    <div class="page-desc">OpenTelemetry, Jaeger, Zipkin, trace context propagation, and span analysis</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat16-p4-alerting-incidents.html" class="page-card">
+                    <div class="page-num">Page 16.4</div>
+                    <div class="page-title">Alerting & Incidents</div>
+                    <div class="page-desc">Alert design, on-call rotations, incident management, and post-mortems</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat16-p5-apm.html" class="page-card">
+                    <div class="page-num">Page 16.5</div>
+                    <div class="page-title">APM</div>
+                    <div class="page-desc">Application performance monitoring, profiling, bottleneck detection, and optimization</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat16-p6-aiops.html" class="page-card">
+                    <div class="page-num">Page 16.6</div>
+                    <div class="page-title">AIOps</div>
+                    <div class="page-desc">AI-powered operations, anomaly detection, predictive alerting, and auto-remediation</div>
+                    <div class="page-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat15-networking-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">15: Networking</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 16 of 29</div>
+        <a href="cat16-p1-metrics-monitoring.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Start Learning</div>
+                <div class="footer-link-title">16.1 Metrics & Monitoring</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

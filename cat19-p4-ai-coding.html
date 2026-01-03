@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Coding Tools | Emerging Technologies | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #EC4899;
+            --cat-light: #F472B6;
+            --cat-dark: #DB2777;
+            --cat-glow: rgba(236, 72, 153, 0.15);
+            --page-primary: #EC4899;
+            --page-light: #F472B6;
+            --page-glow: rgba(236, 72, 153, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --teal: #14B8A6;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+        .overview-content ul { margin-left: 20px; margin-bottom: 12px; }
+        .overview-content li { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .overview-content strong { color: var(--text-primary); }
+
+        .callout { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; display: flex; gap: 16px; }
+        .callout.info { border-left: 4px solid var(--blue); }
+        .callout.warning { border-left: 4px solid var(--yellow); }
+        .callout.success { border-left: 4px solid var(--green); }
+        .callout.pink { border-left: 4px solid var(--pink); }
+        .callout-icon { font-size: 24px; }
+        .callout-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .callout-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* TOOL CARDS */
+        .tool-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .tool-card.featured { border-color: var(--page-primary); background: linear-gradient(135deg, var(--bg-dark) 0%, var(--page-glow) 100%); }
+        .tool-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .tool-name { font-size: 18px; font-weight: 600; }
+        .tool-company { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .tool-badge { padding: 4px 10px; border-radius: 9999px; font-size: 10px; font-weight: 600; }
+        .tool-badge.ide { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .tool-badge.cli { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tool-badge.agent { background: rgba(139, 92, 246, 0.15); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.3); }
+        .tool-badge.extension { background: rgba(249, 115, 22, 0.15); color: var(--orange); border: 1px solid rgba(249, 115, 22, 0.3); }
+        .tool-badge.hot { background: rgba(236, 72, 153, 0.15); color: var(--pink); border: 1px solid rgba(236, 72, 153, 0.3); }
+        .tool-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .tool-stats { display: flex; gap: 16px; margin-bottom: 12px; }
+        .tool-stat { font-size: 11px; color: var(--text-muted); }
+        .tool-stat-value { font-weight: 600; color: var(--text-primary); }
+        .tool-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tool-feature { font-size: 10px; padding: 3px 8px; background: var(--bg-card); border-radius: 4px; color: var(--text-muted); }
+        .tool-feature.highlight { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+
+        /* COMPARISON TABLE */
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+        .compare-table th { text-align: left; padding: 12px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .compare-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .compare-table .tool-name-cell { font-weight: 600; color: var(--text-primary); }
+        .compare-table .check { color: var(--green); }
+        .compare-table .partial { color: var(--yellow); }
+        .compare-table .none { color: var(--text-muted); }
+        .compare-table .best { background: rgba(16, 185, 129, 0.1); }
+
+        /* CAPABILITY CARDS */
+        .capability-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .capability-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s; }
+        .capability-card:hover { border-color: var(--page-primary); }
+        .capability-icon { font-size: 36px; margin-bottom: 12px; }
+        .capability-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .capability-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+        /* USE CASE CARDS */
+        .usecase-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .usecase-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .usecase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .usecase-icon { width: 44px; height: 44px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .usecase-title { font-size: 15px; font-weight: 600; }
+        .usecase-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .usecase-examples { font-size: 12px; color: var(--text-muted); }
+        .usecase-examples strong { color: var(--text-secondary); }
+
+        /* PRACTICES */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* TIMELINE */
+        .timeline { position: relative; padding-left: 30px; margin-bottom: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
+        .timeline-item { position: relative; padding-bottom: 24px; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -26px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--page-primary); border: 2px solid var(--bg-card); }
+        .timeline-date { font-size: 12px; color: var(--page-light); font-weight: 600; margin-bottom: 4px; }
+        .timeline-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .timeline-desc { font-size: 13px; color: var(--text-secondary); }
+
+        /* SPECTRUM */
+        .spectrum { display: flex; margin-bottom: 24px; border-radius: 12px; overflow: hidden; }
+        .spectrum-item { flex: 1; padding: 20px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border-color); }
+        .spectrum-item:first-child { border-radius: 12px 0 0 12px; }
+        .spectrum-item:last-child { border-radius: 0 12px 12px 0; }
+        .spectrum-level { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .spectrum-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .spectrum-desc { font-size: 11px; color: var(--text-muted); }
+        .spectrum-item.l1 { border-bottom: 3px solid var(--blue); }
+        .spectrum-item.l2 { border-bottom: 3px solid var(--cyan); }
+        .spectrum-item.l3 { border-bottom: 3px solid var(--green); }
+        .spectrum-item.l4 { border-bottom: 3px solid var(--purple); }
+
+        /* AGENT SECTION */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .cap-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+        .code-function { color: var(--cyan); }
+
+        /* RELATED */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .tool-grid, .usecase-grid, .practices-grid, .agent-grid { grid-template-columns: 1fr; }
+            .capability-grid, .related-grid { grid-template-columns: 1fr; }
+            .spectrum { flex-direction: column; }
+            .spectrum-item { border-radius: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat19-emerging-technologies-overview.html">Emerging Technologies</a>
+        <span class="sep">/</span>
+        <span class="current">AI Coding Tools</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🚀 Category 19</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat19-emerging-technologies-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat19-p1-foundation-models.html"><span class="nav-icon">🧠</span> 19.1 Foundation Models</a></li>
+            <li><a href="cat19-p2-agentic-ai.html"><span class="nav-icon">🤖</span> 19.2 Agentic AI</a></li>
+            <li><a href="cat19-p3-multimodal-ai.html"><span class="nav-icon">🎨</span> 19.3 Multimodal AI</a></li>
+            <li><a href="cat19-p4-ai-coding.html" class="active"><span class="nav-icon">💻</span> 19.4 AI Coding Tools</a></li>
+            <li><a href="cat19-p5-edge-ai.html"><span class="nav-icon">📱</span> 19.5 Edge & On-Device</a></li>
+            <li><a href="cat19-p6-ai-infrastructure.html"><span class="nav-icon">🖥️</span> 19.6 AI Infrastructure</a></li>
+            <li><a href="cat19-p7-ai-safety.html"><span class="nav-icon">🛡️</span> 19.7 AI Safety & Governance</a></li>
+            <li><a href="cat19-p8-rag-knowledge.html"><span class="nav-icon">📚</span> 19.8 RAG & Knowledge</a></li>
+            <li><a href="cat19-p9-observability.html"><span class="nav-icon">📊</span> 19.9 Observability & Evals</a></li>
+            <li><a href="cat19-p10-enterprise-adoption.html"><span class="nav-icon">🏢</span> 19.10 Enterprise Adoption</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#revolution"><span class="nav-icon">🌊</span> The Revolution</a></li>
+            <li><a href="#spectrum"><span class="nav-icon">📊</span> Assistance Spectrum</a></li>
+            <li><a href="#ide-assistants"><span class="nav-icon">🖥️</span> AI-Native IDEs</a></li>
+            <li><a href="#cursor"><span class="nav-icon">⚡</span> Cursor Deep Dive</a></li>
+            <li><a href="#copilot"><span class="nav-icon">🤖</span> GitHub Copilot</a></li>
+            <li><a href="#cli-tools"><span class="nav-icon">💻</span> CLI Tools</a></li>
+            <li><a href="#claude-code"><span class="nav-icon">🔧</span> Claude Code</a></li>
+            <li><a href="#agents"><span class="nav-icon">🤖</span> Autonomous Agents</a></li>
+            <li><a href="#capabilities"><span class="nav-icon">⚙️</span> Capabilities</a></li>
+            <li><a href="#comparison"><span class="nav-icon">📊</span> Tool Comparison</a></li>
+            <li><a href="#extensions"><span class="nav-icon">🔌</span> IDE Extensions</a></li>
+            <li><a href="#review"><span class="nav-icon">🔍</span> Code Review</a></li>
+            <li><a href="#prompting"><span class="nav-icon">✍️</span> Prompting</a></li>
+            <li><a href="#models"><span class="nav-icon">🧠</span> Model Selection</a></li>
+            <li><a href="#costs"><span class="nav-icon">💰</span> Costs & ROI</a></li>
+            <li><a href="#adoption"><span class="nav-icon">🚀</span> Adoption</a></li>
+            <li><a href="#workflows"><span class="nav-icon">🔄</span> Workflows</a></li>
+            <li><a href="#enterprise"><span class="nav-icon">🏢</span> Enterprise</a></li>
+            <li><a href="#benchmarks"><span class="nav-icon">📈</span> Benchmarks</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#security"><span class="nav-icon">🔐</span> Security</a></li>
+            <li><a href="#future"><span class="nav-icon">🔮</span> Future</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">💻 Page 19.4</div>
+                <h1>AI Coding Tools</h1>
+                <p>From autocomplete to autonomous agents—AI is transforming how software is built. IDE assistants, CLI tools, and coding agents that write, debug, and deploy code.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">55%</div>
+                    <div class="hero-metric-label">Faster Coding</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">$9B</div>
+                    <div class="hero-metric-label">Cursor Valuation</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">1M+</div>
+                    <div class="hero-metric-label">Copilot Users</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Agentic</div>
+                    <div class="hero-metric-label">The New Paradigm</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>The AI-assisted development landscape</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What Are AI Coding Tools?</h3>
+                    <p><strong>AI coding tools</strong> are software that uses large language models to assist with programming tasks—from simple autocomplete to autonomous code generation. They understand code, natural language, and the relationship between them.</p>
+                    <p>The goal: <strong>augment developer productivity</strong> by handling routine tasks, suggesting solutions, and enabling developers to work at higher levels of abstraction.</p>
+                </div>
+                <div>
+                    <h3>Tool Categories</h3>
+                    <ul>
+                        <li><strong>IDE Assistants</strong> — Cursor, Windsurf, VS Code + Extensions</li>
+                        <li><strong>Code Extensions</strong> — GitHub Copilot, Cody, Tabnine, Amazon Q</li>
+                        <li><strong>CLI Tools</strong> — Claude Code, Aider, GPT-Engineer</li>
+                        <li><strong>Autonomous Agents</strong> — Devin, Factory, Cosine Genie</li>
+                        <li><strong>Code Review</strong> — CodeRabbit, Graphite, What The Diff</li>
+                        <li><strong>Specialized</strong> — Copilot Workspace, Replit Agent</li>
+                    </ul>
+                </div>
+                <div class="overview-full">
+                    <h3>The Paradigm Shift</h3>
+                    <p>We're moving through distinct phases: <strong>autocomplete</strong> (predict the next line), <strong>chat-assisted</strong> (ask questions about code), <strong>agentic</strong> (delegate multi-step tasks). The end state is AI that can take a feature request and deliver working, tested code—with humans providing guidance and review. The fastest developers are already 2-3x more productive with AI tools. The gap between AI-augmented and traditional development is widening rapidly.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE REVOLUTION -->
+        <section class="module" id="revolution">
+            <div class="module-header">
+                <div class="module-icon">🌊</div>
+                <div class="module-info">
+                    <h2>The AI Coding Revolution</h2>
+                    <p>How we got here and where we're going</p>
+                </div>
+            </div>
+
+            <div class="callout pink">
+                <div class="callout-icon">📈</div>
+                <div class="callout-content">
+                    <h4>The Numbers Are Staggering</h4>
+                    <p>GitHub Copilot: <strong>1.8 million paying subscribers</strong>, $100M+ ARR. Cursor: <strong>$100M ARR</strong> in 2 years, $9B valuation. 77% of developers use AI tools. Studies show <strong>30-55% faster task completion</strong>. This isn't hype—it's the fastest-adopted developer tool category in history.</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2021</div>
+                    <div class="timeline-title">GitHub Copilot Technical Preview</div>
+                    <div class="timeline-desc">OpenAI Codex powers the first mainstream AI coding assistant. Trained on public GitHub repos. Controversy and excitement.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2022</div>
+                    <div class="timeline-title">Copilot Goes GA, Competition Emerges</div>
+                    <div class="timeline-desc">Copilot becomes generally available ($10/month). Tabnine, Cody, and others compete. ChatGPT launches, showing potential.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-title">Chat-Based Coding Takes Off</div>
+                    <div class="timeline-desc">Copilot Chat, Claude Projects. Developers start having conversations about their code. Cursor gains traction.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-title">Agentic Coding Arrives</div>
+                    <div class="timeline-desc">Devin demo. Cursor Composer. Multi-file editing. Claude Code launches. AI writes entire features, not just lines.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2025</div>
+                    <div class="timeline-title">Autonomous Development</div>
+                    <div class="timeline-desc">Background agents. CI/CD integration. AI handles issues end-to-end. Human role shifts to specification and review.</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Productivity Impact</h3>
+                    <ul>
+                        <li><strong>GitHub study</strong> — 55% faster task completion with Copilot</li>
+                        <li><strong>McKinsey</strong> — 30-50% improvement in coding speed</li>
+                        <li><strong>Cursor users</strong> — Report 2-5x productivity gains</li>
+                        <li><strong>Google internal</strong> — AI generates 25%+ of new code</li>
+                        <li><strong>Stack Overflow</strong> — 70% of devs use AI tools regularly</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>What Changed</h3>
+                    <ul>
+                        <li><strong>Model quality</strong> — GPT-4, Claude 3.5, specialized code models</li>
+                        <li><strong>Context windows</strong> — 128K-1M tokens = entire codebases</li>
+                        <li><strong>Instruction following</strong> — Models that actually do what you ask</li>
+                        <li><strong>Speed</strong> — Sub-second responses feel native</li>
+                        <li><strong>Integration</strong> — Deep IDE integration, not just autocomplete</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ASSISTANCE SPECTRUM -->
+        <section class="module" id="spectrum">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>The Assistance Spectrum</h2>
+                    <p>From autocomplete to autonomous agents</p>
+                </div>
+            </div>
+
+            <div class="spectrum">
+                <div class="spectrum-item l1">
+                    <div class="spectrum-level">Level 1</div>
+                    <div class="spectrum-title">Autocomplete</div>
+                    <div class="spectrum-desc">Predict next line. Ghost text. Tab to accept.</div>
+                </div>
+                <div class="spectrum-item l2">
+                    <div class="spectrum-level">Level 2</div>
+                    <div class="spectrum-title">Chat Assistant</div>
+                    <div class="spectrum-desc">Q&A about code. Explain, refactor, suggest.</div>
+                </div>
+                <div class="spectrum-item l3">
+                    <div class="spectrum-level">Level 3</div>
+                    <div class="spectrum-title">Composer/Agent</div>
+                    <div class="spectrum-desc">Multi-file edits. Execute plans. Run tests.</div>
+                </div>
+                <div class="spectrum-item l4">
+                    <div class="spectrum-level">Level 4</div>
+                    <div class="spectrum-title">Autonomous</div>
+                    <div class="spectrum-desc">Full features. Background work. CI/CD integration.</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Level 1-2: Copilot Era</h3>
+                    <p>Most developers today operate at Levels 1-2. Autocomplete saves keystrokes. Chat helps with unfamiliar APIs or debugging. This already provides significant productivity gains—but the human is still doing all the work.</p>
+                </div>
+                <div>
+                    <h3>Level 3-4: Agentic Era</h3>
+                    <p>The frontier is Levels 3-4. Cursor Composer, Claude Code, and Devin operate here. You describe what you want; the AI plans, implements, tests, and iterates. Human role shifts from writing code to reviewing and guiding.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- IDE ASSISTANTS -->
+        <section class="module" id="ide-assistants">
+            <div class="module-header">
+                <div class="module-icon">🖥️</div>
+                <div class="module-info">
+                    <h2>AI-Native IDEs</h2>
+                    <p>Editors built from the ground up for AI</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">💡</div>
+                <div class="callout-content">
+                    <h4>The IDE War Has Begun</h4>
+                    <p>Traditional IDEs (VS Code, JetBrains) are adding AI features. But AI-native editors (Cursor, Windsurf) are built around AI from day one. They're growing explosively—<strong>Cursor went from 0 to $100M ARR in 2 years</strong>. The question for developers: adapt your existing IDE or switch to AI-first?</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card featured">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Cursor</div>
+                            <div class="tool-company">Anysphere</div>
+                        </div>
+                        <span class="tool-badge hot">🔥 Hot</span>
+                    </div>
+                    <p class="tool-desc">AI-native code editor built on VS Code. Composer for multi-file generation. Agent mode for autonomous coding. Best-in-class UX for AI-assisted development.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">$100M+</span> ARR</div>
+                        <div class="tool-stat"><span class="tool-stat-value">$9B</span> Valuation</div>
+                        <div class="tool-stat"><span class="tool-stat-value">500K+</span> Users</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Composer</span>
+                        <span class="tool-feature highlight">Agent Mode</span>
+                        <span class="tool-feature">Multi-file</span>
+                        <span class="tool-feature">Codebase Context</span>
+                        <span class="tool-feature">@-mentions</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Windsurf</div>
+                            <div class="tool-company">Codeium</div>
+                        </div>
+                        <span class="tool-badge ide">IDE</span>
+                    </div>
+                    <p class="tool-desc">AI-native IDE from Codeium. Cascade for agentic workflows. Flow mode for continuous AI assistance. Strong free tier. Growing fast.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">1M+</span> Downloads</div>
+                        <div class="tool-stat"><span class="tool-stat-value">$1.25B</span> Valuation</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Cascade</span>
+                        <span class="tool-feature highlight">Flow Mode</span>
+                        <span class="tool-feature">Free Tier</span>
+                        <span class="tool-feature">Multi-file</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Zed</div>
+                            <div class="tool-company">Zed Industries</div>
+                        </div>
+                        <span class="tool-badge ide">IDE</span>
+                    </div>
+                    <p class="tool-desc">High-performance editor with AI integration. Built in Rust for speed. Collaborative features. Growing AI capabilities with assistant panel.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Fast</span> Performance</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Collab</span> Built-in</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature">Rust Speed</span>
+                        <span class="tool-feature">Collaboration</span>
+                        <span class="tool-feature">AI Panel</span>
+                        <span class="tool-feature">Multi-buffer</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Void</div>
+                            <div class="tool-company">Void</div>
+                        </div>
+                        <span class="tool-badge ide">IDE</span>
+                    </div>
+                    <p class="tool-desc">Open-source Cursor alternative. Privacy-focused. Bring your own API keys. Local-first with cloud options. Early stage but promising.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Open</span> Source</div>
+                        <div class="tool-stat"><span class="tool-stat-value">BYOK</span> Model</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Open Source</span>
+                        <span class="tool-feature">Privacy</span>
+                        <span class="tool-feature">BYOK</span>
+                        <span class="tool-feature">Local-first</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CURSOR DEEP DIVE -->
+        <section class="module" id="cursor">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Cursor Deep Dive</h2>
+                    <p>The breakout AI coding tool of 2024</p>
+                </div>
+            </div>
+
+            <div class="callout pink">
+                <div class="callout-icon">🚀</div>
+                <div class="callout-content">
+                    <h4>The Cursor Phenomenon</h4>
+                    <p>Cursor went from launch to <strong>$100M ARR in under 2 years</strong>—one of the fastest-growing developer tools ever. Raised at $9B valuation. Why? It got the AI UX right: seamless integration, powerful features, feels like magic when it works.</p>
+                </div>
+            </div>
+
+            <div class="capability-grid">
+                <div class="capability-card">
+                    <div class="capability-icon">✨</div>
+                    <div class="capability-title">Tab Completion</div>
+                    <div class="capability-desc">Predictive autocomplete that understands your codebase. Multi-line suggestions. Learns your patterns.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">💬</div>
+                    <div class="capability-title">Cmd+K Inline</div>
+                    <div class="capability-desc">Edit code inline with natural language. Select code, describe change, apply. Fast iteration loop.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🎼</div>
+                    <div class="capability-title">Composer</div>
+                    <div class="capability-desc">Multi-file editing with AI. Create features spanning multiple files. Plan and execute together.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🤖</div>
+                    <div class="capability-title">Agent Mode</div>
+                    <div class="capability-desc">Autonomous coding agent. Runs commands, writes tests, iterates on errors. Human approves each step.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">📚</div>
+                    <div class="capability-title">@-Mentions</div>
+                    <div class="capability-desc">Reference files, folders, docs, URLs in prompts. @codebase for full context. @web for search.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🔗</div>
+                    <div class="capability-title">Codebase Indexing</div>
+                    <div class="capability-desc">Indexes entire codebase for semantic search. Ask questions about any file. Smart context selection.</div>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Key Features</h3>
+                    <ul>
+                        <li><strong>.cursorrules</strong> — Project-level AI instructions</li>
+                        <li><strong>Model selection</strong> — GPT-4o, Claude, o1, custom models</li>
+                        <li><strong>Diff view</strong> — Clear before/after for all changes</li>
+                        <li><strong>Terminal integration</strong> — AI reads terminal output</li>
+                        <li><strong>Image input</strong> — Paste designs, get code</li>
+                        <li><strong>Privacy mode</strong> — Code doesn't leave your machine</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Pricing</h3>
+                    <ul>
+                        <li><strong>Free</strong> — 2000 completions, 50 premium requests/month</li>
+                        <li><strong>Pro ($20/mo)</strong> — Unlimited completions, 500 fast requests</li>
+                        <li><strong>Business ($40/mo)</strong> — Team features, admin controls, SSO</li>
+                        <li><strong>Enterprise</strong> — Custom deployment, security, support</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- GITHUB COPILOT -->
+        <section class="module" id="copilot">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>GitHub Copilot</h2>
+                    <p>The incumbent with the largest user base</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>The Pioneer</h3>
+                    <p>GitHub Copilot launched in 2021 and defined the category. With <strong>1.8 million paying subscribers</strong> and deep GitHub integration, it's the most widely adopted AI coding tool. Now expanding beyond autocomplete to agents and workspace.</p>
+                </div>
+                <div>
+                    <h3>Product Suite</h3>
+                    <ul>
+                        <li><strong>Copilot</strong> — Core autocomplete ($10-19/mo)</li>
+                        <li><strong>Copilot Chat</strong> — IDE chat integration</li>
+                        <li><strong>Copilot Workspace</strong> — Issue-to-PR agent (preview)</li>
+                        <li><strong>Copilot CLI</strong> — Command line assistance</li>
+                        <li><strong>Copilot for Docs</strong> — Documentation chat</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Copilot Individual</div>
+                            <div class="tool-company">GitHub / Microsoft</div>
+                        </div>
+                        <span class="tool-badge extension">Extension</span>
+                    </div>
+                    <p class="tool-desc">Core autocomplete experience. Works in VS Code, JetBrains, Neovim. Chat integration. The original AI coding assistant.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">$10</span>/month</div>
+                        <div class="tool-stat"><span class="tool-stat-value">1.8M</span> Subscribers</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Autocomplete</span>
+                        <span class="tool-feature highlight">Chat</span>
+                        <span class="tool-feature">Multi-IDE</span>
+                        <span class="tool-feature">GPT-4</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Copilot Workspace</div>
+                            <div class="tool-company">GitHub / Microsoft</div>
+                        </div>
+                        <span class="tool-badge agent">Agent</span>
+                    </div>
+                    <p class="tool-desc">Agent that turns GitHub issues into pull requests. Plans implementation, makes changes across files, runs tests. GitHub's answer to Devin.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Preview</span> Status</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Issue→PR</span> Flow</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Issue to PR</span>
+                        <span class="tool-feature highlight">Multi-file</span>
+                        <span class="tool-feature">Planning</span>
+                        <span class="tool-feature">Testing</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLI TOOLS -->
+        <section class="module" id="cli-tools">
+            <div class="module-header">
+                <div class="module-icon">💻</div>
+                <div class="module-info">
+                    <h2>CLI Coding Tools</h2>
+                    <p>AI coding from the command line</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">⌨️</div>
+                <div class="callout-content">
+                    <h4>Terminal-First Development</h4>
+                    <p>Some developers prefer CLI tools over IDEs. They're lighter, scriptable, and work over SSH. Claude Code, Aider, and others bring agentic coding to the terminal. Great for quick tasks, server work, or those who live in tmux.</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card featured">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Claude Code</div>
+                            <div class="tool-company">Anthropic</div>
+                        </div>
+                        <span class="tool-badge cli">CLI</span>
+                    </div>
+                    <p class="tool-desc">Anthropic's agentic coding tool. Terminal-based with deep codebase understanding. MCP integration for extensibility. Designed for complex, multi-file tasks.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Claude 3.5/4</span> Model</div>
+                        <div class="tool-stat"><span class="tool-stat-value">MCP</span> Native</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Agentic</span>
+                        <span class="tool-feature highlight">MCP</span>
+                        <span class="tool-feature">Multi-file</span>
+                        <span class="tool-feature">Git Integration</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Aider</div>
+                            <div class="tool-company">Paul Gauthier</div>
+                        </div>
+                        <span class="tool-badge cli">CLI</span>
+                    </div>
+                    <p class="tool-desc">Popular open-source CLI for AI coding. Works with any LLM. Excellent at multi-file edits. Strong community. Very scriptable.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">25K+</span> GitHub Stars</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Open</span> Source</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Open Source</span>
+                        <span class="tool-feature highlight">Multi-model</span>
+                        <span class="tool-feature">Git Native</span>
+                        <span class="tool-feature">Scriptable</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">GPT-Engineer</div>
+                            <div class="tool-company">gpt-engineer.org</div>
+                        </div>
+                        <span class="tool-badge cli">CLI</span>
+                    </div>
+                    <p class="tool-desc">Generate entire codebases from specifications. CLI-based project scaffolding. Good for greenfield projects and prototyping.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">50K+</span> Stars</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Open</span> Source</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature">Full Projects</span>
+                        <span class="tool-feature">Scaffolding</span>
+                        <span class="tool-feature">Open Source</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Continue</div>
+                            <div class="tool-company">Continue.dev</div>
+                        </div>
+                        <span class="tool-badge extension">Extension</span>
+                    </div>
+                    <p class="tool-desc">Open-source AI coding extension. Works in VS Code and JetBrains. Bring your own model. Highly customizable. MCP support.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">18K+</span> Stars</div>
+                        <div class="tool-stat"><span class="tool-stat-value">BYOM</span> Model</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Open Source</span>
+                        <span class="tool-feature highlight">MCP</span>
+                        <span class="tool-feature">Multi-model</span>
+                        <span class="tool-feature">Customizable</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLAUDE CODE DEEP DIVE -->
+        <section class="module" id="claude-code">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Claude Code Deep Dive</h2>
+                    <p>Anthropic's agentic coding tool</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>What is Claude Code?</h3>
+                    <p>Claude Code is Anthropic's terminal-based agentic coding tool. Unlike autocomplete tools, it's designed for <strong>complex, multi-step tasks</strong>: implementing features, fixing bugs across files, refactoring codebases. It reads your code, makes plans, and executes them with your approval.</p>
+                </div>
+                <div>
+                    <h3>Key Capabilities</h3>
+                    <ul>
+                        <li><strong>Codebase understanding</strong> — Reads and indexes your entire project</li>
+                        <li><strong>Multi-file edits</strong> — Coordinates changes across files</li>
+                        <li><strong>Command execution</strong> — Runs tests, builds, lints</li>
+                        <li><strong>Git integration</strong> — Understands your repo history</li>
+                        <li><strong>MCP extensibility</strong> — Connect to external tools and data</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="agent-code" style="margin-top: 24px;">
+                <div class="code-header">Claude Code Usage Examples</div>
+                <div class="code-content">
+<pre><span class="code-comment"># Install Claude Code</span>
+npm install -g @anthropic-ai/claude-code
+
+<span class="code-comment"># Start in a project directory</span>
+cd my-project
+claude-code
+
+<span class="code-comment"># Natural language requests</span>
+> Add user authentication with JWT tokens
+
+> Fix the bug where users can't upload files larger than 5MB
+
+> Refactor the database module to use connection pooling
+
+> Write tests for the payment processing service
+
+<span class="code-comment"># Reference specific files</span>
+> Look at src/api/users.ts and add rate limiting
+
+<span class="code-comment"># Use MCP for external context</span>
+> Check Jira for the latest tickets and fix PROJ-1234
+
+<span class="code-comment"># Safe mode - requires approval for each action</span>
+claude-code --safe-mode</pre>
+                </div>
+            </div>
+
+            <div class="capability-grid" style="margin-top: 24px;">
+                <div class="capability-card">
+                    <div class="capability-icon">🔍</div>
+                    <div class="capability-title">Code Search</div>
+                    <div class="capability-desc">Semantic search across entire codebase. Find relevant code without knowing file names.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">📝</div>
+                    <div class="capability-title">Smart Edits</div>
+                    <div class="capability-desc">Applies changes with full context. Handles imports, dependencies, and related updates.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🔌</div>
+                    <div class="capability-title">MCP Integration</div>
+                    <div class="capability-desc">Connect to Jira, Slack, databases, and custom tools via Model Context Protocol.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AUTONOMOUS AGENTS -->
+        <section class="module" id="agents">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Autonomous Coding Agents</h2>
+                    <p>AI that writes code end-to-end</p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">🚧</div>
+                <div class="callout-content">
+                    <h4>The Frontier (and Its Limits)</h4>
+                    <p>Autonomous coding agents can handle entire features—but they're not ready to replace developers. They work best on <strong>well-defined, isolated tasks</strong>. Complex architecture decisions, ambiguous requirements, and novel problems still need human judgment. Think of them as junior developers who need guidance and code review.</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Devin</div>
+                            <div class="tool-company">Cognition AI</div>
+                        </div>
+                        <span class="tool-badge agent">Agent</span>
+                    </div>
+                    <p class="tool-desc">The first "AI software engineer." Operates in a full development environment. Plans, codes, debugs, deploys. $2B valuation. Limited access.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">$2B</span> Valuation</div>
+                        <div class="tool-stat"><span class="tool-stat-value">13.86%</span> SWE-bench</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Full Environment</span>
+                        <span class="tool-feature">Planning</span>
+                        <span class="tool-feature">Debugging</span>
+                        <span class="tool-feature">Browser</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Factory</div>
+                            <div class="tool-company">Factory AI</div>
+                        </div>
+                        <span class="tool-badge agent">Agent</span>
+                    </div>
+                    <p class="tool-desc">Enterprise coding agents. Droids that work on tickets in the background. CI/CD integration. Focus on maintenance and bug fixes.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Enterprise</span> Focus</div>
+                        <div class="tool-stat"><span class="tool-stat-value">CI/CD</span> Integration</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Background</span>
+                        <span class="tool-feature">Enterprise</span>
+                        <span class="tool-feature">Tickets</span>
+                        <span class="tool-feature">CI/CD</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Cosine Genie</div>
+                            <div class="tool-company">Cosine</div>
+                        </div>
+                        <span class="tool-badge agent">Agent</span>
+                    </div>
+                    <p class="tool-desc">AI agent that understands your codebase deeply. Handles feature requests end-to-end. Strong on understanding existing patterns.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">30%+</span> SWE-bench</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Deep</span> Understanding</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Context</span>
+                        <span class="tool-feature">Features</span>
+                        <span class="tool-feature">Patterns</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Replit Agent</div>
+                            <div class="tool-company">Replit</div>
+                        </div>
+                        <span class="tool-badge agent">Agent</span>
+                    </div>
+                    <p class="tool-desc">Build apps from descriptions in Replit. Full-stack generation. Deploys automatically. Great for prototypes and simple apps.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Cloud</span> Native</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Auto</span> Deploy</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Full-stack</span>
+                        <span class="tool-feature">Deploy</span>
+                        <span class="tool-feature">Cloud</span>
+                        <span class="tool-feature">Beginner-friendly</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAPABILITIES -->
+        <section class="module" id="capabilities">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>AI Coding Capabilities</h2>
+                    <p>What AI can do for developers</p>
+                </div>
+            </div>
+
+            <div class="capability-grid">
+                <div class="capability-card">
+                    <div class="capability-icon">⌨️</div>
+                    <div class="capability-title">Code Completion</div>
+                    <div class="capability-desc">Predict next lines as you type. Multi-line suggestions. Context-aware completions.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">✍️</div>
+                    <div class="capability-title">Code Generation</div>
+                    <div class="capability-desc">Write functions from descriptions. Generate boilerplate. Scaffold components.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🔍</div>
+                    <div class="capability-title">Code Explanation</div>
+                    <div class="capability-desc">Explain complex code. Document functions. Onboard to new codebases.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🔄</div>
+                    <div class="capability-title">Refactoring</div>
+                    <div class="capability-desc">Improve code structure. Rename variables. Extract functions. Modernize patterns.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🐛</div>
+                    <div class="capability-title">Bug Fixing</div>
+                    <div class="capability-desc">Identify and fix bugs. Explain errors. Suggest solutions from stack traces.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🧪</div>
+                    <div class="capability-title">Test Generation</div>
+                    <div class="capability-desc">Write unit tests. Generate test cases. Improve coverage.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">📝</div>
+                    <div class="capability-title">Documentation</div>
+                    <div class="capability-desc">Generate docstrings. Write README files. Create API docs.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🔒</div>
+                    <div class="capability-title">Security Review</div>
+                    <div class="capability-desc">Identify vulnerabilities. Suggest secure alternatives. Review for OWASP issues.</div>
+                </div>
+
+                <div class="capability-card">
+                    <div class="capability-icon">🔀</div>
+                    <div class="capability-title">Code Translation</div>
+                    <div class="capability-desc">Convert between languages. Migrate frameworks. Port legacy code.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOL COMPARISON -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Tool Comparison</h2>
+                    <p>Features across major AI coding tools</p>
+                </div>
+            </div>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Type</th>
+                        <th>Multi-file</th>
+                        <th>Agent Mode</th>
+                        <th>Codebase</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="tool-name-cell">Cursor</td>
+                        <td>IDE</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check best">✓✓✓</td>
+                        <td>$20/mo</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">GitHub Copilot</td>
+                        <td>Extension</td>
+                        <td class="partial">~</td>
+                        <td class="partial">~</td>
+                        <td class="check">✓✓</td>
+                        <td>$10-19/mo</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Windsurf</td>
+                        <td>IDE</td>
+                        <td class="check">✓✓✓</td>
+                        <td class="check">✓✓✓</td>
+                        <td class="check">✓✓</td>
+                        <td>Free / $15/mo</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Claude Code</td>
+                        <td>CLI</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check best">✓✓✓</td>
+                        <td>API costs</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Aider</td>
+                        <td>CLI</td>
+                        <td class="check">✓✓✓</td>
+                        <td class="check">✓✓</td>
+                        <td class="check">✓✓</td>
+                        <td>Free + API</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Cody</td>
+                        <td>Extension</td>
+                        <td class="partial">~</td>
+                        <td class="partial">~</td>
+                        <td class="check best">✓✓✓</td>
+                        <td>Free / $9/mo</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Devin</td>
+                        <td>Agent</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check">✓✓</td>
+                        <td>$500/mo+</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- CODE EXTENSIONS -->
+        <section class="module" id="extensions">
+            <div class="module-header">
+                <div class="module-icon">🔌</div>
+                <div class="module-info">
+                    <h2>IDE Extensions</h2>
+                    <p>AI coding for your existing editor</p>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">💡</div>
+                <div class="callout-content">
+                    <h4>Extend, Don't Replace</h4>
+                    <p>Not ready to switch IDEs? Extensions bring AI to VS Code, JetBrains, and other editors. You get AI assistance while keeping your familiar environment. Most tools offer both standalone IDEs and extensions.</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Cody</div>
+                            <div class="tool-company">Sourcegraph</div>
+                        </div>
+                        <span class="tool-badge extension">Extension</span>
+                    </div>
+                    <p class="tool-desc">Deep codebase understanding from Sourcegraph. Best-in-class context awareness. Works across massive codebases. Strong enterprise features.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Best</span> Context</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Enterprise</span> Ready</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Deep Context</span>
+                        <span class="tool-feature highlight">Multi-repo</span>
+                        <span class="tool-feature">Free Tier</span>
+                        <span class="tool-feature">VS Code</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Tabnine</div>
+                            <div class="tool-company">Tabnine</div>
+                        </div>
+                        <span class="tool-badge extension">Extension</span>
+                    </div>
+                    <p class="tool-desc">Privacy-focused AI completion. On-premise deployment option. Trained on permissively licensed code. Enterprise-ready.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Privacy</span> Focus</div>
+                        <div class="tool-stat"><span class="tool-stat-value">On-prem</span> Option</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Privacy</span>
+                        <span class="tool-feature highlight">On-premise</span>
+                        <span class="tool-feature">Multi-IDE</span>
+                        <span class="tool-feature">Enterprise</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Amazon Q Developer</div>
+                            <div class="tool-company">AWS</div>
+                        </div>
+                        <span class="tool-badge extension">Extension</span>
+                    </div>
+                    <p class="tool-desc">AWS's AI coding assistant. Deep AWS integration. Security scanning built-in. Strong for AWS-centric development.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">AWS</span> Integration</div>
+                        <div class="tool-stat"><span class="tool-stat-value">Security</span> Scans</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">AWS Native</span>
+                        <span class="tool-feature">Security</span>
+                        <span class="tool-feature">Free Tier</span>
+                        <span class="tool-feature">VS Code</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Supermaven</div>
+                            <div class="tool-company">Supermaven</div>
+                        </div>
+                        <span class="tool-badge extension">Extension</span>
+                    </div>
+                    <p class="tool-desc">Fastest AI completions. 1M token context. Built by ex-Tabnine founder. Focus on speed and accuracy.</p>
+                    <div class="tool-stats">
+                        <div class="tool-stat"><span class="tool-stat-value">Fastest</span> Speed</div>
+                        <div class="tool-stat"><span class="tool-stat-value">1M</span> Context</div>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Speed</span>
+                        <span class="tool-feature highlight">Long Context</span>
+                        <span class="tool-feature">Free</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CODE REVIEW TOOLS -->
+        <section class="module" id="review">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>AI Code Review</h2>
+                    <p>Automated PR review and feedback</p>
+                </div>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">CodeRabbit</div>
+                            <div class="tool-company">CodeRabbit</div>
+                        </div>
+                        <span class="tool-badge extension">Review</span>
+                    </div>
+                    <p class="tool-desc">AI-powered code review for GitHub/GitLab PRs. Line-by-line feedback. Security checks. Learns your patterns over time.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">PR Review</span>
+                        <span class="tool-feature">Security</span>
+                        <span class="tool-feature">Learning</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">PR-Agent</div>
+                            <div class="tool-company">CodiumAI</div>
+                        </div>
+                        <span class="tool-badge extension">Review</span>
+                    </div>
+                    <p class="tool-desc">Open-source PR review agent. Auto-describe PRs. Review, improve, ask questions. Self-hostable.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Open Source</span>
+                        <span class="tool-feature">Self-host</span>
+                        <span class="tool-feature">Multi-feature</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">Graphite</div>
+                            <div class="tool-company">Graphite</div>
+                        </div>
+                        <span class="tool-badge extension">Review</span>
+                    </div>
+                    <p class="tool-desc">AI-assisted code review with stacking workflows. Merge queue. Review suggestions. Popular with fast-moving teams.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Stacking</span>
+                        <span class="tool-feature">Merge Queue</span>
+                        <span class="tool-feature">AI Review</span>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div>
+                            <div class="tool-name">What The Diff</div>
+                            <div class="tool-company">What The Diff</div>
+                        </div>
+                        <span class="tool-badge extension">Review</span>
+                    </div>
+                    <p class="tool-desc">AI-generated PR summaries. Explains changes in plain English. Slack integration. Helps reviewers understand context.</p>
+                    <div class="tool-features">
+                        <span class="tool-feature highlight">Summaries</span>
+                        <span class="tool-feature">Slack</span>
+                        <span class="tool-feature">Plain English</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROMPTING STRATEGIES -->
+        <section class="module" id="prompting">
+            <div class="module-header">
+                <div class="module-icon">✍️</div>
+                <div class="module-info">
+                    <h2>Prompting Strategies</h2>
+                    <p>Getting better results from AI coding tools</p>
+                </div>
+            </div>
+
+            <div class="callout pink">
+                <div class="callout-icon">💡</div>
+                <div class="callout-content">
+                    <h4>Prompts Are Programs</h4>
+                    <p>The quality of AI output directly reflects the quality of your prompt. Vague requests get vague results. <strong>Treat prompting as a skill to develop.</strong> The best developers are learning to write prompts as carefully as they write code.</p>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">📋</div>
+                        <div class="usecase-title">Be Specific</div>
+                    </div>
+                    <p class="usecase-desc"><strong>Bad:</strong> "Add authentication"<br><strong>Good:</strong> "Add JWT-based authentication with refresh tokens. Use the existing User model. Add login/logout/refresh endpoints to /api/auth/. Store refresh tokens in Redis."</p>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">📁</div>
+                        <div class="usecase-title">Reference Context</div>
+                    </div>
+                    <p class="usecase-desc"><strong>Bad:</strong> "Fix the bug"<br><strong>Good:</strong> "Look at @src/api/users.ts and @src/db/queries.ts. The getUser function returns null when user exists. Check the query condition."</p>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🎯</div>
+                        <div class="usecase-title">Specify Style</div>
+                    </div>
+                    <p class="usecase-desc"><strong>Bad:</strong> "Write a function"<br><strong>Good:</strong> "Write a TypeScript function with JSDoc comments. Use async/await, not callbacks. Follow the patterns in @src/utils/. Include error handling."</p>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🔄</div>
+                        <div class="usecase-title">Iterate Progressively</div>
+                    </div>
+                    <p class="usecase-desc"><strong>Bad:</strong> "Build the entire payment system"<br><strong>Good:</strong> Start with "Create the payment model" → "Add the Stripe integration" → "Write the checkout endpoint" → "Add tests"</p>
+                </div>
+            </div>
+
+            <div class="agent-code" style="margin-top: 24px;">
+                <div class="code-header">Example .cursorrules file</div>
+                <div class="code-content">
+<pre><span class="code-comment"># Project Context</span>
+This is a Next.js 14 application with TypeScript.
+We use Tailwind CSS for styling and Prisma for database.
+The app follows a modular architecture in src/modules/.
+
+<span class="code-comment"># Code Style</span>
+- Use functional components with hooks
+- Prefer named exports over default exports
+- Use async/await, never callbacks
+- Add JSDoc comments for public functions
+- Use Zod for runtime validation
+
+<span class="code-comment"># Patterns</span>
+- API routes go in src/app/api/
+- Database queries in src/db/queries/
+- Shared components in src/components/ui/
+- Use the Result type for error handling
+
+<span class="code-comment"># Testing</span>
+- Write tests with Vitest
+- Mock external services
+- Test both success and error paths
+
+<span class="code-comment"># Don'ts</span>
+- Don't use any type
+- Don't hardcode credentials
+- Don't skip error handling
+- Don't modify migrations directly</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODEL SELECTION -->
+        <section class="module" id="models">
+            <div class="module-header">
+                <div class="module-icon">🧠</div>
+                <div class="module-info">
+                    <h2>Model Selection for Coding</h2>
+                    <p>Which model to use for what</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Model Strengths</h3>
+                    <ul>
+                        <li><strong>Claude 3.5 Sonnet</strong> — Best all-around for coding. Great context, instruction following</li>
+                        <li><strong>GPT-4o</strong> — Strong general coding. Fast. Good for completion</li>
+                        <li><strong>o1 / o3</strong> — Complex reasoning tasks. Algorithm design. Debugging tricky issues</li>
+                        <li><strong>DeepSeek Coder</strong> — Open source, strong benchmark scores</li>
+                        <li><strong>Codestral</strong> — Mistral's code model. Fast, efficient</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Task-Model Matching</h3>
+                    <ul>
+                        <li><strong>Autocomplete</strong> → Fast model (GPT-4o-mini, Codestral)</li>
+                        <li><strong>Feature implementation</strong> → Strong model (Claude 3.5, GPT-4o)</li>
+                        <li><strong>Complex debugging</strong> → Reasoning model (o1, Claude with thinking)</li>
+                        <li><strong>Code review</strong> → Mid-tier (Claude 3.5 Sonnet, GPT-4o)</li>
+                        <li><strong>Documentation</strong> → Any capable model</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="compare-table" style="margin-top: 24px;">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Speed</th>
+                        <th>Quality</th>
+                        <th>Context</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="tool-name-cell">Claude 3.5 Sonnet</td>
+                        <td class="check">✓✓</td>
+                        <td class="check best">✓✓✓</td>
+                        <td>200K</td>
+                        <td>Multi-file features, refactoring</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">GPT-4o</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check">✓✓✓</td>
+                        <td>128K</td>
+                        <td>Fast iterations, completion</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">o1</td>
+                        <td class="partial">~</td>
+                        <td class="check best">✓✓✓</td>
+                        <td>128K</td>
+                        <td>Complex algorithms, debugging</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">GPT-4o-mini</td>
+                        <td class="check best">✓✓✓</td>
+                        <td class="check">✓✓</td>
+                        <td>128K</td>
+                        <td>Autocomplete, simple tasks</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">DeepSeek Coder</td>
+                        <td class="check">✓✓</td>
+                        <td class="check">✓✓</td>
+                        <td>16K</td>
+                        <td>Open source, self-host</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- COSTS & ROI -->
+        <section class="module" id="costs">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>Costs & ROI</h2>
+                    <p>The economics of AI coding tools</p>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-icon">📈</div>
+                <div class="callout-content">
+                    <h4>The ROI Is Clear</h4>
+                    <p>$20-40/month per developer for tools that increase productivity 30-50%? For a $150K/year engineer, that's <strong>$45K-75K in productivity gains for ~$400/year in tool costs</strong>. The math is overwhelming. Most companies see payback in weeks, not months.</p>
+                </div>
+            </div>
+
+            <div class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Free Tier</th>
+                        <th>Pro/Individual</th>
+                        <th>Team/Business</th>
+                        <th>Enterprise</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="tool-name-cell">Cursor</td>
+                        <td>2K completions/mo</td>
+                        <td>$20/mo</td>
+                        <td>$40/mo</td>
+                        <td>Custom</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">GitHub Copilot</td>
+                        <td>Free for students</td>
+                        <td>$10/mo</td>
+                        <td>$19/mo</td>
+                        <td>$39/mo</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Windsurf</td>
+                        <td>Generous free</td>
+                        <td>$15/mo</td>
+                        <td>$30/mo</td>
+                        <td>Custom</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Cody</td>
+                        <td>Good free tier</td>
+                        <td>$9/mo</td>
+                        <td>$19/mo</td>
+                        <td>Custom</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Tabnine</td>
+                        <td>Basic completion</td>
+                        <td>$12/mo</td>
+                        <td>$39/mo</td>
+                        <td>Custom</td>
+                    </tr>
+                    <tr>
+                        <td class="tool-name-cell">Claude Code</td>
+                        <td>—</td>
+                        <td>API costs (~$10-50)</td>
+                        <td>—</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="overview-content" style="margin-top: 24px;">
+                <div>
+                    <h3>Hidden Costs</h3>
+                    <ul>
+                        <li><strong>API overages</strong> — Heavy users can exceed limits</li>
+                        <li><strong>Training time</strong> — Learning to use tools effectively</li>
+                        <li><strong>Context switching</strong> — If tool is slow or breaks flow</li>
+                        <li><strong>Review overhead</strong> — Bad AI code costs time to fix</li>
+                        <li><strong>Security review</strong> — Additional due diligence</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Maximizing ROI</h3>
+                    <ul>
+                        <li><strong>Train developers</strong> — Prompting skills matter</li>
+                        <li><strong>Share patterns</strong> — .cursorrules, prompt libraries</li>
+                        <li><strong>Measure productivity</strong> — Track before/after metrics</li>
+                        <li><strong>Right-size plans</strong> — Don't over-provision seats</li>
+                        <li><strong>Use free tiers</strong> — For occasional users</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADOPTION STRATEGIES -->
+        <section class="module" id="adoption">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Adoption Strategies</h2>
+                    <p>Rolling out AI coding tools</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Start with Champions</h4>
+                        <p>Identify enthusiastic early adopters. Let them pilot tools and become internal advocates. Their success stories drive broader adoption.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Measure Impact</h4>
+                        <p>Track metrics before and after: PRs merged, cycle time, developer satisfaction. Data convinces skeptics better than anecdotes.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Create Guidelines</h4>
+                        <p>Establish policies: what code needs extra review, what's off-limits, how to handle IP concerns. Clarity reduces friction.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Invest in Training</h4>
+                        <p>Run workshops on effective prompting, tool features, common pitfalls. The gap between good and bad AI users is huge.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Share Best Practices</h4>
+                        <p>Create shared prompt libraries, .cursorrules templates, and tips channels. Collective learning accelerates everyone.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Iterate on Tools</h4>
+                        <p>The landscape changes fast. Reevaluate tools quarterly. What was best 6 months ago may not be now.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WORKFLOWS -->
+        <section class="module" id="workflows">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>AI Coding Workflows</h2>
+                    <p>How to integrate AI into development</p>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🏗️</div>
+                        <div class="usecase-title">Feature Development</div>
+                    </div>
+                    <p class="usecase-desc">Describe feature → AI plans implementation → Review plan → AI writes code → Review diffs → Iterate → Merge. Human focuses on requirements and review.</p>
+                    <div class="usecase-examples"><strong>Tools:</strong> Cursor Composer, Claude Code, Copilot Workspace</div>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🐛</div>
+                        <div class="usecase-title">Bug Fixing</div>
+                    </div>
+                    <p class="usecase-desc">Paste error → AI analyzes → Suggests fix → Apply → Test. For complex bugs: AI traces through code, identifies root cause, proposes solution.</p>
+                    <div class="usecase-examples"><strong>Tools:</strong> Any AI coding tool with codebase context</div>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🧪</div>
+                        <div class="usecase-title">Test Writing</div>
+                    </div>
+                    <p class="usecase-desc">Select function → AI generates tests → Review coverage → Add edge cases → Run and iterate. AI handles boilerplate; human ensures meaningful assertions.</p>
+                    <div class="usecase-examples"><strong>Tools:</strong> Cursor, Copilot, Claude Code</div>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">📖</div>
+                        <div class="usecase-title">Code Review</div>
+                    </div>
+                    <p class="usecase-desc">AI reviews PRs for issues, suggests improvements, checks for patterns. Human makes final decisions. Automated first-pass review.</p>
+                    <div class="usecase-examples"><strong>Tools:</strong> CodeRabbit, PR-Agent, Graphite</div>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">📚</div>
+                        <div class="usecase-title">Onboarding</div>
+                    </div>
+                    <p class="usecase-desc">Ask questions about codebase → AI explains architecture → Navigate unfamiliar code → Understand patterns. Faster onboarding to new projects.</p>
+                    <div class="usecase-examples"><strong>Tools:</strong> Cody, Cursor @codebase, Claude Code</div>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🔄</div>
+                        <div class="usecase-title">Refactoring</div>
+                    </div>
+                    <p class="usecase-desc">Describe desired change → AI plans across files → Review scope → Execute → Verify tests pass. Large refactors become manageable.</p>
+                    <div class="usecase-examples"><strong>Tools:</strong> Cursor Composer, Claude Code, Aider</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ENTERPRISE -->
+        <section class="module" id="enterprise">
+            <div class="module-header">
+                <div class="module-icon">🏢</div>
+                <div class="module-info">
+                    <h2>Enterprise Considerations</h2>
+                    <p>Deploying AI coding tools at scale</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Key Concerns</h3>
+                    <ul>
+                        <li><strong>Code privacy</strong> — Does code leave your network?</li>
+                        <li><strong>IP protection</strong> — Training data, output ownership</li>
+                        <li><strong>Compliance</strong> — SOC 2, HIPAA, FedRAMP requirements</li>
+                        <li><strong>SSO/SCIM</strong> — Enterprise identity management</li>
+                        <li><strong>Audit logs</strong> — Track who used what, when</li>
+                        <li><strong>Model selection</strong> — Choose approved models</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Enterprise Options</h3>
+                    <ul>
+                        <li><strong>GitHub Copilot Enterprise</strong> — GitHub integration, SSO, audit</li>
+                        <li><strong>Cursor Business/Enterprise</strong> — Privacy mode, SSO, admin</li>
+                        <li><strong>Amazon CodeWhisperer</strong> — AWS integration, security scans</li>
+                        <li><strong>Tabnine Enterprise</strong> — On-premise option, private models</li>
+                        <li><strong>Cody Enterprise</strong> — Deep codebase context, security</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⚖️</div>
+                <div class="callout-content">
+                    <h4>Legal Considerations</h4>
+                    <p>AI-generated code may raise IP questions. Who owns the output? What if it resembles training data? Most tools indemnify users, but policies vary. Review terms carefully. Consider copyright implications for regulated industries. Some companies require disclosure of AI-generated code.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BENCHMARKS -->
+        <section class="module" id="benchmarks">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Benchmarks & Evaluation</h2>
+                    <p>Measuring AI coding performance</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Key Benchmarks</h3>
+                    <ul>
+                        <li><strong>SWE-bench</strong> — Real GitHub issues, fix and verify</li>
+                        <li><strong>HumanEval</strong> — Function completion from docstrings</li>
+                        <li><strong>MBPP</strong> — Mostly Basic Python Problems</li>
+                        <li><strong>CodeContests</strong> — Competitive programming problems</li>
+                        <li><strong>LiveCodeBench</strong> — Continuously updated from LeetCode</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Current Performance</h3>
+                    <ul>
+                        <li><strong>SWE-bench Verified</strong> — Cosine 30%+, Claude 49%+ (assisted)</li>
+                        <li><strong>HumanEval</strong> — GPT-4 ~90%, Claude 3.5 ~92%</li>
+                        <li><strong>Practical tasks</strong> — Much harder to measure</li>
+                        <li><strong>Real-world</strong> — Highly context-dependent</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">📊</div>
+                <div class="callout-content">
+                    <h4>Benchmarks vs Reality</h4>
+                    <p>Benchmarks measure specific capabilities but don't capture real-world effectiveness. A tool might score lower on HumanEval but have better UX and codebase understanding that makes it more productive in practice. <strong>Try tools on your actual work</strong> to evaluate fit.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Getting the most from AI coding tools</p>
+                </div>
+            </div>
+
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Write Clear Prompts</h4>
+                        <p>Be specific about requirements. Include context. Mention constraints. The quality of output mirrors the quality of input.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Review Everything</h4>
+                        <p>AI makes mistakes. Security issues, subtle bugs, poor patterns. Treat AI code like code from a junior developer—review carefully.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Use Project Context Files</h4>
+                        <p>.cursorrules, CLAUDE.md, AGENTS.md—give AI context about your project's patterns, conventions, and architecture.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Iterate in Small Steps</h4>
+                        <p>Don't ask for complete features at once. Build incrementally. Review each step. Correct course early.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Leverage Codebase Context</h4>
+                        <p>Use @codebase, @file references. Help AI understand your patterns. More context = better output.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Know When Not to Use AI</h4>
+                        <p>Novel architectures, security-critical code, performance-sensitive paths—sometimes manual is better.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Keep Tests Running</h4>
+                        <p>AI can introduce bugs. Continuous test execution catches issues early. AI + TDD = powerful combination.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Learn the Shortcuts</h4>
+                        <p>Cmd+K, Cmd+L, tab, reject. Speed comes from muscle memory. Invest time in learning your tool's UX.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECURITY -->
+        <section class="module" id="security">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Security Considerations</h2>
+                    <p>Keeping code and systems safe</p>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🔒</div>
+                        <div class="usecase-title">Code Exposure</div>
+                    </div>
+                    <p class="usecase-desc">Understand where your code goes. Cloud-based tools send code to servers. Use privacy modes, on-premise options, or BYOK for sensitive projects.</p>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🔑</div>
+                        <div class="usecase-title">Secret Leakage</div>
+                    </div>
+                    <p class="usecase-desc">AI might suggest patterns that expose secrets. Never accept code with hardcoded credentials. Use environment variables, secrets managers.</p>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">🛡️</div>
+                        <div class="usecase-title">Vulnerability Introduction</div>
+                    </div>
+                    <p class="usecase-desc">AI can suggest insecure patterns—SQL injection, XSS, improper auth. Always security review AI-generated code. Use SAST tools.</p>
+                </div>
+
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-icon">📋</div>
+                        <div class="usecase-title">Dependency Risks</div>
+                    </div>
+                    <p class="usecase-desc">AI suggests packages that may be outdated, vulnerable, or malicious (typosquatting). Verify dependencies before adding.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FUTURE -->
+        <section class="module" id="future">
+            <div class="module-header">
+                <div class="module-icon">🔮</div>
+                <div class="module-info">
+                    <h2>The Future of AI Coding</h2>
+                    <p>Where development is headed</p>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-icon">🚀</div>
+                <div class="callout-content">
+                    <h4>The Next 2-3 Years</h4>
+                    <p>Coding is the leading edge of AI automation. Models will get better at understanding codebases, planning multi-step tasks, and working autonomously. The developer role will shift toward <strong>specification, architecture, and review</strong>. Junior developer tasks will be increasingly automated. Senior developers will be dramatically more productive.</p>
+                </div>
+            </div>
+
+            <div class="overview-content">
+                <div>
+                    <h3>Near-Term Trends</h3>
+                    <ul>
+                        <li><strong>Better agents</strong> — Handle entire features reliably</li>
+                        <li><strong>Background work</strong> — AI works while you're away</li>
+                        <li><strong>CI/CD integration</strong> — AI in the pipeline</li>
+                        <li><strong>Specialization</strong> — Tools for specific frameworks/languages</li>
+                        <li><strong>Voice coding</strong> — Describe changes verbally</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Longer-Term Vision</h3>
+                    <ul>
+                        <li><strong>Spec-to-code</strong> — Describe product, get working software</li>
+                        <li><strong>Self-maintaining</strong> — AI handles updates, security patches</li>
+                        <li><strong>Collaborative teams</strong> — AI agents as team members</li>
+                        <li><strong>No-code graduation</strong> — Prototypes become production</li>
+                        <li><strong>Universal programming</strong> — Anyone can "code"</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>A meta-agent for AI-assisted development</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🔧 CodeAssistant</h3>
+                    <p>An agent that orchestrates AI coding tools based on the task at hand. Routes to the right tool, provides context, and manages the development workflow.</p>
+                    
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="cap-icon">📋</span> Analyze task requirements</div>
+                        <div class="agent-capability"><span class="cap-icon">🛠️</span> Select appropriate AI tool</div>
+                        <div class="agent-capability"><span class="cap-icon">📁</span> Gather codebase context</div>
+                        <div class="agent-capability"><span class="cap-icon">✍️</span> Generate implementation plan</div>
+                        <div class="agent-capability"><span class="cap-icon">🔍</span> Review generated code</div>
+                        <div class="agent-capability"><span class="cap-icon">🧪</span> Run tests and validate</div>
+                        <div class="agent-capability"><span class="cap-icon">📝</span> Document changes</div>
+                        <div class="agent-capability"><span class="cap-icon">🔄</span> Iterate on feedback</div>
+                    </div>
+                </div>
+
+                <div class="agent-code">
+                    <div class="code-header">code_assistant.py</div>
+                    <div class="code-content">
+<pre><span class="code-comment"># CodeAssistant Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+<span class="code-keyword">from</span> tools <span class="code-keyword">import</span> (
+    FileReader, CodeSearcher, TestRunner,
+    GitOperations, LintChecker
+)
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+code_assistant = Agent(
+    role=<span class="code-string">"Senior Software Engineer"</span>,
+    goal=<span class="code-string">"""Implement features and fix bugs 
+    with high-quality, tested code"""</span>,
+    backstory=<span class="code-string">"""Expert developer who writes 
+    clean, maintainable code. Follows best 
+    practices, writes tests, and documents 
+    changes thoroughly."""</span>,
+    tools=[
+        FileReader(),
+        CodeSearcher(),
+        TestRunner(),
+        GitOperations(),
+        LintChecker()
+    ],
+    llm=llm,
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">implement_feature</span>(
+    description: <span class="code-keyword">str</span>,
+    context_files: <span class="code-keyword">list</span>[<span class="code-keyword">str</span>]
+) -> <span class="code-keyword">dict</span>:
+    <span class="code-string">"""Implement a feature with AI assistance."""</span>
+    
+    task = Task(
+        description=<span class="code-string">f"""
+        Implement the following feature:
+        {description}
+        
+        Context files: {context_files}
+        
+        Steps:
+        1. Understand existing code patterns
+        2. Plan implementation approach
+        3. Write code following project style
+        4. Add appropriate tests
+        5. Run linter and fix issues
+        6. Document changes
+        """</span>,
+        agent=code_assistant,
+        expected_output=<span class="code-string">"Implemented feature with tests"</span>
+    )
+    
+    crew = Crew(agents=[code_assistant], tasks=[task])
+    result = <span class="code-keyword">await</span> crew.kickoff_async()
+    
+    <span class="code-keyword">return</span> {
+        <span class="code-string">"files_changed"</span>: result.files,
+        <span class="code-string">"tests_added"</span>: result.tests,
+        <span class="code-string">"documentation"</span>: result.docs
+    }</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Related Topics</h2>
+                    <p>Continue exploring emerging technologies</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat19-p2-agentic-ai.html" class="related-card">
+                    <div class="related-icon">🤖</div>
+                    <div class="related-title">Agentic AI</div>
+                    <div class="related-desc">The agent patterns powering coding tools</div>
+                </a>
+                <a href="cat19-p1-foundation-models.html" class="related-card">
+                    <div class="related-icon">🧠</div>
+                    <div class="related-title">Foundation Models</div>
+                    <div class="related-desc">The models behind code generation</div>
+                </a>
+                <a href="cat19-p9-observability.html" class="related-card">
+                    <div class="related-icon">📊</div>
+                    <div class="related-title">Observability & Evals</div>
+                    <div class="related-desc">Measuring AI code quality</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat19-p3-multimodal-ai.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">19.3 Multimodal AI</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 19.4</div>
+        <a href="cat19-p5-edge-ai.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">19.5 Edge & On-Device AI</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

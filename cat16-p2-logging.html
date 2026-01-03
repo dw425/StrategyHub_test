@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging | Monitoring & Observability | Category 16 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --violet: #8B5CF6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        .architecture-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .architecture-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .architecture-title { font-size: var(--font-sm); font-weight: 600; }
+        .architecture-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .architecture-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .comparison-card { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .comparison-card:hover { border-color: var(--comp-color); }
+        .comparison-card.structured { --comp-color: #10B981; }
+        .comparison-card.unstructured { --comp-color: #EF4444; }
+        .comparison-header { padding: var(--space-lg); background: color-mix(in srgb, var(--comp-color) 10%, transparent); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-md); }
+        .comparison-icon { width: 48px; height: 48px; background: color-mix(in srgb, var(--comp-color) 20%, transparent); border: 2px solid var(--comp-color); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .comparison-title { font-size: var(--font-lg); font-weight: 700; color: var(--comp-color); }
+        .comparison-subtitle { font-size: var(--font-xs); color: var(--text-muted); }
+        .comparison-body { padding: var(--space-lg); }
+        .comparison-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .comparison-code { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-dark); padding: var(--space-md); border-radius: var(--radius-md); color: var(--text-secondary); margin-bottom: var(--space-lg); overflow-x: auto; white-space: pre; line-height: 1.6; }
+        .comparison-list { list-style: none; }
+        .comparison-list li { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .comparison-list li::before { content: '✓'; color: var(--comp-color); font-weight: bold; }
+        .levels-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .level-card { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+        .level-card:hover { transform: translateY(-4px); border-color: var(--level-color); }
+        .level-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--level-color); }
+        .level-card.trace { --level-color: #6B7280; }
+        .level-card.debug { --level-color: #3B82F6; }
+        .level-card.info { --level-color: #10B981; }
+        .level-card.warn { --level-color: #F59E0B; }
+        .level-card.error { --level-color: #EF4444; }
+        .level-icon { font-size: 28px; margin-bottom: var(--space-sm); }
+        .level-name { font-size: var(--font-base); font-weight: 700; color: var(--level-color); margin-bottom: var(--space-xs); }
+        .level-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .level-volume { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-color); }
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); }
+        .tool-card-header { padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .tool-logo { width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; }
+        .tool-info h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: 2px; }
+        .tool-type { font-size: var(--font-xs); color: var(--text-muted); }
+        .tool-card-body { padding: var(--space-lg); }
+        .tool-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.6; }
+        .tool-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tool-feature { font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-full); color: var(--text-muted); }
+        .query-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .query-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .query-title { font-size: var(--font-sm); font-weight: 600; }
+        .query-tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+        .query-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .query-tab:hover { color: var(--text-primary); }
+        .query-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); }
+        .query-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border-color); }
+        .query-example { background: var(--bg-card); padding: var(--space-lg); }
+        .query-label { font-size: var(--font-xs); font-weight: 600; margin-bottom: var(--space-sm); color: var(--cat-light); }
+        .query-code { font-family: 'Monaco', monospace; font-size: 11px; background: var(--bg-dark); padding: var(--space-md); border-radius: var(--radius-md); color: var(--cyan); margin-bottom: var(--space-sm); overflow-x: auto; }
+        .query-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .patterns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .pattern-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .pattern-card:hover { border-color: var(--cat-primary); }
+        .pattern-icon { font-size: 28px; margin-bottom: var(--space-md); }
+        .pattern-name { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); }
+        .pattern-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; }
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-primary); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 1px solid var(--cat-dark); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; }
+        .antipatterns-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .antipattern-card { background: var(--bg-card); border: 1px solid var(--danger-red); border-radius: var(--radius-lg); padding: var(--space-lg); }
+        .antipattern-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+        .antipattern-icon { font-size: 20px; }
+        .antipattern-title { font-size: var(--font-sm); font-weight: 600; color: var(--danger-red); }
+        .antipattern-desc { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.6; margin-bottom: var(--space-md); }
+        .antipattern-fix { font-size: var(--font-xs); color: var(--success-green); display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .antipattern-fix::before { content: '✓'; font-weight: bold; }
+        .scorecard-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .scorecard-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .scorecard-title { font-size: var(--font-sm); font-weight: 600; }
+        .scorecard-table { width: 100%; border-collapse: collapse; }
+        .scorecard-table th, .scorecard-table td { padding: var(--space-md) var(--space-lg); text-align: left; border-bottom: 1px solid var(--border-color); }
+        .scorecard-table th { font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase; background: var(--bg-card-alt); }
+        .scorecard-table tr:last-child td { border-bottom: none; }
+        .scorecard-table td { font-size: var(--font-sm); }
+        .scorecard-table tr:hover td { background: var(--bg-hover); }
+        .score-cell { display: flex; align-items: center; gap: 8px; }
+        .score-bar { height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden; width: 50px; }
+        .score-fill { height: 100%; border-radius: 4px; }
+        .score-fill.high { background: var(--success-green); }
+        .score-fill.medium { background: var(--warning-yellow); }
+        .score-fill.low { background: var(--danger-red); }
+        .score-num { font-size: var(--font-xs); color: var(--text-secondary); font-weight: 600; min-width: 24px; }
+        .tool-name-cell { display: flex; align-items: center; gap: var(--space-sm); }
+        .tool-mini-logo { width: 24px; height: 24px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; }
+        .retention-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .retention-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; transition: all 0.3s; }
+        .retention-card:hover { border-color: var(--cat-primary); }
+        .retention-period { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .retention-type { font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); }
+        .retention-use { font-size: var(--font-xs); color: var(--text-muted); line-height: 1.5; }
+        .agent-card { display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .agent-info { padding: var(--space-xl); display: flex; flex-direction: column; justify-content: center; }
+        .agent-badge { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .agent-title { font-size: var(--font-xl); font-weight: 700; margin-bottom: var(--space-md); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: 1.7; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: var(--space-sm); }
+        .agent-capability { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: var(--font-sm); color: var(--text-secondary); }
+        .cap-icon { font-size: 16px; width: 20px; text-align: center; }
+        .agent-code { background: var(--bg-dark); padding: var(--space-xl); border-left: 1px solid var(--border-color); }
+        .code-header { padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--font-xs); color: var(--text-muted); font-family: monospace; }
+        .code-block { background: var(--bg-card); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: var(--space-md); overflow-x: auto; max-height: 350px; overflow-y: auto; }
+        .code-block pre { font-family: 'Monaco', monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--success-green); }
+        .code-comment { color: var(--text-muted); }
+        .code-number { color: var(--cyan); }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .related-card { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-xs); }
+        .related-title { font-size: var(--font-base); font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-xs); }
+        .related-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .comparison-grid, .agent-card { grid-template-columns: 1fr; }
+            .levels-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-grid, .query-grid, .practices-grid, .antipatterns-grid, .retention-grid, .patterns-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat16-monitoring-observability-overview.html">Monitoring & Observability</a>
+        <span class="sep">/</span>
+        <span class="current">Logging</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📊 Category 16</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat16-monitoring-observability-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat16-p1-metrics-monitoring.html"><span class="nav-icon">📈</span> 16.1 Metrics</a></li>
+            <li><a href="cat16-p2-logging.html" class="active"><span class="nav-icon">📝</span> 16.2 Logging</a></li>
+            <li><a href="cat16-p3-distributed-tracing.html"><span class="nav-icon">🔗</span> 16.3 Tracing</a></li>
+            <li><a href="cat16-p4-alerting-incidents.html"><span class="nav-icon">🚨</span> 16.4 Alerting</a></li>
+            <li><a href="cat16-p5-apm.html"><span class="nav-icon">⚡</span> 16.5 APM</a></li>
+            <li><a href="cat16-p6-aiops.html"><span class="nav-icon">🤖</span> 16.6 AIOps</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture</a></li>
+            <li><a href="#structured"><span class="nav-icon">📋</span> Structured vs Plain</a></li>
+            <li><a href="#levels"><span class="nav-icon">📊</span> Log Levels</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Platforms</a></li>
+            <li><a href="#queries"><span class="nav-icon">🔍</span> Query Languages</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📐</span> Log Patterns</a></li>
+            <li><a href="#retention"><span class="nav-icon">🗄️</span> Retention</a></li>
+            <li><a href="#practices"><span class="nav-icon">✨</span> Best Practices</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">🚫</span> Anti-Patterns</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📋</span> Scorecard</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">📝 Page 16.2</div>
+                <h1>Logging</h1>
+                <p>Capture, aggregate, and analyze discrete events from applications and infrastructure. Search through logs to debug issues, audit activity, and understand system behavior.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">TB/day</div>
+                    <div class="hero-metric-label">Enterprise Scale</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">5</div>
+                    <div class="hero-metric-label">Log Levels</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;1s</div>
+                    <div class="hero-metric-label">Search Latency</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">JSON</div>
+                    <div class="hero-metric-label">Structured Format</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Logging Architecture</h2>
+                    <p>How logs flow from sources to analysis</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Logs are discrete, timestamped records of events. Unlike metrics which are numeric samples, logs capture contextual information—error messages, stack traces, user actions, API requests. Centralized logging aggregates these events from distributed systems into a searchable repository.</p>
+                <p>A modern logging pipeline involves collection agents, processing/enrichment, storage, and visualization. The goal: make it possible to search billions of log lines in seconds to answer questions during incident response.</p>
+            </div>
+            
+            <div class="architecture-container">
+                <div class="architecture-header">
+                    <div class="architecture-title">📝 Log Aggregation Pipeline</div>
+                    <div class="architecture-badge">STREAMING DATA</div>
+                </div>
+                <div class="architecture-canvas">
+                    <svg viewBox="0 0 920 400" style="width: 100%; height: 400px;">
+                        <defs>
+                            <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowAmber"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowBlue"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowPurple"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <filter id="glowRed"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        </defs>
+                        
+                        <!-- SOURCES -->
+                        <rect x="20" y="30" width="150" height="340" rx="12" fill="rgba(16,185,129,0.05)" stroke="#10B981" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="95" y="55" fill="#34D399" font-size="11" font-weight="600" text-anchor="middle">LOG SOURCES</text>
+                        
+                        <rect x="32" y="75" width="126" height="40" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                        <text x="95" y="100" fill="#34D399" font-size="10" text-anchor="middle">🖥️ Applications</text>
+                        
+                        <rect x="32" y="125" width="126" height="40" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="95" y="150" fill="#60A5FA" font-size="10" text-anchor="middle">🐳 Containers</text>
+                        
+                        <rect x="32" y="175" width="126" height="40" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="95" y="200" fill="#A78BFA" font-size="10" text-anchor="middle">🖧 Infrastructure</text>
+                        
+                        <rect x="32" y="225" width="126" height="40" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                        <text x="95" y="250" fill="#F472B6" font-size="10" text-anchor="middle">🗄️ Databases</text>
+                        
+                        <rect x="32" y="275" width="126" height="40" rx="6" fill="#1a1a2e" stroke="#F97316" stroke-width="1"/>
+                        <text x="95" y="300" fill="#FB923C" font-size="10" text-anchor="middle">☁️ Cloud Services</text>
+                        
+                        <!-- COLLECTION -->
+                        <rect x="220" y="70" width="140" height="250" rx="12" fill="rgba(245,158,11,0.1)" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="290" y="95" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle">COLLECTION</text>
+                        
+                        <rect x="235" y="115" width="110" height="55" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="290" y="140" fill="#FBBF24" font-size="10" text-anchor="middle">📤 Agents</text>
+                        <text x="290" y="158" fill="#6a6a7a" font-size="8" text-anchor="middle">Fluentd • Filebeat</text>
+                        
+                        <rect x="235" y="185" width="110" height="55" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="290" y="210" fill="#FBBF24" font-size="10" text-anchor="middle">🔄 Parsing</text>
+                        <text x="290" y="228" fill="#6a6a7a" font-size="8" text-anchor="middle">Grok • JSON • Regex</text>
+                        
+                        <rect x="235" y="255" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                        <text x="290" y="283" fill="#FBBF24" font-size="10" text-anchor="middle">🏷️ Enrichment</text>
+                        
+                        <!-- PROCESSING -->
+                        <rect x="410" y="70" width="140" height="250" rx="12" fill="rgba(59,130,246,0.1)" stroke="#3B82F6" stroke-width="2"/>
+                        <text x="480" y="95" fill="#60A5FA" font-size="11" font-weight="600" text-anchor="middle">PROCESSING</text>
+                        
+                        <rect x="425" y="115" width="110" height="55" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="480" y="140" fill="#60A5FA" font-size="10" text-anchor="middle">📨 Buffer/Queue</text>
+                        <text x="480" y="158" fill="#6a6a7a" font-size="8" text-anchor="middle">Kafka • Redis</text>
+                        
+                        <rect x="425" y="185" width="110" height="55" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="480" y="210" fill="#60A5FA" font-size="10" text-anchor="middle">⚙️ Transform</text>
+                        <text x="480" y="228" fill="#6a6a7a" font-size="8" text-anchor="middle">Filter • Route • Mask</text>
+                        
+                        <rect x="425" y="255" width="110" height="45" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                        <text x="480" y="283" fill="#60A5FA" font-size="10" text-anchor="middle">🗜️ Compress</text>
+                        
+                        <!-- STORAGE & ANALYSIS -->
+                        <rect x="600" y="30" width="160" height="340" rx="12" fill="rgba(139,92,246,0.05)" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="5 3"/>
+                        <text x="680" y="55" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle">STORAGE & ANALYSIS</text>
+                        
+                        <rect x="615" y="75" width="130" height="55" rx="8" fill="#1a1a2e" stroke="#F7CE26" stroke-width="2"/>
+                        <text x="680" y="100" fill="#F7CE26" font-size="11" font-weight="600" text-anchor="middle">🔍 Elasticsearch</text>
+                        <text x="680" y="118" fill="#6a6a7a" font-size="8" text-anchor="middle">Index • Search • Analyze</text>
+                        
+                        <rect x="615" y="145" width="130" height="50" rx="6" fill="#1a1a2e" stroke="#E91C84" stroke-width="2"/>
+                        <text x="680" y="170" fill="#E91C84" font-size="11" font-weight="600" text-anchor="middle">📊 Kibana</text>
+                        <text x="680" y="185" fill="#6a6a7a" font-size="8" text-anchor="middle">Dashboards • Discover</text>
+                        
+                        <rect x="615" y="210" width="130" height="50" rx="6" fill="#1a1a2e" stroke="#F46800" stroke-width="2"/>
+                        <text x="680" y="235" fill="#F46800" font-size="11" font-weight="600" text-anchor="middle">📈 Grafana Loki</text>
+                        <text x="680" y="250" fill="#6a6a7a" font-size="8" text-anchor="middle">Labels • LogQL</text>
+                        
+                        <rect x="615" y="275" width="130" height="50" rx="6" fill="#1a1a2e" stroke="#00BFA5" stroke-width="2"/>
+                        <text x="680" y="300" fill="#00BFA5" font-size="11" font-weight="600" text-anchor="middle">🗄️ Object Storage</text>
+                        <text x="680" y="318" fill="#6a6a7a" font-size="8" text-anchor="middle">S3 • Long-term Archive</text>
+                        
+                        <!-- ALERTS -->
+                        <rect x="805" y="100" width="100" height="90" rx="10" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="2"/>
+                        <text x="855" y="130" fill="#F87171" font-size="11" font-weight="600" text-anchor="middle">🚨 Alerts</text>
+                        <text x="855" y="155" fill="#6a6a7a" font-size="9" text-anchor="middle">Slack • PagerDuty</text>
+                        <text x="855" y="175" fill="#6a6a7a" font-size="9" text-anchor="middle">Email • Webhooks</text>
+                        
+                        <!-- MAIN CONNECTION LINES -->
+                        <!-- Sources to Collection - multiple lines from each source -->
+                        <path d="M 158 95 Q 185 95 185 145 Q 185 190 220 190" stroke="#10B981" stroke-width="2" fill="none"/>
+                        <path d="M 158 145 Q 190 145 190 190 L 220 190" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M 158 195 L 220 195" stroke="#8B5CF6" stroke-width="2" fill="none"/>
+                        <path d="M 158 245 Q 190 245 190 200 L 220 200" stroke="#EC4899" stroke-width="2" fill="none"/>
+                        <path d="M 158 295 Q 185 295 185 250 Q 185 205 220 205" stroke="#F97316" stroke-width="2" fill="none"/>
+                        
+                        <!-- Collection to Processing -->
+                        <line x1="360" y1="142" x2="410" y2="142" stroke="#F59E0B" stroke-width="3"/>
+                        <line x1="360" y1="212" x2="410" y2="212" stroke="#F59E0B" stroke-width="3"/>
+                        <line x1="360" y1="277" x2="410" y2="277" stroke="#F59E0B" stroke-width="3"/>
+                        
+                        <!-- Processing to Storage -->
+                        <path d="M 550 142 Q 575 142 575 102 L 600 102" stroke="#3B82F6" stroke-width="3" fill="none"/>
+                        <path d="M 550 142 Q 575 142 575 170 L 600 170" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M 550 212 Q 575 212 575 235 L 600 235" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        <path d="M 550 277 Q 575 277 575 300 L 600 300" stroke="#3B82F6" stroke-width="2" fill="none"/>
+                        
+                        <!-- Storage to Alerts -->
+                        <line x1="745" y1="102" x2="805" y2="125" stroke="#8B5CF6" stroke-width="2"/>
+                        <line x1="745" y1="170" x2="805" y2="145" stroke="#E91C84" stroke-width="2"/>
+                        
+                        <!-- FLOW LABELS -->
+                        <rect x="175" y="195" width="35" height="16" rx="3" fill="#0a0a0f"/>
+                        <text x="192" y="207" fill="#10B981" font-size="8" font-weight="600" text-anchor="middle">SHIP</text>
+                        
+                        <rect x="365" y="165" width="40" height="16" rx="3" fill="#0a0a0f"/>
+                        <text x="385" y="177" fill="#F59E0B" font-size="8" font-weight="600" text-anchor="middle">STREAM</text>
+                        
+                        <rect x="555" y="165" width="35" height="16" rx="3" fill="#0a0a0f"/>
+                        <text x="572" y="177" fill="#3B82F6" font-size="8" font-weight="600" text-anchor="middle">INDEX</text>
+                        
+                        <rect x="755" y="108" width="40" height="16" rx="3" fill="#0a0a0f"/>
+                        <text x="775" y="120" fill="#EF4444" font-size="8" font-weight="600" text-anchor="middle">ALERT</text>
+                        
+                        <!-- ANIMATED DOTS - Sources to Collection -->
+                        <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 158 95 Q 185 95 185 145 Q 185 190 220 190"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.3s" path="M 158 145 Q 190 145 190 190 L 220 190"/>
+                        </circle>
+                        <circle r="5" fill="#8B5CF6" filter="url(#glowPurple)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.5s" path="M 158 195 L 220 195"/>
+                        </circle>
+                        <circle r="5" fill="#EC4899" filter="url(#glowPurple)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.7s" path="M 158 245 Q 190 245 190 200 L 220 200"/>
+                        </circle>
+                        <circle r="5" fill="#F97316" filter="url(#glowAmber)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.9s" path="M 158 295 Q 185 295 185 250 Q 185 205 220 205"/>
+                        </circle>
+                        
+                        <!-- ANIMATED DOTS - Collection to Processing -->
+                        <circle r="5" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="1s" repeatCount="indefinite" path="M 360 142 L 410 142"/>
+                        </circle>
+                        <circle r="5" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="1s" repeatCount="indefinite" begin="0.33s" path="M 360 212 L 410 212"/>
+                        </circle>
+                        <circle r="5" fill="#F59E0B" filter="url(#glowAmber)">
+                            <animateMotion dur="1s" repeatCount="indefinite" begin="0.66s" path="M 360 277 L 410 277"/>
+                        </circle>
+                        
+                        <!-- ANIMATED DOTS - Processing to Storage -->
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" path="M 550 142 Q 575 142 575 102 L 600 102"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.4s" path="M 550 212 Q 575 212 575 235 L 600 235"/>
+                        </circle>
+                        <circle r="5" fill="#3B82F6" filter="url(#glowBlue)">
+                            <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.8s" path="M 550 277 Q 575 277 575 300 L 600 300"/>
+                        </circle>
+                        
+                        <!-- ANIMATED DOTS - Storage to Alerts -->
+                        <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 745 102 L 805 125"/>
+                        </circle>
+                        <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s" path="M 745 170 L 805 145"/>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- STRUCTURED VS UNSTRUCTURED -->
+        <section class="module" id="structured">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Structured vs Unstructured Logs</h2>
+                    <p>Why format matters for searchability</p>
+                </div>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card structured">
+                    <div class="comparison-header">
+                        <div class="comparison-icon">✅</div>
+                        <div>
+                            <div class="comparison-title">Structured Logging</div>
+                            <div class="comparison-subtitle">JSON, Key-Value Pairs</div>
+                        </div>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-desc">Structured logs use consistent, machine-parseable formats like JSON. Every field is explicitly named, making queries fast and reliable.</div>
+                        <div class="comparison-code">{
+  "timestamp": "2024-01-15T10:23:45Z",
+  "level": "ERROR",
+  "service": "payment-api",
+  "trace_id": "abc123",
+  "user_id": "u-456",
+  "message": "Payment failed",
+  "error_code": "CARD_DECLINED",
+  "amount": 99.99,
+  "currency": "USD"
+}</div>
+                        <ul class="comparison-list">
+                            <li>Precise field-level queries</li>
+                            <li>Easy aggregation and statistics</li>
+                            <li>Consistent schema across services</li>
+                            <li>Machine learning ready</li>
+                            <li>Better correlation with traces</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="comparison-card unstructured">
+                    <div class="comparison-header">
+                        <div class="comparison-icon">⚠️</div>
+                        <div>
+                            <div class="comparison-title">Unstructured Logging</div>
+                            <div class="comparison-subtitle">Plain Text, Free Form</div>
+                        </div>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-desc">Plain text logs require parsing with regex or grok patterns. Field extraction is brittle and changes when log formats change.</div>
+                        <div class="comparison-code">2024-01-15 10:23:45 ERROR [payment-api] 
+Payment failed for user u-456. 
+Card declined. Amount: $99.99 USD.
+Trace: abc123</div>
+                        <ul class="comparison-list">
+                            <li>Human readable at a glance</li>
+                            <li>No schema to maintain</li>
+                            <li>Legacy system compatibility</li>
+                            <li>Regex parsing required</li>
+                            <li>Fragile field extraction</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- LOG LEVELS -->
+        <section class="module" id="levels">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Log Levels</h2>
+                    <p>Severity classification for filtering</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Log levels indicate severity and help filter noise. In production, typically only INFO and above are captured. During debugging, TRACE and DEBUG provide granular insight. Configure levels per-service to control volume.</p>
+            </div>
+            
+            <div class="levels-grid">
+                <div class="level-card trace">
+                    <div class="level-icon">🔬</div>
+                    <div class="level-name">TRACE</div>
+                    <div class="level-desc">Finest granularity. Function entry/exit, variable values. Development only.</div>
+                    <div class="level-volume">📈 Highest Volume</div>
+                </div>
+                <div class="level-card debug">
+                    <div class="level-icon">🐛</div>
+                    <div class="level-name">DEBUG</div>
+                    <div class="level-desc">Diagnostic info for developers. Request details, intermediate state.</div>
+                    <div class="level-volume">📊 High Volume</div>
+                </div>
+                <div class="level-card info">
+                    <div class="level-icon">ℹ️</div>
+                    <div class="level-name">INFO</div>
+                    <div class="level-desc">Normal operations. Request completed, job started, config loaded.</div>
+                    <div class="level-volume">📉 Moderate Volume</div>
+                </div>
+                <div class="level-card warn">
+                    <div class="level-icon">⚠️</div>
+                    <div class="level-name">WARN</div>
+                    <div class="level-desc">Potential issues. Deprecated API, retry attempts, approaching limits.</div>
+                    <div class="level-volume">📉 Low Volume</div>
+                </div>
+                <div class="level-card error">
+                    <div class="level-icon">🚨</div>
+                    <div class="level-name">ERROR</div>
+                    <div class="level-desc">Failures requiring attention. Exceptions, failed operations, data loss.</div>
+                    <div class="level-volume">📉 Lowest Volume</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Logging Platforms</h2>
+                    <p>Leading tools for log aggregation and analysis</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #F7CE26, #FED530);">ELK</div>
+                        <div class="tool-info">
+                            <h4>Elastic Stack (ELK)</h4>
+                            <div class="tool-type">Open Source • Self-Hosted</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Industry standard stack: Elasticsearch for storage/search, Logstash for processing, Kibana for visualization. Powerful but complex.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Full-Text Search</span>
+                            <span class="tool-feature">KQL/Lucene</span>
+                            <span class="tool-feature">Dashboards</span>
+                            <span class="tool-feature">Alerts</span>
+                            <span class="tool-feature">ML</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">Lo</div>
+                        <div class="tool-info">
+                            <h4>Grafana Loki</h4>
+                            <div class="tool-type">Open Source • Cloud-Native</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Like Prometheus but for logs. Indexes labels only, stores compressed logs in object storage. Cost-effective at scale.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Label-Based</span>
+                            <span class="tool-feature">LogQL</span>
+                            <span class="tool-feature">Object Storage</span>
+                            <span class="tool-feature">Grafana Native</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #65A637, #7BC043);">Sp</div>
+                        <div class="tool-info">
+                            <h4>Splunk</h4>
+                            <div class="tool-type">Enterprise • SaaS</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Enterprise leader with powerful SPL query language, SIEM capabilities, and extensive app ecosystem. Premium pricing.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">SPL</span>
+                            <span class="tool-feature">SIEM</span>
+                            <span class="tool-feature">Apps/Add-ons</span>
+                            <span class="tool-feature">ML Toolkit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">Dd</div>
+                        <div class="tool-info">
+                            <h4>Datadog Logs</h4>
+                            <div class="tool-type">SaaS • Unified Platform</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Part of unified observability platform. Seamless correlation with metrics and traces. Live tail and pattern detection.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Unified View</span>
+                            <span class="tool-feature">Patterns</span>
+                            <span class="tool-feature">Live Tail</span>
+                            <span class="tool-feature">Archives</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #00A3E0, #00BCD4);">Fl</div>
+                        <div class="tool-info">
+                            <h4>Fluentd / Fluent Bit</h4>
+                            <div class="tool-type">CNCF • Collection</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Unified logging layer. Fluent Bit is lightweight for edge/containers. 500+ output plugins for any destination.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">500+ Plugins</span>
+                            <span class="tool-feature">Lightweight</span>
+                            <span class="tool-feature">K8s Native</span>
+                            <span class="tool-feature">Buffering</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #E91C84, #EC4899);">Be</div>
+                        <div class="tool-info">
+                            <h4>Elastic Beats</h4>
+                            <div class="tool-type">Open Source • Shippers</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Lightweight data shippers. Filebeat for logs, Metricbeat for metrics, Packetbeat for network. Edge collection agents.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Filebeat</span>
+                            <span class="tool-feature">Metricbeat</span>
+                            <span class="tool-feature">Modules</span>
+                            <span class="tool-feature">Processors</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #00C7B7, #14B8A6);">Su</div>
+                        <div class="tool-info">
+                            <h4>Sumo Logic</h4>
+                            <div class="tool-type">SaaS • Analytics</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Cloud-native machine data analytics. Real-time dashboards, anomaly detection, and security analytics built-in.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Real-time</span>
+                            <span class="tool-feature">Anomaly ML</span>
+                            <span class="tool-feature">Cloud SIEM</span>
+                            <span class="tool-feature">CSE</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">CW</div>
+                        <div class="tool-info">
+                            <h4>CloudWatch Logs</h4>
+                            <div class="tool-type">AWS Native • Managed</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">Native AWS logging service. Deep integration with Lambda, ECS, EKS. Logs Insights for ad-hoc queries.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">AWS Native</span>
+                            <span class="tool-feature">Insights</span>
+                            <span class="tool-feature">Metric Filters</span>
+                            <span class="tool-feature">Subscriptions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-logo" style="background: linear-gradient(135deg, #425CC7, #5A67D8);">Ve</div>
+                        <div class="tool-info">
+                            <h4>Vector</h4>
+                            <div class="tool-type">Open Source • Pipeline</div>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <div class="tool-desc">High-performance observability data pipeline. Written in Rust. Drop-in Logstash replacement with better efficiency.</div>
+                        <div class="tool-features">
+                            <span class="tool-feature">Rust</span>
+                            <span class="tool-feature">VRL</span>
+                            <span class="tool-feature">Multi-Source</span>
+                            <span class="tool-feature">Efficient</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- QUERY LANGUAGES -->
+        <section class="module" id="queries">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>Query Languages</h2>
+                    <p>Searching and analyzing logs</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Each logging platform has its own query language with distinct syntax and capabilities. Mastering these languages is essential for effective log analysis, incident response, and building alerting rules. Below are comprehensive references for the most common platforms.</p>
+            </div>
+            
+            <div class="query-container" style="margin-bottom: var(--space-xl);">
+                <div class="query-header">
+                    <div class="query-title">🔍 Elasticsearch KQL / Lucene</div>
+                </div>
+                <div class="query-grid">
+                    <div class="query-example">
+                        <div class="query-label">Basic Field Match</div>
+                        <div class="query-code">level: "ERROR" AND service: "payment-api"</div>
+                        <div class="query-desc">Filter by exact field values. Use quotes for strings.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Time Range Filter</div>
+                        <div class="query-code">@timestamp >= "2024-01-15" AND @timestamp < "2024-01-16"</div>
+                        <div class="query-desc">Query within specific date/time range.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Wildcard Search</div>
+                        <div class="query-code">message: *timeout* AND NOT service: health-check</div>
+                        <div class="query-desc">Pattern matching with wildcards, exclusions.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Range Queries</div>
+                        <div class="query-code">response_time: [100 TO 500] AND status: [400 TO 599]</div>
+                        <div class="query-desc">Numeric ranges with inclusive brackets.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Regex Pattern</div>
+                        <div class="query-code">message: /user-[0-9]+/ AND level: "WARN"</div>
+                        <div class="query-desc">Regular expression matching in fields.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Exists Check</div>
+                        <div class="query-code">_exists_: error_code AND NOT _exists_: retry_count</div>
+                        <div class="query-desc">Check if field exists in document.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Fuzzy Match</div>
+                        <div class="query-code">message: "database~2" OR message: "databse"</div>
+                        <div class="query-desc">Approximate matching with edit distance.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Nested Boolean</div>
+                        <div class="query-code">(level: "ERROR" OR level: "FATAL") AND (service: "api" OR service: "web")</div>
+                        <div class="query-desc">Complex boolean logic with grouping.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="query-container" style="margin-bottom: var(--space-xl);">
+                <div class="query-header">
+                    <div class="query-title">📊 LogQL (Grafana Loki)</div>
+                </div>
+                <div class="query-grid">
+                    <div class="query-example">
+                        <div class="query-label">Label Selector</div>
+                        <div class="query-code">{app="nginx", env="prod", cluster="us-east"}</div>
+                        <div class="query-desc">Select streams by labels (indexed, fast).</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Line Filter</div>
+                        <div class="query-code">{app="api"} |= "error" != "healthcheck"</div>
+                        <div class="query-desc">Contains (|=) and not contains (!=) filters.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Regex Filter</div>
+                        <div class="query-code">{app="api"} |~ "user_id=[0-9]+" !~ "test"</div>
+                        <div class="query-desc">Regex match (|~) and not match (!~).</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">JSON Parser</div>
+                        <div class="query-code">{app="api"} | json | level="error" | status >= 500</div>
+                        <div class="query-desc">Parse JSON, filter on extracted fields.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Logfmt Parser</div>
+                        <div class="query-code">{app="api"} | logfmt | duration > 1s | method="POST"</div>
+                        <div class="query-desc">Parse key=value format logs.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Pattern Parser</div>
+                        <div class="query-code">{app="nginx"} | pattern `&lt;ip&gt; - - &lt;_&gt; "&lt;method&gt; &lt;path&gt;"` | method="POST"</div>
+                        <div class="query-desc">Extract fields using pattern template.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Rate Calculation</div>
+                        <div class="query-code">rate({app="api"} |= "error" [5m])</div>
+                        <div class="query-desc">Error rate per second over 5 minutes.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Count Over Time</div>
+                        <div class="query-code">count_over_time({app="api"} |= "error" [1h])</div>
+                        <div class="query-desc">Total error count in last hour.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Sum by Label</div>
+                        <div class="query-code">sum by (status) (rate({app="api"} | json [5m]))</div>
+                        <div class="query-desc">Aggregate rates grouped by status.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Top K</div>
+                        <div class="query-code">topk(5, sum by (path) (rate({app="api"} | json [5m])))</div>
+                        <div class="query-desc">Top 5 paths by request rate.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Quantile</div>
+                        <div class="query-code">quantile_over_time(0.99, {app="api"} | json | unwrap duration [5m]) by (service)</div>
+                        <div class="query-desc">P99 duration by service.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Line Format</div>
+                        <div class="query-code">{app="api"} | json | line_format "{{.level}} {{.message}}"</div>
+                        <div class="query-desc">Reformat output using Go templates.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="query-container" style="margin-bottom: var(--space-xl);">
+                <div class="query-header">
+                    <div class="query-title">🟢 Splunk SPL</div>
+                </div>
+                <div class="query-grid">
+                    <div class="query-example">
+                        <div class="query-label">Index Search</div>
+                        <div class="query-code">index=prod sourcetype=nginx level=ERROR</div>
+                        <div class="query-desc">Search specific index and sourcetype.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Stats Command</div>
+                        <div class="query-code">index=prod level=ERROR | stats count by host, service</div>
+                        <div class="query-desc">Aggregate counts grouped by fields.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Timechart</div>
+                        <div class="query-code">index=prod | timechart span=1h count by level</div>
+                        <div class="query-desc">Time-series chart with hourly buckets.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Top Values</div>
+                        <div class="query-code">index=prod | top 10 uri_path by status</div>
+                        <div class="query-desc">Top 10 paths grouped by status code.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Field Extraction</div>
+                        <div class="query-code">index=prod | rex field=message "user=(?&lt;username&gt;\w+)"</div>
+                        <div class="query-desc">Extract fields using regex named groups.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Eval Calculation</div>
+                        <div class="query-code">index=prod | eval duration_ms=duration*1000 | where duration_ms > 1000</div>
+                        <div class="query-desc">Create calculated fields, filter results.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Transaction</div>
+                        <div class="query-code">index=prod | transaction session_id maxspan=30m</div>
+                        <div class="query-desc">Group events by session within time window.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Lookup Enrichment</div>
+                        <div class="query-code">index=prod | lookup user_info user_id OUTPUT department, manager</div>
+                        <div class="query-desc">Join with lookup table for enrichment.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Percentiles</div>
+                        <div class="query-code">index=prod | stats perc50(duration) perc95(duration) perc99(duration) by service</div>
+                        <div class="query-desc">Calculate percentiles by service.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Subsearch</div>
+                        <div class="query-code">index=prod [search index=alerts | fields host] | stats count by host</div>
+                        <div class="query-desc">Use subsearch results as filter.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Rare Values</div>
+                        <div class="query-code">index=prod | rare status_code limit=20</div>
+                        <div class="query-desc">Find least common values (anomalies).</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Dedup</div>
+                        <div class="query-code">index=prod | dedup user_id sortby -_time | table user_id, action, _time</div>
+                        <div class="query-desc">Remove duplicates, keep most recent.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="query-container">
+                <div class="query-header">
+                    <div class="query-title">☁️ CloudWatch Logs Insights</div>
+                </div>
+                <div class="query-grid">
+                    <div class="query-example">
+                        <div class="query-label">Filter & Display</div>
+                        <div class="query-code">fields @timestamp, @message | filter @message like /ERROR/</div>
+                        <div class="query-desc">Select fields, filter by pattern.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Stats Aggregation</div>
+                        <div class="query-code">stats count(*) as errorCount by bin(1h)</div>
+                        <div class="query-desc">Count errors in hourly buckets.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Parse JSON</div>
+                        <div class="query-code">parse @message '{"level":"*","service":"*"}' as level, service</div>
+                        <div class="query-desc">Extract fields from JSON logs.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Top Contributors</div>
+                        <div class="query-code">stats count(*) by service | sort count desc | limit 10</div>
+                        <div class="query-desc">Top 10 services by log volume.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Percentiles</div>
+                        <div class="query-code">stats pct(@duration, 50) as p50, pct(@duration, 99) as p99 by service</div>
+                        <div class="query-desc">Calculate latency percentiles.</div>
+                    </div>
+                    <div class="query-example">
+                        <div class="query-label">Lambda Cold Starts</div>
+                        <div class="query-code">filter @type = "REPORT" | stats avg(@duration), max(@memoryUsed) by bin(5m)</div>
+                        <div class="query-desc">Lambda performance over time.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- LOG PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Logging Patterns</h2>
+                    <p>Common approaches for effective logging</p>
+                </div>
+            </div>
+            
+            <div class="patterns-grid">
+                <div class="pattern-card">
+                    <div class="pattern-icon">🏷️</div>
+                    <div class="pattern-name">Contextual Logging</div>
+                    <div class="pattern-desc">Include request_id, user_id, trace_id in every log for correlation across services.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📦</div>
+                    <div class="pattern-name">Log Aggregation</div>
+                    <div class="pattern-desc">Centralize logs from all services into one searchable store. Don't log locally.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🎭</div>
+                    <div class="pattern-name">Sensitive Data Masking</div>
+                    <div class="pattern-desc">Redact PII, passwords, tokens before shipping. Compliance is mandatory.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📊</div>
+                    <div class="pattern-name">Metric Extraction</div>
+                    <div class="pattern-desc">Derive metrics from logs: error counts, latency distributions, business KPIs.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🔗</div>
+                    <div class="pattern-name">Log-Trace Correlation</div>
+                    <div class="pattern-desc">Embed trace_id in logs. Click from log to distributed trace in one step.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">⚡</div>
+                    <div class="pattern-name">Async Logging</div>
+                    <div class="pattern-desc">Don't block request threads on log writes. Use async appenders with buffers.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🗂️</div>
+                    <div class="pattern-name">Log Sampling</div>
+                    <div class="pattern-desc">Sample verbose logs (DEBUG) at high traffic. Keep all ERROR logs.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📝</div>
+                    <div class="pattern-name">Canonical Logging</div>
+                    <div class="pattern-desc">One comprehensive log per request at completion with all context. Reduces noise.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🏢</div>
+                    <div class="pattern-name">Multi-Tenancy</div>
+                    <div class="pattern-desc">Include tenant_id in all logs. Enable filtering and access control by customer.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RETENTION -->
+        <section class="module" id="retention">
+            <div class="module-header">
+                <div class="module-icon">🗄️</div>
+                <div class="module-info">
+                    <h2>Retention Strategies</h2>
+                    <p>Balancing cost, compliance, and searchability</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Log retention is a tradeoff between cost, compliance requirements, and operational needs. Hot storage enables fast search but is expensive. Archive to cold storage for compliance while keeping recent logs searchable.</p>
+            </div>
+            
+            <div class="retention-grid">
+                <div class="retention-card">
+                    <div class="retention-period">7d</div>
+                    <div class="retention-type">Hot Tier</div>
+                    <div class="retention-use">Real-time debugging, incident response, live dashboards</div>
+                </div>
+                <div class="retention-card">
+                    <div class="retention-period">30d</div>
+                    <div class="retention-type">Warm Tier</div>
+                    <div class="retention-use">Recent history, trend analysis, post-mortems</div>
+                </div>
+                <div class="retention-card">
+                    <div class="retention-period">90d</div>
+                    <div class="retention-type">Cold Tier</div>
+                    <div class="retention-use">Compliance, audit trails, historical queries</div>
+                </div>
+                <div class="retention-card">
+                    <div class="retention-period">1y+</div>
+                    <div class="retention-type">Archive</div>
+                    <div class="retention-use">Regulatory compliance (SOX, HIPAA, GDPR)</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✨</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective logging</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Use Structured Logging</h4>
+                        <p>Always emit JSON logs. Include consistent fields: timestamp, level, service, trace_id, message.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Include Context</h4>
+                        <p>Add request_id, user_id, tenant_id to every log. Enables filtering and correlation.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Log at Appropriate Level</h4>
+                        <p>DEBUG for development, INFO for operations, ERROR for failures. Don't log sensitive data.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Centralize Everything</h4>
+                        <p>Ship all logs to central store. Local files are useless in distributed systems.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Use UTC Timestamps</h4>
+                        <p>Always log in UTC with ISO 8601 format. Avoid timezone confusion across regions.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Set Up Retention Policies</h4>
+                        <p>Automate log lifecycle: hot → warm → cold → archive. Balance cost and compliance.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Monitor Log Pipeline</h4>
+                        <p>Alert on dropped logs, parsing failures, ingestion delays. Logs about logs.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Create Saved Searches</h4>
+                        <p>Pre-build common queries: errors by service, failed logins, slow requests. Ready for incidents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- ANTI-PATTERNS -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">🚫</div>
+                <div class="module-info">
+                    <h2>Anti-Patterns to Avoid</h2>
+                    <p>Common logging mistakes</p>
+                </div>
+            </div>
+            
+            <div class="antipatterns-grid">
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔐</span>
+                        <span class="antipattern-title">Logging Sensitive Data</span>
+                    </div>
+                    <div class="antipattern-desc">Passwords, API keys, credit cards, PII in logs. Security and compliance nightmare.</div>
+                    <div class="antipattern-fix">Use log scrubbing/masking. Never log secrets.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📢</span>
+                        <span class="antipattern-title">Excessive Logging</span>
+                    </div>
+                    <div class="antipattern-desc">Logging every function call, loop iteration, or byte. Explodes storage costs.</div>
+                    <div class="antipattern-fix">Log meaningful events. Use sampling for verbose paths.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🔇</span>
+                        <span class="antipattern-title">Insufficient Logging</span>
+                    </div>
+                    <div class="antipattern-desc">Only logging errors with no context. "An error occurred" helps no one.</div>
+                    <div class="antipattern-fix">Include relevant context: what, who, when, why.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">📝</span>
+                        <span class="antipattern-title">Inconsistent Format</span>
+                    </div>
+                    <div class="antipattern-desc">Different services using different log formats. Some JSON, some plain text.</div>
+                    <div class="antipattern-fix">Standardize on structured format across all services.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">🖥️</span>
+                        <span class="antipattern-title">Local-Only Logs</span>
+                    </div>
+                    <div class="antipattern-desc">Keeping logs only on the server. Containers die, logs disappear forever.</div>
+                    <div class="antipattern-fix">Ship to central store immediately. Don't rely on local storage.</div>
+                </div>
+                <div class="antipattern-card">
+                    <div class="antipattern-header">
+                        <span class="antipattern-icon">⏱️</span>
+                        <span class="antipattern-title">Missing Timestamps</span>
+                    </div>
+                    <div class="antipattern-desc">Relying on ingestion time or inconsistent time formats. Breaks timeline analysis.</div>
+                    <div class="antipattern-fix">Always include UTC timestamp in ISO 8601 format.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- SCORECARD -->
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Platform Scorecard</h2>
+                    <p>Comparing logging platforms</p>
+                </div>
+            </div>
+            
+            <div class="scorecard-container">
+                <div class="scorecard-header">
+                    <div class="scorecard-title">Logging Platform Comparison</div>
+                </div>
+                <table class="scorecard-table">
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Scale</th>
+                            <th>Query</th>
+                            <th>Ease</th>
+                            <th>Cost</th>
+                            <th>Features</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #F7CE26, #FED530);">ELK</div> Elastic Stack</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div><span class="score-num">9.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 60%"></div></div><span class="score-num">6.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 65%"></div></div><span class="score-num">6.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.5</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #F46800, #FF8C00);">Lo</div> Grafana Loki</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div><span class="score-num">8.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 80%"></div></div><span class="score-num">8.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 78%"></div></div><span class="score-num">7.8</span></div></td>
+                            <td><strong style="color: var(--success-green);">8.6</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #65A637, #7BC043);">Sp</div> Splunk</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill low" style="width: 30%"></div></div><span class="score-num">3.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div><span class="score-num">9.8</span></div></td>
+                            <td><strong style="color: var(--warning-yellow);">8.4</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #632CA6, #8B5CF6);">Dd</div> Datadog Logs</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div><span class="score-num">9.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div><span class="score-num">8.8</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div><span class="score-num">9.2</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill low" style="width: 40%"></div></div><span class="score-num">4.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div><span class="score-num">9.5</span></div></td>
+                            <td><strong style="color: var(--warning-yellow);">8.3</strong></td>
+                        </tr>
+                        <tr>
+                            <td><div class="tool-name-cell"><div class="tool-mini-logo" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">CW</div> CloudWatch</div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div><span class="score-num">8.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 70%"></div></div><span class="score-num">7.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div><span class="score-num">9.0</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill medium" style="width: 65%"></div></div><span class="score-num">6.5</span></div></td>
+                            <td><div class="score-cell"><div class="score-bar"><div class="score-fill high" style="width: 75%"></div></div><span class="score-num">7.5</span></div></td>
+                            <td><strong style="color: var(--warning-yellow);">7.8</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>LoggingEngineer Agent</h2>
+                    <p>Your AI specialist for logging systems</p>
+                </div>
+            </div>
+            
+            <div class="agent-card">
+                <div class="agent-info">
+                    <div class="agent-badge">📝 Specialized Agent</div>
+                    <h3 class="agent-title">LoggingEngineer</h3>
+                    <p class="agent-desc">Expert agent for designing log schemas, configuring collection pipelines, writing search queries, and optimizing log aggregation infrastructure for reliability and cost.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="cap-icon">📋</span> Structured log schema design</div>
+                        <div class="agent-capability"><span class="cap-icon">🔄</span> Pipeline configuration</div>
+                        <div class="agent-capability"><span class="cap-icon">🔍</span> Query optimization</div>
+                        <div class="agent-capability"><span class="cap-icon">🏷️</span> Log parsing patterns</div>
+                        <div class="agent-capability"><span class="cap-icon">🎭</span> PII masking rules</div>
+                        <div class="agent-capability"><span class="cap-icon">📊</span> Dashboard creation</div>
+                        <div class="agent-capability"><span class="cap-icon">🗄️</span> Retention policies</div>
+                        <div class="agent-capability"><span class="cap-icon">💰</span> Cost optimization</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">fluent-bit.conf</div>
+                    <div class="code-block">
+<pre><span class="code-comment"># Fluent Bit configuration for Kubernetes</span>
+
+<span class="code-keyword">[SERVICE]</span>
+    <span class="code-string">Flush</span>         <span class="code-number">1</span>
+    <span class="code-string">Log_Level</span>     info
+    <span class="code-string">Parsers_File</span>  parsers.conf
+    <span class="code-string">HTTP_Server</span>   On
+    <span class="code-string">HTTP_Port</span>     <span class="code-number">2020</span>
+
+<span class="code-keyword">[INPUT]</span>
+    <span class="code-string">Name</span>              tail
+    <span class="code-string">Tag</span>               kube.*
+    <span class="code-string">Path</span>              /var/log/containers/*.log
+    <span class="code-string">Parser</span>            docker
+    <span class="code-string">DB</span>                /var/log/flb_kube.db
+    <span class="code-string">Mem_Buf_Limit</span>     <span class="code-number">5MB</span>
+    <span class="code-string">Skip_Long_Lines</span>   On
+    <span class="code-string">Refresh_Interval</span>  <span class="code-number">10</span>
+
+<span class="code-keyword">[FILTER]</span>
+    <span class="code-string">Name</span>                kubernetes
+    <span class="code-string">Match</span>               kube.*
+    <span class="code-string">Kube_URL</span>            https://kubernetes.default.svc:443
+    <span class="code-string">Kube_CA_File</span>        /var/run/secrets/kubernetes.io/token
+    <span class="code-string">Kube_Token_File</span>     /var/run/secrets/kubernetes.io/token
+    <span class="code-string">Merge_Log</span>           On
+    <span class="code-string">K8S-Logging.Parser</span>  On
+
+<span class="code-keyword">[FILTER]</span>
+    <span class="code-string">Name</span>          modify
+    <span class="code-string">Match</span>         *
+    <span class="code-string">Remove</span>        password
+    <span class="code-string">Remove</span>        api_key
+    <span class="code-string">Remove</span>        secret
+
+<span class="code-keyword">[OUTPUT]</span>
+    <span class="code-string">Name</span>            es
+    <span class="code-string">Match</span>           *
+    <span class="code-string">Host</span>            elasticsearch
+    <span class="code-string">Port</span>            <span class="code-number">9200</span>
+    <span class="code-string">Logstash_Format</span> On
+    <span class="code-string">Retry_Limit</span>     False</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- RELATED -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring observability</p>
+                </div>
+            </div>
+            
+            <div class="related-grid">
+                <a href="cat16-p1-metrics-monitoring.html" class="related-card">
+                    <div class="related-num">16.1</div>
+                    <div class="related-title">Metrics & Monitoring</div>
+                    <div class="related-desc">Prometheus, time-series data, PromQL queries</div>
+                </a>
+                <a href="cat16-p3-distributed-tracing.html" class="related-card">
+                    <div class="related-num">16.3</div>
+                    <div class="related-title">Distributed Tracing</div>
+                    <div class="related-desc">OpenTelemetry, Jaeger, Zipkin, trace propagation</div>
+                </a>
+                <a href="cat16-p4-alerting-incidents.html" class="related-card">
+                    <div class="related-num">16.4</div>
+                    <div class="related-title">Alerting & Incidents</div>
+                    <div class="related-desc">Alert design, on-call rotations, incident management</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat16-p1-metrics-monitoring.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">16.1 Metrics</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 16.2</div>
+        <a href="cat16-p3-distributed-tracing.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">16.3 Tracing</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

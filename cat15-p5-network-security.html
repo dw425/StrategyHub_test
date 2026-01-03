@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Security | Networking | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #3B82F6;
+            --cat-light: #60A5FA;
+            --cat-dark: #2563EB;
+            --cat-glow: rgba(59, 130, 246, 0.15);
+            --page-primary: #EF4444;
+            --page-light: #F87171;
+            --page-glow: rgba(239, 68, 68, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Security Diagram */
+        .security-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .security-diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .security-diagram-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .security-diagram-badge { font-size: 11px; padding: 4px 10px; background: var(--page-glow); color: var(--page-light); border-radius: 9999px; border: 1px solid var(--page-primary); }
+        .security-legend { display: flex; gap: 16px; }
+        .security-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .security-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .security-legend-dot.blocked { background: var(--red); box-shadow: 0 0 8px var(--red); }
+        .security-legend-dot.allowed { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .security-legend-dot.inspected { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+
+        /* Security Layers Grid */
+        .layers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .layer-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; transition: all 0.2s; position: relative; overflow: hidden; }
+        .layer-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .layer-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--page-primary), var(--page-light)); }
+        .layer-num { font-size: 11px; color: var(--page-light); font-weight: 600; margin-bottom: 8px; }
+        .layer-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .layer-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+        .layer-tools { display: flex; flex-wrap: wrap; gap: 4px; }
+        .layer-tool { font-size: 9px; padding: 2px 6px; background: var(--bg-card); border-radius: 3px; color: var(--text-muted); }
+
+        /* Firewall Types */
+        .firewall-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .firewall-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; transition: all 0.2s; }
+        .firewall-card:hover { border-color: var(--page-primary); }
+        .firewall-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .firewall-icon { width: 40px; height: 40px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .firewall-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .firewall-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .firewall-specs { display: flex; flex-wrap: wrap; gap: 6px; }
+        .firewall-spec { font-size: 10px; padding: 3px 8px; background: var(--bg-card); border-radius: 4px; color: var(--text-muted); }
+
+        /* Security Tools Grid */
+        .security-tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .security-tool-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+        .security-tool-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .security-tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .security-tool-logo { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
+        .security-tool-logo.cloudflare { background: linear-gradient(135deg, #F6821F, #FAAD3F); }
+        .security-tool-logo.paloalto { background: linear-gradient(135deg, #FA582D, #F04E23); }
+        .security-tool-logo.fortinet { background: linear-gradient(135deg, #EE3124, #B71C1C); }
+        .security-tool-logo.crowdstrike { background: linear-gradient(135deg, #FC0D1B, #E53935); }
+        .security-tool-logo.zscaler { background: linear-gradient(135deg, #0090D4, #00BCD4); }
+        .security-tool-logo.okta { background: linear-gradient(135deg, #007DC1, #00297A); }
+        .security-tool-logo.akamai { background: linear-gradient(135deg, #0096D6, #009FDA); }
+        .security-tool-logo.imperva { background: linear-gradient(135deg, #00A3E0, #004B87); }
+        .security-tool-logo.awswaf { background: linear-gradient(135deg, #FF9900, #EC7211); }
+        .security-tool-info h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .security-tool-type { font-size: 11px; color: var(--text-muted); }
+        .security-tool-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .security-tool-features { display: flex; flex-wrap: wrap; gap: 4px; }
+        .security-tool-feature { font-size: 9px; padding: 2px 6px; background: var(--bg-card); border-radius: 3px; color: var(--text-muted); }
+
+        /* Scorecard */
+        .scorecard { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .scorecard-header { display: grid; grid-template-columns: 2fr repeat(6, 1fr); background: var(--bg-card-alt); padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+        .scorecard-header span { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; }
+        .scorecard-header span:first-child { text-align: left; }
+        .scorecard-row { display: grid; grid-template-columns: 2fr repeat(6, 1fr); padding: 14px 16px; border-bottom: 1px solid var(--border-color); transition: background 0.2s; }
+        .scorecard-row:hover { background: var(--bg-hover); }
+        .scorecard-row:last-child { border-bottom: none; }
+        .scorecard-provider { display: flex; align-items: center; gap: 10px; }
+        .scorecard-logo { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .scorecard-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .scorecard-cell { display: flex; align-items: center; justify-content: center; }
+        .score-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; min-width: 40px; text-align: center; }
+        .score-badge.excellent { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .score-badge.good { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .score-badge.average { background: rgba(245, 158, 11, 0.15); color: var(--yellow); }
+        .score-overall { font-size: 14px; font-weight: 700; color: var(--page-light); }
+
+        /* Zero Trust Grid */
+        .zerotrust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .zerotrust-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .zerotrust-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .zerotrust-icon { width: 40px; height: 40px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .zerotrust-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .zerotrust-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .zerotrust-principles { list-style: none; }
+        .zerotrust-principles li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .zerotrust-principles li:last-child { border-bottom: none; }
+
+        /* Compare Table */
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .compare-table th { text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { color: var(--text-muted); }
+        .compare-table th.aws { color: var(--aws-orange); }
+        .compare-table th.azure { color: var(--azure-blue); }
+        .compare-table th.gcp { color: var(--gcp-blue); }
+        .compare-table td { padding: 12px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .compare-table .feature { font-weight: 500; color: var(--text-primary); }
+
+        /* Best Practices */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .practice-card { display: flex; gap: 14px; padding: 18px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .practice-card:hover { border-color: var(--page-primary); }
+        .practice-num { width: 32px; height: 32px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--page-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+        .practice-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Agent */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 12px; color: var(--page-light); }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 8px; }
+        .agent-capability { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary); }
+        .capability-icon { font-size: 16px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); font-size: 12px; font-family: monospace; color: var(--text-muted); }
+        .code-content { padding: 16px; overflow-x: auto; }
+        .code-content pre { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+        .code-keyword { color: var(--pink); }
+        .code-string { color: var(--green); }
+        .code-comment { color: var(--text-muted); }
+
+        /* Related */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { display: block; padding: 20px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-muted); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 16px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 14px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .overview-content { grid-template-columns: 1fr; }
+            .layers-grid { grid-template-columns: repeat(2, 1fr); }
+            .firewall-grid { grid-template-columns: 1fr; }
+            .security-tools-grid { grid-template-columns: 1fr; }
+            .zerotrust-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: 1fr; }
+            .scorecard-header, .scorecard-row { grid-template-columns: 2fr repeat(3, 1fr); }
+            .scorecard-header span:nth-child(n+5), .scorecard-row .scorecard-cell:nth-child(n+5) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Hub</a>
+        <span class="sep">/</span>
+        <a href="cat15-networking-overview.html">Networking</a>
+        <span class="sep">/</span>
+        <span class="current">Network Security</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🌐 Category 15</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat15-networking-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat15-p1-network-architecture.html"><span class="nav-icon">🏗️</span> 15.1 Network Architecture</a></li>
+            <li><a href="cat15-p2-load-balancing.html"><span class="nav-icon">⚖️</span> 15.2 Load Balancing</a></li>
+            <li><a href="cat15-p3-dns-cdn.html"><span class="nav-icon">🌍</span> 15.3 DNS & CDN</a></li>
+            <li><a href="cat15-p4-vpn-connectivity.html"><span class="nav-icon">🔒</span> 15.4 VPN & Connectivity</a></li>
+            <li><a href="cat15-p5-network-security.html" class="active"><span class="nav-icon">🛡️</span> 15.5 Network Security</a></li>
+            <li><a href="cat15-p6-service-mesh.html"><span class="nav-icon">🕸️</span> 15.6 Service Mesh</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏰</span> Defense in Depth</a></li>
+            <li><a href="#firewalls"><span class="nav-icon">🔥</span> Firewalls</a></li>
+            <li><a href="#waf"><span class="nav-icon">🌐</span> WAF & DDoS</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Security Tools</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📊</span> Scorecard</a></li>
+            <li><a href="#zerotrust"><span class="nav-icon">🔐</span> Zero Trust</a></li>
+            <li><a href="#cloud-compare"><span class="nav-icon">☁️</span> Provider Comparison</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <section class="hero-compact">
+            <div class="hero-left">
+                <div class="hero-tag">🛡️ Page 15.5</div>
+                <h1>Network Security</h1>
+                <p>Comprehensive protection for cloud infrastructure with firewalls, WAF, DDoS mitigation, and zero-trust architecture. Defense in depth from edge to workload.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">100 Tbps</div>
+                    <div class="hero-metric-label">DDoS Capacity</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;1ms</div>
+                    <div class="hero-metric-label">WAF Latency</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">99.999%</div>
+                    <div class="hero-metric-label">Threat Detection</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">7 Layers</div>
+                    <div class="hero-metric-label">OSI Protection</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Overview</h2>
+                    <p>Understanding cloud network security</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>Why Network Security Matters</h3>
+                    <p>Network security protects your infrastructure, applications, and data from unauthorized access, attacks, and data breaches. In cloud environments, the attack surface expands with distributed resources, APIs, and multiple entry points.</p>
+                    <p>Modern threats include: <strong>DDoS attacks</strong> overwhelming infrastructure, <strong>injection attacks</strong> exploiting application vulnerabilities, <strong>lateral movement</strong> after initial breach, and <strong>data exfiltration</strong> stealing sensitive information.</p>
+                </div>
+                <div>
+                    <h3>Defense in Depth Strategy</h3>
+                    <p><strong>Perimeter Security:</strong> DDoS protection, WAF, and edge firewalls filter malicious traffic before it reaches your infrastructure.</p>
+                    <p><strong>Network Segmentation:</strong> VPCs, subnets, and security groups isolate workloads and limit blast radius of breaches.</p>
+                    <p><strong>Zero Trust:</strong> Never trust, always verify. Authenticate and authorize every request regardless of network location.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Shared Responsibility Model</h3>
+                    <p>In cloud environments, security is a shared responsibility. Cloud providers secure the infrastructure (physical security, hypervisor, network fabric), while customers secure their workloads (OS patches, application security, data encryption, IAM policies). Understanding this boundary is critical—misconfigured security groups, overly permissive IAM roles, and exposed S3 buckets are common causes of cloud breaches. Use cloud-native security tools alongside third-party solutions for comprehensive protection.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏰</div>
+                <div class="module-info">
+                    <h2>Defense in Depth Architecture</h2>
+                    <p>Multiple layers of security controls</p>
+                </div>
+            </div>
+            <div class="security-diagram">
+                <div class="security-diagram-header">
+                    <div class="security-diagram-title">🛡️ Multi-Layer Security Architecture</div>
+                    <div class="security-legend">
+                        <div class="security-legend-item"><div class="security-legend-dot blocked"></div> Blocked Traffic</div>
+                        <div class="security-legend-item"><div class="security-legend-dot allowed"></div> Allowed Traffic</div>
+                        <div class="security-legend-item"><div class="security-legend-dot inspected"></div> Inspected</div>
+                    </div>
+                </div>
+                <svg viewBox="0 0 900 300" style="width: 100%; height: 300px;">
+                    <defs>
+                        <filter id="glowRed"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        <filter id="glowGreen"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        <filter id="glowYellow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#EF4444;stop-opacity:0.3"/>
+                            <stop offset="25%" style="stop-color:#F59E0B;stop-opacity:0.3"/>
+                            <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:0.3"/>
+                            <stop offset="75%" style="stop-color:#10B981;stop-opacity:0.3"/>
+                            <stop offset="100%" style="stop-color:#10B981;stop-opacity:0.5"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- BACKGROUND CONNECTION LINES -->
+                    <line x1="120" y1="150" x2="740" y2="150" stroke="url(#lineGrad)" stroke-width="40" stroke-linecap="round" opacity="0.3"/>
+                    <line x1="120" y1="150" x2="740" y2="150" stroke="#2a2a3e" stroke-width="2" stroke-dasharray="8 4" opacity="0.5"/>
+                    <line x1="120" y1="130" x2="740" y2="130" stroke="#2a2a3e" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/>
+                    <line x1="120" y1="170" x2="740" y2="170" stroke="#2a2a3e" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/>
+                    
+                    <!-- Internet/Attackers -->
+                    <rect x="20" y="100" width="100" height="100" rx="10" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="2"/>
+                    <text x="70" y="140" fill="#F87171" font-size="28" text-anchor="middle">🌐</text>
+                    <text x="70" y="170" fill="#F87171" font-size="11" font-weight="600" text-anchor="middle">Internet</text>
+                    <text x="70" y="185" fill="#6a6a7a" font-size="9" text-anchor="middle">+ Attackers</text>
+                    
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <!-- RED ATTACKS - BLOCKED AT LAYER 1 (Most attacks stopped here) -->
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <circle r="6" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="0.5s" repeatCount="indefinite" path="M 120 130 L 158 130"/>
+                        <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="0.4s" repeatCount="indefinite" begin="0.15s" path="M 120 145 L 158 145"/>
+                        <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.4s" repeatCount="indefinite" begin="0.15s"/>
+                    </circle>
+                    <circle r="7" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="0.35s" repeatCount="indefinite" begin="0.3s" path="M 120 160 L 158 160"/>
+                        <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.35s" repeatCount="indefinite" begin="0.3s"/>
+                    </circle>
+                    <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="0.45s" repeatCount="indefinite" begin="0.5s" path="M 120 170 L 158 170"/>
+                        <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.45s" repeatCount="indefinite" begin="0.5s"/>
+                    </circle>
+                    <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="0.38s" repeatCount="indefinite" begin="0.7s" path="M 120 138 L 158 138"/>
+                        <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.38s" repeatCount="indefinite" begin="0.7s"/>
+                    </circle>
+                    <circle r="6" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="0.42s" repeatCount="indefinite" begin="0.9s" path="M 120 155 L 158 155"/>
+                        <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.42s" repeatCount="indefinite" begin="0.9s"/>
+                    </circle>
+                    
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <!-- RED ATTACKS - SOME GET TO LAYER 2 (20% blocked here) -->
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="1.2s" repeatCount="indefinite" begin="0s" path="M 120 150 L 200 150 L 260 150 L 305 150"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+                    </circle>
+                    <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.8s" path="M 120 140 L 200 140 L 260 140 L 305 140"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="1.4s" repeatCount="indefinite" begin="0.8s"/>
+                    </circle>
+                    <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="1.3s" repeatCount="indefinite" begin="1.6s" path="M 120 160 L 200 160 L 260 160 L 305 160"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="1.3s" repeatCount="indefinite" begin="1.6s"/>
+                    </circle>
+                    <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="1.5s" repeatCount="indefinite" begin="2.4s" path="M 120 145 L 200 145 L 260 145 L 305 145"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="1.5s" repeatCount="indefinite" begin="2.4s"/>
+                    </circle>
+                    <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="1.25s" repeatCount="indefinite" begin="3.2s" path="M 120 155 L 200 155 L 260 155 L 305 155"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="1.25s" repeatCount="indefinite" begin="3.2s"/>
+                    </circle>
+                    
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <!-- RED ATTACKS - FEWER GET TO LAYER 3 (10% blocked here) -->
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.5s" path="M 120 150 L 200 150 L 350 150 L 438 150"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.8;0.95;1" dur="2.5s" repeatCount="indefinite" begin="0.5s"/>
+                    </circle>
+                    <circle r="5" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="2.8s" repeatCount="indefinite" begin="2.5s" path="M 120 145 L 200 145 L 350 145 L 438 145"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.8;0.95;1" dur="2.8s" repeatCount="indefinite" begin="2.5s"/>
+                    </circle>
+                    <circle r="4" fill="#EF4444" filter="url(#glowRed)">
+                        <animateMotion dur="2.6s" repeatCount="indefinite" begin="4.5s" path="M 120 155 L 200 155 L 350 155 L 438 155"/>
+                        <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.8;0.95;1" dur="2.6s" repeatCount="indefinite" begin="4.5s"/>
+                    </circle>
+                    
+                    <!-- Blocked X marks at Layer 1 -->
+                    <text x="160" y="133" fill="#EF4444" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;1;0" dur="0.5s" repeatCount="indefinite"/></text>
+                    <text x="160" y="148" fill="#EF4444" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;1;0" dur="0.4s" repeatCount="indefinite" begin="0.15s"/></text>
+                    <text x="160" y="163" fill="#EF4444" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;1;0" dur="0.35s" repeatCount="indefinite" begin="0.3s"/></text>
+                    
+                    <!-- Blocked X marks at Layer 2 -->
+                    <text x="307" y="153" fill="#F59E0B" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.7;0.85;1" dur="1.2s" repeatCount="indefinite"/></text>
+                    <text x="307" y="143" fill="#F59E0B" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.7;0.85;1" dur="1.4s" repeatCount="indefinite" begin="0.8s"/></text>
+                    <text x="307" y="163" fill="#F59E0B" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.7;0.85;1" dur="1.3s" repeatCount="indefinite" begin="1.6s"/></text>
+                    
+                    <!-- Blocked X marks at Layer 3 -->
+                    <text x="440" y="153" fill="#3B82F6" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.8;0.92;1" dur="2.5s" repeatCount="indefinite" begin="0.5s"/></text>
+                    <text x="440" y="148" fill="#3B82F6" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.8;0.92;1" dur="2.8s" repeatCount="indefinite" begin="2.5s"/></text>
+                    <text x="440" y="158" fill="#3B82F6" font-size="11" opacity="0">✕<animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.8;0.92;1" dur="2.6s" repeatCount="indefinite" begin="4.5s"/></text>
+                    
+                    <!-- Layer 1: Edge/DDoS -->
+                    <rect x="140" y="60" width="120" height="180" rx="10" fill="rgba(239,68,68,0.05)" stroke="#EF4444" stroke-width="2" stroke-dasharray="5 3"/>
+                    <text x="200" y="85" fill="#F87171" font-size="10" font-weight="600" text-anchor="middle">LAYER 1: EDGE</text>
+                    <rect x="160" y="100" width="80" height="60" rx="8" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                    <text x="200" y="125" fill="#F87171" font-size="14" text-anchor="middle">🛡️</text>
+                    <text x="200" y="145" fill="#F87171" font-size="9" font-weight="600" text-anchor="middle">DDoS Shield</text>
+                    <rect x="160" y="170" width="80" height="50" rx="8" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                    <text x="200" y="193" fill="#F87171" font-size="14" text-anchor="middle">🌐</text>
+                    <text x="200" y="210" fill="#F87171" font-size="9" font-weight="600" text-anchor="middle">WAF</text>
+                    <text x="200" y="250" fill="#EF4444" font-size="10" text-anchor="middle">❌ 70% Blocked</text>
+                    
+                    <!-- Layer 2: Network -->
+                    <rect x="290" y="60" width="120" height="180" rx="10" fill="rgba(245,158,11,0.05)" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5 3"/>
+                    <text x="350" y="85" fill="#FBBF24" font-size="10" font-weight="600" text-anchor="middle">LAYER 2: NETWORK</text>
+                    <rect x="310" y="100" width="80" height="60" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                    <text x="350" y="125" fill="#FBBF24" font-size="14" text-anchor="middle">🔥</text>
+                    <text x="350" y="145" fill="#FBBF24" font-size="9" font-weight="600" text-anchor="middle">Firewall</text>
+                    <rect x="310" y="170" width="80" height="50" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                    <text x="350" y="193" fill="#FBBF24" font-size="14" text-anchor="middle">🔒</text>
+                    <text x="350" y="210" fill="#FBBF24" font-size="9" font-weight="600" text-anchor="middle">NACLs</text>
+                    <text x="350" y="250" fill="#F59E0B" font-size="10" text-anchor="middle">❌ 20% Blocked</text>
+                    
+                    <!-- Layer 3: Host -->
+                    <rect x="440" y="60" width="120" height="180" rx="10" fill="rgba(59,130,246,0.05)" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5 3"/>
+                    <text x="500" y="85" fill="#60A5FA" font-size="10" font-weight="600" text-anchor="middle">LAYER 3: HOST</text>
+                    <rect x="460" y="100" width="80" height="60" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="500" y="125" fill="#60A5FA" font-size="14" text-anchor="middle">🔐</text>
+                    <text x="500" y="145" fill="#60A5FA" font-size="9" font-weight="600" text-anchor="middle">Security Groups</text>
+                    <rect x="460" y="170" width="80" height="50" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="500" y="193" fill="#60A5FA" font-size="14" text-anchor="middle">🦅</text>
+                    <text x="500" y="210" fill="#60A5FA" font-size="9" font-weight="600" text-anchor="middle">EDR Agent</text>
+                    <text x="500" y="250" fill="#3B82F6" font-size="10" text-anchor="middle">❌ 10% Blocked</text>
+                    
+                    <!-- Layer 4: App -->
+                    <rect x="590" y="60" width="120" height="180" rx="10" fill="rgba(16,185,129,0.05)" stroke="#10B981" stroke-width="2" stroke-dasharray="5 3"/>
+                    <text x="650" y="85" fill="#34D399" font-size="10" font-weight="600" text-anchor="middle">LAYER 4: APP</text>
+                    <rect x="610" y="100" width="80" height="60" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="650" y="125" fill="#34D399" font-size="14" text-anchor="middle">👤</text>
+                    <text x="650" y="145" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle">IAM / RBAC</text>
+                    <rect x="610" y="170" width="80" height="50" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="650" y="193" fill="#34D399" font-size="14" text-anchor="middle">🔑</text>
+                    <text x="650" y="210" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle">Secrets Mgmt</text>
+                    <text x="650" y="250" fill="#10B981" font-size="10" text-anchor="middle">✓ 0% Threats</text>
+                    
+                    <!-- Workload -->
+                    <rect x="740" y="100" width="140" height="100" rx="10" fill="rgba(16,185,129,0.1)" stroke="#10B981" stroke-width="2"/>
+                    <text x="810" y="135" fill="#34D399" font-size="28" text-anchor="middle">💎</text>
+                    <text x="810" y="165" fill="#34D399" font-size="11" font-weight="600" text-anchor="middle">Protected</text>
+                    <text x="810" y="180" fill="#34D399" font-size="11" font-weight="600" text-anchor="middle">Workload</text>
+                    
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <!-- GREEN LEGITIMATE TRAFFIC - PASSES THROUGH ALL LAYERS (Slow) -->
+                    <!-- ═══════════════════════════════════════════════════════════════ -->
+                    <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="7s" repeatCount="indefinite" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="4" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="8s" repeatCount="indefinite" begin="1s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="6.5s" repeatCount="indefinite" begin="2s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="4" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="7.5s" repeatCount="indefinite" begin="3s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="6s" repeatCount="indefinite" begin="4s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="4" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="8.5s" repeatCount="indefinite" begin="5s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="5" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="7.2s" repeatCount="indefinite" begin="6s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                    <circle r="4" fill="#10B981" filter="url(#glowGreen)">
+                        <animateMotion dur="6.8s" repeatCount="indefinite" begin="0.5s" path="M 120 150 L 200 150 L 350 150 L 500 150 L 650 150 L 810 150"/>
+                    </circle>
+                </svg>
+            </div>
+            
+            <div class="layers-grid">
+                <div class="layer-card">
+                    <div class="layer-num">LAYER 1</div>
+                    <div class="layer-title">Edge Protection</div>
+                    <div class="layer-desc">First line of defense at the network edge. Absorbs volumetric attacks and filters malicious requests before reaching infrastructure.</div>
+                    <div class="layer-tools"><span class="layer-tool">DDoS Shield</span><span class="layer-tool">WAF</span><span class="layer-tool">CDN</span><span class="layer-tool">Rate Limiting</span></div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-num">LAYER 2</div>
+                    <div class="layer-title">Network Controls</div>
+                    <div class="layer-desc">Network-level filtering and segmentation. Controls traffic flow between subnets and enforces isolation between workloads.</div>
+                    <div class="layer-tools"><span class="layer-tool">Firewall</span><span class="layer-tool">NACLs</span><span class="layer-tool">VPC Flow Logs</span><span class="layer-tool">IDS/IPS</span></div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-num">LAYER 3</div>
+                    <div class="layer-title">Host Security</div>
+                    <div class="layer-desc">Instance-level protection with stateful firewalls and endpoint detection. Monitors for malicious activity on individual hosts.</div>
+                    <div class="layer-tools"><span class="layer-tool">Security Groups</span><span class="layer-tool">EDR</span><span class="layer-tool">Host Firewall</span><span class="layer-tool">AV</span></div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-num">LAYER 4</div>
+                    <div class="layer-title">Application Security</div>
+                    <div class="layer-desc">Identity-based access control and secrets management. Ensures only authenticated and authorized requests reach applications.</div>
+                    <div class="layer-tools"><span class="layer-tool">IAM</span><span class="layer-tool">RBAC</span><span class="layer-tool">Secrets</span><span class="layer-tool">mTLS</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="firewalls">
+            <div class="module-header">
+                <div class="module-icon">🔥</div>
+                <div class="module-info">
+                    <h2>Firewall Types</h2>
+                    <p>Network traffic filtering at different layers</p>
+                </div>
+            </div>
+            <div class="firewall-grid">
+                <div class="firewall-card">
+                    <div class="firewall-header"><div class="firewall-icon">🔒</div><div class="firewall-title">Security Groups</div></div>
+                    <div class="firewall-desc">Stateful instance-level firewall. Rules apply to individual EC2/VM instances. Return traffic automatically allowed. Default deny inbound.</div>
+                    <div class="firewall-specs"><span class="firewall-spec">Stateful</span><span class="firewall-spec">Instance-level</span><span class="firewall-spec">Allow rules only</span><span class="firewall-spec">60 rules/group</span></div>
+                </div>
+                <div class="firewall-card">
+                    <div class="firewall-header"><div class="firewall-icon">🚧</div><div class="firewall-title">Network ACLs</div></div>
+                    <div class="firewall-desc">Stateless subnet-level firewall. Must explicitly allow return traffic. Evaluated in order by rule number. Supports allow and deny rules.</div>
+                    <div class="firewall-specs"><span class="firewall-spec">Stateless</span><span class="firewall-spec">Subnet-level</span><span class="firewall-spec">Allow + Deny</span><span class="firewall-spec">Numbered rules</span></div>
+                </div>
+                <div class="firewall-card">
+                    <div class="firewall-header"><div class="firewall-icon">🔥</div><div class="firewall-title">Network Firewall</div></div>
+                    <div class="firewall-desc">Managed stateful firewall for VPC. Suricata-compatible IDS/IPS rules. Deep packet inspection, TLS inspection, domain filtering.</div>
+                    <div class="firewall-specs"><span class="firewall-spec">Managed</span><span class="firewall-spec">IDS/IPS</span><span class="firewall-spec">DPI</span><span class="firewall-spec">TLS Inspection</span></div>
+                </div>
+                <div class="firewall-card">
+                    <div class="firewall-header"><div class="firewall-icon">🌐</div><div class="firewall-title">Web Application Firewall</div></div>
+                    <div class="firewall-desc">Layer 7 firewall for HTTP/HTTPS. Protects against OWASP Top 10, SQL injection, XSS. Custom rules and managed rule sets.</div>
+                    <div class="firewall-specs"><span class="firewall-spec">Layer 7</span><span class="firewall-spec">OWASP</span><span class="firewall-spec">Bot Control</span><span class="firewall-spec">Rate Limiting</span></div>
+                </div>
+                <div class="firewall-card">
+                    <div class="firewall-header"><div class="firewall-icon">🏢</div><div class="firewall-title">Next-Gen Firewall (NGFW)</div></div>
+                    <div class="firewall-desc">Enterprise firewall with application awareness. User identity integration, threat intelligence, SSL decryption, sandboxing.</div>
+                    <div class="firewall-specs"><span class="firewall-spec">App-aware</span><span class="firewall-spec">User ID</span><span class="firewall-spec">Threat Intel</span><span class="firewall-spec">Sandboxing</span></div>
+                </div>
+                <div class="firewall-card">
+                    <div class="firewall-header"><div class="firewall-icon">☁️</div><div class="firewall-title">Cloud-Native FWaaS</div></div>
+                    <div class="firewall-desc">Firewall as a Service for cloud workloads. Centralized policy management, auto-scaling, multi-cloud support, SASE integration.</div>
+                    <div class="firewall-specs"><span class="firewall-spec">FWaaS</span><span class="firewall-spec">Auto-scale</span><span class="firewall-spec">Multi-cloud</span><span class="firewall-spec">SASE</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="waf">
+            <div class="module-header">
+                <div class="module-icon">🌐</div>
+                <div class="module-info">
+                    <h2>WAF & DDoS Protection</h2>
+                    <p>Application-layer security and volumetric attack mitigation</p>
+                </div>
+            </div>
+            <div class="zerotrust-grid">
+                <div class="zerotrust-card">
+                    <div class="zerotrust-header"><div class="zerotrust-icon">🛡️</div><div class="zerotrust-title">WAF Protection</div></div>
+                    <div class="zerotrust-desc">Web Application Firewalls inspect HTTP/HTTPS traffic and block malicious requests targeting application vulnerabilities.</div>
+                    <ul class="zerotrust-principles">
+                        <li><span>🔒</span> SQL Injection - Block malicious database queries</li>
+                        <li><span>🔒</span> XSS (Cross-Site Scripting) - Prevent script injection</li>
+                        <li><span>🔒</span> CSRF - Stop cross-site request forgery</li>
+                        <li><span>🔒</span> Path Traversal - Block directory access attempts</li>
+                        <li><span>🔒</span> Bot Protection - Detect and block malicious bots</li>
+                        <li><span>🔒</span> Rate Limiting - Prevent brute force attacks</li>
+                    </ul>
+                </div>
+                <div class="zerotrust-card">
+                    <div class="zerotrust-header"><div class="zerotrust-icon">⚡</div><div class="zerotrust-title">DDoS Mitigation</div></div>
+                    <div class="zerotrust-desc">Distributed Denial of Service protection absorbs massive attack traffic before it reaches your infrastructure.</div>
+                    <ul class="zerotrust-principles">
+                        <li><span>🌊</span> Volumetric - UDP floods, amplification attacks</li>
+                        <li><span>🔌</span> Protocol - SYN floods, ping of death, Smurf</li>
+                        <li><span>🎯</span> Application - HTTP floods, Slowloris, DNS query</li>
+                        <li><span>📊</span> Capacity - 100+ Tbps scrubbing capacity</li>
+                        <li><span>⏱️</span> Response - Sub-second attack detection</li>
+                        <li><span>🌍</span> Anycast - Global network absorbs attacks at edge</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Security Tools & Platforms</h2>
+                    <p>Leading network security solutions</p>
+                </div>
+            </div>
+            <div class="security-tools-grid">
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo cloudflare">CF</div>
+                        <div class="security-tool-info"><h4>Cloudflare</h4><div class="security-tool-type">Edge Security / CDN</div></div>
+                    </div>
+                    <div class="security-tool-desc">Global edge network with integrated WAF, DDoS protection, and CDN. Zero Trust access, bot management, and API security.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">WAF</span><span class="security-tool-feature">DDoS</span><span class="security-tool-feature">Zero Trust</span><span class="security-tool-feature">Bot Mgmt</span><span class="security-tool-feature">330+ PoPs</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo paloalto">PA</div>
+                        <div class="security-tool-info"><h4>Palo Alto Networks</h4><div class="security-tool-type">NGFW / SASE</div></div>
+                    </div>
+                    <div class="security-tool-desc">Enterprise next-gen firewall with Prisma Cloud for cloud security. App-ID, User-ID, Content-ID for deep visibility and control.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">NGFW</span><span class="security-tool-feature">Prisma Cloud</span><span class="security-tool-feature">Cortex XDR</span><span class="security-tool-feature">SASE</span><span class="security-tool-feature">Threat Intel</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo fortinet">FT</div>
+                        <div class="security-tool-info"><h4>Fortinet</h4><div class="security-tool-type">NGFW / Security Fabric</div></div>
+                    </div>
+                    <div class="security-tool-desc">FortiGate NGFW with Security Fabric for unified visibility. FortiGuard threat intelligence, SD-WAN integration, OT security.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">FortiGate</span><span class="security-tool-feature">FortiGuard</span><span class="security-tool-feature">SD-WAN</span><span class="security-tool-feature">OT Security</span><span class="security-tool-feature">ASIC</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo crowdstrike">CS</div>
+                        <div class="security-tool-info"><h4>CrowdStrike</h4><div class="security-tool-type">EDR / XDR</div></div>
+                    </div>
+                    <div class="security-tool-desc">Cloud-native endpoint protection with Falcon platform. AI-powered threat detection, threat hunting, and incident response.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">Falcon</span><span class="security-tool-feature">EDR</span><span class="security-tool-feature">XDR</span><span class="security-tool-feature">Threat Intel</span><span class="security-tool-feature">MDR</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo zscaler">ZS</div>
+                        <div class="security-tool-info"><h4>Zscaler</h4><div class="security-tool-type">SASE / Zero Trust</div></div>
+                    </div>
+                    <div class="security-tool-desc">Cloud-native SASE platform. Zero Trust Exchange connects users to apps without network access. Inline inspection of all traffic.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">ZIA</span><span class="security-tool-feature">ZPA</span><span class="security-tool-feature">Zero Trust</span><span class="security-tool-feature">CASB</span><span class="security-tool-feature">DLP</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo okta">OK</div>
+                        <div class="security-tool-info"><h4>Okta</h4><div class="security-tool-type">Identity / Zero Trust</div></div>
+                    </div>
+                    <div class="security-tool-desc">Identity-first security with SSO, MFA, and lifecycle management. Universal Directory integrates all identity sources.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">SSO</span><span class="security-tool-feature">MFA</span><span class="security-tool-feature">Lifecycle</span><span class="security-tool-feature">API Access</span><span class="security-tool-feature">7000+ Apps</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo akamai">AK</div>
+                        <div class="security-tool-info"><h4>Akamai</h4><div class="security-tool-type">Edge Security / CDN</div></div>
+                    </div>
+                    <div class="security-tool-desc">Massive edge network with App & API Protector. Prolexic DDoS protection, Bot Manager, and micro-segmentation with Guardicore.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">App Protector</span><span class="security-tool-feature">Prolexic</span><span class="security-tool-feature">Bot Mgr</span><span class="security-tool-feature">Guardicore</span><span class="security-tool-feature">4000+ PoPs</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo imperva">IM</div>
+                        <div class="security-tool-info"><h4>Imperva</h4><div class="security-tool-type">WAF / Data Security</div></div>
+                    </div>
+                    <div class="security-tool-desc">Application and data security platform. Cloud WAF, DDoS protection, API security, and database activity monitoring.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">Cloud WAF</span><span class="security-tool-feature">DDoS</span><span class="security-tool-feature">API Security</span><span class="security-tool-feature">DAM</span><span class="security-tool-feature">RASP</span></div>
+                </div>
+                <div class="security-tool-card">
+                    <div class="security-tool-header">
+                        <div class="security-tool-logo awswaf">AW</div>
+                        <div class="security-tool-info"><h4>AWS Security Suite</h4><div class="security-tool-type">Cloud-Native</div></div>
+                    </div>
+                    <div class="security-tool-desc">Native AWS security services including WAF, Shield, GuardDuty, Security Hub, and Network Firewall. Deep AWS integration.</div>
+                    <div class="security-tool-features"><span class="security-tool-feature">WAF</span><span class="security-tool-feature">Shield</span><span class="security-tool-feature">GuardDuty</span><span class="security-tool-feature">Security Hub</span><span class="security-tool-feature">Macie</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Security Tools Scorecard</h2>
+                    <p>Comparative ratings across key capabilities</p>
+                </div>
+            </div>
+            <div class="scorecard">
+                <div class="scorecard-header">
+                    <span>Platform</span>
+                    <span>WAF</span>
+                    <span>DDoS</span>
+                    <span>Zero Trust</span>
+                    <span>Ease of Use</span>
+                    <span>Value</span>
+                    <span>Overall</span>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo cloudflare">CF</div><span class="scorecard-name">Cloudflare</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.3</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.2</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.4</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">9.4</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo paloalto">PA</div><span class="scorecard-name">Palo Alto</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.5</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.6</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo fortinet">FT</div><span class="scorecard-name">Fortinet</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.7</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo crowdstrike">CS</div><span class="scorecard-name">CrowdStrike</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">7.9</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo zscaler">ZS</div><span class="scorecard-name">Zscaler</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.6</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo akamai">AK</div><span class="scorecard-name">Akamai</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.2</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.8</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge average">7.0</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.4</span></div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-provider"><div class="scorecard-logo awswaf">AW</div><span class="scorecard-name">AWS Security</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.5</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge good">8.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.0</span></div>
+                    <div class="scorecard-cell"><span class="score-badge excellent">9.5</span></div>
+                    <div class="scorecard-cell"><span class="score-overall">8.8</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="zerotrust">
+            <div class="module-header">
+                <div class="module-icon">🔐</div>
+                <div class="module-info">
+                    <h2>Zero Trust Architecture</h2>
+                    <p>Never trust, always verify</p>
+                </div>
+            </div>
+            <div class="zerotrust-grid">
+                <div class="zerotrust-card">
+                    <div class="zerotrust-header"><div class="zerotrust-icon">🎯</div><div class="zerotrust-title">Core Principles</div></div>
+                    <div class="zerotrust-desc">Zero Trust assumes breach and verifies every request as though it originates from an untrusted network.</div>
+                    <ul class="zerotrust-principles">
+                        <li><span>🔒</span> Verify explicitly - Always authenticate and authorize</li>
+                        <li><span>🔑</span> Least privilege - Just-in-time, just-enough access</li>
+                        <li><span>💥</span> Assume breach - Minimize blast radius, segment access</li>
+                        <li><span>📊</span> Inspect all traffic - No implicit trust for any network</li>
+                        <li><span>🔄</span> Continuous validation - Re-verify throughout session</li>
+                    </ul>
+                </div>
+                <div class="zerotrust-card">
+                    <div class="zerotrust-header"><div class="zerotrust-icon">🏗️</div><div class="zerotrust-title">Implementation Pillars</div></div>
+                    <div class="zerotrust-desc">Zero Trust spans identity, devices, networks, applications, and data with unified policy enforcement.</div>
+                    <ul class="zerotrust-principles">
+                        <li><span>👤</span> Identity - Strong authentication, MFA, SSO</li>
+                        <li><span>💻</span> Devices - Device health, compliance, MDM</li>
+                        <li><span>🌐</span> Network - Micro-segmentation, encrypted traffic</li>
+                        <li><span>📱</span> Applications - Per-app access, no network access</li>
+                        <li><span>📁</span> Data - Classification, encryption, DLP</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="cloud-compare">
+            <div class="module-header">
+                <div class="module-icon">☁️</div>
+                <div class="module-info">
+                    <h2>Cloud Provider Security Services</h2>
+                    <p>Native security offerings comparison</p>
+                </div>
+            </div>
+            <table class="compare-table">
+                <thead><tr><th>Capability</th><th class="aws">AWS</th><th class="azure">Azure</th><th class="gcp">GCP</th></tr></thead>
+                <tbody>
+                    <tr><td class="feature">WAF</td><td>AWS WAF</td><td>Azure WAF</td><td>Cloud Armor</td></tr>
+                    <tr><td class="feature">DDoS Protection</td><td>Shield Standard/Advanced</td><td>DDoS Protection</td><td>Cloud Armor + Anycast</td></tr>
+                    <tr><td class="feature">Network Firewall</td><td>Network Firewall</td><td>Azure Firewall</td><td>Cloud Firewall</td></tr>
+                    <tr><td class="feature">Security Groups</td><td>Security Groups</td><td>NSGs</td><td>VPC Firewall Rules</td></tr>
+                    <tr><td class="feature">Threat Detection</td><td>GuardDuty</td><td>Defender for Cloud</td><td>Security Command Center</td></tr>
+                    <tr><td class="feature">SIEM</td><td>Security Lake</td><td>Sentinel</td><td>Chronicle</td></tr>
+                    <tr><td class="feature">Secrets Management</td><td>Secrets Manager</td><td>Key Vault</td><td>Secret Manager</td></tr>
+                    <tr><td class="feature">Identity</td><td>IAM + Identity Center</td><td>Entra ID</td><td>Cloud Identity + IAM</td></tr>
+                    <tr><td class="feature">Compliance</td><td>Artifact, Config</td><td>Compliance Manager</td><td>Assured Workloads</td></tr>
+                    <tr><td class="feature">Zero Trust</td><td>Verified Access</td><td>Conditional Access</td><td>BeyondCorp Enterprise</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Security recommendations for cloud networks</p>
+                </div>
+            </div>
+            <div class="practices-grid">
+                <div class="practice-card"><div class="practice-num">1</div><div class="practice-content"><h4>Defense in Depth</h4><p>Layer multiple security controls. Don't rely on any single control. Combine edge protection, network segmentation, host security, and application controls.</p></div></div>
+                <div class="practice-card"><div class="practice-num">2</div><div class="practice-content"><h4>Least Privilege Access</h4><p>Grant minimum permissions required. Use IAM roles instead of long-term credentials. Implement just-in-time access for privileged operations.</p></div></div>
+                <div class="practice-card"><div class="practice-num">3</div><div class="practice-content"><h4>Encrypt Everything</h4><p>Encrypt data at rest and in transit. Use TLS 1.3 for all connections. Implement mTLS for service-to-service communication in sensitive environments.</p></div></div>
+                <div class="practice-card"><div class="practice-num">4</div><div class="practice-content"><h4>Monitor and Alert</h4><p>Enable VPC Flow Logs, CloudTrail, and GuardDuty. Set up alerts for security events. Maintain audit logs for compliance and forensics.</p></div></div>
+                <div class="practice-card"><div class="practice-num">5</div><div class="practice-content"><h4>Segment Networks</h4><p>Use separate VPCs/VNets for prod, dev, and sensitive workloads. Implement micro-segmentation within environments. Control east-west traffic.</p></div></div>
+                <div class="practice-card"><div class="practice-num">6</div><div class="practice-content"><h4>Automate Security</h4><p>Use Infrastructure as Code for security configurations. Implement automated compliance checks. Deploy security controls via CI/CD pipelines.</p></div></div>
+            </div>
+        </section>
+
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>SecurityArchitect</h2>
+                    <p>Network security specialist agent</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>🛡️ SecurityArchitect</h3>
+                    <p>Specialized agent for designing and implementing cloud network security architectures. Analyzes threat models, recommends security controls, and generates security configurations.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">🔍</span> Threat modeling and risk assessment</div>
+                        <div class="agent-capability"><span class="capability-icon">🏗️</span> Security architecture design</div>
+                        <div class="agent-capability"><span class="capability-icon">📋</span> Compliance mapping (SOC2, HIPAA, PCI)</div>
+                        <div class="agent-capability"><span class="capability-icon">🔥</span> WAF rule configuration</div>
+                        <div class="agent-capability"><span class="capability-icon">🔐</span> Zero Trust implementation</div>
+                        <div class="agent-capability"><span class="capability-icon">📝</span> Security policy generation</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">security-group.tf</div>
+                    <div class="code-content">
+<pre><span class="code-keyword">resource</span> <span class="code-string">"aws_security_group"</span> <span class="code-string">"web"</span> {
+  name        = <span class="code-string">"web-sg"</span>
+  vpc_id      = aws_vpc.main.id
+  description = <span class="code-string">"Web tier security group"</span>
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = <span class="code-string">"tcp"</span>
+    cidr_blocks = [<span class="code-string">"0.0.0.0/0"</span>]
+    description = <span class="code-string">"HTTPS from internet"</span>
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = <span class="code-string">"-1"</span>
+    cidr_blocks = [<span class="code-string">"0.0.0.0/0"</span>]
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring networking</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat15-p4-vpn-connectivity.html" class="related-card"><div class="related-icon">🔒</div><div class="related-title">VPN & Connectivity</div><div class="related-desc">Secure tunnels and hybrid connectivity</div></a>
+                <a href="cat15-p6-service-mesh.html" class="related-card"><div class="related-icon">🕸️</div><div class="related-title">Service Mesh</div><div class="related-desc">Microservices networking and mTLS</div></a>
+                <a href="cat15-p1-network-architecture.html" class="related-card"><div class="related-icon">🏗️</div><div class="related-title">Network Architecture</div><div class="related-desc">VPC design and network topology</div></a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat15-p4-vpn-connectivity.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous</div><div class="footer-link-title">15.4 VPN & Connectivity</div></div></a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 15</div>
+        <a href="cat15-p6-service-mesh.html" class="footer-link"><div><div class="footer-link-label">Next</div><div class="footer-link-title">15.6 Service Mesh</div></div><span>→</span></a>
+    </div>
+</footer>
+
+</body>
+</html>

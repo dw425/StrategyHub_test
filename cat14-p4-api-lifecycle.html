@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Lifecycle | 14.4 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --violet: #7C3AED;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 56px; height: 56px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        .subsection { margin-top: var(--space-xl); }
+        .subsection-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-lg); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LIFECYCLE FIGURE-8 VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .lifecycle-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .lifecycle-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .lifecycle-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .lifecycle-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .lifecycle-canvas { padding: var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; }
+        .lifecycle-canvas::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 25% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 40%), radial-gradient(circle at 75% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 40%); }
+        
+        /* Figure-8 Layout */
+        .figure8-wrapper { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+        
+        /* Loop Labels */
+        .loop-headers { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-md); }
+        .loop-header { text-align: center; }
+        .loop-header-title { font-size: var(--font-lg); font-weight: 700; margin-bottom: var(--space-xs); }
+        .loop-header-title.inner { color: #3B82F6; }
+        .loop-header-title.outer { color: #10B981; }
+        .loop-header-subtitle { font-size: var(--font-xs); color: var(--text-muted); }
+        
+        /* Figure-8 SVG */
+        .figure8-svg { width: 100%; height: 300px; display: block; }
+        
+        /* Phase Nodes Grid */
+        .phase-nodes-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--space-md); align-items: center; margin-top: var(--space-lg); }
+        
+        .loop-phases { display: flex; flex-direction: column; gap: var(--space-md); }
+        .loop-phases.inner { align-items: flex-end; }
+        .loop-phases.outer { align-items: flex-start; }
+        
+        .phase-row { display: flex; align-items: center; gap: var(--space-md); }
+        .loop-phases.inner .phase-row { flex-direction: row-reverse; }
+        
+        .phase-node { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-card-alt); border: 2px solid var(--node-color, var(--border-color)); border-radius: var(--radius-lg); transition: all 0.3s; cursor: pointer; min-width: 160px; }
+        .phase-node:hover { transform: translateX(4px); border-color: var(--node-color); box-shadow: 0 0 20px color-mix(in srgb, var(--node-color) 30%, transparent); }
+        .loop-phases.inner .phase-node:hover { transform: translateX(-4px); }
+        
+        .phase-node-icon { width: 44px; height: 44px; background: color-mix(in srgb, var(--node-color) 15%, transparent); border: 2px solid var(--node-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .phase-node-info { display: flex; flex-direction: column; }
+        .phase-node-num { font-size: 10px; color: var(--node-color); font-weight: 700; }
+        .phase-node-label { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); }
+        
+        /* Node Colors */
+        .phase-node.design { --node-color: #3B82F6; }
+        .phase-node.develop { --node-color: #60A5FA; }
+        .phase-node.test { --node-color: #818CF8; }
+        .phase-node.deploy { --node-color: #8B5CF6; }
+        .phase-node.publish { --node-color: #10B981; }
+        .phase-node.monitor { --node-color: #34D399; }
+        .phase-node.version { --node-color: #5EEAD4; }
+        .phase-node.retire { --node-color: #14B8A6; }
+        
+        /* Center Connection */
+        .center-connection { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-lg); }
+        .center-hub { width: 100px; height: 100px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2)); border: 3px solid var(--cat-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(6, 182, 212, 0.3); }
+        .center-hub-icon { font-size: 32px; }
+        .center-hub-label { font-size: var(--font-xs); color: var(--cat-light); font-weight: 600; }
+        
+        /* Flow Arrows */
+        .flow-indicators { display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md); }
+        .flow-indicator { display: flex; align-items: center; gap: var(--space-xs); font-size: var(--font-xs); color: var(--text-muted); }
+        .flow-indicator.inner { color: #3B82F6; }
+        .flow-indicator.outer { color: #10B981; }
+
+        /* Stats Bar */
+        .lifecycle-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); padding: var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .lifecycle-stat { text-align: center; padding: var(--space-sm); }
+        .lifecycle-stat-value { font-size: var(--font-base); font-weight: 700; }
+        .lifecycle-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .lifecycle-stat:nth-child(1) .lifecycle-stat-value, .lifecycle-stat:nth-child(2) .lifecycle-stat-value { color: #3B82F6; }
+        .lifecycle-stat:nth-child(3) .lifecycle-stat-value, .lifecycle-stat:nth-child(4) .lifecycle-stat-value { color: #10B981; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PHASE DETAILS GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .phases-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .phase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); position: relative; overflow: hidden; transition: all 0.3s; }
+        .phase-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--phase-color, var(--cat-primary)); }
+        .phase-card:hover { border-color: var(--phase-color); transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        
+        .phase-card.design { --phase-color: #3B82F6; }
+        .phase-card.develop { --phase-color: #8B5CF6; }
+        .phase-card.test { --phase-color: #EC4899; }
+        .phase-card.deploy { --phase-color: #F97316; }
+        .phase-card.publish { --phase-color: #F59E0B; }
+        .phase-card.monitor { --phase-color: #10B981; }
+        .phase-card.version { --phase-color: #14B8A6; }
+        .phase-card.retire { --phase-color: #06B6D4; }
+        
+        .phase-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .phase-card-icon { width: 52px; height: 52px; background: color-mix(in srgb, var(--phase-color) 15%, transparent); border: 2px solid var(--phase-color); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .phase-card-num { font-size: var(--font-xs); color: var(--phase-color); font-weight: 700; }
+        .phase-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .phase-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-lg); }
+        .phase-card-tasks { list-style: none; }
+        .phase-card-tasks li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-sm); }
+        .phase-card-tasks li::before { content: '✓'; color: var(--phase-color); font-weight: bold; font-size: 12px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VERSIONING SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .versioning-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .version-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); text-align: center; transition: all 0.3s; }
+        .version-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); }
+        .version-icon { font-size: 48px; margin-bottom: var(--space-md); }
+        .version-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-sm); }
+        .version-example { font-family: monospace; font-size: var(--font-lg); color: var(--cat-light); background: var(--bg-card-alt); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); margin-bottom: var(--space-md); display: inline-block; }
+        .version-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DEPRECATION TIMELINE
+        ═══════════════════════════════════════════════════════════════ */
+        .timeline-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .timeline-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .timeline-content { padding: var(--space-xl); }
+        
+        .timeline { position: relative; padding-left: var(--space-2xl); }
+        .timeline::before { content: ''; position: absolute; left: 16px; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--success-green), var(--warning-yellow), var(--danger-red)); border-radius: 2px; }
+        
+        .timeline-item { position: relative; padding-bottom: var(--space-xl); }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -32px; top: 4px; width: 20px; height: 20px; background: var(--bg-card); border: 3px solid var(--item-color, var(--cat-primary)); border-radius: 50%; }
+        .timeline-item.active .timeline-dot::after { content: ''; position: absolute; inset: 3px; background: var(--item-color); border-radius: 50%; }
+        .timeline-date { font-size: var(--font-xs); color: var(--item-color); font-weight: 600; margin-bottom: var(--space-xs); }
+        .timeline-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); }
+        .timeline-desc { font-size: var(--font-sm); color: var(--text-secondary); }
+        
+        .timeline-item.announce { --item-color: var(--success-green); }
+        .timeline-item.warn { --item-color: var(--warning-yellow); }
+        .timeline-item.sunset { --item-color: var(--orange); }
+        .timeline-item.retire { --item-color: var(--danger-red); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           GOVERNANCE
+        ═══════════════════════════════════════════════════════════════ */
+        .governance-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .governance-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .governance-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .governance-card-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .governance-card-icon.inner-loop { background: rgba(59, 130, 246, 0.15); border-color: #3B82F6; }
+        .governance-card-icon.outer-loop { background: rgba(16, 185, 129, 0.15); border-color: #10B981; }
+        .governance-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .governance-card-content { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .governance-card-content ul { list-style: none; margin-top: var(--space-md); }
+        .governance-card-content li { padding: var(--space-xs) 0; display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .governance-card-content li::before { content: '→'; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DOCUMENTATION
+        ═══════════════════════════════════════════════════════════════ */
+        .docs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .doc-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); text-align: center; transition: all 0.3s; }
+        .doc-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); }
+        .doc-icon { font-size: 40px; margin-bottom: var(--space-md); }
+        .doc-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .doc-desc { font-size: var(--font-sm); color: var(--text-secondary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .tools-table-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table { width: 100%; border-collapse: collapse; }
+        .tools-table th { padding: var(--space-md); text-align: left; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tools-table td { padding: var(--space-md); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .tools-table tr:last-child td { border-bottom: none; }
+        .tools-table tr:hover td { background: var(--bg-hover); }
+        .tool-name { display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-primary); }
+        .tool-icon { font-size: 20px; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); }
+        .badge-oss { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .badge-commercial { background: rgba(124, 58, 237, 0.2); color: var(--violet); }
+        .badge-cloud { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-dark); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-base); margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-panel-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-panel-title { font-size: var(--font-sm); font-weight: 600; }
+        .code-panel-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .code-panel-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #79C0FF; }
+
+        .use-case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .use-case-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .use-case-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .use-case-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .use-case-content h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); color: var(--cat-light); }
+        .use-case-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .phases-grid { grid-template-columns: 1fr; }
+            .versioning-grid { grid-template-columns: 1fr; }
+            .governance-grid { grid-template-columns: 1fr; }
+            .docs-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .use-case-grid { grid-template-columns: 1fr; }
+            .lifecycle-wheel { transform: scale(0.85); }
+            .lifecycle-stats { flex-wrap: wrap; gap: var(--space-md); }
+        }
+        @media (max-width: 768px) {
+            .lifecycle-wheel { transform: scale(0.65); }
+            .lifecycle-canvas { min-height: 380px; }
+            .lifecycle-stats { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat14-integration-apis-overview.html">Integration & APIs</a>
+        <span class="sep">/</span>
+        <span class="current">API Lifecycle</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔗 Category 14</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat14-integration-apis-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat14-p1-api-gateway.html"><span class="nav-icon">🚪</span> 14.1 API Gateway</a></li>
+            <li><a href="cat14-p2-event-architecture.html"><span class="nav-icon">📡</span> 14.2 Event Architecture</a></li>
+            <li><a href="cat14-p3-connectors.html"><span class="nav-icon">🔌</span> 14.3 Connectors</a></li>
+            <li><a href="cat14-p4-api-lifecycle.html" class="active"><span class="nav-icon">🔄</span> 14.4 API Lifecycle</a></li>
+            <li><a href="cat14-p5-webhooks.html"><span class="nav-icon">🪝</span> 14.5 Webhooks</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">💡</span> Overview</a></li>
+            <li><a href="#phases"><span class="nav-icon">🔄</span> Lifecycle Phases</a></li>
+            <li><a href="#versioning"><span class="nav-icon">🏷️</span> Versioning</a></li>
+            <li><a href="#deprecation"><span class="nav-icon">📅</span> Deprecation</a></li>
+            <li><a href="#governance"><span class="nav-icon">⚖️</span> Governance</a></li>
+            <li><a href="#documentation"><span class="nav-icon">📚</span> Documentation</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔄 Page 14.4</span>
+                <h1>API Lifecycle</h1>
+                <p>Manage APIs from design through retirement with versioning, governance, and deprecation strategies that maintain stability for consumers.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">8</div><div class="hero-metric-label">Lifecycle Phases</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">v3</div><div class="hero-metric-label">Current Major Version</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">18mo</div><div class="hero-metric-label">Deprecation Window</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">100%</div><div class="hero-metric-label">API Coverage</div></div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Lifecycle Overview</h2>
+                    <p>Understanding API lifecycle management</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>API lifecycle management encompasses the entire journey of an API from initial concept to eventual retirement. Unlike internal code that can be changed freely, APIs represent <strong>contracts</strong> with external consumers—breaking changes can disrupt businesses, erode trust, and damage your reputation. Effective lifecycle management balances innovation with stability.</p>
+                <p>The lifecycle consists of eight phases that form two interconnected loops. The <strong>inner loop</strong> (Design → Develop → Test → Deploy) runs frequently during active development, often completing multiple cycles per sprint. The <strong>outer loop</strong> (Publish → Monitor → Version → Retire) runs less frequently but carries strategic weight—major versions, deprecation decisions, and sunset timelines happen here.</p>
+                <p>Modern API lifecycle management is increasingly <strong>automated</strong>. CI/CD pipelines validate OpenAPI specs, generate documentation, run contract tests, and deploy to staging environments automatically. API platforms track usage metrics to identify deprecated endpoints ready for retirement. This automation reduces human error and ensures consistency across your API portfolio.</p>
+                <p>The key insight is that lifecycle management is <strong>continuous, not linear</strong>. APIs don't march from design to retirement in a straight line. They cycle through versioning multiple times, with each major version potentially starting a new inner loop while previous versions continue their journey toward retirement. Managing this complexity requires clear processes, good tooling, and constant communication with consumers.</p>
+            </div>
+            
+            <!-- Lifecycle Figure-8 Visualization -->
+            <div class="lifecycle-container">
+                <div class="lifecycle-header">
+                    <div class="lifecycle-title">🔄 API Lifecycle Flow</div>
+                    <div class="lifecycle-badge">Two Interconnected Loops</div>
+                </div>
+                <div class="lifecycle-canvas">
+                    <div class="figure8-wrapper">
+                        <!-- Loop Headers -->
+                        <div class="loop-headers">
+                            <div class="loop-header">
+                                <div class="loop-header-title inner">⚡ Inner Loop (Fast)</div>
+                                <div class="loop-header-subtitle">Multiple times per sprint</div>
+                            </div>
+                            <div class="loop-header">
+                                <div class="loop-header-title outer">🌐 Outer Loop (Slow)</div>
+                                <div class="loop-header-subtitle">Quarterly / Annually</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Figure-8 SVG Path -->
+                        <svg class="figure8-svg" viewBox="0 0 900 200" preserveAspectRatio="xMidYMid meet">
+                            <defs>
+                                <linearGradient id="innerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#3B82F6" />
+                                    <stop offset="100%" style="stop-color:#8B5CF6" />
+                                </linearGradient>
+                                <linearGradient id="outerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#10B981" />
+                                    <stop offset="100%" style="stop-color:#14B8A6" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Inner Loop (left) - Glow -->
+                            <ellipse cx="225" cy="100" rx="180" ry="80" fill="none" stroke="#3B82F6" stroke-width="30" opacity="0.1"/>
+                            <!-- Outer Loop (right) - Glow -->
+                            <ellipse cx="675" cy="100" rx="180" ry="80" fill="none" stroke="#10B981" stroke-width="30" opacity="0.1"/>
+                            <!-- Inner Loop (left) - Main -->
+                            <ellipse cx="225" cy="100" rx="180" ry="80" fill="none" stroke="url(#innerGrad)" stroke-width="3" stroke-dasharray="10,5"/>
+                            <!-- Outer Loop (right) - Main -->
+                            <ellipse cx="675" cy="100" rx="180" ry="80" fill="none" stroke="url(#outerGrad)" stroke-width="3" stroke-dasharray="10,5"/>
+                            <!-- Center intersection highlight -->
+                            <circle cx="450" cy="100" r="40" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.5"/>
+                            
+                            <!-- Animated flow dots - Inner Loop (FAST - more balls, quick animation) -->
+                            <circle r="6" fill="#3B82F6" style="filter: drop-shadow(0 0 6px #3B82F6);">
+                                <animateMotion dur="2s" repeatCount="indefinite">
+                                    <mpath href="#innerPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="6" fill="#60A5FA" style="filter: drop-shadow(0 0 6px #60A5FA);">
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="0.4s">
+                                    <mpath href="#innerPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="6" fill="#3B82F6" style="filter: drop-shadow(0 0 6px #3B82F6);">
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="0.8s">
+                                    <mpath href="#innerPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="6" fill="#818CF8" style="filter: drop-shadow(0 0 6px #818CF8);">
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="1.2s">
+                                    <mpath href="#innerPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="6" fill="#60A5FA" style="filter: drop-shadow(0 0 6px #60A5FA);">
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="1.6s">
+                                    <mpath href="#innerPath"/>
+                                </animateMotion>
+                            </circle>
+                            
+                            <!-- Animated flow dots - Outer Loop (SLOW - fewer balls, slow animation) -->
+                            <circle r="7" fill="#10B981" style="filter: drop-shadow(0 0 8px #10B981);">
+                                <animateMotion dur="12s" repeatCount="indefinite">
+                                    <mpath href="#outerPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="7" fill="#34D399" style="filter: drop-shadow(0 0 8px #34D399);">
+                                <animateMotion dur="12s" repeatCount="indefinite" begin="6s">
+                                    <mpath href="#outerPath"/>
+                                </animateMotion>
+                            </circle>
+                            
+                            <!-- Hidden paths for animation -->
+                            <path id="innerPath" d="M405,100 A180,80 0 1,0 405,101" fill="none" style="visibility:hidden"/>
+                            <path id="outerPath" d="M495,100 A180,80 0 1,1 495,101" fill="none" style="visibility:hidden"/>
+                            
+                            <!-- Direction arrows -->
+                            <polygon points="85,60 95,55 95,65" fill="#3B82F6" opacity="0.8"/>
+                            <polygon points="365,140 355,135 355,145" fill="#8B5CF6" opacity="0.8"/>
+                            <polygon points="535,60 545,55 545,65" fill="#10B981" opacity="0.8"/>
+                            <polygon points="815,140 805,135 805,145" fill="#14B8A6" opacity="0.8"/>
+                        </svg>
+                        
+                        <!-- Phase Nodes -->
+                        <div class="phase-nodes-grid">
+                            <!-- Inner Loop Phases (left) -->
+                            <div class="loop-phases inner">
+                                <div class="phase-row">
+                                    <div class="phase-node design">
+                                        <div class="phase-node-icon">📐</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">01</span>
+                                            <span class="phase-node-label">Design</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="phase-row">
+                                    <div class="phase-node develop">
+                                        <div class="phase-node-icon">💻</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">02</span>
+                                            <span class="phase-node-label">Develop</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="phase-row">
+                                    <div class="phase-node test">
+                                        <div class="phase-node-icon">🧪</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">03</span>
+                                            <span class="phase-node-label">Test</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="phase-row">
+                                    <div class="phase-node deploy">
+                                        <div class="phase-node-icon">🚀</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">04</span>
+                                            <span class="phase-node-label">Deploy</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Center Connection -->
+                            <div class="center-connection">
+                                <div class="center-hub">
+                                    <div class="center-hub-icon">🔄</div>
+                                    <div class="center-hub-label">Release</div>
+                                </div>
+                                <div class="flow-indicators">
+                                    <div class="flow-indicator inner">← Fast iterations</div>
+                                    <div class="flow-indicator outer">Strategic cycles →</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Outer Loop Phases (right) -->
+                            <div class="loop-phases outer">
+                                <div class="phase-row">
+                                    <div class="phase-node publish">
+                                        <div class="phase-node-icon">📢</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">05</span>
+                                            <span class="phase-node-label">Publish</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="phase-row">
+                                    <div class="phase-node monitor">
+                                        <div class="phase-node-icon">📊</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">06</span>
+                                            <span class="phase-node-label">Monitor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="phase-row">
+                                    <div class="phase-node version">
+                                        <div class="phase-node-icon">🏷️</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">07</span>
+                                            <span class="phase-node-label">Version</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="phase-row">
+                                    <div class="phase-node retire">
+                                        <div class="phase-node-icon">🌅</div>
+                                        <div class="phase-node-info">
+                                            <span class="phase-node-num">08</span>
+                                            <span class="phase-node-label">Retire</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lifecycle-stats">
+                    <div class="lifecycle-stat">
+                        <div class="lifecycle-stat-value">Days-Weeks</div>
+                        <div class="lifecycle-stat-label">Inner Loop Cycle</div>
+                    </div>
+                    <div class="lifecycle-stat">
+                        <div class="lifecycle-stat-value">CI/CD</div>
+                        <div class="lifecycle-stat-label">Automation Level</div>
+                    </div>
+                    <div class="lifecycle-stat">
+                        <div class="lifecycle-stat-value">Months-Years</div>
+                        <div class="lifecycle-stat-label">Outer Loop Cycle</div>
+                    </div>
+                    <div class="lifecycle-stat">
+                        <div class="lifecycle-stat-value">Strategic</div>
+                        <div class="lifecycle-stat-label">Decision Type</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- How It Works Section -->
+            <div class="subsection">
+                <h3 class="subsection-title">⚙️ How the Lifecycle Works</h3>
+            </div>
+            <div class="governance-grid">
+                <div class="governance-card">
+                    <div class="governance-card-header">
+                        <div class="governance-card-icon inner-loop">⚡</div>
+                        <div class="governance-card-title">Inner Loop (Fast)</div>
+                    </div>
+                    <div class="governance-card-content">
+                        <p>The <strong>Design → Develop → Test → Deploy</strong> cycle runs frequently—often multiple times per sprint. This is where features are built.</p>
+                        <ul>
+                            <li>Iterative design refinement with stakeholders</li>
+                            <li>Feature branches merged through CI/CD</li>
+                            <li>Automated testing gates enforce quality</li>
+                            <li>Blue-green or canary deployments reduce risk</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="governance-card">
+                    <div class="governance-card-header">
+                        <div class="governance-card-icon outer-loop">🌐</div>
+                        <div class="governance-card-title">Outer Loop (Slow)</div>
+                    </div>
+                    <div class="governance-card-content">
+                        <p>The <strong>Publish → Monitor → Version → Retire</strong> cycle runs quarterly or annually. This is where strategic decisions happen.</p>
+                        <ul>
+                            <li>Major versions published with marketing</li>
+                            <li>Usage analytics inform roadmap decisions</li>
+                            <li>Breaking changes planned with long lead times</li>
+                            <li>Deprecation communicated 12-24 months ahead</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- LIFECYCLE PHASES -->
+        <section class="module" id="phases">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Lifecycle Phases</h2>
+                    <p>Detailed breakdown of each lifecycle stage</p>
+                </div>
+            </div>
+            
+            <div class="phases-grid">
+                <div class="phase-card design">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">📐</div>
+                        <div>
+                            <div class="phase-card-num">Phase 01</div>
+                            <div class="phase-card-title">Design</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Define API contracts before writing code. Collaborate with stakeholders using design-first methodology. Validate requirements and establish patterns.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Define resource models and relationships</li>
+                        <li>Write OpenAPI/AsyncAPI specification</li>
+                        <li>Review with API governance team</li>
+                        <li>Create mock server for early testing</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card develop">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">💻</div>
+                        <div>
+                            <div class="phase-card-num">Phase 02</div>
+                            <div class="phase-card-title">Develop</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Implement the API following the approved design. Generate server stubs from specs. Build business logic while maintaining contract compliance.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Generate server code from OpenAPI</li>
+                        <li>Implement business logic and validation</li>
+                        <li>Write unit and integration tests</li>
+                        <li>Configure security and rate limiting</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card test">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">🧪</div>
+                        <div>
+                            <div class="phase-card-num">Phase 03</div>
+                            <div class="phase-card-title">Test</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Validate the implementation against the specification. Run contract tests, security scans, and performance benchmarks. Ensure quality gates pass.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Run contract tests (Pact, Dredd)</li>
+                        <li>Execute security vulnerability scans</li>
+                        <li>Perform load and performance testing</li>
+                        <li>Validate against API style guide</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card deploy">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">🚀</div>
+                        <div>
+                            <div class="phase-card-num">Phase 04</div>
+                            <div class="phase-card-title">Deploy</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Release to production environments through automated pipelines. Configure gateway routing, enable monitoring, and set up alerting.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Deploy through CI/CD pipeline</li>
+                        <li>Configure API gateway routes</li>
+                        <li>Enable monitoring and alerts</li>
+                        <li>Perform smoke tests in production</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card publish">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">📢</div>
+                        <div>
+                            <div class="phase-card-num">Phase 05</div>
+                            <div class="phase-card-title">Publish</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Make the API discoverable to consumers. Publish documentation, generate SDKs, announce availability, and onboard early adopters.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Publish to developer portal</li>
+                        <li>Generate client SDKs</li>
+                        <li>Write getting started guides</li>
+                        <li>Announce to consumer community</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card monitor">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">📊</div>
+                        <div>
+                            <div class="phase-card-num">Phase 06</div>
+                            <div class="phase-card-title">Monitor</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Track API health, usage patterns, and consumer satisfaction. Analyze metrics to identify improvement opportunities and capacity needs.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Monitor uptime and latency SLOs</li>
+                        <li>Track usage by endpoint and consumer</li>
+                        <li>Analyze error rates and patterns</li>
+                        <li>Gather feedback from consumers</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card version">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">🏷️</div>
+                        <div>
+                            <div class="phase-card-num">Phase 07</div>
+                            <div class="phase-card-title">Version</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Evolve the API while maintaining backward compatibility. Communicate changes clearly through semantic versioning and changelog updates.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Plan breaking vs non-breaking changes</li>
+                        <li>Increment version appropriately</li>
+                        <li>Update documentation and SDKs</li>
+                        <li>Support multiple versions in parallel</li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card retire">
+                    <div class="phase-card-header">
+                        <div class="phase-card-icon">🌅</div>
+                        <div>
+                            <div class="phase-card-num">Phase 08</div>
+                            <div class="phase-card-title">Retire</div>
+                        </div>
+                    </div>
+                    <p class="phase-card-desc">Gracefully sunset deprecated API versions. Communicate timeline clearly, migrate consumers to new versions, and eventually decommission.</p>
+                    <ul class="phase-card-tasks">
+                        <li>Announce deprecation timeline</li>
+                        <li>Provide migration guides</li>
+                        <li>Track remaining consumer usage</li>
+                        <li>Decommission after sunset date</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- VERSIONING -->
+        <section class="module" id="versioning">
+            <div class="module-header">
+                <div class="module-icon">🏷️</div>
+                <div class="module-info">
+                    <h2>API Versioning</h2>
+                    <p>Strategies for evolving APIs safely</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Versioning is how you evolve APIs while maintaining contracts with existing consumers. The key principle is <strong>semantic versioning</strong>: major versions for breaking changes, minor versions for backward-compatible additions, and patch versions for bug fixes. Choose a versioning strategy that balances consumer convenience with operational complexity.</p>
+                <p>The three main versioning strategies are <strong>URL path versioning</strong> (most explicit), <strong>query parameter versioning</strong> (flexible), and <strong>header versioning</strong> (cleanest URLs). Most public APIs use URL path versioning for its discoverability. Internal APIs sometimes prefer header versioning for cleaner resource URLs.</p>
+            </div>
+            
+            <div class="versioning-grid">
+                <div class="version-card">
+                    <div class="version-icon">🔗</div>
+                    <div class="version-title">URL Path</div>
+                    <div class="version-example">/api/v2/users</div>
+                    <p class="version-desc">Version in the URL path. Most explicit and discoverable. Easy to route at gateway level. Creates clear separation between versions.</p>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon">❓</div>
+                    <div class="version-title">Query Parameter</div>
+                    <div class="version-example">/api/users?v=2</div>
+                    <p class="version-desc">Version as query parameter. Keeps resource URLs clean. Can default to latest version. Less common but flexible.</p>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon">📋</div>
+                    <div class="version-title">Header</div>
+                    <div class="version-example">Accept-Version: v2</div>
+                    <p class="version-desc">Version in HTTP header. Cleanest URLs. Enables content negotiation. Requires custom header handling by clients.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- DEPRECATION -->
+        <section class="module" id="deprecation">
+            <div class="module-header">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                    <h2>Deprecation Strategy</h2>
+                    <p>Gracefully retiring API versions</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Deprecation is the process of phasing out old API versions. The goal is to give consumers <strong>adequate time and clear guidance</strong> to migrate to newer versions. A well-communicated deprecation timeline builds trust; surprise removals destroy it. Industry standard is 12-24 months notice for major version deprecations.</p>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <h3>📅 Deprecation Timeline Example</h3>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline">
+                        <div class="timeline-item announce active">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">Month 0 — Announcement</div>
+                            <div class="timeline-title">Deprecation Announced</div>
+                            <div class="timeline-desc">New version released. Old version marked deprecated in docs. Deprecation headers added to API responses. Migration guide published.</div>
+                        </div>
+                        <div class="timeline-item warn">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">Month 6 — Active Warning</div>
+                            <div class="timeline-title">Warning Period</div>
+                            <div class="timeline-desc">Direct outreach to high-usage consumers. Deprecation warnings in logs. Dashboard alerts for teams still using old version.</div>
+                        </div>
+                        <div class="timeline-item sunset">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">Month 12 — Sunset Warning</div>
+                            <div class="timeline-title">Final Warning</div>
+                            <div class="timeline-desc">90-day countdown begins. Rate limiting on deprecated endpoints. Escalation to remaining consumers. Support for migration.</div>
+                        </div>
+                        <div class="timeline-item retire">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">Month 18 — Retirement</div>
+                            <div class="timeline-title">Version Retired</div>
+                            <div class="timeline-desc">Deprecated version returns 410 Gone. Traffic redirected where possible. Documentation archived. Post-mortem on migration success.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- GOVERNANCE -->
+        <section class="module" id="governance">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>API Governance</h2>
+                    <p>Standards and policies for API quality</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>API governance ensures consistency, security, and quality across your API portfolio. Without governance, you end up with inconsistent naming conventions, varying authentication schemes, and fragmented documentation. A <strong>style guide</strong> defines standards; <strong>automated linting</strong> enforces them; <strong>review processes</strong> catch what automation misses.</p>
+            </div>
+            
+            <div class="governance-grid">
+                <div class="governance-card">
+                    <div class="governance-card-header">
+                        <div class="governance-card-icon">📝</div>
+                        <div class="governance-card-title">API Style Guide</div>
+                    </div>
+                    <div class="governance-card-content">
+                        <p>Document standards for consistent API design across your organization.</p>
+                        <ul>
+                            <li>Naming conventions (camelCase vs snake_case)</li>
+                            <li>URL structure and resource naming</li>
+                            <li>Standard HTTP status codes usage</li>
+                            <li>Error response format</li>
+                            <li>Pagination patterns</li>
+                            <li>Authentication requirements</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="governance-card">
+                    <div class="governance-card-header">
+                        <div class="governance-card-icon">🔍</div>
+                        <div class="governance-card-title">Automated Linting</div>
+                    </div>
+                    <div class="governance-card-content">
+                        <p>Enforce style guide rules automatically in CI/CD pipelines.</p>
+                        <ul>
+                            <li>Spectral for OpenAPI linting</li>
+                            <li>Custom rules for org standards</li>
+                            <li>Breaking change detection</li>
+                            <li>Security policy validation</li>
+                            <li>Documentation completeness checks</li>
+                            <li>PR blocking on violations</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="governance-card">
+                    <div class="governance-card-header">
+                        <div class="governance-card-icon">👥</div>
+                        <div class="governance-card-title">Review Process</div>
+                    </div>
+                    <div class="governance-card-content">
+                        <p>Human review for design decisions that require judgment.</p>
+                        <ul>
+                            <li>API design review board</li>
+                            <li>Security team review for sensitive APIs</li>
+                            <li>Consumer impact assessment</li>
+                            <li>Architecture alignment check</li>
+                            <li>Performance review for high-traffic APIs</li>
+                            <li>Documentation quality review</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="governance-card">
+                    <div class="governance-card-header">
+                        <div class="governance-card-icon">📊</div>
+                        <div class="governance-card-title">Metrics & Reporting</div>
+                    </div>
+                    <div class="governance-card-content">
+                        <p>Track governance health across your API portfolio.</p>
+                        <ul>
+                            <li>Style guide compliance score</li>
+                            <li>Documentation coverage</li>
+                            <li>Security scan pass rate</li>
+                            <li>Breaking change frequency</li>
+                            <li>Deprecated API usage</li>
+                            <li>Consumer satisfaction scores</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- DOCUMENTATION -->
+        <section class="module" id="documentation">
+            <div class="module-header">
+                <div class="module-icon">📚</div>
+                <div class="module-info">
+                    <h2>Documentation</h2>
+                    <p>Essential documentation for API consumers</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Great documentation is the difference between a frustrating API and a delightful one. Documentation should be <strong>accurate</strong> (generated from specs), <strong>complete</strong> (covering all use cases), and <strong>accessible</strong> (easy to navigate). Treat documentation as a product—it's often the first impression consumers have of your API.</p>
+            </div>
+            
+            <div class="docs-grid">
+                <div class="doc-card">
+                    <div class="doc-icon">📖</div>
+                    <div class="doc-title">API Reference</div>
+                    <p class="doc-desc">Auto-generated from OpenAPI spec. Every endpoint, parameter, and response documented.</p>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">🚀</div>
+                    <div class="doc-title">Getting Started</div>
+                    <p class="doc-desc">Quick start guide to first successful API call in under 5 minutes.</p>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">📋</div>
+                    <div class="doc-title">Tutorials</div>
+                    <p class="doc-desc">Step-by-step guides for common use cases and integrations.</p>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">💡</div>
+                    <div class="doc-title">Code Examples</div>
+                    <p class="doc-desc">Working code samples in multiple languages (Python, JS, Go, etc.).</p>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">📝</div>
+                    <div class="doc-title">Changelog</div>
+                    <p class="doc-desc">Version history with breaking changes highlighted and migration notes.</p>
+                </div>
+                <div class="doc-card">
+                    <div class="doc-icon">⚠️</div>
+                    <div class="doc-title">Error Guide</div>
+                    <p class="doc-desc">Common errors, their causes, and resolution steps.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Software for API lifecycle management</p>
+                </div>
+            </div>
+            
+            <div class="tools-table-container">
+                <div class="tools-table-header">
+                    <h3>🔧 API Lifecycle Tools</h3>
+                </div>
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Type</th>
+                            <th>Primary Use</th>
+                            <th>Key Feature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">📐</span> Stoplight</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>API Design & Docs</td>
+                            <td>Visual OpenAPI editor</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔷</span> SwaggerHub</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>Design Collaboration</td>
+                            <td>Team-based API design</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">📮</span> Postman</span></td>
+                            <td><span class="badge badge-commercial">Commercial</span></td>
+                            <td>Testing & Docs</td>
+                            <td>Collections & workspaces</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🔍</span> Spectral</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>API Linting</td>
+                            <td>Custom rule engine</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">📝</span> Redoc</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Documentation</td>
+                            <td>Beautiful API docs</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🧪</span> Dredd</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Contract Testing</td>
+                            <td>Spec vs implementation</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">🤝</span> Pact</span></td>
+                            <td><span class="badge badge-oss">OSS</span></td>
+                            <td>Contract Testing</td>
+                            <td>Consumer-driven contracts</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tool-name"><span class="tool-icon">☁️</span> Apigee</span></td>
+                            <td><span class="badge badge-cloud">Cloud</span></td>
+                            <td>Full Lifecycle</td>
+                            <td>Google Cloud native</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective lifecycle management</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Design First, Code Second</h4>
+                        <p>Write OpenAPI specs before implementation. Review designs with stakeholders. Generate code from specs, not specs from code.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Never Break Backward Compatibility</h4>
+                        <p>Within a major version, only add—never remove or change. Reserve breaking changes for major version bumps with long deprecation windows.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Version from Day One</h4>
+                        <p>Include version in URLs from the start, even for v1. It's much harder to add versioning later than to have it from the beginning.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Automate Everything</h4>
+                        <p>Automate linting, testing, documentation generation, and deployment. Manual processes introduce errors and slow teams down.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Track Usage Metrics</h4>
+                        <p>Know which endpoints are used, by whom, and how often. Data-driven decisions about deprecation and investment.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Communicate Proactively</h4>
+                        <p>Announce changes early and often. Deprecation headers, email notifications, changelog updates, developer blog posts.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Support Multiple Versions</h4>
+                        <p>Run old versions long enough for consumers to migrate. Budget for maintaining 2-3 major versions simultaneously.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Treat Docs as Product</h4>
+                        <p>Documentation is your API's UX. Invest in quality, keep it updated, and measure consumer satisfaction with docs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered API lifecycle automation</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The <strong>LifecycleOps Crew</strong> brings AI-powered automation to API lifecycle management. These specialized agents monitor API health, detect breaking changes, automate documentation updates, and guide deprecation processes—transforming manual governance into intelligent, proactive API stewardship.</p>
+                <p>APIs generate vast amounts of signals: usage patterns, error rates, schema changes, consumer feedback. AI agents excel at correlating these signals to identify APIs ready for deprecation, detect undocumented breaking changes before deployment, and generate migration guides automatically. The LifecycleOps Crew augments your platform team, handling routine lifecycle tasks while surfacing decisions that require human judgment.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔄</div>
+                    <div class="agent-name">LifecycleOps Crew</div>
+                    <div class="agent-role">API Lifecycle Automation</div>
+                    <p class="agent-desc">A coordinated team of specialized agents that manage API lifecycle tasks, from design review through deprecation. Each agent focuses on a specific phase while sharing context for holistic lifecycle governance.</p>
+                    <ul class="agent-capabilities">
+                        <li>Breaking change detection in PRs</li>
+                        <li>Automated documentation generation</li>
+                        <li>Deprecation timeline management</li>
+                        <li>Consumer impact analysis</li>
+                        <li>Style guide compliance checking</li>
+                        <li>Migration guide generation</li>
+                        <li>Usage pattern analysis for retirement decisions</li>
+                        <li>Changelog automation</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header">
+                        <span class="code-panel-title">lifecycle_ops_crew.py</span>
+                        <span class="code-panel-lang">Python</span>
+                    </div>
+                    <div class="code-panel-content">
+                        <pre><span class="code-comment"># LifecycleOps Crew - AI-Powered API Lifecycle</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Breaking Change Detector Agent</span>
+breaking_agent = Agent(
+    role=<span class="code-string">"Breaking Change Detector"</span>,
+    goal=<span class="code-string">"Identify breaking changes before deployment"</span>,
+    backstory=<span class="code-string">"""Expert at analyzing OpenAPI diffs to detect
+    breaking changes: removed endpoints, changed types,
+    required field additions, and semantic changes."""</span>,
+    llm=llm,
+    tools=[openapi_differ, schema_analyzer, impact_assessor]
+)
+
+<span class="code-comment"># Documentation Agent</span>
+docs_agent = Agent(
+    role=<span class="code-string">"Documentation Generator"</span>,
+    goal=<span class="code-string">"Keep API documentation accurate and complete"</span>,
+    backstory=<span class="code-string">"""Documentation specialist who generates
+    changelogs, updates API references, and creates
+    migration guides from spec changes."""</span>,
+    llm=llm,
+    tools=[doc_generator, changelog_writer, example_creator]
+)
+
+<span class="code-comment"># Deprecation Manager Agent</span>
+deprecation_agent = Agent(
+    role=<span class="code-string">"Deprecation Manager"</span>,
+    goal=<span class="code-string">"Orchestrate smooth API deprecations"</span>,
+    backstory=<span class="code-string">"""Deprecation expert who tracks timelines,
+    monitors consumer migration progress, and
+    coordinates sunset communications."""</span>,
+    llm=llm,
+    tools=[usage_analyzer, notification_sender, timeline_tracker]
+)
+
+<span class="code-comment"># Governance Agent</span>
+governance_agent = Agent(
+    role=<span class="code-string">"Governance Enforcer"</span>,
+    goal=<span class="code-string">"Ensure APIs comply with standards"</span>,
+    backstory=<span class="code-string">"""Style guide expert who validates APIs
+    against organizational standards and provides
+    specific remediation guidance."""</span>,
+    llm=llm,
+    tools=[spectral_linter, style_checker, compliance_reporter]
+)
+
+<span class="code-comment"># Create LifecycleOps Crew</span>
+lifecycle_ops_crew = Crew(
+    agents=[breaking_agent, docs_agent, 
+            deprecation_agent, governance_agent],
+    tasks=[
+        Task(description=<span class="code-string">"Check PR for breaking changes"</span>,
+             agent=breaking_agent),
+        Task(description=<span class="code-string">"Update docs for changes"</span>,
+             agent=docs_agent),
+        Task(description=<span class="code-string">"Review deprecation status"</span>,
+             agent=deprecation_agent),
+        Task(description=<span class="code-string">"Validate governance compliance"</span>,
+             agent=governance_agent),
+    ],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Use Cases -->
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Agent Use Cases</h3>
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔍</div>
+                        <div class="use-case-content">
+                            <h4>PR Breaking Change Review</h4>
+                            <p>Agent analyzes OpenAPI diff in PR, identifies removed field as breaking change, blocks merge, and suggests backward-compatible alternative.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📝</div>
+                        <div class="use-case-content">
+                            <h4>Auto-Generated Changelog</h4>
+                            <p>Docs agent detects new endpoints in release, generates changelog entry with examples, and updates API reference documentation automatically.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📅</div>
+                        <div class="use-case-content">
+                            <h4>Deprecation Readiness</h4>
+                            <p>Deprecation agent analyzes v1 usage, identifies 3 consumers still active, generates personalized migration outreach, and tracks progress to sunset.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">⚖️</div>
+                        <div class="use-case-content">
+                            <h4>Governance Report</h4>
+                            <p>Governance agent scans API portfolio, identifies 12 style guide violations, generates compliance report with specific line-by-line fixes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat14-p3-connectors.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">14.3 Connectors</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 14.4</div>
+        <a href="cat14-p5-webhooks.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">14.5 Webhooks</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

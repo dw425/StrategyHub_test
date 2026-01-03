@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectors | 14.3 | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #06B6D4;
+            --cat-light: #22D3EE;
+            --cat-dark: #0891B2;
+            --cat-glow: rgba(6, 182, 212, 0.15);
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --violet: #7C3AED;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; text-decoration: none; color: inherit; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 56px; height: 56px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+
+        /* Subsections */
+        .subsection { margin-top: var(--space-xl); }
+        .subsection-title { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-lg); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONNECTOR HUB VISUALIZATION
+        ═══════════════════════════════════════════════════════════════ */
+        .connector-hub-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .connector-hub-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .connector-hub-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .connector-hub-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .connector-hub-canvas { padding: var(--space-2xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; min-height: 450px; }
+        .connector-hub-canvas::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%); }
+        
+        .hub-layout { display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; height: 380px; }
+        
+        /* Central Hub */
+        .central-hub { width: 160px; height: 160px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0.05) 100%); border: 3px solid var(--cat-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; box-shadow: 0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 30px rgba(6, 182, 212, 0.1); }
+        .central-hub::before { content: ''; position: absolute; inset: -15px; border: 2px dashed rgba(6, 182, 212, 0.3); border-radius: 50%; animation: hub-rotate 20s linear infinite; }
+        .central-hub-icon { font-size: 48px; margin-bottom: var(--space-sm); }
+        .central-hub-label { font-size: var(--font-base); font-weight: 700; color: var(--cat-light); }
+        .central-hub-sublabel { font-size: var(--font-xs); color: var(--text-muted); }
+        
+        @keyframes hub-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* Connection Lines from connectors to hub */
+        .hub-connections { position: absolute; width: 380px; height: 380px; pointer-events: none; z-index: 5; }
+        
+        /* Orbiting Connectors */
+        .connector-orbit { position: absolute; width: 380px; height: 380px; border: 1px dashed rgba(6, 182, 212, 0.2); border-radius: 50%; }
+        
+        .orbit-connector { position: absolute; width: 80px; height: 80px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s; cursor: pointer; }
+        .orbit-connector:hover { transform: scale(1.15); border-color: var(--cat-primary); box-shadow: 0 0 25px rgba(6, 182, 212, 0.4); z-index: 20; }
+        .orbit-connector-icon { font-size: 28px; margin-bottom: 2px; }
+        .orbit-connector-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Position connectors around the orbit */
+        .orbit-connector:nth-child(1) { top: -40px; left: 50%; transform: translateX(-50%); }
+        .orbit-connector:nth-child(2) { top: 15%; right: -40px; }
+        .orbit-connector:nth-child(3) { top: 50%; right: -40px; transform: translateY(-50%); }
+        .orbit-connector:nth-child(4) { bottom: 15%; right: -40px; }
+        .orbit-connector:nth-child(5) { bottom: -40px; left: 50%; transform: translateX(-50%); }
+        .orbit-connector:nth-child(6) { bottom: 15%; left: -40px; }
+        .orbit-connector:nth-child(7) { top: 50%; left: -40px; transform: translateY(-50%); }
+        .orbit-connector:nth-child(8) { top: 15%; left: -40px; }
+        
+        /* Connector type colors */
+        .orbit-connector.database { border-color: var(--blue); }
+        .orbit-connector.database:hover { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
+        .orbit-connector.saas { border-color: var(--violet); }
+        .orbit-connector.saas:hover { box-shadow: 0 0 25px rgba(124, 58, 237, 0.4); }
+        .orbit-connector.cloud { border-color: var(--orange); }
+        .orbit-connector.cloud:hover { box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); }
+        .orbit-connector.messaging { border-color: var(--success-green); }
+        .orbit-connector.messaging:hover { box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
+        
+        /* Connection Lines */
+        .connection-line { position: absolute; background: linear-gradient(90deg, transparent, var(--cat-primary), transparent); height: 2px; transform-origin: left center; opacity: 0.5; }
+        
+        /* Animated data packets on connections */
+        .data-packet { position: absolute; width: 8px; height: 8px; background: var(--cat-light); border-radius: 50%; box-shadow: 0 0 10px var(--cat-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONNECTOR TYPES GRID
+        ═══════════════════════════════════════════════════════════════ */
+        .connector-types-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .connector-type-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); position: relative; overflow: hidden; transition: all 0.3s; }
+        .connector-type-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--type-color, var(--cat-primary)); }
+        .connector-type-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        
+        .connector-type-card.databases { --type-color: var(--blue); }
+        .connector-type-card.saas { --type-color: var(--violet); }
+        .connector-type-card.files { --type-color: var(--orange); }
+        .connector-type-card.messaging { --type-color: var(--success-green); }
+        .connector-type-card.protocols { --type-color: var(--pink); }
+        .connector-type-card.custom { --type-color: var(--teal); }
+        
+        .connector-type-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .connector-type-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--type-color, var(--cat-primary)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .connector-type-title { font-size: var(--font-lg); font-weight: 600; }
+        .connector-type-count { font-size: var(--font-xs); color: var(--text-muted); }
+        .connector-type-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-lg); }
+        
+        .connector-examples { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+        .connector-example { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-xs) var(--space-sm); font-size: var(--font-xs); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-xs); }
+        .connector-example-icon { font-size: 14px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           POPULAR CONNECTORS TABLE
+        ═══════════════════════════════════════════════════════════════ */
+        .connectors-table-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .connectors-table-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .connectors-table { width: 100%; border-collapse: collapse; }
+        .connectors-table th { padding: var(--space-md); text-align: left; font-size: var(--font-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .connectors-table td { padding: var(--space-md); font-size: var(--font-sm); color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .connectors-table tr:last-child td { border-bottom: none; }
+        .connectors-table tr:hover td { background: var(--bg-hover); }
+        .connector-name { display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-primary); }
+        .connector-icon { font-size: 20px; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); }
+        .badge-source { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .badge-sink { background: rgba(16, 185, 129, 0.2); color: var(--success-green); }
+        .badge-both { background: rgba(124, 58, 237, 0.2); color: var(--violet); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DATA FLOW PATTERNS
+        ═══════════════════════════════════════════════════════════════ */
+        .patterns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .pattern-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); text-align: center; transition: all 0.3s; }
+        .pattern-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); }
+        .pattern-icon { font-size: 48px; margin-bottom: var(--space-md); }
+        .pattern-name { font-size: var(--font-lg); font-weight: 600; margin-bottom: var(--space-sm); }
+        .pattern-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONFIGURATION SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .config-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .config-panel-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .config-panel-title { font-size: var(--font-sm); font-weight: 600; }
+        .config-panel-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .config-panel-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+        .config-panel-content pre { margin: 0; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-property { color: #79C0FF; }
+        .code-number { color: #79C0FF; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TRANSFORMATION PIPELINE - DYNAMIC DESIGN
+        ═══════════════════════════════════════════════════════════════ */
+        .transform-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .transform-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .transform-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .transform-badge { font-size: var(--font-xs); padding: 4px 12px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-dark); }
+        
+        .transform-canvas { padding: var(--space-2xl) var(--space-xl); background: linear-gradient(180deg, var(--bg-dark) 0%, #0d0d14 100%); position: relative; overflow: hidden; }
+        .transform-canvas::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 60%, rgba(59, 130, 246, 0.1) 0%, transparent 40%), radial-gradient(circle at 80% 60%, rgba(16, 185, 129, 0.1) 0%, transparent 40%); }
+        
+        /* Main Flow Layout */
+        .transform-flow { position: relative; z-index: 1; height: 280px; max-width: 900px; margin: 0 auto; }
+        
+        /* SVG Flow Path - Background Arc */
+        .flow-path-svg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        
+        /* Transform Stages Container */
+        .transform-stages { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        
+        /* Individual Stage */
+        .transform-stage { position: absolute; display: flex; flex-direction: column; align-items: center; text-align: center; width: 100px; }
+        .transform-stage-bubble { width: 72px; height: 72px; background: var(--bg-card); border: 3px solid var(--stage-color, var(--cat-primary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 30px color-mix(in srgb, var(--stage-color) 40%, transparent); transition: all 0.3s; }
+        .transform-stage-bubble:hover { transform: scale(1.15); }
+        .transform-stage-label { margin-top: var(--space-sm); font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); }
+        .transform-stage-desc { font-size: var(--font-xs); color: var(--text-muted); }
+        
+        /* Stage Positions - Arc Layout */
+        .transform-stage.stage-1 { left: 5%; top: 55%; --stage-color: #3B82F6; }
+        .transform-stage.stage-2 { left: 22%; top: 15%; --stage-color: #8B5CF6; }
+        .transform-stage.stage-3 { left: 50%; top: 5%; transform: translateX(-50%); --stage-color: #06B6D4; }
+        .transform-stage.stage-4 { right: 22%; top: 15%; --stage-color: #14B8A6; }
+        .transform-stage.stage-5 { right: 5%; top: 55%; --stage-color: #10B981; }
+        
+        /* Input/Output Labels */
+        .flow-endpoint { position: absolute; top: 65%; display: flex; flex-direction: column; align-items: center; gap: var(--space-xs); }
+        .flow-endpoint.input { left: 0; }
+        .flow-endpoint.output { right: 0; }
+        .flow-endpoint-icon { font-size: 32px; }
+        .flow-endpoint-label { font-size: var(--font-xs); color: var(--text-muted); font-weight: 600; }
+        .flow-endpoint.input .flow-endpoint-label { color: #3B82F6; }
+        .flow-endpoint.output .flow-endpoint-label { color: #10B981; }
+        
+        /* Stats Bar */
+        .transform-stats { display: flex; justify-content: center; gap: var(--space-2xl); padding: var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .transform-stat { text-align: center; }
+        .transform-stat-value { font-size: var(--font-lg); font-weight: 700; }
+        .transform-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .transform-stat:nth-child(1) .transform-stat-value { color: #3B82F6; }
+        .transform-stat:nth-child(2) .transform-stat-value { color: #8B5CF6; }
+        .transform-stat:nth-child(3) .transform-stat-value { color: #06B6D4; }
+        .transform-stat:nth-child(4) .transform-stat-value { color: #10B981; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ERROR HANDLING & MONITORING
+        ═══════════════════════════════════════════════════════════════ */
+        .monitoring-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .monitoring-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .monitoring-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+        .monitoring-card-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .monitoring-card-title { font-size: var(--font-lg); font-weight: 600; }
+        .monitoring-card-content { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.7; }
+        .monitoring-card-content ul { list-style: none; margin-top: var(--space-md); }
+        .monitoring-card-content li { padding: var(--space-xs) 0; display: flex; align-items: flex-start; gap: var(--space-sm); }
+        .monitoring-card-content li::before { content: '→'; color: var(--cat-light); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BEST PRACTICES
+        ═══════════════════════════════════════════════════════════════ */
+        .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .practice-card:hover { border-color: var(--cat-dark); }
+        .practice-num { width: 36px; height: 36px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: 700; color: var(--cat-light); flex-shrink: 0; }
+        .practice-content h4 { font-size: var(--font-base); margin-bottom: var(--space-xs); }
+        .practice-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLS COMPARISON
+        ═══════════════════════════════════════════════════════════════ */
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); }
+        .tool-card-header { padding: var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); text-align: center; }
+        .tool-card-icon { font-size: 40px; margin-bottom: var(--space-sm); }
+        .tool-card-name { font-size: var(--font-lg); font-weight: 600; }
+        .tool-card-tagline { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-xs); }
+        .tool-card-body { padding: var(--space-lg); }
+        .tool-features { list-style: none; }
+        .tool-features li { padding: var(--space-xs) 0; font-size: var(--font-sm); color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-sm); }
+        .tool-features li::before { content: '✓'; color: var(--success-green); font-weight: bold; font-size: 12px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENT SECTION
+        ═══════════════════════════════════════════════════════════════ */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-panel-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .code-panel-title { font-size: var(--font-sm); font-weight: 600; }
+        .code-panel-lang { font-size: var(--font-xs); color: var(--cat-light); background: var(--cat-glow); padding: 2px 8px; border-radius: var(--radius-sm); }
+        .code-panel-content { padding: var(--space-lg); background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; }
+
+        /* Use Case Grid */
+        .use-case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+        .use-case-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); display: flex; gap: var(--space-md); transition: all 0.3s; }
+        .use-case-card:hover { border-color: var(--cat-dark); transform: translateY(-2px); }
+        .use-case-icon { width: 48px; height: 48px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .use-case-content h4 { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-xs); color: var(--cat-light); }
+        .use-case-content p { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .connector-types-grid { grid-template-columns: 1fr; }
+            .patterns-grid { grid-template-columns: 1fr; }
+            .config-grid { grid-template-columns: 1fr; }
+            .monitoring-grid { grid-template-columns: 1fr; }
+            .practices-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .use-case-grid { grid-template-columns: 1fr; }
+            .hub-layout { transform: scale(0.8); }
+            .transform-stats { flex-wrap: wrap; gap: var(--space-md); }
+            .flow-endpoint { display: none; }
+        }
+        @media (max-width: 768px) {
+            .hub-layout { transform: scale(0.6); }
+            .transform-flow { height: 220px; }
+            .transform-stage-bubble { width: 56px; height: 56px; font-size: 22px; }
+            .transform-stage-label { font-size: var(--font-xs); }
+            .transform-stage-desc { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><span>STRATEGY</span>HUB</a>
+    <div class="breadcrumb">
+        <a href="index.html">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat14-integration-apis-overview.html">Integration & APIs</a>
+        <span class="sep">/</span>
+        <span class="current">Connectors</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🔗 Category 14</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat14-integration-apis-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat14-p1-api-gateway.html"><span class="nav-icon">🚪</span> 14.1 API Gateway</a></li>
+            <li><a href="cat14-p2-event-architecture.html"><span class="nav-icon">📡</span> 14.2 Event Architecture</a></li>
+            <li><a href="cat14-p3-connectors.html" class="active"><span class="nav-icon">🔌</span> 14.3 Connectors</a></li>
+            <li><a href="cat14-p4-api-lifecycle.html"><span class="nav-icon">🔄</span> 14.4 API Lifecycle</a></li>
+            <li><a href="cat14-p5-webhooks.html"><span class="nav-icon">🪝</span> 14.5 Webhooks</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#concepts"><span class="nav-icon">💡</span> Core Concepts</a></li>
+            <li><a href="#types"><span class="nav-icon">📦</span> Connector Types</a></li>
+            <li><a href="#popular"><span class="nav-icon">⭐</span> Popular Connectors</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📐</span> Data Flow Patterns</a></li>
+            <li><a href="#transforms"><span class="nav-icon">🔄</span> Transformations</a></li>
+            <li><a href="#config"><span class="nav-icon">⚙️</span> Configuration</a></li>
+            <li><a href="#monitoring"><span class="nav-icon">📊</span> Monitoring</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔌 Page 14.3</span>
+                <h1>Connectors</h1>
+                <p>Bridge systems with pre-built integrations that move data between databases, SaaS applications, file systems, and messaging platforms.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">300+</div><div class="hero-metric-label">Pre-built Connectors</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10TB+</div><div class="hero-metric-label">Daily Data Volume</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">&lt;5min</div><div class="hero-metric-label">Setup Time</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">99.9%</div><div class="hero-metric-label">Sync Reliability</div></div>
+            </div>
+        </section>
+
+        <!-- CORE CONCEPTS -->
+        <section class="module" id="concepts">
+            <div class="module-header">
+                <div class="module-icon">💡</div>
+                <div class="module-info">
+                    <h2>Core Concepts</h2>
+                    <p>Understanding data integration connectors</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Connectors are pre-built integration components that establish communication between different systems. Instead of writing custom code to interact with each database, API, or application, connectors provide a <strong>standardized interface</strong> for extracting data from sources and loading it into destinations. This abstraction dramatically reduces integration complexity and maintenance burden.</p>
+                <p>Modern connector frameworks follow the <strong>Extract-Load-Transform (ELT)</strong> or <strong>Extract-Transform-Load (ETL)</strong> paradigm. Source connectors extract data from origin systems, applying any necessary transformations, while sink connectors load data into target systems. The connector runtime handles connection management, error recovery, schema evolution, and exactly-once delivery semantics—complexities you'd otherwise need to implement yourself.</p>
+                <p>The connector ecosystem has exploded with the rise of data platforms. Tools like <strong>Fivetran</strong>, <strong>Airbyte</strong>, <strong>Kafka Connect</strong>, and <strong>dbt</strong> offer hundreds of pre-built connectors for popular systems. When pre-built connectors don't exist, most frameworks provide SDKs for building custom connectors that integrate seamlessly with the same operational infrastructure.</p>
+            </div>
+            
+            <!-- Connector Hub Visualization -->
+            <div class="connector-hub-container">
+                <div class="connector-hub-header">
+                    <div class="connector-hub-title">🔌 Integration Hub</div>
+                    <div class="connector-hub-badge">300+ Connectors</div>
+                </div>
+                <div class="connector-hub-canvas">
+                    <div class="hub-layout">
+                        <!-- SVG Connection Lines -->
+                        <svg class="hub-connections" viewBox="0 0 380 380">
+                            <!-- Connection Lines - solid strokes -->
+                            <line x1="190" y1="50" x2="190" y2="120" stroke="#06B6D4" stroke-width="2" opacity="0.6" />
+                            <line x1="300" y1="100" x2="240" y2="145" stroke="#7C3AED" stroke-width="2" opacity="0.6" />
+                            <line x1="330" y1="190" x2="260" y2="190" stroke="#F97316" stroke-width="2" opacity="0.6" />
+                            <line x1="300" y1="280" x2="240" y2="235" stroke="#10B981" stroke-width="2" opacity="0.6" />
+                            <line x1="190" y1="330" x2="190" y2="260" stroke="#3B82F6" stroke-width="2" opacity="0.6" />
+                            <line x1="80" y1="280" x2="140" y2="235" stroke="#7C3AED" stroke-width="2" opacity="0.6" />
+                            <line x1="50" y1="190" x2="120" y2="190" stroke="#F97316" stroke-width="2" opacity="0.6" />
+                            <line x1="80" y1="100" x2="140" y2="145" stroke="#10B981" stroke-width="2" opacity="0.6" />
+                            
+                            <!-- Animated Data Pulses using animateMotion -->
+                            <circle r="5" fill="#22D3EE" style="filter: drop-shadow(0 0 6px #22D3EE);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" path="M190,50 L190,120" />
+                            </circle>
+                            <circle r="5" fill="#7C3AED" style="filter: drop-shadow(0 0 6px #7C3AED);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.2s" path="M300,100 L240,145" />
+                            </circle>
+                            <circle r="5" fill="#F97316" style="filter: drop-shadow(0 0 6px #F97316);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.4s" path="M330,190 L260,190" />
+                            </circle>
+                            <circle r="5" fill="#10B981" style="filter: drop-shadow(0 0 6px #10B981);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.6s" path="M300,280 L240,235" />
+                            </circle>
+                            <circle r="5" fill="#3B82F6" style="filter: drop-shadow(0 0 6px #3B82F6);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.8s" path="M190,330 L190,260" />
+                            </circle>
+                            <circle r="5" fill="#7C3AED" style="filter: drop-shadow(0 0 6px #7C3AED);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="1s" path="M80,280 L140,235" />
+                            </circle>
+                            <circle r="5" fill="#F97316" style="filter: drop-shadow(0 0 6px #F97316);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="1.2s" path="M50,190 L120,190" />
+                            </circle>
+                            <circle r="5" fill="#10B981" style="filter: drop-shadow(0 0 6px #10B981);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="1.4s" path="M80,100 L140,145" />
+                            </circle>
+                            
+                            <!-- Reverse direction pulses (from hub to connectors) -->
+                            <circle r="5" fill="#22D3EE" style="filter: drop-shadow(0 0 6px #22D3EE);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.75s" path="M190,120 L190,50" />
+                            </circle>
+                            <circle r="5" fill="#7C3AED" style="filter: drop-shadow(0 0 6px #7C3AED);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.95s" path="M240,145 L300,100" />
+                            </circle>
+                            <circle r="5" fill="#10B981" style="filter: drop-shadow(0 0 6px #10B981);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="1.15s" path="M260,190 L330,190" />
+                            </circle>
+                            <circle r="5" fill="#F97316" style="filter: drop-shadow(0 0 6px #F97316);">
+                                <animateMotion dur="1.5s" repeatCount="indefinite" begin="1.35s" path="M240,235 L300,280" />
+                            </circle>
+                        </svg>
+                        
+                        <div class="connector-orbit">
+                            <!-- Orbiting Connectors -->
+                            <div class="orbit-connector database">
+                                <div class="orbit-connector-icon">🐘</div>
+                                <div class="orbit-connector-label">PostgreSQL</div>
+                            </div>
+                            <div class="orbit-connector saas">
+                                <div class="orbit-connector-icon">📊</div>
+                                <div class="orbit-connector-label">Salesforce</div>
+                            </div>
+                            <div class="orbit-connector cloud">
+                                <div class="orbit-connector-icon">☁️</div>
+                                <div class="orbit-connector-label">S3</div>
+                            </div>
+                            <div class="orbit-connector messaging">
+                                <div class="orbit-connector-icon">🦊</div>
+                                <div class="orbit-connector-label">Kafka</div>
+                            </div>
+                            <div class="orbit-connector database">
+                                <div class="orbit-connector-icon">❄️</div>
+                                <div class="orbit-connector-label">Snowflake</div>
+                            </div>
+                            <div class="orbit-connector saas">
+                                <div class="orbit-connector-icon">📧</div>
+                                <div class="orbit-connector-label">HubSpot</div>
+                            </div>
+                            <div class="orbit-connector cloud">
+                                <div class="orbit-connector-icon">🔷</div>
+                                <div class="orbit-connector-label">BigQuery</div>
+                            </div>
+                            <div class="orbit-connector messaging">
+                                <div class="orbit-connector-icon">🐰</div>
+                                <div class="orbit-connector-label">RabbitMQ</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Central Hub -->
+                        <div class="central-hub">
+                            <div class="central-hub-icon">🔌</div>
+                            <div class="central-hub-label">Connector Hub</div>
+                            <div class="central-hub-sublabel">Unified Data Flow</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CONNECTOR TYPES -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                    <h2>Connector Types</h2>
+                    <p>Categories of integration connectors</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Connectors can be categorized by the type of system they integrate with. Each category has unique characteristics—databases require CDC (Change Data Capture) for efficient syncing, SaaS applications use REST/GraphQL APIs with rate limits, file systems need efficient large file handling, and messaging systems require exactly-once processing semantics.</p>
+                <p>Understanding these categories helps you choose the right connector and anticipate operational considerations. <strong>Database connectors</strong> often support both full refresh and incremental sync modes. <strong>SaaS connectors</strong> must handle API versioning and OAuth token refresh. <strong>Streaming connectors</strong> need careful offset management for reliability.</p>
+            </div>
+            
+            <div class="connector-types-grid">
+                <div class="connector-type-card databases">
+                    <div class="connector-type-header">
+                        <div class="connector-type-icon">🗄️</div>
+                        <div>
+                            <div class="connector-type-title">Database Connectors</div>
+                            <div class="connector-type-count">80+ connectors</div>
+                        </div>
+                    </div>
+                    <p class="connector-type-desc">Connect to relational databases, NoSQL stores, and data warehouses. Support CDC for real-time sync, batch extraction, and schema introspection. Handle connection pooling and credential rotation.</p>
+                    <div class="connector-examples">
+                        <span class="connector-example"><span class="connector-example-icon">🐘</span> PostgreSQL</span>
+                        <span class="connector-example"><span class="connector-example-icon">🐬</span> MySQL</span>
+                        <span class="connector-example"><span class="connector-example-icon">🍃</span> MongoDB</span>
+                        <span class="connector-example"><span class="connector-example-icon">❄️</span> Snowflake</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔷</span> BigQuery</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔴</span> Redis</span>
+                    </div>
+                </div>
+                
+                <div class="connector-type-card saas">
+                    <div class="connector-type-header">
+                        <div class="connector-type-icon">☁️</div>
+                        <div>
+                            <div class="connector-type-title">SaaS Application Connectors</div>
+                            <div class="connector-type-count">150+ connectors</div>
+                        </div>
+                    </div>
+                    <p class="connector-type-desc">Integrate with business applications via REST/GraphQL APIs. Handle OAuth authentication, API rate limiting, pagination, and schema changes. Support incremental sync based on timestamps.</p>
+                    <div class="connector-examples">
+                        <span class="connector-example"><span class="connector-example-icon">📊</span> Salesforce</span>
+                        <span class="connector-example"><span class="connector-example-icon">📧</span> HubSpot</span>
+                        <span class="connector-example"><span class="connector-example-icon">💬</span> Slack</span>
+                        <span class="connector-example"><span class="connector-example-icon">📋</span> Jira</span>
+                        <span class="connector-example"><span class="connector-example-icon">📝</span> Notion</span>
+                        <span class="connector-example"><span class="connector-example-icon">💳</span> Stripe</span>
+                    </div>
+                </div>
+                
+                <div class="connector-type-card files">
+                    <div class="connector-type-header">
+                        <div class="connector-type-icon">📁</div>
+                        <div>
+                            <div class="connector-type-title">File & Storage Connectors</div>
+                            <div class="connector-type-count">40+ connectors</div>
+                        </div>
+                    </div>
+                    <p class="connector-type-desc">Read and write files from cloud storage, SFTP servers, and local filesystems. Support multiple formats (CSV, JSON, Parquet, Avro) with automatic schema detection and compression handling.</p>
+                    <div class="connector-examples">
+                        <span class="connector-example"><span class="connector-example-icon">📦</span> AWS S3</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔷</span> Azure Blob</span>
+                        <span class="connector-example"><span class="connector-example-icon">☁️</span> GCS</span>
+                        <span class="connector-example"><span class="connector-example-icon">📂</span> SFTP</span>
+                        <span class="connector-example"><span class="connector-example-icon">📊</span> Google Sheets</span>
+                        <span class="connector-example"><span class="connector-example-icon">🗂️</span> Dropbox</span>
+                    </div>
+                </div>
+                
+                <div class="connector-type-card messaging">
+                    <div class="connector-type-header">
+                        <div class="connector-type-icon">📡</div>
+                        <div>
+                            <div class="connector-type-title">Messaging & Streaming Connectors</div>
+                            <div class="connector-type-count">30+ connectors</div>
+                        </div>
+                    </div>
+                    <p class="connector-type-desc">Connect to message brokers and event streaming platforms. Support exactly-once semantics, offset management, partition handling, and dead letter queue integration.</p>
+                    <div class="connector-examples">
+                        <span class="connector-example"><span class="connector-example-icon">🦊</span> Apache Kafka</span>
+                        <span class="connector-example"><span class="connector-example-icon">🐰</span> RabbitMQ</span>
+                        <span class="connector-example"><span class="connector-example-icon">📬</span> AWS SQS</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔔</span> AWS SNS</span>
+                        <span class="connector-example"><span class="connector-example-icon">☁️</span> Google Pub/Sub</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔷</span> Azure Event Hubs</span>
+                    </div>
+                </div>
+                
+                <div class="connector-type-card protocols">
+                    <div class="connector-type-header">
+                        <div class="connector-type-icon">🔗</div>
+                        <div>
+                            <div class="connector-type-title">Protocol Connectors</div>
+                            <div class="connector-type-count">20+ connectors</div>
+                        </div>
+                    </div>
+                    <p class="connector-type-desc">Generic connectors for standard protocols. Build custom integrations without writing full connectors. Support REST, GraphQL, SOAP, gRPC, and JDBC with configuration-driven setup.</p>
+                    <div class="connector-examples">
+                        <span class="connector-example"><span class="connector-example-icon">🌐</span> REST API</span>
+                        <span class="connector-example"><span class="connector-example-icon">📊</span> GraphQL</span>
+                        <span class="connector-example"><span class="connector-example-icon">📡</span> gRPC</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔌</span> JDBC</span>
+                        <span class="connector-example"><span class="connector-example-icon">📨</span> SOAP</span>
+                        <span class="connector-example"><span class="connector-example-icon">📧</span> SMTP</span>
+                    </div>
+                </div>
+                
+                <div class="connector-type-card custom">
+                    <div class="connector-type-header">
+                        <div class="connector-type-icon">🛠️</div>
+                        <div>
+                            <div class="connector-type-title">Custom Connectors</div>
+                            <div class="connector-type-count">SDK Available</div>
+                        </div>
+                    </div>
+                    <p class="connector-type-desc">Build custom connectors for proprietary systems or unique requirements. Most platforms provide SDKs in Python, Java, or Go. Inherit operational features like monitoring and error handling.</p>
+                    <div class="connector-examples">
+                        <span class="connector-example"><span class="connector-example-icon">🐍</span> Python SDK</span>
+                        <span class="connector-example"><span class="connector-example-icon">☕</span> Java SDK</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔵</span> Go SDK</span>
+                        <span class="connector-example"><span class="connector-example-icon">📦</span> Low-Code Builder</span>
+                        <span class="connector-example"><span class="connector-example-icon">🔧</span> Connector Templates</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- POPULAR CONNECTORS -->
+        <section class="module" id="popular">
+            <div class="module-header">
+                <div class="module-icon">⭐</div>
+                <div class="module-info">
+                    <h2>Popular Connectors</h2>
+                    <p>Most commonly used integration connectors</p>
+                </div>
+            </div>
+            
+            <div class="connectors-table-container">
+                <div class="connectors-table-header">
+                    <h3>🔝 Top Connectors by Usage</h3>
+                </div>
+                <table class="connectors-table">
+                    <thead>
+                        <tr>
+                            <th>Connector</th>
+                            <th>Direction</th>
+                            <th>Sync Modes</th>
+                            <th>Key Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">🐘</span> PostgreSQL</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Full, Incremental, CDC</td>
+                            <td>Logical replication, SSL, SSH tunnel</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">❄️</span> Snowflake</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Full, Incremental</td>
+                            <td>Bulk loading, warehouse scheduling</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">📊</span> Salesforce</span></td>
+                            <td><span class="badge badge-source">Source</span></td>
+                            <td>Full, Incremental</td>
+                            <td>Bulk API, real-time streaming</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">📦</span> AWS S3</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Full, Incremental</td>
+                            <td>Multi-format, partitioning</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">🦊</span> Apache Kafka</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Streaming</td>
+                            <td>Exactly-once, schema registry</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">📧</span> HubSpot</span></td>
+                            <td><span class="badge badge-source">Source</span></td>
+                            <td>Full, Incremental</td>
+                            <td>Contacts, deals, engagements</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">💳</span> Stripe</span></td>
+                            <td><span class="badge badge-source">Source</span></td>
+                            <td>Full, Incremental</td>
+                            <td>Transactions, subscriptions</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">🔷</span> BigQuery</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Full, Incremental</td>
+                            <td>Batch insert, streaming insert</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">🐬</span> MySQL</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Full, Incremental, CDC</td>
+                            <td>Binlog replication, SSL</td>
+                        </tr>
+                        <tr>
+                            <td><span class="connector-name"><span class="connector-icon">📋</span> Google Sheets</span></td>
+                            <td><span class="badge badge-both">Source + Sink</span></td>
+                            <td>Full</td>
+                            <td>Auto schema detection</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- DATA FLOW PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Data Flow Patterns</h2>
+                    <p>Common connector deployment architectures</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Connectors can be deployed in different patterns depending on your data architecture. The choice between <strong>batch</strong> and <strong>streaming</strong>, <strong>hub-and-spoke</strong> vs <strong>point-to-point</strong>, and <strong>push</strong> vs <strong>pull</strong> models impacts latency, complexity, and operational overhead. Understanding these patterns helps you design integrations that meet your requirements without over-engineering.</p>
+            </div>
+            
+            <div class="patterns-grid">
+                <div class="pattern-card">
+                    <div class="pattern-icon">🎯</div>
+                    <div class="pattern-name">Hub & Spoke</div>
+                    <p class="pattern-desc">All connectors route through a central data hub (warehouse/lake). Simplifies governance and enables cross-source analytics. Most common for analytics workloads.</p>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">↔️</div>
+                    <div class="pattern-name">Point-to-Point</div>
+                    <p class="pattern-desc">Direct connectors between specific systems. Lower latency, simpler for 1:1 integrations. Can become complex with many connections (N² problem).</p>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🌊</div>
+                    <div class="pattern-name">Event Streaming</div>
+                    <p class="pattern-desc">Connectors publish to event streams (Kafka). Enables real-time processing, event replay, and multiple consumers. Highest complexity but most flexible.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TRANSFORMATIONS -->
+        <section class="module" id="transforms">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Data Transformations</h2>
+                    <p>Processing data as it flows through connectors</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Raw data from source systems rarely matches the format needed by destinations. Connectors apply transformations to clean, normalize, and enrich data in transit. The modern approach favors <strong>ELT</strong> (Extract-Load-Transform)—loading raw data first, then transforming in the warehouse—over traditional <strong>ETL</strong> where transformations happen before loading.</p>
+                <p>Transformation capabilities range from simple field mapping to complex operations like joining streams, aggregating windows, and applying machine learning models. Many platforms support SQL-based transformations, while others offer visual transformation builders or custom code execution.</p>
+            </div>
+            
+            <!-- Dynamic Transformation Visualization -->
+            <div class="transform-container">
+                <div class="transform-header">
+                    <div class="transform-title">🔄 Transformation Pipeline</div>
+                    <div class="transform-badge">Real-time Processing</div>
+                </div>
+                <div class="transform-canvas">
+                    <div class="transform-flow">
+                        <!-- SVG Flow Path -->
+                        <svg class="flow-path-svg" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet">
+                            <defs>
+                                <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#3B82F6" />
+                                    <stop offset="25%" style="stop-color:#8B5CF6" />
+                                    <stop offset="50%" style="stop-color:#06B6D4" />
+                                    <stop offset="75%" style="stop-color:#14B8A6" />
+                                    <stop offset="100%" style="stop-color:#10B981" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Glow layer -->
+                            <path d="M80,200 C180,80 350,40 450,40 C550,40 720,80 820,200" 
+                                  fill="none" stroke="url(#flowGradient)" stroke-width="50" 
+                                  stroke-linecap="round" opacity="0.15" filter="blur(15px)"/>
+                            <!-- Main path -->
+                            <path d="M80,200 C180,80 350,40 450,40 C550,40 720,80 820,200" 
+                                  fill="none" stroke="url(#flowGradient)" stroke-width="35" 
+                                  stroke-linecap="round" opacity="0.4"/>
+                        </svg>
+                        
+                        <!-- Transform Stages -->
+                        <div class="transform-stages">
+                            <div class="transform-stage stage-1">
+                                <div class="transform-stage-bubble">📥</div>
+                                <span class="transform-stage-label">Extract</span>
+                                <span class="transform-stage-desc">Pull from source</span>
+                            </div>
+                            <div class="transform-stage stage-2">
+                                <div class="transform-stage-bubble">🧹</div>
+                                <span class="transform-stage-label">Clean</span>
+                                <span class="transform-stage-desc">Validate & fix</span>
+                            </div>
+                            <div class="transform-stage stage-3">
+                                <div class="transform-stage-bubble">🔀</div>
+                                <span class="transform-stage-label">Transform</span>
+                                <span class="transform-stage-desc">Map & reshape</span>
+                            </div>
+                            <div class="transform-stage stage-4">
+                                <div class="transform-stage-bubble">🔗</div>
+                                <span class="transform-stage-label">Enrich</span>
+                                <span class="transform-stage-desc">Join & lookup</span>
+                            </div>
+                            <div class="transform-stage stage-5">
+                                <div class="transform-stage-bubble">📤</div>
+                                <span class="transform-stage-label">Load</span>
+                                <span class="transform-stage-desc">Write to dest</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Animated Data Particles (SVG for better animation) -->
+                        <svg class="data-particles" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet" style="position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;">
+                            <defs>
+                                <path id="flowPath" d="M80,200 C180,80 350,40 450,40 C550,40 720,80 820,200" />
+                            </defs>
+                            <circle r="8" fill="#3B82F6" style="filter: drop-shadow(0 0 8px #3B82F6);">
+                                <animateMotion dur="2.5s" repeatCount="indefinite">
+                                    <mpath href="#flowPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="8" fill="#8B5CF6" style="filter: drop-shadow(0 0 8px #8B5CF6);">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.4s">
+                                    <mpath href="#flowPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="8" fill="#06B6D4" style="filter: drop-shadow(0 0 8px #06B6D4);">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.8s">
+                                    <mpath href="#flowPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="8" fill="#14B8A6" style="filter: drop-shadow(0 0 8px #14B8A6);">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="1.2s">
+                                    <mpath href="#flowPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="8" fill="#10B981" style="filter: drop-shadow(0 0 8px #10B981);">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="1.6s">
+                                    <mpath href="#flowPath"/>
+                                </animateMotion>
+                            </circle>
+                            <circle r="8" fill="#3B82F6" style="filter: drop-shadow(0 0 8px #3B82F6);">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="2s">
+                                    <mpath href="#flowPath"/>
+                                </animateMotion>
+                            </circle>
+                        </svg>
+                        
+                        <!-- Endpoints -->
+                        <div class="flow-endpoint input">
+                            <span class="flow-endpoint-icon">📄</span>
+                            <span class="flow-endpoint-label">RAW DATA</span>
+                        </div>
+                        <div class="flow-endpoint output">
+                            <span class="flow-endpoint-icon">✨</span>
+                            <span class="flow-endpoint-label">CLEAN DATA</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="transform-stats">
+                    <div class="transform-stat">
+                        <div class="transform-stat-value">50K</div>
+                        <div class="transform-stat-label">Records/sec</div>
+                    </div>
+                    <div class="transform-stat">
+                        <div class="transform-stat-value">12</div>
+                        <div class="transform-stat-label">Transform Rules</div>
+                    </div>
+                    <div class="transform-stat">
+                        <div class="transform-stat-value">&lt;100ms</div>
+                        <div class="transform-stat-label">Latency</div>
+                    </div>
+                    <div class="transform-stat">
+                        <div class="transform-stat-value">99.9%</div>
+                        <div class="transform-stat-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- CONFIGURATION -->
+        <section class="module" id="config">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Configuration Examples</h2>
+                    <p>Setting up connectors for common scenarios</p>
+                </div>
+            </div>
+            
+            <div class="config-grid">
+                <div class="config-panel">
+                    <div class="config-panel-header">
+                        <span class="config-panel-title">Airbyte PostgreSQL Source</span>
+                        <span class="config-panel-lang">YAML</span>
+                    </div>
+                    <div class="config-panel-content">
+                        <pre><span class="code-comment"># PostgreSQL CDC Source Connector</span>
+<span class="code-property">sourceDefinitionId</span>: <span class="code-string">decd338e-5647-4c0b-adf4-da0e75f5a750</span>
+<span class="code-property">connectionConfiguration</span>:
+  <span class="code-property">host</span>: <span class="code-string">db.example.com</span>
+  <span class="code-property">port</span>: <span class="code-number">5432</span>
+  <span class="code-property">database</span>: <span class="code-string">production</span>
+  <span class="code-property">username</span>: <span class="code-string">${POSTGRES_USER}</span>
+  <span class="code-property">password</span>: <span class="code-string">${POSTGRES_PASSWORD}</span>
+  <span class="code-property">ssl_mode</span>:
+    <span class="code-property">mode</span>: <span class="code-string">verify-full</span>
+  <span class="code-property">replication_method</span>:
+    <span class="code-property">method</span>: <span class="code-string">CDC</span>
+    <span class="code-property">publication</span>: <span class="code-string">airbyte_publication</span>
+    <span class="code-property">replication_slot</span>: <span class="code-string">airbyte_slot</span>
+  <span class="code-property">schemas</span>:
+    - <span class="code-string">public</span>
+    - <span class="code-string">analytics</span></pre>
+                    </div>
+                </div>
+                
+                <div class="config-panel">
+                    <div class="config-panel-header">
+                        <span class="config-panel-title">Kafka Connect S3 Sink</span>
+                        <span class="config-panel-lang">JSON</span>
+                    </div>
+                    <div class="config-panel-content">
+                        <pre>{
+  <span class="code-property">"name"</span>: <span class="code-string">"s3-sink-connector"</span>,
+  <span class="code-property">"config"</span>: {
+    <span class="code-property">"connector.class"</span>: <span class="code-string">"io.confluent.connect.s3.S3SinkConnector"</span>,
+    <span class="code-property">"tasks.max"</span>: <span class="code-number">3</span>,
+    <span class="code-property">"topics"</span>: <span class="code-string">"events,orders"</span>,
+    <span class="code-property">"s3.bucket.name"</span>: <span class="code-string">"data-lake-raw"</span>,
+    <span class="code-property">"s3.region"</span>: <span class="code-string">"us-west-2"</span>,
+    <span class="code-property">"flush.size"</span>: <span class="code-number">10000</span>,
+    <span class="code-property">"rotate.interval.ms"</span>: <span class="code-number">3600000</span>,
+    <span class="code-property">"format.class"</span>: <span class="code-string">"io.confluent.connect.s3.format.parquet.ParquetFormat"</span>,
+    <span class="code-property">"partitioner.class"</span>: <span class="code-string">"io.confluent.connect.storage.partitioner.TimeBasedPartitioner"</span>,
+    <span class="code-property">"path.format"</span>: <span class="code-string">"'year'=YYYY/'month'=MM/'day'=dd"</span>,
+    <span class="code-property">"partition.duration.ms"</span>: <span class="code-number">86400000</span>
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MONITORING -->
+        <section class="module" id="monitoring">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Monitoring & Error Handling</h2>
+                    <p>Ensuring reliable data integration</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Connectors operate continuously, often processing millions of records daily. Effective monitoring is essential for catching issues before they impact downstream systems. Key metrics include <strong>sync latency</strong>, <strong>throughput</strong>, <strong>error rates</strong>, and <strong>schema drift detection</strong>. Alert on anomalies—sudden throughput drops often indicate source system issues.</p>
+            </div>
+            
+            <div class="monitoring-grid">
+                <div class="monitoring-card">
+                    <div class="monitoring-card-header">
+                        <div class="monitoring-card-icon">📈</div>
+                        <div class="monitoring-card-title">Key Metrics</div>
+                    </div>
+                    <div class="monitoring-card-content">
+                        <ul>
+                            <li><strong>Records synced</strong> — Count per sync cycle</li>
+                            <li><strong>Sync duration</strong> — Time per full/incremental sync</li>
+                            <li><strong>Lag time</strong> — Delay between source and destination</li>
+                            <li><strong>Error rate</strong> — Failed records / total records</li>
+                            <li><strong>API quota usage</strong> — For SaaS connectors</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="monitoring-card">
+                    <div class="monitoring-card-header">
+                        <div class="monitoring-card-icon">⚠️</div>
+                        <div class="monitoring-card-title">Error Handling</div>
+                    </div>
+                    <div class="monitoring-card-content">
+                        <ul>
+                            <li><strong>Retry policies</strong> — Exponential backoff for transient failures</li>
+                            <li><strong>Dead letter queues</strong> — Capture failed records for investigation</li>
+                            <li><strong>Circuit breakers</strong> — Stop syncs on repeated failures</li>
+                            <li><strong>Schema evolution</strong> — Handle source schema changes gracefully</li>
+                            <li><strong>Alerting</strong> — Notify on sync failures or anomalies</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="monitoring-card">
+                    <div class="monitoring-card-header">
+                        <div class="monitoring-card-icon">🔍</div>
+                        <div class="monitoring-card-title">Data Quality</div>
+                    </div>
+                    <div class="monitoring-card-content">
+                        <ul>
+                            <li><strong>Freshness checks</strong> — Alert if data is stale</li>
+                            <li><strong>Volume anomalies</strong> — Detect unexpected row count changes</li>
+                            <li><strong>Schema validation</strong> — Ensure expected columns/types</li>
+                            <li><strong>Null rate tracking</strong> — Monitor data completeness</li>
+                            <li><strong>Deduplication</strong> — Identify and handle duplicates</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="monitoring-card">
+                    <div class="monitoring-card-header">
+                        <div class="monitoring-card-icon">🔐</div>
+                        <div class="monitoring-card-title">Security</div>
+                    </div>
+                    <div class="monitoring-card-content">
+                        <ul>
+                            <li><strong>Credential rotation</strong> — Automated secret refresh</li>
+                            <li><strong>Encryption in transit</strong> — TLS for all connections</li>
+                            <li><strong>Encryption at rest</strong> — Encrypted staging areas</li>
+                            <li><strong>PII handling</strong> — Masking, hashing sensitive data</li>
+                            <li><strong>Audit logging</strong> — Track all data access</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Integration Platforms</h2>
+                    <p>Tools for managing connectors at scale</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔄</div>
+                        <div class="tool-card-name">Airbyte</div>
+                        <div class="tool-card-tagline">Open Source ELT</div>
+                    </div>
+                    <div class="tool-card-body">
+                        <ul class="tool-features">
+                            <li>300+ connectors</li>
+                            <li>Open source (self-host or cloud)</li>
+                            <li>Connector Development Kit</li>
+                            <li>Incremental sync & CDC</li>
+                            <li>dbt integration</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🚀</div>
+                        <div class="tool-card-name">Fivetran</div>
+                        <div class="tool-card-tagline">Managed ELT</div>
+                    </div>
+                    <div class="tool-card-body">
+                        <ul class="tool-features">
+                            <li>500+ connectors</li>
+                            <li>Fully managed service</li>
+                            <li>Automatic schema migrations</li>
+                            <li>Enterprise security</li>
+                            <li>Usage-based pricing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🦊</div>
+                        <div class="tool-card-name">Kafka Connect</div>
+                        <div class="tool-card-tagline">Streaming Integration</div>
+                    </div>
+                    <div class="tool-card-body">
+                        <ul class="tool-features">
+                            <li>100+ connectors</li>
+                            <li>Real-time streaming</li>
+                            <li>Exactly-once semantics</li>
+                            <li>Distributed & scalable</li>
+                            <li>Schema Registry integration</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔷</div>
+                        <div class="tool-card-name">Stitch</div>
+                        <div class="tool-card-tagline">Simple ELT</div>
+                    </div>
+                    <div class="tool-card-body">
+                        <ul class="tool-features">
+                            <li>140+ connectors</li>
+                            <li>5-minute setup</li>
+                            <li>Talend-backed</li>
+                            <li>Row-based pricing</li>
+                            <li>Automatic scaling</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">☁️</div>
+                        <div class="tool-card-name">AWS Glue</div>
+                        <div class="tool-card-tagline">Serverless ETL</div>
+                    </div>
+                    <div class="tool-card-body">
+                        <ul class="tool-features">
+                            <li>AWS native connectors</li>
+                            <li>Serverless Spark</li>
+                            <li>Data Catalog integration</li>
+                            <li>Visual ETL builder</li>
+                            <li>Pay per DPU-hour</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔮</div>
+                        <div class="tool-card-name">Meltano</div>
+                        <div class="tool-card-tagline">DataOps Platform</div>
+                    </div>
+                    <div class="tool-card-body">
+                        <ul class="tool-features">
+                            <li>Singer-based connectors</li>
+                            <li>GitOps workflow</li>
+                            <li>CLI-first approach</li>
+                            <li>dbt & Airflow integration</li>
+                            <li>Free & open source</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for reliable data integration</p>
+                </div>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <div class="practice-num">1</div>
+                    <div class="practice-content">
+                        <h4>Use Incremental Sync When Possible</h4>
+                        <p>Full refreshes are slow and expensive. Configure incremental sync based on timestamps or CDC to move only changed data.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">2</div>
+                    <div class="practice-content">
+                        <h4>Handle Schema Evolution</h4>
+                        <p>Source schemas change. Configure connectors to handle new columns gracefully and alert on breaking changes.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">3</div>
+                    <div class="practice-content">
+                        <h4>Secure Credentials Properly</h4>
+                        <p>Never hardcode credentials. Use secrets managers, rotate regularly, and apply least-privilege access.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">4</div>
+                    <div class="practice-content">
+                        <h4>Monitor Sync Health</h4>
+                        <p>Set up alerts for sync failures, latency spikes, and volume anomalies. Dashboard key metrics visibly.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">5</div>
+                    <div class="practice-content">
+                        <h4>Test in Staging First</h4>
+                        <p>Always test new connectors and configuration changes in a staging environment before production.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">6</div>
+                    <div class="practice-content">
+                        <h4>Document Data Lineage</h4>
+                        <p>Track where data comes from and where it goes. Essential for debugging, compliance, and impact analysis.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">7</div>
+                    <div class="practice-content">
+                        <h4>Plan for API Rate Limits</h4>
+                        <p>SaaS connectors hit API limits. Configure appropriate sync frequencies and handle 429 responses gracefully.</p>
+                    </div>
+                </div>
+                <div class="practice-card">
+                    <div class="practice-num">8</div>
+                    <div class="practice-content">
+                        <h4>Version Control Configurations</h4>
+                        <p>Store connector configs in Git. Enables review, rollback, and infrastructure-as-code practices.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered connector management and optimization</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The <strong>ConnectorOps Crew</strong> brings AI-powered automation to data integration management. These specialized agents monitor connector health, detect sync anomalies, optimize configurations, and troubleshoot failures—turning reactive break-fix into proactive data pipeline governance.</p>
+                <p>Data integration involves managing dozens or hundreds of connectors, each with unique failure modes, rate limits, and schema behaviors. AI agents excel at correlating failures across connectors, identifying root causes from logs, and recommending configuration optimizations. The ConnectorOps Crew augments your data engineering team, handling routine monitoring while surfacing insights that require human judgment.</p>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔌</div>
+                    <div class="agent-name">ConnectorOps Crew</div>
+                    <div class="agent-role">Data Integration Management</div>
+                    <p class="agent-desc">A coordinated team of specialized agents that monitor connector health, optimize sync performance, detect anomalies, and troubleshoot integration failures. Each agent focuses on a specific domain while sharing context for holistic pipeline governance.</p>
+                    <ul class="agent-capabilities">
+                        <li>Sync health monitoring and failure prediction</li>
+                        <li>Schema drift detection and impact analysis</li>
+                        <li>Rate limit optimization for SaaS connectors</li>
+                        <li>Automated troubleshooting and remediation</li>
+                        <li>Data quality anomaly detection</li>
+                        <li>Configuration optimization recommendations</li>
+                        <li>Cost analysis and right-sizing</li>
+                        <li>Credential rotation monitoring</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-panel-header">
+                        <span class="code-panel-title">connector_ops_crew.py</span>
+                        <span class="code-panel-lang">Python</span>
+                    </div>
+                    <div class="code-panel-content">
+                        <pre><span class="code-comment"># ConnectorOps Crew - AI-Powered Integration Management</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Sync Health Monitor Agent</span>
+health_agent = Agent(
+    role=<span class="code-string">"Sync Health Monitor"</span>,
+    goal=<span class="code-string">"Monitor connector sync health and predict failures"</span>,
+    backstory=<span class="code-string">"""Expert at analyzing sync metrics, detecting
+    patterns that precede failures, and recommending
+    preventive actions before data pipelines break."""</span>,
+    llm=llm,
+    tools=[sync_metrics, failure_predictor, alert_manager]
+)
+
+<span class="code-comment"># Schema Guardian Agent</span>
+schema_agent = Agent(
+    role=<span class="code-string">"Schema Guardian"</span>,
+    goal=<span class="code-string">"Detect schema changes and assess impact"</span>,
+    backstory=<span class="code-string">"""Schema evolution expert who monitors source
+    systems for changes, assesses downstream impact,
+    and recommends migration strategies."""</span>,
+    llm=llm,
+    tools=[schema_tracker, impact_analyzer, migration_planner]
+)
+
+<span class="code-comment"># Performance Optimizer Agent</span>
+perf_agent = Agent(
+    role=<span class="code-string">"Performance Optimizer"</span>,
+    goal=<span class="code-string">"Optimize connector performance and costs"</span>,
+    backstory=<span class="code-string">"""Performance tuning specialist who analyzes
+    throughput, identifies bottlenecks, and recommends
+    configuration optimizations."""</span>,
+    llm=llm,
+    tools=[perf_analyzer, cost_calculator, config_optimizer]
+)
+
+<span class="code-comment"># Troubleshooter Agent</span>
+debug_agent = Agent(
+    role=<span class="code-string">"Integration Troubleshooter"</span>,
+    goal=<span class="code-string">"Diagnose and resolve connector failures"</span>,
+    backstory=<span class="code-string">"""Debugging expert who analyzes error logs,
+    identifies root causes, and provides step-by-step
+    remediation guidance."""</span>,
+    llm=llm,
+    tools=[log_analyzer, error_classifier, remediation_guide]
+)
+
+<span class="code-comment"># Create ConnectorOps Crew</span>
+connector_ops_crew = Crew(
+    agents=[health_agent, schema_agent, 
+            perf_agent, debug_agent],
+    tasks=[
+        Task(description=<span class="code-string">"Check all sync health"</span>,
+             agent=health_agent),
+        Task(description=<span class="code-string">"Scan for schema changes"</span>,
+             agent=schema_agent),
+        Task(description=<span class="code-string">"Analyze performance"</span>,
+             agent=perf_agent),
+        Task(description=<span class="code-string">"Review recent failures"</span>,
+             agent=debug_agent),
+    ],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Use Cases -->
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Agent Use Cases</h3>
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔮</div>
+                        <div class="use-case-content">
+                            <h4>Failure Prediction</h4>
+                            <p>Health agent analyzes sync patterns and detects early warning signs—increasing error rates, growing latency—and alerts before complete failure occurs.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">📋</div>
+                        <div class="use-case-content">
+                            <h4>Schema Change Impact</h4>
+                            <p>Schema agent detects new columns in Salesforce, traces downstream dependencies, and generates migration plan for affected dbt models and dashboards.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">⚡</div>
+                        <div class="use-case-content">
+                            <h4>Performance Optimization</h4>
+                            <p>Performance agent identifies that PostgreSQL connector is bottlenecked on single-threaded extraction, recommends parallel extraction with optimal batch size.</p>
+                        </div>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-icon">🔧</div>
+                        <div class="use-case-content">
+                            <h4>Automated Troubleshooting</h4>
+                            <p>Debug agent analyzes HubSpot connector failure, identifies expired OAuth token, generates remediation steps and updates runbook documentation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat14-p2-event-architecture.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous</div>
+                <div class="footer-link-title">14.2 Event Architecture</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 14.3</div>
+        <a href="cat14-p4-api-lifecycle.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next</div>
+                <div class="footer-link-title">14.4 API Lifecycle</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>
